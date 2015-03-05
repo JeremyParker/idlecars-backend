@@ -1,0 +1,1 @@
+web: gunicorn idlecars.wsgi --log-file -
