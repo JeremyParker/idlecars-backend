@@ -40,6 +40,10 @@ to make sure your virtualenv is set to the right virtualenv
 
 
 
+
+
+
+
 I like to use P4Merge as a visual merge tool:
 $ git config --global merge.tool p4mergetool
 $ git config --global mergetool.p4mergetool.cmd \
