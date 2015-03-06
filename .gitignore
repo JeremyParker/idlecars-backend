@@ -56,4 +56,5 @@ target/
 *.log
 *.pyc
 venv
+.env
 staticfiles
