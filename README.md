@@ -7,8 +7,8 @@ Have a Heroku account and get added to the idlecars app
 
 Make sure you have installed: (see http://docs.python-guide.org/en/latest/starting/install/osx/)
 Python 2.7.9
-Setuptools
-Pip
+setuptools
+pip
 virtualenv
 
 Also install:
