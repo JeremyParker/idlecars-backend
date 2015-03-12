@@ -3,7 +3,7 @@ The repo for Idle Cars.
 
 'server' is the webapp.
 
-To set up a local dev environment
+## Local environment setup
 
 Have a Heroku account and get added to the idlecars app
 
@@ -22,7 +22,7 @@ Also install:
 
 Create a virtual env for this project with the command
 ```
-mkvirtualenv idlecars
+mkvirtualenv -p [path_to_python(something like /usr/local/bin/python)] idlecars
 ```
 
 Then choose to use that virtual env with the command
@@ -53,8 +53,14 @@ python manage.py syncdb --settings=idlecars.local_settings
 ```
 You will be prompted to create a superuser. Create user 'admin' with password 'idlecars'. (Not sure if this will be necessary, but we might need a common user for unit tests.)
 
+### Running the server
+Foreman is a ruby gem that is installed with the heroku toolbelt. It will run your local server.
+```
+foreman start
+```
 
 
+### Merge tool
 Personally, I like to use P4Merge as a visual merge tool:
 
 ```
