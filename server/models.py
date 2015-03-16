@@ -1,3 +1,6 @@
+# -*- encoding:utf-8 -*-
+from __future__ import unicode_literals
+
 from django.db import models
 import model_helpers
 
@@ -18,7 +21,7 @@ class Driver(models.Model):
     email = models.CharField(blank=True, max_length=128, null=True, unique=True)
     email_verified = models.DateTimeField(null=True, blank=True)
 
-    def get_full_name(self):
+    def full_name(self):
         return u"{first_name} {last_name}".format(first_name=self.first_name, last_name=self.last_name).title()
 
     def __unicode__(self):
