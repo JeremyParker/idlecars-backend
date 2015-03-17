@@ -59,6 +59,15 @@ Foreman is a ruby gem that is installed with the heroku toolbelt. It will run yo
 foreman start
 ```
 
+### Running the tests
+run
+```
+python manage.py test server
+```
+to run the unit test suite. All the tests should pass. To run the tests with debug enabled, run
+```
+python manage.py test server --nocapture
+```
 
 ### Merge tool
 Personally, I like to use P4Merge as a visual merge tool:
