@@ -7,7 +7,7 @@ import model_helpers
 class FleetPartner(models.Model):
     name = models.CharField(max_length=256)
     contact = models.CharField(max_length=256, blank=True)
-    phone = models.CharField(max_length=256, blank=True, help_text="Comma separated")
+    phone_number = models.CharField(max_length=256, blank=True, help_text="Comma separated", db_column='phone')
     email = models.CharField(max_length=256, blank=True, help_text="Comma separated")
 
     def __unicode__(self):
@@ -26,6 +26,6 @@ class Driver(models.Model):
 
     def __unicode__(self):
         if self.email:
-            return "{name} ({email})".format(name=self.get_full_name(), email=self.email)
+            return "{name} ({email})".format(name=self.full_name(), email=self.email)
         else:
-            return "{name} ({pk})".format(name=self.get_full_name(), pk=self.pk)
+            return "{name} ({pk})".format(name=self.full_name(), pk=self.pk)
