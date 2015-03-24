@@ -108,3 +108,19 @@ CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
     'aosrmyaqgjycqa.s3-website-us-east-1.amazonaws.com',
 )
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+        }
+    }
+}
