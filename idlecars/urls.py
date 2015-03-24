@@ -7,6 +7,8 @@ from django.contrib import admin
 from server import views
 
 urlpatterns = patterns('',
+    url(r'^email$', views.email, name='email'),
+
     url(r'^$', views.index, name='index'),
 
     url(r'^admin/', include(admin.site.urls)),
