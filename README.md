@@ -19,6 +19,7 @@ Also install:
 * virtualenvwrapper
 * Heroku toolbelt: https://toolbelt.heroku.com/
 * Postgres: http://postgresapp.com/
+* redis
 
 Create a virtual env for this project with the command
 ```
