@@ -20,6 +20,8 @@ Also install:
 * Heroku toolbelt: https://toolbelt.heroku.com/
 * Postgres: http://postgresapp.com/
 * redis
+  * `brew install redis` on OSX
+  * `redis-server &` to boot it up
 
 Create a virtual env for this project with the command
 ```
