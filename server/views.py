@@ -10,9 +10,11 @@ def index(request):
     return JsonResponse({'cars': 'idle'})
 
 def email(request):
-    # import pdb; pdb.set_trace()
-    if request.GET.has_key('address'):
-        text = 'Im trying to send an email to {address}'.format(**request.GET)
-        return HttpResponse(text)
+    def email_address():
+        return request.GET.get('address')
+
+    if email_address():
+        text = 'Im trying to send an email to {}'.format(email_address())
+        return HttpResponse('<h1>{}</h1>'.format(text))
     else:
         return HttpResponse("<h1>Add an address param please!</h1>")
