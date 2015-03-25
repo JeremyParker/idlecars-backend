@@ -50,6 +50,6 @@ link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
 
   footer
     .content
-      p
-        a.ask(href="#") ASK US ANYTHING
-      p © #{ now } idlecars
+      p.ask
+        a(href="#") ASK US ANYTHING
+      | <p>© {% now 'Y' %} idlecars</p>

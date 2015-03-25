@@ -91,13 +91,17 @@ p.strong {
 }
 
 footer .content {
-  height: 15rem;
+  height: 10rem;
   color: #666;
   flex-direction: column;
   justify-content: center;
 }
 
 .ask {
+  margin-bottom: 3rem;
+}
+
+.ask a {
   font-weight: 600;
   text-decoration: underline;
 }
