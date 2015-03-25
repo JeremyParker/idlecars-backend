@@ -8,13 +8,19 @@ from idlecars.constants import MAX_EMAIL_LENGTH
 from idlecars import model_helpers
 
 '''
-Abstract base class for prospects - people who provide their email address through the landing page.
+Abstract base class for prospects - 
+people who provide their email address through the landing page.
 '''
 class Prospect(models.Model):
     class Meta:
         abstract = True
 
-    email = models.EmailField(max_length=MAX_EMAIL_LENGTH, blank=False, unique=True, verbose_name='Email Address')
+    email = models.EmailField(
+        max_length=MAX_EMAIL_LENGTH,
+        blank=False,
+        unique=True,
+        verbose_name='Email Address'
+    )
     zipcode = models.CharField(
         max_length=5,
         blank=False,
