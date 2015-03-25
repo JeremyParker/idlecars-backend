@@ -25,7 +25,7 @@ def index(request):
             if driver_form.is_valid():
                 new_driver = driver_form.save()
                 return HttpResponseRedirect(urlresolvers.reverse('driver_survey', args=(new_driver.pk,)))
-        
+
         elif request.path_info == urlresolvers.reverse('owner_endpoint'):
             owner_form = forms.OwnerProspectForm(request.POST or None)
             if owner_form.is_valid():
@@ -39,7 +39,7 @@ def index(request):
         'owner_action': urlresolvers.reverse('owner_endpoint'),
         'owner_form': owner_form,
     }
-    return render(request, 'landing_page.html', context)
+    return render(request, 'landing_page.jade', context)
 
 
 '''
