@@ -1,0 +1,10 @@
+{% block content %}
+  <p>Thank you for your interest. An email has been sent to your address.</p>
+
+  <p>Additional Information:</p>
+  <form action="{{ action }}" method="post">
+      {% csrf_token %}
+      {{ survey_form.as_p }}
+      <input type="submit" value="Submit" />
+  </form>
+{% endblock %}

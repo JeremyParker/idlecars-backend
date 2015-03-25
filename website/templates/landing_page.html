@@ -1,9 +1,17 @@
 {% block content %}
   <h1>Landing page design goes here</h1>
 
-  <form action="" method="post">
+  <p>I'm a driver. How can I get a luxury car and make money?</p>
+  <form action="{{driver_action}}" method="post">
       {% csrf_token %}
-      {{ form.as_p }}
+      {{ driver_form.as_p }}
+      <input type="submit" value="Let's Talk" />
+  </form>
+
+  <p>I own a car. How can my car make me money?</p>
+  <form action="{{owner_action}}" method="post">
+      {% csrf_token %}
+      {{ owner_form.as_p }}
       <input type="submit" value="Let's Talk" />
   </form>
 {% endblock %}
