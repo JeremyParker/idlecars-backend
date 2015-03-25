@@ -47,11 +47,12 @@ class OwnerProspect(Prospect):
 
 
 class DriverSurvey(models.Model):
-    driver_prospect = models.ForeignKey(DriverProspect, related_name='driver_survey')
+    driver_prospect = models.ForeignKey(DriverProspect, null=True, related_name='driver_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
 
 
 class OwnerSurvey(models.Model):
+    owner_prospect = models.ForeignKey(OwnerProspect, null=True, related_name='owner_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
