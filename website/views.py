@@ -59,7 +59,7 @@ def driver_survey(request, driver_pk=None):
         'action': urlresolvers.reverse('driver_survey', args=(new_driver.pk,)),
         'survey_form': survey_form,
     }
-    return render(request, 'driver_survey.html', context)
+    return render(request, 'driver_survey.jade', context)
 
 
 '''
@@ -79,7 +79,7 @@ def owner_survey(request, owner_pk=None):
         'action': urlresolvers.reverse('owner_survey', args=(new_owner.pk,)),
         'survey_form': survey_form,
     }
-    return render(request, 'owner_survey.html', context)
+    return render(request, 'owner_survey.jade', context)
 
 
 '''
