@@ -1,0 +1,103 @@
+body {
+  background: black;
+  color: white;
+  font-family: 'Khula', sans-serif;
+}
+
+h1, h2, h3, p {
+  font-weight: 300;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+h1, h2, h3 {
+  line-height: 1em;
+}
+
+h1, h2 {
+  font-size: 2.5rem;
+  line-height: 1em;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.35em;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ddd;
+}
+
+.hero {
+  width: 100%;
+}
+
+.content {
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.headline {
+  background: #222;
+}
+
+.container {
+  width: 25rem;
+}
+/*
+.headline .content, .select .content, .get-more .content {
+  height: 20rem;
+}
+*/
+
+.content {
+  height: 20rem;
+}
+
+.get-more {
+  background: white;
+  color: black;
+  text-align: center;
+}
+
+.get-more .content {
+  justify-content: center;
+}
+
+.get-more .container {
+  width: 30rem;
+}
+
+p.strong {
+  font-weight: 600;
+  margin: 0;
+}
+
+.keep-more .content {
+  justify-content: flex-end;
+}
+
+.keep-more .container {
+  width: 18rem;
+  margin-right: 7rem;
+}
+
+footer .content {
+  height: 15rem;
+  color: #666;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ask {
+  font-weight: 600;
+  text-decoration: underline;
+}
