@@ -34,10 +34,10 @@ class AdminTest(TestCase):
         Check all the automatically generated admin pages that Django provides for 
         all the models in our app.
         '''
-    	for model in [
-    		# (slug, factory) pairs for all the admin-accessible models in the app:
+        for model in [
+            # (slug, factory) pairs for all the admin-accessible models in the app:
             ('fleetpartner', factories.FleetPartner),
-        	('driver', factories.Driver),
+            ('driver', factories.Driver),
         ]:
             # get the views that don't need an existing object
             for view in [
@@ -64,10 +64,10 @@ class AdminTest(TestCase):
         self.assertEquals(Driver.objects.count(), 0)
 
         post_data = {
-	        'first_name': 'Henry',
-	        'last_name': 'Ford',
-	        'phone_number': '555-555-1212',
-	        'email': 'example@wherever.com',
+            'first_name': 'Henry',
+            'last_name': 'Ford',
+            'phone_number': '555-555-1212',
+            'email': 'example@wherever.com',
         }
 
         response = self.client.post(reverse('admin:server_driver_add'), post_data)
