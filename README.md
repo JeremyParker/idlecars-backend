@@ -22,6 +22,10 @@ Also install:
 * redis
   * `brew install redis` on OSX
   * `redis-server &` to boot it up
+* direnv
+  * `brew install direnv` on OSX
+  * get the latest `.envrc` from another dev and put it in the project root
+  * `direnv allow` to enable direnv
 
 Create a virtual env for this project with the command
 ```
