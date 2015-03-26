@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: black;
   color: white;
@@ -38,19 +42,25 @@ a:hover {
 }
 
 .container {
-  max-width: 50rem;
+  max-width: 54rem;
   margin: 0 auto;
-  padding: 3rem 0;
+  padding: 5rem 0;
   display: flex;
   align-items: center;
 }
 
 .headline {
-  background: #222;
+  background: url(img/loading_screen.png) no-repeat #222;
+  background-position: calc(50% + 300px) center;
 }
 
 .headline .container {
+  height: 699px;
   position: relative;
+}
+
+.headline p {
+  max-width: 20rem;
 }
 
 .headline img {
@@ -58,7 +68,7 @@ a:hover {
   left: -71px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1050px) {
   .headline img {
     left: 0;
   }
