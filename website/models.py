@@ -7,14 +7,17 @@ from django.core.validators import RegexValidator, MinLengthValidator, MaxLength
 from idlecars.constants import MAX_EMAIL_LENGTH
 from idlecars import model_helpers
 
-'''
-Abstract base class for prospects - 
-people who provide their email address through the landing page.
-'''
-class Prospect(models.Model):
-    class Meta:
-        abstract = True
 
+ROLE_CHOICES = model_helpers.Choices(
+    driver='Driver',
+    owner='Owner',
+)
+
+'''
+Class for contacts.
+People who provide their email address through the landing page.
+'''
+class Contact(models.Model):
     email = models.EmailField(
         max_length=MAX_EMAIL_LENGTH,
         blank=False,
@@ -35,30 +38,24 @@ class Prospect(models.Model):
             MaxLengthValidator(5),
         ],
     )
+    role = model_helpers.ChoiceField(choices=ROLE_CHOICES, max_length=16, default='Driver')
     created_time = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u"{role}: {email}".format(role=self.role, email=self.email)
     # TODO(JP):
     # referer_url = models.CharField(max_length=1000, null=True, blank=True)
     # device = model_helpers.ChoiceField(max_length=30, choices=DEVICES)
     # user_agent = 
 
 
-class DriverProspect(Prospect):
-    def __unicode__(self):
-        return u"Driver: {email} {zipcode}".format(email=self.email, zipcode=self.zipcode)
-
-
-class OwnerProspect(Prospect):
-    def __unicode__(self):
-        return u"Owner: {email} {zipcode}".format(email=self.email, zipcode=self.zipcode)
-
-
 class DriverSurvey(models.Model):
-    driver_prospect = models.ForeignKey(DriverProspect, null=True, related_name='driver_survey')
+    contact = models.ForeignKey(Contact, null=True, related_name='driver_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
 
 
 class OwnerSurvey(models.Model):
-    owner_prospect = models.ForeignKey(OwnerProspect, null=True, related_name='owner_survey')
+    contact = models.ForeignKey(Contact, null=True, related_name='owner_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
