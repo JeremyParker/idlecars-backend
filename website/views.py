@@ -16,28 +16,21 @@ There are two forms on the page, each of which has a different 'action' url. The
 actions are both handled through this view.
 '''
 def index(request):
-    driver_form = forms.DriverProspectForm()
-    owner_form = forms.OwnerProspectForm()
+    contact_form = forms.ContactForm()
 
     if request.method == 'POST':
-        if request.path_info == urlresolvers.reverse('driver_endpoint'):
-            driver_form = forms.DriverProspectForm(request.POST or None)
-            if driver_form.is_valid():
-                new_driver = driver_form.save()
-                return HttpResponseRedirect(urlresolvers.reverse('driver_survey', args=(new_driver.pk,)))
-
-        elif request.path_info == urlresolvers.reverse('owner_endpoint'):
-            owner_form = forms.OwnerProspectForm(request.POST or None)
-            if owner_form.is_valid():
-                new_owner = owner_form.save()
-                return HttpResponseRedirect(urlresolvers.reverse('owner_survey', args=(new_owner.pk,)))
+        contact_form = forms.ContactForm(request.POST or None)
+        if contact_form.is_valid():
+            new_contact = contact_form.save()
+            if new_contact.role == "driver":
+                return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
+            else:
+                return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'driver_action': urlresolvers.reverse('driver_endpoint'),
-        'driver_form': driver_form,
-        'owner_action': urlresolvers.reverse('owner_endpoint'),
-        'owner_form': owner_form,
+        'action': urlresolvers.reverse('website:index'),
+        'contact_form': contact_form,
     }
     return render(request, 'landing_page.jade', context)
 
@@ -45,18 +38,19 @@ def index(request):
 '''
 View to handle the driver survey form, store form info and respond with a thank you message.
 '''
-def driver_survey(request, driver_pk=None):
-    new_driver = get_object_or_404(models.DriverProspect, pk=driver_pk)
+def driver_survey(request, pk=None):
     survey_form = forms.DriverSurveyForm(request.POST or None)
-
     if request.method == 'POST':
         if survey_form.is_valid():
-            survey_form.save()
-            return HttpResponseRedirect(urlresolvers.reverse('thankyou'))
+            survey = survey_form.save(commit=False)
+            contact = get_object_or_404(models.Contact, pk=pk)
+            survey.contact = contact
+            survey.save()
+            return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('driver_survey', args=(new_driver.pk,)),
+        'action': urlresolvers.reverse('website:driver_survey', args=(pk,)),
         'survey_form': survey_form,
     }
     return render(request, 'driver_survey.jade', context)
@@ -65,18 +59,19 @@ def driver_survey(request, driver_pk=None):
 '''
 View to handle the owner survey form, store form info and respond with a thank you message.
 '''
-def owner_survey(request, owner_pk=None):
-    new_owner = get_object_or_404(models.OwnerProspect, pk=owner_pk)
+def owner_survey(request, pk=None):
     survey_form = forms.OwnerSurveyForm(request.POST or None)
-
     if request.method == 'POST':
         if survey_form.is_valid():
-            survey_form.save()
-            return HttpResponseRedirect(urlresolvers.reverse('thankyou'))
+            survey = survey_form.save(commit=False)
+            contact = get_object_or_404(models.Contact, pk=pk)
+            survey.contact = contact
+            survey.save()
+            return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('owner_survey', args=(new_owner.pk,)),
+        'action': urlresolvers.reverse('website:owner_survey', args=(pk,)),
         'survey_form': survey_form,
     }
     return render(request, 'owner_survey.jade', context)

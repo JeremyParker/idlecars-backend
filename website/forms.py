@@ -5,18 +5,17 @@ from django import forms
 
 import models
 
-class DriverProspectForm(forms.ModelForm):
+class ContactForm(forms.ModelForm):
     class Meta:
-        model = models.DriverProspect
-
-class OwnerProspectForm(forms.ModelForm):
-    class Meta:
-        model = models.OwnerProspect
+        model = models.Contact
+        exclude = []
 
 class DriverSurveyForm(forms.ModelForm):
     class Meta:
         model = models.DriverSurvey
+        exclude = ['contact']        
 
 class OwnerSurveyForm(forms.ModelForm):
     class Meta:
         model = models.OwnerSurvey
+        exclude = ['contact']
