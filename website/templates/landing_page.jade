@@ -38,7 +38,7 @@ link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
     .container
       form(action="#{ action }", method="post")
         - csrf_token
-        #{ prospect_form.as_p }
+        #{ contact_form.as_p }
         input(type="submit", value="Let's Talk")
 
   footer

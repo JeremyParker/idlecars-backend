@@ -16,21 +16,21 @@ There are two forms on the page, each of which has a different 'action' url. The
 actions are both handled through this view.
 '''
 def index(request):
-    prospect_form = forms.ProspectForm()
+    contact_form = forms.ContactForm()
 
     if request.method == 'POST':
-        prospect_form = forms.ProspectForm(request.POST or None)
-        if prospect_form.is_valid():
-            new_prospect = prospect_form.save()
-            if new_prospect.role == "driver":
-                return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_prospect.pk,)))
+        contact_form = forms.ContactForm(request.POST or None)
+        if contact_form.is_valid():
+            new_contact = contact_form.save()
+            if new_contact.role == "driver":
+                return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
             else:
-                return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_prospect.pk,)))
+                return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
         'action': urlresolvers.reverse('website:index'),
-        'prospect_form': prospect_form,
+        'contact_form': contact_form,
     }
     return render(request, 'landing_page.jade', context)
 
@@ -43,8 +43,8 @@ def driver_survey(request, pk=None):
     if request.method == 'POST':
         if survey_form.is_valid():
             survey = survey_form.save(commit=False)
-            prospect = get_object_or_404(models.Prospect, pk=pk)
-            survey.prospect = prospect
+            contact = get_object_or_404(models.Contact, pk=pk)
+            survey.contact = contact
             survey.save()
             return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
 
@@ -64,8 +64,8 @@ def owner_survey(request, pk=None):
     if request.method == 'POST':
         if survey_form.is_valid():
             survey = survey_form.save(commit=False)
-            prospect = get_object_or_404(models.Prospect, pk=pk)
-            survey.prospect = prospect
+            contact = get_object_or_404(models.Contact, pk=pk)
+            survey.contact = contact
             survey.save()
             return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
 

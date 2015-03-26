@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='Prospect',
+            name='Contact',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('email', models.EmailField(unique=True, max_length=254, verbose_name='Email Address')),
@@ -49,14 +49,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='ownersurvey',
-            name='prospect',
-            field=models.ForeignKey(related_name='owner_survey', to='website.Prospect', null=True),
+            name='contact',
+            field=models.ForeignKey(related_name='owner_survey', to='website.Contact', null=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='driversurvey',
-            name='prospect',
-            field=models.ForeignKey(related_name='driver_survey', to='website.Prospect', null=True),
+            name='contact',
+            field=models.ForeignKey(related_name='driver_survey', to='website.Contact', null=True),
             preserve_default=True,
         ),
     ]

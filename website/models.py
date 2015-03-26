@@ -14,10 +14,10 @@ ROLE_CHOICES = model_helpers.Choices(
 )
 
 '''
-Class for prospects.
+Class for contacts.
 People who provide their email address through the landing page.
 '''
-class Prospect(models.Model):
+class Contact(models.Model):
     email = models.EmailField(
         max_length=MAX_EMAIL_LENGTH,
         blank=False,
@@ -50,12 +50,12 @@ class Prospect(models.Model):
 
 
 class DriverSurvey(models.Model):
-    prospect = models.ForeignKey(Prospect, null=True, related_name='driver_survey')
+    contact = models.ForeignKey(Contact, null=True, related_name='driver_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
 
 
 class OwnerSurvey(models.Model):
-    prospect = models.ForeignKey(Prospect, null=True, related_name='owner_survey')
+    contact = models.ForeignKey(Contact, null=True, related_name='owner_survey')
     source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
