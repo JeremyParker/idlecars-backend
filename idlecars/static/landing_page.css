@@ -40,13 +40,28 @@ a:hover {
 .container {
   max-width: 50rem;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 3rem 0;
   display: flex;
   align-items: center;
 }
 
 .headline {
   background: #222;
+}
+
+.headline .container {
+  position: relative;
+}
+
+.headline img {
+  position: absolute;
+  left: -71px;
+}
+
+@media (max-width: 1000px) {
+  .headline img {
+    left: 0;
+  }
 }
 
 .content {
