@@ -13,6 +13,21 @@ ROLE_CHOICES = model_helpers.Choices(
     owner='Owner',
 )
 
+SOURCE_CHOICES = model_helpers.Choices(
+    mouth='Word of mouth',
+    poster='I saw a poster',
+    search='I searched online',
+    facebook='Facebook',
+    twitter='Twitter',
+    other="Other"
+)
+
+EXCHANGE_CHOICES = model_helpers.Choices(
+    garage='I can pick up the vehicle from a parking garage at the start of every shift.',
+    delivery='I would need the vehicle delivered to my home at the start of every shift',
+    overnight='I would need to keep the vehicle in my posession between shifts'
+)
+
 '''
 Class for contacts.
 People who provide their email address through the landing page.
@@ -51,11 +66,34 @@ class Contact(models.Model):
 
 class DriverSurvey(models.Model):
     contact = models.ForeignKey(Contact, null=True, related_name='driver_survey')
-    source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
+    source = model_helpers.ChoiceField(
+        choices=SOURCE_CHOICES,
+        max_length=32,
+        verbose_name='How did you hear about idlecars?'
+    )
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
+    licenced = models.BooleanField(default=False, verbose_name='I have a commercial driver\'s license')
+    credit_card = models.BooleanField(default=False, verbose_name='I have a credit card')
+
+    account_uber = models.BooleanField(default=False, verbose_name='Uber')
+    account_lyft = models.BooleanField(default=False, verbose_name='Lyft')
+    account_whisk = models.BooleanField(default=False, verbose_name='Whisk')
+    account_via = models.BooleanField(default=False, verbose_name='Via')
+    account_gett = models.BooleanField(default=False, verbose_name='Gett')
+    account_other = models.CharField(max_length=255, blank=True, verbose_name='')
+
+    exchange = model_helpers.ChoiceField(
+        choices=EXCHANGE_CHOICES,
+        max_length=256,
+        default=EXCHANGE_CHOICES['garage']
+    )
 
 
 class OwnerSurvey(models.Model):
     contact = models.ForeignKey(Contact, null=True, related_name='owner_survey')
-    source = models.CharField(max_length=32, verbose_name='How did you hear about idlecars?')
+    source = model_helpers.ChoiceField(
+        choices=SOURCE_CHOICES,
+        max_length=32,
+        verbose_name='How did you hear about idlecars?'
+    )
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
