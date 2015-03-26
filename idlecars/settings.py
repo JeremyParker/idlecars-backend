@@ -93,6 +93,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
+IMAGE_URL = '/static/img/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )

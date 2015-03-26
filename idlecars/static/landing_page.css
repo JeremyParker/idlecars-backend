@@ -37,7 +37,7 @@ a:hover {
   width: 100%;
 }
 
-.content {
+.container {
   max-width: 50rem;
   margin: 0 auto;
   padding: 1rem;
@@ -49,11 +49,11 @@ a:hover {
   background: #222;
 }
 
-.container {
+.content {
   width: 25rem;
 }
 
-.content {
+.container {
   height: 20rem;
 }
 
@@ -63,11 +63,11 @@ a:hover {
   text-align: center;
 }
 
-.get-more .content {
+.get-more .container {
   justify-content: center;
 }
 
-.get-more .container {
+.get-more .content {
   width: 30rem;
 }
 
@@ -76,16 +76,16 @@ p.strong {
   margin: 0;
 }
 
-.keep-more .content {
+.keep-more .container {
   justify-content: flex-end;
 }
 
-.keep-more .container {
+.keep-more .content {
   width: 18rem;
   margin-right: 7rem;
 }
 
-footer .content {
+footer .container {
   height: 10rem;
   color: #666;
   flex-direction: column;

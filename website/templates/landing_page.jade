@@ -4,38 +4,39 @@ link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
 
 - block content
   .hero.headline
-    .content
-      .container
+    .container
+      //- img(src="#{ IMAGE_URL }idlecars_logo_white.png", alt="logo")
+      .content
         h1 No car? No problem.
         p Idlecars let's you rent luxury cars and earn money as a rideshare driver.
 
   .hero.select
-    .content
-      .container
+    .container
+      .content
         h2 Select the best
         p We provide a wide selection of premium vehicles to drive for high-end rideshare and limousine services.
 
   .hero.get-more
-    .content
-      .container
+    .container
+      .content
         h2 Get more rides
         p.strong Our cars allow you to drive for any base.
         p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
 
   .hero.keep-more
-    .content
-      .container
+    .container
+      .content
         h2 Keep more of your earnings
         p You only pay for the hours you rent.
 
   .hero.get-more
-    .content
-      .container
+    .container
+      .content
         h2 Convenient for you
         p We take care of all the paperwork and we cover the cost of insurance, parking, and maintennance. We even ensure each car is clean for every shift.
 
-  .content
-    .container
+  .container
+    .content
       p I'm a driver. How can I get a luxury car and make money?
       form(action="#{ driver_action }", method="post")
         - csrf_token
@@ -49,7 +50,7 @@ link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
         input(type="submit", value="Let's Talk")
 
   footer
-    .content
+    .container
       p.ask
         a(href="#") ASK US ANYTHING
       | <p>© {% now 'Y' %} idlecars</p>
