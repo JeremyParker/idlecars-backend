@@ -1,48 +1,48 @@
-link(href='//fonts.googleapis.com/css?family=Khula:400,300,600', rel='stylesheet', type='text/css')
+link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
 link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
 link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
 
 - block content
   .hero.headline
-    .content
-      .container
+    .container
+      img(src="#{ STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
+      .content
         h1 No car? No problem.
         p Idlecars let's you rent luxury cars and earn money as a rideshare driver.
 
   .hero.select
-    .content
-      .container
+    .container
+      .content
         h2 Select the best
         p We provide a wide selection of premium vehicles to drive for high-end rideshare and limousine services.
 
   .hero.get-more
-    .content
-      .container
-        h2 Get more rides
-        p.strong Our cars allow you to drive for any base.
-        p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
+    .container
+      h2 Get more rides
+      p.strong Our cars allow you to drive for any base.
+      p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
+      img(src="#{ STATIC_URL }img/services.jpg", alt="uber lift and others")
 
   .hero.keep-more
-    .content
-      .container
+    .container
+      .content
         h2 Keep more of your earnings
         p You only pay for the hours you rent.
 
-  .hero.get-more
-    .content
-      .container
-        h2 Convenient for you
-        p We take care of all the paperwork and we cover the cost of insurance, parking, and maintennance. We even ensure each car is clean for every shift.
-
-  .content
+  .hero.get-more.convenient
     .container
+      h2 Convenient for you
+      p We take care of all the paperwork and we cover the cost of insurance, parking, and maintennance. We even ensure each car is clean for every shift.
+
+  .container
+    .content
       form(action="#{ action }", method="post")
         - csrf_token
         #{ contact_form.as_p }
         input(type="submit", value="Let's Talk")
 
   footer
-    .content
+    .container
       p.ask
         a(href="#") ASK US ANYTHING
       | <p>© {% now 'Y' %} idlecars</p>
