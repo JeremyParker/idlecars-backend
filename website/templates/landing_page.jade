@@ -36,16 +36,9 @@ link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
 
   .content
     .container
-      p I'm a driver. How can I get a luxury car and make money?
-      form(action="#{ driver_action }", method="post")
+      form(action="#{ action }", method="post")
         - csrf_token
-        #{ driver_form.as_p }
-        input(type="submit", value="Let's Talk")
-
-      p I own a car. How can my car make me money?
-      form(action="#{ owner_action }", method="post")
-        - csrf_token
-        #{ owner_form.as_p }
+        #{ prospect_form.as_p }
         input(type="submit", value="Let's Talk")
 
   footer

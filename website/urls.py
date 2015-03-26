@@ -8,12 +8,7 @@ from . import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
-
-    url(r'^driver_prospect/new$', views.index, name="driver_endpoint"),
     url(r'^driver_prospect/(\d+)/driver_survey/new$', views.driver_survey, name='driver_survey'),
-
-    url(r'^owner_prospect/new$', views.index, name="owner_endpoint"),
     url(r'^owner_prospect/(\d+)/owner_survey/new$', views.owner_survey, name='owner_survey'),
-
     url(r'^thankyou/$', views.thankyou, name='thankyou'),
 )
