@@ -46,17 +46,18 @@ def index(request):
 View to handle the driver survey form, store form info and respond with a thank you message.
 '''
 def driver_survey(request, driver_pk=None):
-    new_driver = get_object_or_404(models.DriverProspect, pk=driver_pk)
     survey_form = forms.DriverSurveyForm(request.POST or None)
-
     if request.method == 'POST':
         if survey_form.is_valid():
-            survey_form.save()
+            survey = survey_form.save(commit=False)
+            driver = get_object_or_404(models.DriverProspect, pk=driver_pk)
+            survey.driver_prospect = driver
+            survey.save()
             return HttpResponseRedirect(urlresolvers.reverse('thankyou'))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('driver_survey', args=(new_driver.pk,)),
+        'action': urlresolvers.reverse('driver_survey', args=(driver_pk,)),
         'survey_form': survey_form,
     }
     return render(request, 'driver_survey.html', context)
@@ -66,12 +67,13 @@ def driver_survey(request, driver_pk=None):
 View to handle the owner survey form, store form info and respond with a thank you message.
 '''
 def owner_survey(request, owner_pk=None):
-    new_owner = get_object_or_404(models.OwnerProspect, pk=owner_pk)
     survey_form = forms.OwnerSurveyForm(request.POST or None)
-
     if request.method == 'POST':
         if survey_form.is_valid():
-            survey_form.save()
+            survey = survey_form.save(commit=False)
+            owner = get_object_or_404(models.OwnerProspect, pk=owner_pk)
+            survey.owner_prospect = owner
+            survey.save()
             return HttpResponseRedirect(urlresolvers.reverse('thankyou'))
 
     # if it was a GET request, or if there isn't valid form data...

@@ -7,3 +7,5 @@ import models
 
 admin.site.register(models.DriverProspect)
 admin.site.register(models.OwnerProspect)
+admin.site.register(models.DriverSurvey)
+admin.site.register(models.OwnerSurvey)
