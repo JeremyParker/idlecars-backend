@@ -7,6 +7,7 @@ import sendgrid
 
 class SendgridEmail(object):
     def __init__(self):
+        # get these values from 'heroku config' tool
         username = os.getenv('SENDGRID_USERNAME')
         password = os.getenv('SENDGRID_PASSWORD')
 

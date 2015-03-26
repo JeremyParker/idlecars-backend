@@ -8,14 +8,18 @@ import models
 class ContactForm(forms.ModelForm):
     class Meta:
         model = models.Contact
-        exclude = []
+        fields = ['email', 'zipcode', 'role']
+        widgets = {
+            'role': forms.RadioSelect(),
+        }
+
 
 class DriverSurveyForm(forms.ModelForm):
     class Meta:
         model = models.DriverSurvey
-        exclude = ['contact']        
+        fields = ['source', 'other_source']        
 
 class OwnerSurveyForm(forms.ModelForm):
     class Meta:
         model = models.OwnerSurvey
-        exclude = ['contact']
+        fields = ['source', 'other_source']        
