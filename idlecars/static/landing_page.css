@@ -49,8 +49,12 @@ a:hover {
   align-items: center;
 }
 
+.content {
+  width: 25rem;
+}
+
 .headline {
-  background: url(img/loading_screen.png) no-repeat #222;
+  background: url(img/loadingscreen.png) no-repeat #222;
   background-position: calc(50% + 300px) center;
 }
 
@@ -74,12 +78,13 @@ a:hover {
   }
 }
 
-.content {
-  width: 25rem;
+.select {
+  background: url(img/selectthebest.jpg) no-repeat black;
+  background-position: calc(50% + 300px) center;
 }
 
-.container {
-  height: 20rem;
+.select .container {
+  height: 522px
 }
 
 .get-more {
@@ -89,11 +94,12 @@ a:hover {
 }
 
 .get-more .container {
+  flex-direction: column;
   justify-content: center;
 }
 
-.get-more .content {
-  width: 30rem;
+.get-more p {
+  max-width: 30rem;
 }
 
 p.strong {
