@@ -96,6 +96,7 @@ a:hover {
 .get-more .container {
   flex-direction: column;
   justify-content: center;
+  min-height: 400px;
 }
 
 .get-more p {
@@ -107,13 +108,23 @@ p.strong {
   margin: 0;
 }
 
+.keep-more {
+  background: url(img/scheduler.png) no-repeat black;
+  background-position: calc(50% - 300px) bottom;
+}
+
 .keep-more .container {
+  height: 600px;
   justify-content: flex-end;
 }
 
 .keep-more .content {
   width: 18rem;
   margin-right: 7rem;
+}
+
+.convenient .container {
+  min-height: 400px;
 }
 
 footer .container {
