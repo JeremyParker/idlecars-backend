@@ -78,7 +78,7 @@ def owner_survey(request, owner_pk=None):
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('owner_survey', args=(new_owner.pk,)),
+        'action': urlresolvers.reverse('owner_survey', args=(owner_pk,)),
         'survey_form': survey_form,
     }
     return render(request, 'owner_survey.jade', context)
