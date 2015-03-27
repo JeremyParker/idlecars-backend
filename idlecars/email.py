@@ -12,18 +12,18 @@ class SendgridEmail(object):
         password = os.getenv('SENDGRID_PASSWORD')
 
         if not (username and password):
-            return
+            raise RuntimeError("email username/password are not set in this environment.")
 
         self.client = sendgrid.SendGridClient(username, password)
 
-    def send_to(self, address):
+    def send_to(self, address, subject, html, text, cc = None):
         if not hasattr(self, 'client'):
-            return
+            raise RuntimeError("There is no email client available.")
 
         message = sendgrid.Mail()
         message.add_to(address)
-        message.set_subject('Welcome to idlecars')
-        message.set_html('<h1>This is a test</h1>')
-        message.set_text('This is a test')
+        message.set_subject(subject)
+        message.set_html(html)
+        message.set_text(text)
         message.set_from('idlecars <info@idlecars.com>')
         return self.client.send(message)
