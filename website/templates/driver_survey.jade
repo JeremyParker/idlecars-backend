@@ -1,12 +1,17 @@
-link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
-link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
-link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
+extends ./base.jade
 
 - block content
-    p Thank you for your interest. An email has been sent to your address.
+  .hero.headline
+    .container
+      .content
+        h2 Thank you for your interest.
+        p An email has been sent to your address.
 
-    p Additional Information:
-    form(action="#{ action }", method="post")
-        - csrf_token
-        #{ survey_form.as_p }
-        input(type="submit", value="Submit")
+  .hero.select
+    .container
+      .content
+        p Additional Information:
+        form(action="#{ action }", method="post")
+            - csrf_token
+            #{ survey_form.as_p }
+            input(type="submit", value="Submit")
