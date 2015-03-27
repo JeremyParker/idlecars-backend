@@ -9,8 +9,8 @@ from idlecars import model_helpers
 
 
 ROLE_CHOICES = model_helpers.Choices(
-    driver='Driver',
-    owner='Owner',
+    driver='I\'m a driver.',
+    owner='I own a car.',
 )
 
 '''
@@ -46,7 +46,7 @@ class Contact(models.Model):
     # TODO(JP):
     # referer_url = models.CharField(max_length=1000, null=True, blank=True)
     # device = model_helpers.ChoiceField(max_length=30, choices=DEVICES)
-    # user_agent = 
+    # user_agent =
 
 
 class DriverSurvey(models.Model):

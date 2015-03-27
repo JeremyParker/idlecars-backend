@@ -39,6 +39,7 @@ a:hover {
 
 .hero {
   width: 100%;
+  overflow: hidden;
 }
 
 .container {
