@@ -9,7 +9,7 @@ from idlecars import model_helpers
 
 
 ROLE_CHOICES = model_helpers.Choices(
-    driver='I\'m a driver.',
+    driver='I want to drive.',
     owner='I own a car.',
 )
 
