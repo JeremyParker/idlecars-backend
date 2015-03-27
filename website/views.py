@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
 from django.core import urlresolvers
-
 from django.http import HttpResponse, HttpResponseRedirect
 
 import forms
 import models
+import jobs
 
 
 '''
@@ -22,6 +22,7 @@ def index(request):
         contact_form = forms.ContactForm(request.POST or None)
         if contact_form.is_valid():
             new_contact = contact_form.save()
+            jobs.queue_welcome_email(new_contact.email)
             if new_contact.role == "driver":
                 return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
             else:
