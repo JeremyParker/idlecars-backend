@@ -6,12 +6,11 @@ head
     meta(name='description', content='Earn more from rideshare by driving a premium 
     vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    link(rel='apple-touch-icon', href='apple-touch-icon.png')
+
     // Place favicon.ico in the root directory
     link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
     link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
     link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
-    script(src='js/vendor/modernizr-2.8.3.min.js')
   body
     //if lt IE 8
       p.browserupgrade
@@ -24,9 +23,6 @@ head
     // Add your site or application content here
     - block content
     - endblock
-
-    script(src='js/plugins.js')
-    script(src='js/main.js')
 
     // Google Analytics: change UA-XXXXX-X to be your site's ID.
     script.
