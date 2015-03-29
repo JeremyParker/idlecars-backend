@@ -179,6 +179,7 @@ li {
 
 .role li {
   padding-left: 3rem;
+  display: flex;
 }
 
 .role li label {
@@ -271,5 +272,9 @@ footer .container {
     background: rgba(0,0,0,0.5);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
     height: 300px;
+  }
+
+  .role li {
+    padding: 0;
   }
 }
