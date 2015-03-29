@@ -91,12 +91,11 @@ input {
 
 .headline img {
   position: absolute;
-  left: -71px;
 }
 
-@media (max-width: 1050px) {
+@media (min-width: 1000px) {
   .headline img {
-    left: 0;
+    left: -40px;
   }
 }
 
@@ -251,6 +250,12 @@ footer .container {
 
   .container {
     padding: 3rem 2rem;
+  }
+
+  .headline img {
+    top: 1rem;
+    right: 1rem;
+    max-width: 40%;
   }
 
   .headline, .select, .keep-more {
