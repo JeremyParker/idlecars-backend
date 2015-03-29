@@ -50,7 +50,7 @@ input {
 .container {
   max-width: 54rem;
   margin: 0 auto;
-  padding: 5rem 0;
+  padding: 5rem 2rem;
   display: flex;
   align-items: center;
 }
@@ -233,4 +233,38 @@ footer .container {
 .ask a {
   font-weight: 700;
   text-decoration: underline;
+}
+
+@media (max-width: 415px) {
+  h1, h2 {
+    font-size: 2rem;
+    line-height: 1em;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .container {
+    padding: 3rem 2rem;
+  }
+
+  .headline, .select, .keep-more {
+    background-size: auto 300px;
+    background-position: calc(50% + 150px) center;
+  }
+
+  .convenient .container {
+    height: 300px;
+  }
+
+  .headline .container, .select .container, .keep-more .container {
+    background: rgba(0,0,0,0.5);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+    height: 300px;
+  }
 }
