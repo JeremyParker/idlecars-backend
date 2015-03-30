@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import server.model_helpers
+from idlecars import model_helpers
 
 
 class Migration(migrations.Migration):
@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
             name='Driver',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('first_name', server.model_helpers.StrippedCharField(max_length=30, blank=True)),
-                ('last_name', server.model_helpers.StrippedCharField(max_length=30, blank=True)),
+                ('first_name', model_helpers.StrippedCharField(max_length=30, blank=True)),
+                ('last_name', model_helpers.StrippedCharField(max_length=30, blank=True)),
                 ('phone_number', models.CharField(max_length=40, blank=True)),
                 ('email', models.CharField(max_length=128, unique=True, null=True, blank=True)),
                 ('email_verified', models.DateTimeField(null=True, blank=True)),
