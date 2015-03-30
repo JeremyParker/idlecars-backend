@@ -86,9 +86,5 @@ def owner_survey(request, pk=None):
     }
     return render(request, 'owner_survey.jade', context)
 
-
-'''
-A final thankyou for submitting the extra market survey info.
-'''
-def thankyou(request):
-    return HttpResponse("Thankyou for taking the time to fill out our survey. Someone will be in touch shortly.")
+def email_preview(request):
+    return render(request, 'email.html')
