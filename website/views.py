@@ -16,6 +16,10 @@ There are two forms on the page, each of which has a different 'action' url. The
 actions are both handled through this view.
 '''
 def index(request):
+
+    def _show_thanks():
+        return 'thanks' in request.GET
+
     contact_form = forms.ContactForm()
 
     if request.method == 'POST':
@@ -25,6 +29,8 @@ def index(request):
             jobs.queue_welcome_email(new_contact.email)
 
             # NOTE(jefk): survey is not ready yet, so now redirect to home
+            url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
+            return HttpResponseRedirect(url)
             # if new_contact.role == "driver":
             #     return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
             # else:
@@ -34,7 +40,7 @@ def index(request):
     context = {
         'action': urlresolvers.reverse('website:index'),
         'contact_form': contact_form,
-        'show_thanks': True,
+        'show_thanks': _show_thanks(),
     }
     return render(request, 'landing_page.jade', context)
 
