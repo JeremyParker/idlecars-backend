@@ -1,38 +1,46 @@
 extends ./base.jade
 
 - block content
-  .hero.headline
+
+  - if show_thanks
+    section.thanks
+      .container
+        .content
+          h2 Thanks!
+          p Expect an email from us shortly.
+
+  section.headline
     .container
       img(src="#{ STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
       .content
         h1 No car? No problem.
         p Idlecars let's you rent luxury cars and earn money as a rideshare driver.
 
-  .hero.select
+  section.select
     .container
       .content
         h2 Select the best
         p We provide a wide selection of premium vehicles to drive for high-end rideshare and limousine services.
 
-  .hero.get-more
+  section.get-more
     .container
       h2 Get more rides
       p.strong Our cars allow you to drive for any base.
       p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
       img(src="#{ STATIC_URL }img/services.jpg", alt="uber lift and others")
 
-  .hero.keep-more
+  section.keep-more
     .container
       .content
         h2 Keep more of your earnings
         p You only pay for the hours you rent.
 
-  .hero.get-more.convenient
+  section.get-more.convenient
     .container
       h2 Convenient for you
       p We take care of all the paperwork and we cover the cost of insurance, parking, and maintennance. We even ensure each car is clean for every shift.
 
-  .hero.form
+  section.form
     .container
       form(action="#{ action }", method="post")
         - csrf_token
