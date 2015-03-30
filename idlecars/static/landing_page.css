@@ -51,7 +51,9 @@ section {
   max-width: 54rem;
   margin: 0 auto;
   padding: 5rem 2rem;
+  display: -webkit-flex;
   display: flex;
+  -webkit-align-items: center;
   align-items: center;
 }
 
@@ -100,12 +102,7 @@ section {
 
 .headline img {
   position: absolute;
-}
-
-@media (min-width: 1000px) {
-  .headline img {
-    left: -40px;
-  }
+  top: 5rem;
 }
 
 .select {
@@ -124,7 +121,9 @@ section {
 }
 
 .get-more .container {
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-justify-content: center;
   justify-content: center;
   min-height: 400px;
 }
@@ -145,6 +144,7 @@ p.strong {
 
 .keep-more .container {
   height: 600px;
+  -webkit-justify-content: flex-end;
   justify-content: flex-end;
 }
 
@@ -165,12 +165,16 @@ p.strong {
 form {
   width: 100%;
   margin: 0;
+  display: -webkit-flex;
   display: flex;
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: stretch;
   align-items: stretch;
 }
 
 ul {
+  display: -webkit-flex;
   display: flex;
   margin: 0;
   padding: 0;
@@ -178,6 +182,7 @@ ul {
 }
 
 li {
+  -webkit-flex: 1;
   flex: 1;
 }
 
@@ -225,13 +230,16 @@ ul.contact {
 }
 
 form .button {
+  -webkit-align-self: center;
   align-self: center;
 }
 
 footer .container {
   height: 10rem;
   color: #666;
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-justify-content: center;
   justify-content: center;
 }
 
@@ -285,5 +293,11 @@ footer .container {
 
   .role li {
     padding: 0;
+  }
+}
+
+@media (min-width: 1000px) {
+  .headline img {
+    left: -40px;
   }
 }
