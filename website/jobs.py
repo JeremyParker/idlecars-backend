@@ -1,18 +1,39 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from idlecars.email import SendgridEmail
+from django.shortcuts import get_object_or_404
+
+from idlecars import email
 from idlecars.job_queue import job_queue
 
-
-def queue_welcome_email(to_address):
-    job_queue.enqueue(_send_welcome_email, to_address)
+import models
 
 
-def _send_welcome_email(to_address):
-    return SendgridEmail().send_to(
-        address = to_address,
+def queue_driver_welcome_email(email_address):
+    job_queue.enqueue(_send_driver_welcome_email, email_address)
+
+
+def queue_owner_welcome_email(email_address):
+    job_queue.enqueue(_send_owner_welcome_email, email_address)
+
+
+def _send_driver_welcome_email(email_address):
+    html = '<h1>This is a test of the driver email</h1>'
+    text = 'This is a test of the driver email'
+    return email.SendgridEmail().send_to(
+        address = email_address,
         subject = 'Welcome to idlecars',
-        html = '<h1>This is a test</h1>',
-        text = 'This is a test',
+        html = html,
+        text = text,
+    )
+
+
+def _send_owner_welcome_email(email_address):
+    html = '<h1>This is a test of the owner email</h1>'
+    text = 'This is a test of the owner email'
+    return email.SendgridEmail().send_to(
+        address = email_address,
+        subject = 'Welcome to idlecars',
+        html = html,
+        text = text,
     )
