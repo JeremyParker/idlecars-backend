@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-import model_helpers
+from idlecars import model_helpers
 
 class FleetPartner(models.Model):
     name = models.CharField(max_length=256)
