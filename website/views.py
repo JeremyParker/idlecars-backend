@@ -23,10 +23,12 @@ def index(request):
         if contact_form.is_valid():
             new_contact = contact_form.save()
             jobs.queue_welcome_email(new_contact.email)
-            if new_contact.role == "driver":
-                return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
-            else:
-                return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
+
+            # NOTE(jefk): survey is not ready yet, so now redirect to home
+            # if new_contact.role == "driver":
+            #     return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
+            # else:
+            #     return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
