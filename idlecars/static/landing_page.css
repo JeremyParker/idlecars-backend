@@ -75,6 +75,15 @@ section {
   opacity: 0.9;
 }
 
+.thanks {
+  background: #0d72fe;
+  color: white;
+}
+
+.thanks .container {
+  padding: 2rem 2rem;
+}
+
 .headline {
   background: url(img/loadingscreen.png) no-repeat #222;
   background-position: calc(50% + 300px) center;

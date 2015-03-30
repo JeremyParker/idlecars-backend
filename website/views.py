@@ -34,6 +34,7 @@ def index(request):
     context = {
         'action': urlresolvers.reverse('website:index'),
         'contact_form': contact_form,
+        'show_thanks': True,
     }
     return render(request, 'landing_page.jade', context)
 
