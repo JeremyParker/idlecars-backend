@@ -10,7 +10,7 @@ from django.template.loader import get_template
 
 def queue_driver_welcome_email(email_address):
     # render the template to HTML
-    html = get_template('driver_welcome_email.html').render()
+    html = get_template('driver_welcome_email.html').render(Context({}))
     text = '''
     Welcome!
     Idlecars let’s you earn more money from rideshare by renting premium cars.
@@ -31,7 +31,7 @@ def queue_driver_welcome_email(email_address):
 
 def queue_owner_welcome_email(email_address):
     # render the template to HTML
-    html = get_template('owner_welcome_email.html').render()
+    html = get_template('owner_welcome_email.html').render(Context({}))
     text = '''
     Welcome!
     Find more drivers for your idle cars.
