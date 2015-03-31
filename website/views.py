@@ -25,6 +25,8 @@ def index(request):
         if contact_form.is_valid():
             try:
                 new_contact = models.Contact.objects.get(email=contact_form.cleaned_data['email'])
+                for attr in contact_form.cleaned_data:
+                    setattr(new_contact, attr, contact_form.cleaned_data[attr])
             except models.Contact.DoesNotExist:
                 new_contact = contact_form.save()
 
@@ -103,4 +105,4 @@ def owner_survey(request, pk=None):
     return render(request, 'owner_survey.jade', context)
 
 def email_preview(request):
-    return render(request, 'welcome_email.html')
+    return render(request, 'owner_welcome_email.html')
