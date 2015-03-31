@@ -16,7 +16,8 @@ ROLE_CHOICES = model_helpers.Choices(
 )
 
 SOURCE_CHOICES = model_helpers.Choices(
-    _2_mouth='Word of mouth',
+    _1_idlecars='From someone at idlecars',
+    _2_mouth='From a friend',
     _3_poster='I saw a poster',
     _4_search='I searched online',
     _5_facebook='Facebook',
@@ -32,9 +33,16 @@ EXCHANGE_CHOICES = model_helpers.Choices(
 )
 
 VEHICLE_CHOICES = model_helpers.Choices(
-    suv='Luxury SUV',
-    sedan='Luxury Sedan',
-    uber_x='Any Vehicle'
+    luxury_suv='Luxury SUV',
+    luxury_sedan='Luxury Sedan',
+    suv='Non-luxury SUV and MiniVan',
+    sedan='Non-luxury Sedan or Crossover',
+)
+
+SHIFT_CHOICES = model_helpers.Choices(
+    _1="4am to 3pm",
+    _2="4pm to 3am",
+    other="Something else",
 )
 
 '''
@@ -62,7 +70,7 @@ class Contact(models.Model):
             MaxLengthValidator(5),
         ],
     )
-    role = model_helpers.ChoiceField(choices=ROLE_CHOICES, max_length=16, default='Driver')
+    role = model_helpers.ChoiceField(choices=ROLE_CHOICES, max_length=16, default='driver')
     created_time = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
@@ -84,13 +92,14 @@ class DriverSurvey(models.Model):
     other_source = models.CharField(max_length=255, blank=True, verbose_name='')
     licenced = models.BooleanField(default=False, verbose_name='I have a commercial driver\'s license')
     credit_card = models.BooleanField(default=False, verbose_name='I have a credit card')
-    car_owner = models.BooleanField(default=False, verbose_name='I own a car')
+    car_owner = models.BooleanField(default=False, verbose_name='I don\'t own a car')
 
     account_uber = models.BooleanField(default=False, verbose_name='Uber')
     account_lyft = models.BooleanField(default=False, verbose_name='Lyft')
     account_whisk = models.BooleanField(default=False, verbose_name='Whisk')
     account_via = models.BooleanField(default=False, verbose_name='Via')
     account_gett = models.BooleanField(default=False, verbose_name='Gett')
+    account_groundlink = models.BooleanField(default=False, verbose_name='Groundlink')
     account_other = models.BooleanField(default=False, verbose_name='Other Dispatcher')
     account_other_name = models.CharField(max_length=255, blank=True, verbose_name='')
 
@@ -108,30 +117,14 @@ class DriverSurvey(models.Model):
     )
 
     midnight = datetime.time(0)
-
-    rent_monday =       models.BooleanField(default=False, verbose_name='Monday')
-    rent_tuesday =      models.BooleanField(default=False, verbose_name='Tuesday')
-    rent_wednesday =    models.BooleanField(default=False, verbose_name='Wednesday')
-    rent_thursday =     models.BooleanField(default=False, verbose_name='Thursday')
-    rent_friday =       models.BooleanField(default=False, verbose_name='Friday')
-    rent_saturday =     models.BooleanField(default=False, verbose_name='Saturday')
-    rent_sunday =       models.BooleanField(default=False, verbose_name='Sunday')
-
-    start_monday =       models.TimeField(default=midnight, verbose_name='')
-    start_tuesday =      models.TimeField(default=midnight, verbose_name='')
-    start_wednesday =    models.TimeField(default=midnight, verbose_name='')
-    start_thursday =     models.TimeField(default=midnight, verbose_name='')
-    start_friday =       models.TimeField(default=midnight, verbose_name='')
-    start_saturday =     models.TimeField(default=midnight, verbose_name='')
-    start_sunday =       models.TimeField(default=midnight, verbose_name='')
-
-    end_monday =       models.TimeField(default=midnight, verbose_name='')
-    end_tuesday =      models.TimeField(default=midnight, verbose_name='')
-    end_wednesday =    models.TimeField(default=midnight, verbose_name='')
-    end_thursday =     models.TimeField(default=midnight, verbose_name='')
-    end_friday =       models.TimeField(default=midnight, verbose_name='')
-    end_saturday =     models.TimeField(default=midnight, verbose_name='')
-    end_sunday =       models.TimeField(default=midnight, verbose_name='')
+    shift_choice = model_helpers.ChoiceField(
+        choices=sorted(SHIFT_CHOICES, key=lambda x: x[0]),
+        max_length=128,
+        blank=True,
+        verbose_name='What shift would you prefer to drive?',
+    )
+    shift_other_start = models.TimeField(default=midnight, verbose_name='')
+    shift_other_end = models.TimeField(default=midnight, verbose_name='')
 
 
 class OwnerSurvey(models.Model):
