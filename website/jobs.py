@@ -7,8 +7,6 @@ from idlecars.job_queue import job_queue
 from django.template import Context
 from django.template.loader import get_template
 
-import models
-
 
 def queue_driver_welcome_email(email_address):
     # render the template to HTML
