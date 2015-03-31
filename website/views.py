@@ -23,7 +23,11 @@ def index(request):
     if request.method == 'POST':
         contact_form = forms.ContactForm(request.POST)
         if contact_form.is_valid():
-            new_contact = contact_form.save()
+            try:
+                new_contact = models.Contact.objects.get(email=contact_form.cleaned_data['email'])
+            except models.Contact.DoesNotExist:
+                new_contact = contact_form.save()
+
             if new_contact.role == 'driver':
                 jobs.queue_driver_welcome_email(new_contact.email)
             else:
@@ -60,7 +64,9 @@ def driver_survey(request, pk=None):
             contact = get_object_or_404(models.Contact, pk=pk)
             survey.contact = contact
             survey.save()
-            return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
+
+            url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
+            return HttpResponseRedirect(url)
     else:
         survey_form = forms.DriverSurveyForm(initial={'exchange': '_no_response'})
 
@@ -76,14 +82,18 @@ def driver_survey(request, pk=None):
 View to handle the owner survey form, store form info and respond with a thank you message.
 '''
 def owner_survey(request, pk=None):
-    survey_form = forms.OwnerSurveyForm(request.POST or None)
     if request.method == 'POST':
+        survey_form = forms.OwnerSurveyForm(request.POST)
         if survey_form.is_valid():
             survey = survey_form.save(commit=False)
             contact = get_object_or_404(models.Contact, pk=pk)
             survey.contact = contact
             survey.save()
-            return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
+
+            url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
+            return HttpResponseRedirect(url)
+    else:
+        survey_form = forms.OwnerSurveyForm()
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
