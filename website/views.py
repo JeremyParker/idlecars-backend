@@ -31,7 +31,7 @@ def index(request):
             if new_contact.role == 'driver':
                 jobs.queue_driver_welcome_email(new_contact.email)
             else:
-                jobs.queue_owner_welcome_email(new_contact.email)                
+                jobs.queue_owner_welcome_email(new_contact.email)
 
             # NOTE(jefk): survey is not ready yet, so now redirect to home
             url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
@@ -103,4 +103,4 @@ def owner_survey(request, pk=None):
     return render(request, 'owner_survey.jade', context)
 
 def email_preview(request):
-    return render(request, 'email.html')
+    return render(request, 'welcome_email.html')
