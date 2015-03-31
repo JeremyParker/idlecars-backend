@@ -12,7 +12,7 @@ import models
 
 def queue_driver_welcome_email(email_address):
     # render the template to HTML
-    html = get_template('email.html').render(
+    html = get_template('welcome_email.html').render(
         Context({
             'title': 'Title',
             'body': 'Body',
@@ -29,7 +29,7 @@ def queue_driver_welcome_email(email_address):
 
 def queue_owner_welcome_email(email_address):
     # render the template to HTML
-    html = get_template('email.html').render(
+    html = get_template('welcome_email.html').render(
         Context({
             'title': 'Title',
             'body': 'Body',
@@ -45,10 +45,9 @@ def queue_owner_welcome_email(email_address):
 
 
 def _send_welcome_email(email_address, html, text):
-    import pdb; pdb.set_trace()
     return email.SendgridEmail().send_to(
         address = email_address,
-        subject = 'Idle Cars signup confirmation',
+        subject = 'Welcome to idlecars',
         html = html,
         text = text,
     )
