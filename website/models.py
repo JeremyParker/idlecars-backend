@@ -53,7 +53,6 @@ class Contact(models.Model):
     email = models.EmailField(
         max_length=MAX_EMAIL_LENGTH,
         blank=False,
-        unique=True,
         verbose_name='Email Address'
     )
     zipcode = models.CharField(
