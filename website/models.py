@@ -70,7 +70,7 @@ class Contact(models.Model):
             MaxLengthValidator(5),
         ],
     )
-    role = model_helpers.ChoiceField(choices=ROLE_CHOICES, max_length=16, default='Driver')
+    role = model_helpers.ChoiceField(choices=ROLE_CHOICES, max_length=16, default='driver')
     created_time = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
@@ -120,7 +120,7 @@ class DriverSurvey(models.Model):
     shift_choice = model_helpers.ChoiceField(
         choices=sorted(SHIFT_CHOICES, key=lambda x: x[0]),
         max_length=128,
-        default=SHIFT_CHOICES['_1'],
+        blank=True,
         verbose_name='What shift would you prefer to drive?',
     )
     shift_other_start = models.TimeField(default=midnight, verbose_name='')

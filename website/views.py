@@ -20,10 +20,8 @@ def index(request):
     def _show_thanks():
         return 'thanks' in request.GET
 
-    contact_form = forms.ContactForm()
-
     if request.method == 'POST':
-        contact_form = forms.ContactForm(request.POST or None)
+        contact_form = forms.ContactForm(request.POST)
         if contact_form.is_valid():
             new_contact = contact_form.save()
             jobs.queue_welcome_email(new_contact.email)
@@ -35,6 +33,9 @@ def index(request):
             #     return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
             # else:
             #     return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
+    else:
+        contact_form = forms.ContactForm()
+
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
@@ -49,14 +50,16 @@ def index(request):
 View to handle the driver survey form, store form info and respond with a thank you message.
 '''
 def driver_survey(request, pk=None):
-    survey_form = forms.DriverSurveyForm(request.POST or None)
     if request.method == 'POST':
+        survey_form = forms.DriverSurveyForm(request.POST)
         if survey_form.is_valid():
             survey = survey_form.save(commit=False)
             contact = get_object_or_404(models.Contact, pk=pk)
             survey.contact = contact
             survey.save()
             return HttpResponseRedirect(urlresolvers.reverse('website:thankyou'))
+    else:
+        survey_form = forms.DriverSurveyForm(initial={'exchange': '_no_response'})
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
