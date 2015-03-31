@@ -103,4 +103,4 @@ def owner_survey(request, pk=None):
     return render(request, 'owner_survey.jade', context)
 
 def email_preview(request):
-    return render(request, 'welcome_email.html')
+    return render(request, 'owner_welcome_email.html')
