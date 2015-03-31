@@ -26,7 +26,10 @@ def index(request):
         contact_form = forms.ContactForm(request.POST or None)
         if contact_form.is_valid():
             new_contact = contact_form.save()
-            jobs.queue_welcome_email(new_contact.email)
+            if new_contact.role == 'driver':
+                jobs.queue_driver_welcome_email(new_contact.email)
+            else:
+                jobs.queue_owner_welcome_email(new_contact.email)                
 
             # NOTE(jefk): survey is not ready yet, so now redirect to home
             url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
