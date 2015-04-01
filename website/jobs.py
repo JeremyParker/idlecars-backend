@@ -1,19 +1,32 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.template import Context
+from django.template.loader import get_template
+from django.utils.http import urlquote
+
 from idlecars import email
 from idlecars.job_queue import job_queue
 
-from django.template import Context
-from django.template.loader import get_template
-
-
 def queue_driver_welcome_email(email_address):
+    def _reply_email_subject():
+        return urlquote("I want to drive!")
+
+    def _reply_email_body():
+        text = '''
+        What kind of car are you looking for?
+
+        When do you need it?
+        '''
+        return urlquote(text)
+
     context = Context({
         'message': 'Earn more money from rideshare by renting premium cars.',
         'instruction_header': 'Ask and you shall recieve',
         'instructions': 'Tell us what kind of car, and when you want to drive. We will find the right fit.',
-        'cta': 'Request a car'
+        'cta': 'Request a car',
+        'reply_email_subject': _reply_email_subject(),
+        'reply_email_body': _reply_email_body(),
     })
     html = get_template('welcome_email.html').render(conext)
 
@@ -36,11 +49,24 @@ def queue_driver_welcome_email(email_address):
 
 
 def queue_owner_welcome_email(email_address):
+    def _reply_email_subject():
+        return urlquote("I want to list my car")
+
+    def _reply_email_body():
+        text = '''
+        What kind of car do you want to list?
+
+        When is it available?
+        '''
+        return urlquote(text)
+
     context = Context({
         'message': 'Earn more money from rideshare by renting premium cars.',
         'instruction_header': 'Ask and you shall recieve',
         'instructions': 'Tell us what kind of car, and when you want to drive. We will find the right fit.',
         'cta': 'Request a car'
+        'reply_email_subject': _reply_email_subject(),
+        'reply_email_body': _reply_email_body(),
     })
     html = get_template('welcome_email.html').render(context)
 
