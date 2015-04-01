@@ -105,4 +105,10 @@ def owner_survey(request, pk=None):
     return render(request, 'owner_survey.jade', context)
 
 def email_preview(request):
-    return render(request, 'owner_welcome_email.html')
+    context = {
+        'message': 'Find more drivers for your idle cars.',
+        'instruction_header': 'List your car',
+        'instructions': 'We’ll walk you through the process step-by-step. Just let us know when you want to rent it, and let us take care of the rest.',
+        'cta': 'List a car',
+    }
+    return render(request, 'welcome_email.html', context)

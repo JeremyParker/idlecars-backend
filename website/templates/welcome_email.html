@@ -3,10 +3,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
 </head>
-<body style="font-family: Verdana">
+<body style="font-family: Verdana; font-size: 16px">
 
 <!--[if !mso]><!-->
-<div style="font-size:0;max-height:0;overflow:hidden;display:none">idlecars</div>
+<div style="font-size:0;max-height:0;overflow:hidden;display:none">Wecome to idlecars!</div>
 <!--<![endif]-->
 
 
@@ -42,21 +42,21 @@
               <img src="data:image/gif;base64,R0lGODlhCgAKAIAAAP///wAAACH5BAEAAAAALAAAAAAKAAoAAAIIhI+py+0PYysAOw==" width="1" height="5" style="display:block">
             </td></tr>
             <tr><td align="center" class="secondary" style="color: #888;">
-               Find more drivers for your idle cars.
+              {{message}}
             </td></tr>
 
             <tr><td>
               <img src="data:image/gif;base64,R0lGODlhCgAKAIAAAP///wAAACH5BAEAAAAALAAAAAAKAAoAAAIIhI+py+0PYysAOw==" width="1" height="40" style="display:block">
             </td></tr>
             <tr><td align="center" class="secondary">
-               List your car
+               {{instruction_header}}
             </td></tr>
 
             <tr><td>
               <img src="data:image/gif;base64,R0lGODlhCgAKAIAAAP///wAAACH5BAEAAAAALAAAAAAKAAoAAAIIhI+py+0PYysAOw==" width="1" height="5" style="display:block">
             </td></tr>
             <tr><td align="center" class="secondary" style="color: #888;">
-               We’ll walk you through the process step-by-step. Just let us know when you want to rent it, and let us take care of the rest.
+               {{instructions}}
             </td></tr>
 
             <tr><td>
@@ -64,9 +64,9 @@
             </td></tr>
 
             <tr><td align="center" style="background:#0d72fe;">
-              <a style="color: white;" href="mailto:support@idlecars.com?subject=I%20want%20to%20list%20my%20car&body=What%20kind%20of%20car%20do%20you%20want%20to%20list%3F%0A%0AWhen%20is%20it%20available%3F">
+              <a style="color: white;" href="mailto:support@idlecars.com?subject={{reply_email_subject}}&body={{reply_email_body}}">
               <img src="data:image/gif;base64,R0lGODlhCgAKAIAAAP///wAAACH5BAEAAAAALAAAAAAKAAoAAAIIhI+py+0PYysAOw==" width="1" height="15" style="display:block">
-               <div width="100%">List a car</div>
+               <div width="100%">{{cta}}</div>
               <img src="data:image/gif;base64,R0lGODlhCgAKAIAAAP///wAAACH5BAEAAAAALAAAAAAKAAoAAAIIhI+py+0PYysAOw==" width="1" height="15" style="display:block">
               </a>
             </td></tr>
@@ -91,7 +91,7 @@
   </td></tr>
   <tr><td align="center">
     <div id="footer">
-      &#169; idlecars
+      &#169; idlecars | 1-844-IDLECAR
     </div>
   </td></tr>
   <tr><td height="50">
