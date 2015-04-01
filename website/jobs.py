@@ -28,7 +28,7 @@ def queue_driver_welcome_email(email_address):
         'reply_email_subject': _reply_email_subject(),
         'reply_email_body': _reply_email_body(),
     })
-    html = get_template('welcome_email.html').render(conext)
+    html = get_template('welcome_email.html').render(context)
 
     text = '''
     Welcome!
@@ -61,10 +61,10 @@ def queue_owner_welcome_email(email_address):
         return urlquote(text)
 
     context = Context({
-        'message': 'Earn more money from rideshare by renting premium cars.',
-        'instruction_header': 'Ask and you shall recieve',
-        'instructions': 'Tell us what kind of car, and when you want to drive. We will find the right fit.',
-        'cta': 'Request a car'
+        'message': 'Find more drivers for your idle cars.',
+        'instruction_header': 'List your car',
+        'instructions': 'We’ll walk you through the process step-by-step. Just let us know when you want to rent it, and let us take care of the rest.',
+        'cta': 'List a car',
         'reply_email_subject': _reply_email_subject(),
         'reply_email_body': _reply_email_body(),
     })
