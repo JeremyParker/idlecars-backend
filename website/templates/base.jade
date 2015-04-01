@@ -1,17 +1,18 @@
-doctype html.no-js(lang='')
-head
-    meta(charset='utf-8')
-    meta(http-equiv='x-ua-compatible', content='ie=edge')
-    title Rideshare Rentals | idlecars
-    meta(name='description', content='Earn more from rideshare by driving a premium vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
-    meta(name='viewport', content='width=device-width, initial-scale=1')
+doctype html
+html(lang="en")
+  head
+      meta(charset='utf-8')
+      meta(http-equiv='x-ua-compatible', content='ie=edge')
+      title Rideshare Rentals | idlecars
+      meta(name='description', content='Earn more from rideshare by driving a premium vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
+      meta(name='viewport', content='width=device-width, initial-scale=1')
 
-    // Place favicon.ico in the root directory
-    link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
-    link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
-    link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
+      // Place favicon.ico in the root directory
+      link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
+      link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
+      link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
+
   body
-
     // Add your site or application content here
     - block content
     - endblock
