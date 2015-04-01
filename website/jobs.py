@@ -9,12 +9,18 @@ from django.template.loader import get_template
 
 
 def queue_driver_welcome_email(email_address):
-    # render the template to HTML
-    html = get_template('driver_welcome_email.html').render(Context({}))
+    context = Context({
+        'message': 'Earn more money from rideshare by renting premium cars.',
+        'instruction_header': 'Ask and you shall recieve',
+        'instructions': 'Tell us what kind of car, and when you want to drive. We will find the right fit.',
+        'cta': 'Request a car'
+    })
+    html = get_template('welcome_email.html').render(conext)
+
     text = '''
     Welcome!
     Idlecars let’s you earn more money from rideshare by renting premium cars.
-    
+
     Ask and you shall recieve
     Tell us what kind of car, and when you want to drive. We will find the right fit.
 
@@ -30,8 +36,14 @@ def queue_driver_welcome_email(email_address):
 
 
 def queue_owner_welcome_email(email_address):
-    # render the template to HTML
-    html = get_template('owner_welcome_email.html').render(Context({}))
+    context = Context({
+        'message': 'Earn more money from rideshare by renting premium cars.',
+        'instruction_header': 'Ask and you shall recieve',
+        'instructions': 'Tell us what kind of car, and when you want to drive. We will find the right fit.',
+        'cta': 'Request a car'
+    })
+    html = get_template('welcome_email.html').render(context)
+
     text = '''
     Welcome!
     Find more drivers for your idle cars.
