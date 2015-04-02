@@ -17,7 +17,7 @@ extends ./base.jade
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
         p Earn more by renting luxury cars and working as a rideshare driver.
-        button.button LEARN MORE
+        a.button(href="#lets-talk") LEARN MORE
 
   section.select
     .container
@@ -43,7 +43,7 @@ extends ./base.jade
       h2 Convenient for you
       p We take care of all the paperwork, insurance, and maintennance. We even ensure each car is clean for every shift.
 
-  section.form
+  section#lets-talk.form
     .container
       form(action="#{ action }", method="post")
         - csrf_token

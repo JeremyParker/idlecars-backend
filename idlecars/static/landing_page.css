@@ -23,6 +23,12 @@ h1, h2 {
   line-height: 1em;
 }
 
+h3 {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
 p {
   font-size: 1rem;
   line-height: 1.35em;
@@ -62,6 +68,8 @@ section {
 }
 
 .button {
+  display: block;
+
   width: 15rem;
   padding: 1rem;
   border: 0;
@@ -69,9 +77,12 @@ section {
   background: #008aff;
   color: white;
 
+  text-align: center;
   font-size: 0.9rem;
   text-transform: uppercase;
   font-weight: 700;
+
+  cursor: pointer;
 }
 
 .button:hover {
@@ -95,6 +106,17 @@ section {
 .headline .container {
   height: 699px;
   position: relative;
+}
+
+.headline h1 {
+  margin-top: 8rem;
+  margin-bottom: 14px;
+}
+
+.headline .button {
+  background: white;
+  color: black;
+  margin-top: 2rem;
 }
 
 .headline p {
@@ -281,7 +303,7 @@ footer .container {
     max-width: 40%;
   }
 
-  .headline button {
+  .headline .button {
     display: none;
   }
 
@@ -327,23 +349,6 @@ footer .container {
   .headline img {
     left: -40px;
   }
-}
-
-.subhead {
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.8rem;
-}
-
-h1 {
-  margin-top: 8rem;
-  margin-bottom: 1.3rem;
-}
-
-.headline button {
-  background: white;
-  color: black;
-  margin-top: 2rem;
 }
 
 .tm {
