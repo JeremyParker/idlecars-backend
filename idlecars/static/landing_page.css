@@ -275,6 +275,11 @@ footer .container {
   text-decoration: underline;
 }
 
+.tm {
+  text-align: center;
+  font-size: 0.7rem;
+}
+
 @media (max-width: 415px) {
   h1, h2 {
     font-size: 1.8rem;
@@ -349,9 +354,4 @@ footer .container {
   .headline img {
     left: -40px;
   }
-}
-
-.tm {
-  text-align: center;
-  font-size: 0.7rem;
 }
