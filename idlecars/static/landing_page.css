@@ -236,7 +236,8 @@ form .button {
 }
 
 footer .container {
-  height: 10rem;
+  height: 17rem;
+  padding: 3rem 2rem;
   -webkit-flex-direction: column;
   flex-direction: column;
   -webkit-justify-content: center;
@@ -254,12 +255,16 @@ footer .container {
 
 @media (max-width: 415px) {
   h1, h2 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     line-height: 1em;
   }
 
+  h3 {
+    line-height: 1rem;
+  }
+
   p {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .button {
@@ -267,7 +272,7 @@ footer .container {
   }
 
   .container {
-    padding: 3rem 2rem;
+    padding: 3rem 1.75rem;
   }
 
   .headline img {
@@ -276,23 +281,45 @@ footer .container {
     max-width: 40%;
   }
 
+  .headline button {
+    display: none;
+  }
+
   .headline, .select, .keep-more {
-    background-size: auto 300px;
+    background-size: auto 350px;
     background-position: calc(50% + 150px) center;
   }
 
   .convenient .container {
-    height: 300px;
+    height: 350px;
   }
 
   .headline .container, .select .container, .keep-more .container {
     background: rgba(0,0,0,0.5);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-    height: 300px;
+    height: 350px;
+  }
+
+  .role {
+    flex-direction: column;
+    padding-bottom: 2rem;
+  }
+
+  .role p {
+    font-size: 0.8rem;
   }
 
   .role li {
     padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .contact {
+    flex-direction: column;
+  }
+
+  .contact li {
+    margin: 1rem 0 0;
   }
 }
 
@@ -317,4 +344,9 @@ h1 {
   background: white;
   color: black;
   margin-top: 2rem;
+}
+
+.tm {
+  text-align: center;
+  font-size: 0.7rem;
 }
