@@ -5,11 +5,11 @@
 body {
   background: black;
   color: white;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Gotham SSm A', 'Gotham SSm B', sans-serif;
 }
 
 h1, h2, h3, p {
-  font-weight: 300;
+  font-weight: 200;
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
@@ -19,12 +19,12 @@ h1, h2, h3 {
 }
 
 h1, h2 {
-  font-size: 2.5rem;
+  font-size: 3rem;
   line-height: 1em;
 }
 
 p {
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1.35em;
 }
 
@@ -50,7 +50,7 @@ section {
 .container {
   max-width: 54rem;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 8rem 2rem;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
@@ -66,9 +66,10 @@ section {
   padding: 1rem;
   border: 0;
 
-  background: #0d72fe;
+  background: #008aff;
   color: white;
 
+  font-size: 0.9rem;
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -78,7 +79,7 @@ section {
 }
 
 .thanks {
-  background: #0d72fe;
+  background: #008aff;
   color: white;
 }
 
@@ -87,7 +88,7 @@ section {
 }
 
 .headline {
-  background: url(img/loadingscreen.png) no-repeat #222;
+  background: url(img/loadingscreen.png) no-repeat #222222;
   background-position: calc(50% + 300px) center;
 }
 
@@ -129,7 +130,7 @@ section {
 }
 
 .get-more p {
-  max-width: 30rem;
+  max-width: 35rem;
 }
 
 p.strong {
@@ -149,8 +150,8 @@ p.strong {
 }
 
 .keep-more .content {
-  width: 18rem;
-  margin-right: 7rem;
+  width: 22rem;
+  margin-right: 4rem;
 }
 
 .convenient .container {
@@ -187,7 +188,7 @@ li {
 }
 
 .role {
-  padding: 0 0 2rem;
+  padding: 0 0 4rem;
   border-bottom: 1px solid #666;
 }
 
@@ -214,7 +215,7 @@ li input {
 }
 
 ul.contact {
-  margin: 2rem 0;
+  margin: 2rem 0 3rem;
 }
 
 .contact li {
@@ -236,7 +237,6 @@ form .button {
 
 footer .container {
   height: 10rem;
-  color: #666;
   -webkit-flex-direction: column;
   flex-direction: column;
   -webkit-justify-content: center;
@@ -244,7 +244,7 @@ footer .container {
 }
 
 .ask {
-  margin-bottom: 3rem;
+  margin-bottom: 6rem;
 }
 
 .ask a {
@@ -300,4 +300,21 @@ footer .container {
   .headline img {
     left: -40px;
   }
+}
+
+.subhead {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+h1 {
+  margin-top: 8rem;
+  margin-bottom: 1.3rem;
+}
+
+.headline button {
+  background: white;
+  color: black;
+  margin-top: 2rem;
 }
