@@ -328,6 +328,7 @@ footer .container {
   }
 
   .role {
+    -webkit-flex-direction: column;
     flex-direction: column;
     padding-bottom: 2rem;
   }
@@ -342,6 +343,7 @@ footer .container {
   }
 
   .contact {
+    -webkit-flex-direction: column;
     flex-direction: column;
   }
 
