@@ -50,12 +50,12 @@ extends ./base.jade
 
         ul.role
           li
-            input#id_role_0(name='role', type='radio', value='driver')
+            #{ contact_form.role.0 }
             div
               label(for='id_role_0') I want to drive.
               p Send me an invitation so I can rent.
           li
-            input#id_role_1(name='role', type='radio', value='owner')
+            #{ contact_form.role.1 }
             div
               label(for='id_role_1') I own a car.
               p I want my car to make me money.
@@ -63,10 +63,12 @@ extends ./base.jade
         ul.contact
           li
             label(for='id_email') Email Address
-            input#id_email(maxlength='254', name='email', type='email', placeholder='you@example.com')
+            #{ contact_form.email }
+            #{ contact_form.email.errors }
           li
             label(for='id_zipcode') Zipcode
-            input#id_zipcode(maxlength='5', name='zipcode', type='text', placeholder='10001')
+            #{ contact_form.zipcode }
+            #{ contact_form.zipcode.errors }
 
         input.button(type="submit", value="Let's Talk")
 
