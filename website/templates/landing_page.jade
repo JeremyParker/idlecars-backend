@@ -1,6 +1,15 @@
 extends ./base.jade
 
+- block head.
+  | #{block.super}
+  script(type="text/javascript" language="javascript") function jumpToForm(){window.location.hash="lets-talk";}
+
+
 - block content
+  if contact_form.errors
+    body(onload="jumpToForm()")
+  else
+    body
 
   - if show_thanks
     section.thanks
@@ -63,12 +72,22 @@ extends ./base.jade
         ul.contact
           li
             label(for='id_email') Email Address
-            #{ contact_form.email }
-            #{ contact_form.email.errors }
+            if contact_form.email.errors
+              .error
+                #{ contact_form.email }
+                #{ contact_form.email.errors }
+            else
+              #{ contact_form.email }
+              #{ contact_form.email.errors }
           li
             label(for='id_zipcode') Zipcode
-            #{ contact_form.zipcode }
-            #{ contact_form.zipcode.errors }
+            if contact_form.zipcode.errors
+              .error
+                #{ contact_form.zipcode }
+                #{ contact_form.zipcode.errors }
+            else
+              #{ contact_form.zipcode }
+              #{ contact_form.zipcode.errors }
 
         input.button(type="submit", value="Let's Talk")
 
