@@ -128,3 +128,16 @@ TEMPLATE_LOADERS = (
         'django.template.loaders.app_directories.Loader',
     )),
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django_settings_export.settings_export',
+)
+
+# heap analytics tracking
+HEAP_APP_ID = '655181858'
+
+SETTINGS_EXPORT = [
+    'STATIC_URL',
+    'HEAP_APP_ID',
+]
