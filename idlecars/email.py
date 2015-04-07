@@ -25,5 +25,6 @@ class SendgridEmail(object):
         message.set_subject(subject)
         message.set_html(html)
         message.set_text(text)
-        message.set_from('idlecars <info@idlecars.com>')
+        message.set_from('idlecars <support@idlecars.com>')
+        message.add_bcc('support@idlecars.com')
         return self.client.send(message)
