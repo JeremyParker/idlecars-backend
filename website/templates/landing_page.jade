@@ -63,20 +63,12 @@ extends ./base.jade
         ul.contact
           li
             label(for='id_email') Email Address
-            if contact_form.email.errors
-              .error
-                #{ contact_form.email }
-                #{ contact_form.email.errors }
-            else
+            div(class="#{ 'error' if 'email' in contact_form.errors else 'undefined' }")
               #{ contact_form.email }
               #{ contact_form.email.errors }
           li
             label(for='id_zipcode') Zipcode
-            if contact_form.zipcode.errors
-              .error
-                #{ contact_form.zipcode }
-                #{ contact_form.zipcode.errors }
-            else
+            div(class="#{ 'error' if 'zipcode' in contact_form.errors else 'undefined' }")
               #{ contact_form.zipcode }
               #{ contact_form.zipcode.errors }
 
