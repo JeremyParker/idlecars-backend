@@ -135,7 +135,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # heap analytics tracking
-HEAP_APP_ID = '655181858'
+HEAP_APP_ID = os.getenv('HEAP_APP_ID', '655181858')
 
 SETTINGS_EXPORT = [
     'STATIC_URL',
