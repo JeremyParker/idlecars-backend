@@ -7,7 +7,7 @@ html(lang="en")
       meta(name='description', content='Earn more from rideshare by driving a premium vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
       meta(name='viewport', content='width=device-width, initial-scale=1')
 
-      // Place favicon.ico in the root directory
+      //- Place favicon.ico in the root directory
       link(href='//fonts.googleapis.com/css?family=Lato:300,400,700', rel='stylesheet', type='text/css')
       link(rel="stylesheet", type="text/css", href="//cloud.typography.com/6263754/658526/css/fonts.css")
       link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }normalize.css")
@@ -18,15 +18,5 @@ html(lang="en")
         heap.load("#{ settings.HEAP_APP_ID }");
 
   body
-    // Add your site or application content here
     - block content
     - endblock
-
-    // Google Analytics
-    script.
-      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-      e.src='https://www.google-analytics.com/analytics.js';
-      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-      ga('create','UA-55866166-1','auto');ga('send','pageview');
