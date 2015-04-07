@@ -227,6 +227,14 @@ li input {
   margin-right: 1rem;
 }
 
+.error {
+  color: red;
+}
+
+.error input {
+  background-color : #ffd1d1;
+}
+
 .contact label {
   display: block;
   margin-bottom: 0.25rem;
