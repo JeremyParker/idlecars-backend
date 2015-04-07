@@ -48,7 +48,7 @@ def index(request):
 
     # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('website:index'),
+        'action': urlresolvers.reverse('website:index') + '#lets-talk',
         'contact_form': contact_form,
         'show_thanks': _show_thanks(),
     }

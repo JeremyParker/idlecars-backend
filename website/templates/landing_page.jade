@@ -1,24 +1,6 @@
 extends ./base.jade
 
-- block head.
-  | #{block.super}
-  script(type="text/javascript" language="javascript") function jumpToForm(){window.location.hash="lets-talk";}
-
-
 - block content
-  if contact_form.errors
-    body(onload="jumpToForm()")
-  else
-    body
-
-  - if show_thanks
-    section.thanks
-      .container
-        .content
-          h2 Thanks!
-          p Expect an email from us shortly.
-          p Don't wan't to wait? 1-844-IDLECAR
-
   section.headline
     .container
       img(src="#{ STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
@@ -52,7 +34,16 @@ extends ./base.jade
       h2 Convenient for you
       p We take care of all the paperwork, insurance, and maintenance. We even ensure each car is clean for every shift.
 
-  section#lets-talk.form
+  #lets-talk
+  - if show_thanks
+    section.thanks
+      .container
+        .content
+          h2 Thanks!
+          p Expect an email from us shortly.
+          p Don't wan't to wait? 1-844-IDLECAR
+
+  section.form
     .container
       form(action="#{ action }", method="post")
         - csrf_token

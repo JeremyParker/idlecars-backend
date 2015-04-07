@@ -1,7 +1,6 @@
 doctype html
 html(lang="en")
   head
-    - block head.
       meta(charset='utf-8')
       meta(http-equiv='x-ua-compatible', content='ie=edge')
       title Revolutionizing Rideshare | idlecars
@@ -14,9 +13,10 @@ html(lang="en")
       link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }normalize.css")
       link(rel="stylesheet", type="text/css", href="#{ STATIC_URL }landing_page.css")
 
-  // Add your site or application content here
-  - block content
-      body
+  body
+    // Add your site or application content here
+    - block content
+    - endblock
 
     // Google Analytics
     script.
