@@ -11,8 +11,8 @@ from idlecars import model_helpers
 
 
 ROLE_CHOICES = model_helpers.Choices(
-    driver='I want to drive.',
-    owner='I own a car.',
+    driver='',
+    owner='',
 )
 
 SOURCE_CHOICES = model_helpers.Choices(
