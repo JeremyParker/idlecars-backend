@@ -89,6 +89,11 @@ section {
   opacity: 0.9;
 }
 
+.button:disabled{
+  background: gray;
+  text-decoration: line-through;
+}
+
 .thanks {
   background: #008aff;
   color: white;
