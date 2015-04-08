@@ -12,7 +12,7 @@ urlpatterns = patterns('',
 
     url(r'^api/$', server.views.index, name='index'),
 
-    url(r'^app/', include(web_app.urls)),
+    url(r'^app/', include(web_app.urls), namespace='web_app'),
 
     url(r'^admin/', include(admin.site.urls)),
 )
