@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'server',
     'website',
     'django_nose',
+    'web_app',
 )
 
 MIDDLEWARE_CLASSES = (
