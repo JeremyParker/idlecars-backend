@@ -5,9 +5,9 @@ from django.test import TestCase
 from server import models
 from idlecars import model_helpers
 
-class TestDriver(TestCase):
+class TestUser(TestCase):
     def test_full_name(self):
-        driver = models.Driver(
+        driver = models.User(
             first_name='Henry',
             last_name='Ford',
         )
