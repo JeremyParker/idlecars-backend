@@ -134,8 +134,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django_settings_export.settings_export',
 )
 
-# heap analytics tracking
-HEAP_APP_ID = os.getenv('HEAP_APP_ID', '655181858')
+# heap analytics tracking for production
+HEAP_APP_ID = '3053705704'
 
 SETTINGS_EXPORT = [
     'STATIC_URL',
