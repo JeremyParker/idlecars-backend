@@ -69,7 +69,7 @@ class UserAccount(models.Model):
 
 class Car(models.Model):
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, blank=False, default='Unknown')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
     status_date = models.DateField(blank=True, null=True)
 
     make = models.CharField(max_length=128, blank=True)
@@ -93,7 +93,6 @@ class Car(models.Model):
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
         max_length=32,
-        blank=False,
         default="No Minimum"
     )
     notes = models.TextField(blank=True)
