@@ -49,7 +49,7 @@ class Owner(models.Model):
             return "Owner {}".format(self.pk)
 
 
-class Customer(models.Model):
+class UserAccount(models.Model):
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)
@@ -59,7 +59,7 @@ class Customer(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="contacts")
 
     def full_name(self):
-        return u"{first_name} {last_name}".format(first_name=self.first_name, last_name=self.last_name)
+        return u"{first} {last}".format(first=self.first_name, last=self.last_name)
 
     def __unicode__(self):
         return "{name} ({contact})".format(
@@ -69,7 +69,7 @@ class Customer(models.Model):
 
 class Car(models.Model):
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField( choices=STATUS, max_length=32, blank=False, default='Unknown')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, blank=False, default='Unknown')
     status_date = models.DateField(blank=True, null=True)
 
     make = models.CharField(max_length=128, blank=True)
@@ -90,5 +90,10 @@ class Car(models.Model):
         _5_six_weeks='Six Weeks',
         _6_two_months='Two Months',
     )
-    min_lease = model_helpers.ChoiceField( choices=MIN_LEASE_CHOICES, max_length=32, blank=False, default="No Minimum")
+    min_lease = model_helpers.ChoiceField(
+        choices=MIN_LEASE_CHOICES,
+        max_length=32,
+        blank=False,
+        default="No Minimum"
+    )
     notes = models.TextField(blank=True)

@@ -37,7 +37,7 @@ class AdminTest(TestCase):
         for model in [
             # (slug, factory) pairs for all the admin-accessible models in the app:
             ('owner', factories.Owner),
-            ('customer', factories.Customer),
+            ('useraccount', factories.UserAccount),
             ('car', factories.Car),
         ]:
             # get the views that don't need an existing object
