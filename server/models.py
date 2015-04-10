@@ -49,7 +49,7 @@ class Owner(models.Model):
             return "Owner {}".format(self.pk)
 
 
-class User(models.Model):
+class Customer(models.Model):
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)

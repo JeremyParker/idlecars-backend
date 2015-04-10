@@ -40,9 +40,9 @@ class StaffUser(Factory):
     last_login = LazyAttribute(lambda o: o.date_joined + datetime.timedelta(days=4, hours=random.randint(0, 23)))
 
 
-class User(Factory):
+class Customer(Factory):
     class Meta:
-        model = 'server.User'
+        model = 'server.Customer'
 
     first_name = LazyAttribute(lambda o: faker.first_name())
     last_name = LazyAttribute(lambda o: faker.last_name())
