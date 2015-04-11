@@ -29,6 +29,7 @@ class OwnerAdmin(admin.ModelAdmin):
         'name',
         'rating',
     ]
+    change_form_template = "change_form_inlines_at_top.html"
 
 admin.site.register(models.Owner, OwnerAdmin)
 admin.site.register(models.Car)

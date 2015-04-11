@@ -122,6 +122,10 @@ LOGGING = {
     }
 }
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "../idlecars/templates"),
+)
+
 TEMPLATE_LOADERS = (
     ('pyjade.ext.django.Loader',(
         'django.template.loaders.filesystem.Loader',
