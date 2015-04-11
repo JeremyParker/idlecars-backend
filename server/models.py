@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from operator import attrgetter
 
 from django.db import models
 from django.core.validators import RegexValidator, MinLengthValidator, MaxLengthValidator
@@ -42,11 +43,25 @@ class Owner(models.Model):
 
     def name(self):
         if self.company_name:
-            return self.company_name
-        if self.user_account.count() == 1:
-            return self.user_account.first().full_name()
+            return self.company_name            
+        names = sorted(self.user_account.all(), key=attrgetter('last_name'))
+        return ', '.join([u.full_name() for u in names])
+
+    # get a value from the associated UserAccount, or return null, or 'multiple values'
+    def get_user_account_attr(self, attrib):
+        users = self.user_account.all()
+        if not users:
+            return ''
+        elif users.count() == 1:
+            return getattr(self.user_account.get(), attrib)
         else:
-            return None
+            return 'multiple values'
+
+    def number(self):
+        return self.get_user_account_attr('phone_number')
+
+    def email(self):
+        return self.get_user_account_attr('email')
 
     def __unicode__(self):
         name = self.name()

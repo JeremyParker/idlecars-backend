@@ -7,6 +7,7 @@ import models as models
 
 class UserAccountInline(admin.StackedInline):
     model = models.UserAccount
+    verbose_name = "Contact"
     def get_extra(self, request, obj=None, **kwargs):
         if obj:
             return 0
@@ -33,6 +34,8 @@ class OwnerAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'rating',
+        'number',
+        'email',
     ]
     change_form_template = "change_form_inlines_at_top.html"
 
