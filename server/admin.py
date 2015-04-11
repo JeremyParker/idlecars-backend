@@ -7,24 +7,29 @@ import models as models
 
 class UserAccountInline(admin.StackedInline):
     model = models.UserAccount
+    def get_extra(self, request, obj=None, **kwargs):
+        if obj:
+            return 0
+        return 1
 
 
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
         UserAccountInline,
     ]
-    fields = [
-        'company_name',
-        'address1',
-        'address2',
-        'city',
-        'state_code',
-        'zipcode',
-        'split_shift',
-        'rating',
-        'last_engagement',
-        'notes',
-    ]
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('split_shift', 'rating'),
+                'last_engagement',
+                'notes',
+                'company_name',
+                'address1',
+                'address2',
+                ('city', 'state_code', 'zipcode'),
+            )
+        }),
+    )
     list_display = [
         'name',
         'rating',
