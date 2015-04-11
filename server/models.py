@@ -57,7 +57,7 @@ class UserAccount(models.Model):
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)
-    email = models.CharField(blank=True, max_length=128, unique=True, default='')
+    email = models.CharField(blank=True, max_length=128, unique=True, null=True)
 
     # if this user is an owner, they have an owner profile
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
