@@ -40,13 +40,17 @@ class Owner(models.Model):
     last_engagement = models.DateField(blank=True, null=True)
     notes = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def name(self):
         if self.company_name:
             return self.company_name
         if self.user_account.count() == 1:
             return self.user_account.first().full_name()
         else:
-            return "Owner {}".format(self.pk)
+            return None
+
+    def __unicode__(self):
+        name = self.name()
+        return name or "Owner {}".format(self.pk)
 
 
 class UserAccount(models.Model):

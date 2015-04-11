@@ -2,9 +2,37 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-import models as server_models
+import models as models
 
 
-admin.site.register(server_models.UserAccount)
-admin.site.register(server_models.Owner)
-admin.site.register(server_models.Car)
+class UserAccountInline(admin.StackedInline):
+    model = models.UserAccount
+
+
+class OwnerAdmin(admin.ModelAdmin):
+    inlines = [
+        UserAccountInline,
+    ]
+    fields = [
+        'company_name',
+        'address1',
+        'address2',
+        'city',
+        'state_code',
+        'zipcode',
+        'split_shift',
+        'rating',
+        'last_engagement',
+        'notes',
+    ]
+    list_display = [
+        'name',
+        'rating',
+    ]
+
+admin.site.register(models.Owner, OwnerAdmin)
+admin.site.register(models.Car)
+
+admin.site.site_header = "Idle Cars Operations"
+admin.site.site_title = ''
+admin.site.index_title = ''
