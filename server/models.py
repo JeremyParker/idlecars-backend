@@ -78,7 +78,7 @@ class UserAccount(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
 
     def full_name(self):
-        return u"{first} {last}".format(first=self.first_name, last=self.last_name)
+        return ' '.join([n for n in [self.first_name, self.last_name] if n])
 
     def __unicode__(self):
         return "{name} ({contact})".format(
@@ -87,6 +87,7 @@ class UserAccount(models.Model):
 
 
 class Car(models.Model):
+    owner = models.ForeignKey(Owner, blank=True, null=True, related_name="cars")
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
     status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
     status_date = models.DateField(blank=True, null=True)
@@ -101,13 +102,14 @@ class Car(models.Model):
     split_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
-        _0_no_min='No Minimum',
-        _1_one_week='One Week',
-        _2_two_weeks='Two Weeks',
-        _3_three_weeks='Three Weeks',
-        _4_one_month='One Month',
-        _5_six_weeks='Six Weeks',
-        _6_two_months='Two Months',
+        _0_unknown='Unknown',
+        _1_no_min='No Minimum',
+        _2_one_week='One Week',
+        _3_two_weeks='Two Weeks',
+        _4_three_weeks='Three Weeks',
+        _5_one_month='One Month',
+        _6_six_weeks='Six Weeks',
+        _7_two_months='Two Months',
     )
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
@@ -115,3 +117,6 @@ class Car(models.Model):
         default="No Minimum"
     )
     notes = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return '{} {} {}'.format(self.year, self.make, self.model)
