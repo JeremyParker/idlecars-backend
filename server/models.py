@@ -43,8 +43,8 @@ class Owner(models.Model):
     def __unicode__(self):
         if self.company_name:
             return self.company_name
-        if self.contacts.count() == 1:
-            return self.contacts.first().full_name()
+        if self.user_account.count() == 1:
+            return self.user_account.first().full_name()
         else:
             return "Owner {}".format(self.pk)
 
@@ -53,10 +53,10 @@ class UserAccount(models.Model):
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)
-    email = models.CharField(blank=True, max_length=128, null=True, unique=True)
+    email = models.CharField(blank=True, max_length=128, unique=True, default='')
 
     # if this user is an owner, they have an owner profile
-    owner = models.ForeignKey(Owner, blank=True, null=True, related_name="contacts")
+    owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
 
     def full_name(self):
         return u"{first} {last}".format(first=self.first_name, last=self.last_name)
@@ -69,7 +69,7 @@ class UserAccount(models.Model):
 
 class Car(models.Model):
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, blank=False, default='Unknown')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
     status_date = models.DateField(blank=True, null=True)
 
     make = models.CharField(max_length=128, blank=True)
@@ -93,7 +93,6 @@ class Car(models.Model):
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
         max_length=32,
-        blank=False,
         default="No Minimum"
     )
     notes = models.TextField(blank=True)
