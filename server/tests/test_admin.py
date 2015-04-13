@@ -37,7 +37,6 @@ class AdminTest(TestCase):
         for model in [
             # (slug, factory) pairs for all the admin-accessible models in the app:
             ('owner', factories.Owner),
-            ('useraccount', factories.UserAccount),
             ('car', factories.Car),
         ]:
             # get the views that don't need an existing object
@@ -59,19 +58,3 @@ class AdminTest(TestCase):
                 url = reverse(view.format(model[0]), args=(obj.pk,))
                 response = self.client.get(url)
                 self.assertEquals(200, response.status_code)
-
-
-    def test_owner_admin(self):
-        self.assertEquals(models.Owner.objects.count(), 0)
-
-        post_data = {
-            'first_name': 'Henry',
-            'last_name': 'Ford',
-            'phone_number': '555-555-1212',
-            'email': 'example@wherever.com',
-        }
-
-        response = self.client.post(reverse('admin:server_owner_add'), post_data)
-
-        self.assertRedirects(response, reverse('admin:server_owner_changelist'))
-        self.assertEquals(models.Owner.objects.count(), 1)
