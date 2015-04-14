@@ -36,11 +36,10 @@ class CarInline(admin.TabularInline):
     extra = 0
     fields = [
         'detail_link',
-        'make',
-        'model',
+        'make_model',
         'year',
         'status',
-        'status_date',
+        'next_available_date',
         'solo_cost',
         'solo_deposit',
         'split_cost',
@@ -50,6 +49,9 @@ class CarInline(admin.TabularInline):
     readonly_fields = ['detail_link']
     def detail_link(self, instance):
         return link(instance, 'details')
+    def status_date(self, instance):
+        if instance.owner:
+            return instance.owner.last_engagement
 
 
 class OwnerAdmin(admin.ModelAdmin):
@@ -75,25 +77,36 @@ class OwnerAdmin(admin.ModelAdmin):
         'rating',
         'number',
         'email',
+        'cars_available',
+        'total_cars',
     ]
     change_form_template = "change_form_inlines_at_top.html"
     def link_name(self, instance):
         return instance.__unicode__()
+    link_name.short_description = "Name"
+
+    def cars_available(self, instance):
+        return instance.cars.filter(status='Available').count()
+
+    def total_cars(self, instance):
+        return instance.cars.count()
 
 
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
+        'effective_status',
         'solo_cost',
         'split_cost',
         'owner_link',
+        'owner_rating',
     ]
     fieldsets = (
         (None, {
             'fields': (
-                ('make', 'model', 'year'),
-                ('owner', 'owner_link'),
-                ('status', 'status_date'),
+                ('make_model', 'year', 'plate'),
+                ('owner', 'owner_link', 'owner_rating'),
+                ('status', 'status_date', 'next_available_date'),
                 ('solo_cost', 'solo_deposit'),
                 ('split_cost', 'split_deposit'),
                 'min_lease',
@@ -101,7 +114,13 @@ class CarAdmin(admin.ModelAdmin):
             )
         }),
     )
-    readonly_fields = ['owner_link']
+    readonly_fields = [
+        'owner_link',
+        'owner_rating',
+        'status_date',
+        'effective_status',
+    ]
+
     def description(self, instance):
         return instance.__unicode__()
     def owner_link(self, instance):
@@ -111,8 +130,18 @@ class CarAdmin(admin.ModelAdmin):
             return None
     owner_link.short_description = 'Owner'
 
+    def owner_rating(self, instance):
+        if instance.owner:
+            return instance.owner.rating
+
+    def status_date(self, instance):
+        if instance.owner:
+            return instance.owner.last_engagement
+
+
 admin.site.register(models.Owner, OwnerAdmin)
 admin.site.register(models.Car, CarAdmin)
+admin.site.register(models.MakeModel)
 
 admin.site.site_header = "Idle Cars Operations"
 admin.site.site_title = ''

@@ -5,7 +5,8 @@ import datetime
 from operator import attrgetter
 
 from django.db import models
-from django.core.validators import RegexValidator, MinLengthValidator, MaxLengthValidator
+from django.core.validators import RegexValidator, MinLengthValidator
+from django.core.validators import MaxLengthValidator, EmailValidator
 
 from idlecars import model_helpers
 
@@ -72,10 +73,20 @@ class UserAccount(models.Model):
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)
-    email = models.CharField(blank=True, max_length=128, unique=True, null=True)
+    email = models.CharField(
+        blank=True,
+        max_length=128,
+        unique=True,
+        null=True,
+        validators=[EmailValidator()],
+    )
 
     # if this user is an owner, they have an owner profile
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
+
+    def clean(self, *args, **kwargs):
+        self.email = self.email.lower().strip() or None
+        super(UserAccount, self).clean(*args, **kwargs)
 
     def full_name(self):
         return ' '.join([n for n in [self.first_name, self.last_name] if n])
@@ -86,16 +97,28 @@ class UserAccount(models.Model):
             contact=self.email or self.phone_number or 'no contact')
 
 
-class Car(models.Model):
-    owner = models.ForeignKey(Owner, blank=True, null=True, related_name="cars")
-    STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
-    status_date = models.DateField(blank=True, null=True)
-
+class MakeModel(models.Model):
     make = models.CharField(max_length=128, blank=True)
     model = models.CharField(max_length=128, blank=True)
-    YEARS = [(y, unicode(y)) for y in range(1995, (datetime.datetime.now().year+1))]
+    def __unicode__(self):
+        return '{} {}'.format(self.make, self.model)
+
+
+class Car(models.Model):
+    owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
+    STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
+    next_available_date = models.DateField(blank=True, null=True)
+    make_model = models.ForeignKey(
+        MakeModel,
+        related_name='+',
+        verbose_name="Make & Model",
+        blank=True,
+        null=True
+    )
+    YEARS = [(y, unicode(y)) for y in range((datetime.datetime.now().year+1), 1995, -1)]
     year = models.IntegerField(choices=YEARS, max_length=4, blank=True, null=True)
+    plate = models.CharField(max_length=24, blank=True)
     solo_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     solo_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     split_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -114,9 +137,18 @@ class Car(models.Model):
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
         max_length=32,
-        default="No Minimum"
+        default='No Minimum'
     )
     notes = models.TextField(blank=True)
 
+    def effective_status(self):
+        if self.next_available_date and self.next_available_date < datetime.date.today():
+            return 'Available'
+        else:
+            return self.status
+
     def __unicode__(self):
-        return '{} {} {}'.format(self.year, self.make, self.model)
+        if self.year:
+            return '{} {}'.format(self.year, self.make_model)
+        else:
+            return unicode(self.make_model)
