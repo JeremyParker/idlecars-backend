@@ -21,6 +21,7 @@ class TestUserAccount(TestCase):
 
     def test_email_not_empty_string(self):
         user = models.UserAccount(email='')
+        user.clean()
         self.assertIsNone(user.email)
 
 
