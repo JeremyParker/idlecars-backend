@@ -19,6 +19,12 @@ class TestUserAccount(TestCase):
         self.assertEqual('Charlie', field.get_prep_value('Charlie  '))
         self.assertEqual('ABCDEF', field.get_prep_value('ABCDEF'))
 
+    def test_email_not_empty_string(self):
+        user = models.UserAccount(email='')
+        user.clean()
+        self.assertIsNone(user.email)
+
+
 class TestOwner(TestCase):
     def test_name(self):
         expected_results = [
