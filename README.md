@@ -79,12 +79,12 @@ python manage.py test server --nocapture
 ### Deployment
 We have two apps on Heroku that we deploy to.
 Staging
-name: staging-idlecars
-url: staging-idlecars.heroku.com
+* name: staging-idlecars
+* url: staging-idlecars.heroku.com
 
 Production
-name: idlecars
-url: idlecars.com
+* name: idlecars
+* url: idlecars.com
 
 
 ### Merge tool
