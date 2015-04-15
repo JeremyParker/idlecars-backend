@@ -12,7 +12,6 @@ import serializers
 
 @api_view(('GET',))
 def api_root(request, format=None):
-    import pdb; pdb.set_trace()
     return Response({
         'cars': reverse('car-list', request=request, format=format),
     })
