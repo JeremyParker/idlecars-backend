@@ -86,7 +86,7 @@ class OwnerAdmin(admin.ModelAdmin):
     link_name.short_description = "Name"
 
     def cars_available(self, instance):
-        return instance.cars.filter(status='Available').count()
+        return instance.cars.filter(status='available').count()
 
     def total_cars(self, instance):
         return instance.cars.count()
