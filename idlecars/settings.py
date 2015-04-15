@@ -104,9 +104,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
-# Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = (os.getenv('CORS_ALLOWED_HOST', 'localhost:3000'),)
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -138,9 +135,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django_settings_export.settings_export',
 )
-
-# heap analytics tracking for production
-HEAP_APP_ID = '3053705704'
 
 SETTINGS_EXPORT = [
     'STATIC_URL',
