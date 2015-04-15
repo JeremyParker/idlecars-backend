@@ -9,7 +9,7 @@ import server.views
 urlpatterns = patterns('',
     url(r'', include('website.urls', namespace='website')),
 
-    url(r'^api/$', server.views.index, name='index'),
+    url(r'^api/', include('server.urls', namespace='server')),
 
     url(r'^admin/', include(admin.site.urls)),
 )
