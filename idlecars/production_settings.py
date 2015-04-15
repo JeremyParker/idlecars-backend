@@ -7,4 +7,4 @@ from settings import *
 HEAP_APP_ID = '3053705704'
 
 # Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = ('app.idlecars.com'),)
+CORS_ORIGIN_WHITELIST = ('app.idlecars.com',)

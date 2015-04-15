@@ -21,4 +21,4 @@ DEBUG = True
 HEAP_APP_ID = '655181858'
 
 # Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = ('localhost:3000'),)
+CORS_ORIGIN_WHITELIST = ('localhost:3000',)
