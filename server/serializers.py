@@ -26,8 +26,8 @@ class CarSerializer(serializers.ModelSerializer):
         return unicode(obj.make_model)
 
     def get_listing_features(self, obj):
-        return '{} minimum lease, {}, {}, Idlecars Certified'.format(
-            obj.min_lease,
+        return '{} minimum lease ∙ {}, {}, ∙ Idlecars Certified'.format(
+            Car.MIN_LEASE_CHOICES[obj.min_lease],
             obj.owner.city,
             obj.owner.state_code
         )
