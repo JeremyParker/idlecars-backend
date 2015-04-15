@@ -1,4 +1,4 @@
-la* {
+* {
   box-sizing: border-box;
 }
 
@@ -87,11 +87,6 @@ section {
 
 .button:hover {
   opacity: 0.9;
-}
-
-.button:disabled{
-  background: gray;
-  text-decoration: line-through;
 }
 
 .thanks {
