@@ -1,4 +1,4 @@
-* {
+la* {
   box-sizing: border-box;
 }
 
@@ -212,6 +212,10 @@ ul {
 li {
   -webkit-flex: 1;
   flex: 1;
+}
+
+.red {
+  color: red;
 }
 
 .role {

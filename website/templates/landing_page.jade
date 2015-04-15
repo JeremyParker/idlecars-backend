@@ -45,7 +45,7 @@ extends ./base.jade
 
   section.form
     .container
-      form(action="#{ action }", method="post", ng-app='', novalidate='', name='myForm')
+      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
         - csrf_token
 
         ul.role
@@ -62,18 +62,19 @@ extends ./base.jade
 
         ul.contact
           li
-            label(for='id_email') Email Address
+            label(for='id_email', ng-bind='emailBind', ng-class='{red:emailRed}')
+              
             input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com',required='')
-            p(style='color:red' ng-show='myForm.email.$dirty && myForm.email.$error.required') *Email address is required.
-            p(style='color:red' ng-show='myForm.email.$dirty && myForm.email.$invalid && !myForm.email.$error.required') *Please enter a valid email address.
 
           li
-            label(for='id_zipcode') Zipcode
+            label(for='id_zipcode', ng-bind='zipBind', ng-class='{red:zipRed}')
+              
             input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
-            p(style='color:red', ng-show='myForm.zipcode.$error.required && myForm.zipcode.$dirty') *Zip code is required
-            p(style='color:red', ng-show='!myForm.zipcode.$error.required && myForm.zipcode.$dirty && myForm.zipcode.$error.pattern') *Please enter a valid zip code.
+          
 
-        input.button(type="submit", value="Let's Talk", ng-disabled='myForm.email.$invalid || myForm.zipcode.$invalid')
+        input.button(type="submit", value="Let's Talk", ng-click='val($event)')
+        
+  
 
   footer
     .container
