@@ -126,7 +126,7 @@ class Car(models.Model):
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _0_unknown='Unknown',
-        _1_no_min='No Minimum',
+        _1_no_min='No',
         _2_one_week='One Week',
         _3_two_weeks='Two Weeks',
         _4_three_weeks='Three Weeks',
