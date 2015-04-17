@@ -125,14 +125,18 @@ class Car(models.Model):
     split_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
-        _0_unknown='Unknown',
-        _1_no_min='No',
-        _2_one_week='One Week',
-        _3_two_weeks='Two Weeks',
-        _4_three_weeks='Three Weeks',
-        _5_one_month='One Month',
-        _6_six_weeks='Six Weeks',
-        _7_two_months='Two Months',
+        _00_unknown='Unknown',
+        _01_no_min='No',
+        _02_one_week='One Week',
+        _03_two_weeks='Two Weeks',
+        _04_three_weeks='Three Weeks',
+        _05_one_month='One Month',
+        _06_six_weeks='Six Weeks',
+        _07_two_months='Two Months',
+        _08_three_months='Three Months',
+        _09_four_months='Four Months',
+        _10_five_months='Five Months',
+        _11_six_months='Six Months',
     )
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
