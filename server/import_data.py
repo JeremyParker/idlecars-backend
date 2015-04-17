@@ -185,6 +185,8 @@ def import_cars():
                             6: '_6_six_weeks',
                         }[count]
                     except KeyError:
+                        if count == '4':
+                            minl = '_5_one_month'
                         pass
 
             car = models.Car(
