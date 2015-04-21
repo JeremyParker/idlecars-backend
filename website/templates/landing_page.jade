@@ -3,7 +3,7 @@ extends ./base.jade
 - block content
   section.headline
     .container
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
+      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
       .content
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
@@ -16,12 +16,13 @@ extends ./base.jade
         h2 Select the best
         p We provide a wide selection of premium vehicles to drive for high-end rideshare and limousine services.
 
-  section.get-more
-    .container
+  section.get-more(id="GM1")
+    .container(id="GC1")
       h2 Get more rides
       p.strong Our cars allow you to drive for any base.
       p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
-      img(src="#{ settings.STATIC_URL }img/services.jpg", alt="uber lift and others")
+      img(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others", class="rs_logo1")
+      img(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others", class="rs_logo2")
 
   section.keep-more
     .container
@@ -30,7 +31,7 @@ extends ./base.jade
         p You only pay for the hours you rent.
 
   section.get-more.convenient
-    .container
+    .container(id="GC2")
       h2 Convenient for you
       p We take care of all the paperwork, insurance, and maintenance. We even ensure each car is clean for every shift.
 
@@ -62,12 +63,12 @@ extends ./base.jade
 
         ul.contact
           li
-            label(for='id_email') Email Address
+            label(for='id_email', class="inputLabel") Email Address
             div(class="#{ 'error' if 'email' in contact_form.errors else '' }")
               #{ contact_form.email }
               #{ contact_form.email.errors }
           li
-            label(for='id_zipcode') Zipcode
+            label(for='id_zipcode', class="inputLabel") Zipcode
             div(class="#{ 'error' if 'zipcode' in contact_form.errors else '' }")
               #{ contact_form.zipcode }
               #{ contact_form.zipcode.errors }
@@ -78,5 +79,6 @@ extends ./base.jade
     .container
       p.ask
         a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      | <p>© {% now 'Y' %} idlecars</p>
-      p.tm All trademarks and images are copyright of their respective owners.
+        div.last_content
+          | <p class='tm'>© {% now 'Y' %} idlecars</p>
+          p.tm All trademarks and images are copyright of their respective owners.
