@@ -40,6 +40,10 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+
     class Meta:
         model = UserAccount
 
@@ -55,11 +59,16 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ('user_account', 'car_id')
 
+    def is_valid(self, raise_exception=False):
+        # TODO - check that the car is available to be booked
+        super(BookingSerializer, self).is_valid(raise_exception=True)
+
     def create(self, validated_data):
         user_account_data = validated_data.pop('user_account')
         user_account = UserAccount.objects.create(**user_account_data)
         car = validated_data['car_id']
-        return Booking.objects.create(
+        booking = Booking.objects.create(
             user_account = user_account,
             car = car,
         )
+        return booking

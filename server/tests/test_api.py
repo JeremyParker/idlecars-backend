@@ -53,34 +53,6 @@ class CarTest(APITestCase):
         self.assertEqual(response.data, expected)
 
 
-# class BookingTest(APITestCase):
-#     def test_create_booking_success(self):
-#         """
-#         Ensure we can create a new booking object.
-#         """
-#         url = reverse('booking-list')
-#         data = {
-#             'first_name': 'Alexandra',
-#             'last_name': 'Higgins',
-#             'phone_number': '212-234-5678',
-#             'email': 'someone@somewhere.com',
-#         }
-#         response = self.client.post(url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         self.assertEqual(response.data, data)
-
-#     def test_create_booking_fail(self):
-#         url = reverse('booking-list')
-#         data = {
-#             'first_name': 'Alexandra',
-#             'last_name': 'Higgins',
-#             'phone_number': '',  # booking must have either phone or email
-#             'email': '',
-#         }
-#         response = self.client.post(url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
 class UserAccountSerializerTest(TestCase):
     def test_deserialize(self):
         json = '''{
@@ -99,6 +71,19 @@ class UserAccountSerializerTest(TestCase):
         self.assertEqual(user_account.phone_number, "212-123-4567")
         self.assertEqual(user_account.email, "someone@somewhere.com")
 
+    def test_deserialize_Fail(self):
+        json = '''{
+            "first_name": "Alexandra",
+            "last_name": "Higgins",
+            "phone_number": "212-123-4567",
+            "email": ""
+        }'''
+        stream = BytesIO(json)
+        data = JSONParser().parse(stream)
+        serializer = UserAccountSerializer(data=data)
+        serializer.is_valid()
+        self.assertEqual(serializer.errors, {'email': [u'This field may not be blank.']})
+
 
 class BookingSerializerTest(TestCase):
     def test_deserialize(self):
@@ -106,7 +91,6 @@ class BookingSerializerTest(TestCase):
         car.save()
 
         user = factories.UserAccount()
-        import pdb; pdb.set_trace()
         json = '''{{
             "user_account": {{
                 "first_name": "{}",
@@ -133,3 +117,45 @@ class BookingSerializerTest(TestCase):
         self.assertEqual(booking.user_account.last_name, user.last_name)
         self.assertEqual(booking.user_account.phone_number, user.phone_number)
         self.assertEqual(booking.user_account.email, user.email)
+
+
+class BookingTest(APITestCase):
+    def setUp(self):
+        self.car = factories.Car()
+        self.car.save()
+        self.data = {
+            'user_account': {
+                'first_name': 'Alexandra',
+                'last_name': 'Higgins',
+                'phone_number': '212-234-5678',
+                'email': 'someone@somewhere.com',
+            },
+            'car_id': self.car.pk
+        }
+
+    def test_create_booking_success(self):
+        """
+        Ensure we can create a new booking object.
+        """
+        url = reverse('server:bookings-list')
+        response = self.client.post(url, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['car_id'], self.car.pk)
+        self.assertEqual(
+            response.data['user_account']['id'],
+            models.UserAccount.objects.latest('pk').pk
+        )
+        self.assertEqual(
+            models.Booking.objects.latest('pk').user_account.phone_number,
+            self.data['user_account']['phone_number']
+        )
+
+    def test_create_booking_fail(self):
+        self.data['user_account']['email'] = ''
+        url = reverse('server:bookings-list')
+        response = self.client.post(url, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.content,
+            '{"user_account":{"email":["This field may not be blank."]}}'
+        )

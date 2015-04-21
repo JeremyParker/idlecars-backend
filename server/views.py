@@ -33,3 +33,4 @@ class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class CreateBookingView(CreateViewSet):
     serializer_class = BookingSerializer
+    queryset = models.Booking.objects.all()
