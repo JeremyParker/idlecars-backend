@@ -48,7 +48,7 @@ class Car(models.Model):
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
         max_length=32,
-        default='No Minimum'
+        default='_00_unknown'
     )
     notes = models.TextField(blank=True)
 
