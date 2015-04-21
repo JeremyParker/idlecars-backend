@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 
 import datetime
 import random
+import string
+from decimal import Decimal
 
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 from factory import LazyAttribute, lazy_attribute, BUILD_STRATEGY
-from factory import DjangoModelFactory
+from factory import DjangoModelFactory, SubFactory, SelfAttribute
 import faker
 
 from server import models
@@ -59,8 +61,29 @@ class Owner(Factory):
         model = 'server.Owner'
 
     company_name = LazyAttribute(lambda o: faker.name() + "'s Cars")
+    address1 = faker.street_address
+    city = LazyAttribute(lambda o: faker.city())
+    state_code = LazyAttribute(lambda o: faker.state_abbr())
+    zipcode = LazyAttribute(lambda o: faker.zipcode())
+
+
+class MakeModel(Factory):
+    class Meta:
+        model = 'server.MakeModel'
+    make = LazyAttribute(lambda o: faker.last_name())
+    model = LazyAttribute(lambda o: faker.last_name())
 
 
 class Car(Factory):
     class Meta:
         model = 'server.Car'
+
+    owner = SubFactory(Owner)
+    status = LazyAttribute(lambda o: random.choice(['available', 'unknown', 'busy']))
+    make_model = SubFactory(MakeModel)
+    year = LazyAttribute(lambda o: random.randint(2000, 2016))
+    plate = LazyAttribute(lambda o: ''.join(
+        [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
+    ))
+    solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 5000) / Decimal(100))
+    solo_deposit = SelfAttribute('solo_cost')
