@@ -16,3 +16,9 @@ DATABASES = {
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Heap Analytics uses the DEBUG app id in development/testing
+HEAP_APP_ID = '655181858'
+
+# Allow cross origin requests from these domains
+CORS_ORIGIN_WHITELIST = ('localhost:3000',)

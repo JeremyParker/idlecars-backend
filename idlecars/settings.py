@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'corsheaders',
     'server',
+    'rest_framework',
     'website',
     'django_nose',
 )
@@ -103,9 +104,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
-# Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = (os.getenv('CORS_ALLOWED_HOST', 'localhost:3000'),)
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -122,9 +120,23 @@ LOGGING = {
     }
 }
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "../idlecars/templates"),
+)
+
 TEMPLATE_LOADERS = (
     ('pyjade.ext.django.Loader',(
         'django.template.loaders.filesystem.Loader',
         'django.template.loaders.app_directories.Loader',
     )),
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django_settings_export.settings_export',
+)
+
+SETTINGS_EXPORT = [
+    'STATIC_URL',
+    'HEAP_APP_ID',
+]

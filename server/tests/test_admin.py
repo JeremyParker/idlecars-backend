@@ -5,7 +5,7 @@ from django.test import Client, TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from server.models import Driver
+from server import models
 from server import factories
 
 class AdminTest(TestCase):
@@ -36,8 +36,8 @@ class AdminTest(TestCase):
         '''
         for model in [
             # (slug, factory) pairs for all the admin-accessible models in the app:
-            ('fleetpartner', factories.FleetPartner),
-            ('driver', factories.Driver),
+            ('owner', factories.Owner),
+            ('car', factories.Car),
         ]:
             # get the views that don't need an existing object
             for view in [
@@ -58,19 +58,3 @@ class AdminTest(TestCase):
                 url = reverse(view.format(model[0]), args=(obj.pk,))
                 response = self.client.get(url)
                 self.assertEquals(200, response.status_code)
-
-
-    def test_driver_admin(self):
-        self.assertEquals(Driver.objects.count(), 0)
-
-        post_data = {
-            'first_name': 'Henry',
-            'last_name': 'Ford',
-            'phone_number': '555-555-1212',
-            'email': 'example@wherever.com',
-        }
-
-        response = self.client.post(reverse('admin:server_driver_add'), post_data)
-
-        self.assertRedirects(response, reverse('admin:server_driver_changelist'))
-        self.assertEquals(Driver.objects.count(), 1)

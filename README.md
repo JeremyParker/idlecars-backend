@@ -76,6 +76,17 @@ to run the unit test suite. All the tests should pass. To run the tests with deb
 python manage.py test server --nocapture
 ```
 
+### Deployment
+We have two apps on Heroku that we deploy to.
+Staging
+* name: staging-idlecars
+* url: staging-idlecars.heroku.com
+
+Production
+* name: idlecars
+* url: idlecars.com
+
+
 ### Merge tool
 Personally, I like to use P4Merge as a visual merge tool:
 
