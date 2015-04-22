@@ -5,7 +5,7 @@ from django.contrib import admin
 import django.utils
 from django.core import urlresolvers
 
-import models as models
+from server import models
 
 # helper to make links on admin pages
 def link(obj, text=None):
@@ -97,7 +97,7 @@ class CarAdmin(admin.ModelAdmin):
         'description',
         'effective_status',
         'solo_cost',
-        'split_cost',
+        'solo_deposit',
         'owner_link',
         'owner_rating',
     ]
@@ -132,7 +132,7 @@ class CarAdmin(admin.ModelAdmin):
 
     def owner_rating(self, instance):
         if instance.owner:
-            return instance.owner.rating
+            return models.Owner.RATING[instance.owner.rating][1]
 
     def status_date(self, instance):
         if instance.owner:
@@ -142,6 +142,7 @@ class CarAdmin(admin.ModelAdmin):
 admin.site.register(models.Owner, OwnerAdmin)
 admin.site.register(models.Car, CarAdmin)
 admin.site.register(models.MakeModel)
+admin.site.register(models.Booking)
 
 admin.site.site_header = "Idle Cars Operations"
 admin.site.site_title = ''
