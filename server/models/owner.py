@@ -8,16 +8,6 @@ from django.core.validators import RegexValidator, MinLengthValidator
 from django.core.validators import MaxLengthValidator
 
 
-RATING = [
-    (0, 'Terrible'),
-    (1, 'Bad'),
-    (2, 'Poor'),
-    (3, 'OK'),
-    (4, 'Good'),
-    (5, 'Excellent'),
-]
-
-
 class Owner(models.Model):
     company_name = models.CharField(max_length=256, blank=True)
     address1 = models.CharField(blank=True, max_length=200)
@@ -32,6 +22,14 @@ class Owner(models.Model):
         ],
     )
     split_shift = models.NullBooleanField(verbose_name="Accepts Split Shifts", blank=True)
+    RATING = [
+        (0, 'Terrible'),
+        (1, 'Bad'),
+        (2, 'Poor'),
+        (3, 'OK'),
+        (4, 'Good'),
+        (5, 'Excellent'),
+    ]
     rating = models.IntegerField(
         choices=RATING,
         blank=True,
