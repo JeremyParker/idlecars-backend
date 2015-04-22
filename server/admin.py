@@ -131,8 +131,10 @@ class CarAdmin(admin.ModelAdmin):
     owner_link.short_description = 'Owner'
 
     def owner_rating(self, instance):
-        if instance.owner:
+        if instance.owner and instance.owner.rating:
             return models.Owner.RATING[instance.owner.rating][1]
+        else:
+            return 'unrated'
 
     def status_date(self, instance):
         if instance.owner:
