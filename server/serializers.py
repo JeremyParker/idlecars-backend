@@ -11,6 +11,7 @@ class CarSerializer(serializers.ModelSerializer):
     listing_features = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -20,6 +21,7 @@ class CarSerializer(serializers.ModelSerializer):
             'listing_features',
             'cost',
             'cost_time',
+            'image_url',
         )
 
     def get_name(self, obj):
@@ -37,6 +39,12 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_cost_time(self, obj):
         return 'a week'
+
+    def get_image_url(self, obj):
+        if obj.make_model and obj.make_model.image_filename:
+            return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(obj.make_model.image_filename)
+        else:
+            return 'https://s3.amazonaws.com/images.idlecars.com/toyota_avalon.jpg' # TODO - slugbug
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
