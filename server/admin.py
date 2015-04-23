@@ -104,7 +104,8 @@ class CarAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('make_model', 'year', 'plate'),
+                ('make_model', 'hybrid', 'year'),
+                ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
                 ('status', 'status_date', 'next_available_date'),
                 ('solo_cost', 'solo_deposit'),
