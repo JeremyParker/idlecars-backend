@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from rest_framework import serializers
 
 from models import Car, UserAccount, Booking
@@ -9,6 +11,9 @@ from models import Car, UserAccount, Booking
 class CarSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     listing_features = serializers.SerializerMethodField()
+    headline_features = serializers.SerializerMethodField()
+    certifications = serializers.SerializerMethodField()
+    details = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
 
@@ -18,6 +23,9 @@ class CarSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'listing_features',
+            'headline_features',
+            'certifications',
+            'details',
             'cost',
             'cost_time',
         )
@@ -26,17 +34,49 @@ class CarSerializer(serializers.ModelSerializer):
         return unicode(obj.make_model)
 
     def get_listing_features(self, obj):
-        return '{} minimum lease ∙ {}, {}, ∙ Idlecars Certified'.format(
+        return '{} minimum lease ∙ Available {} ∙ {}, {}'.format(
             Car.MIN_LEASE_CHOICES[obj.min_lease],
+            self._available_string(obj),
             obj.owner.city,
             obj.owner.state_code,
         )
+
+    def get_headline_features(self, obj):
+        return [
+            'Available {}'.format(self._available_string(obj)),
+            '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
+            '{} deposit'.format(obj.solo_deposit),
+        ]
+
+    def get_certifications(self, obj):
+        certs = [
+            'Insurance is included',
+            'Maintainance is included',
+        ]
+        if obj.base:
+            certs = ['Base registration has been confirmed by idlecars'] + certs
+        if obj.plate:
+            certs = certs + ['Vehicle has TLC plates']
+        return certs
+
+
+    def get_details(self, obj):
+        return [
+            ['Hybrid', '\u2611' if obj.hybrid else '\u2610'],  # checkbox with or without check
+            ['Location', ', '.join(l for l in [obj.owner.city, obj.owner.state_code] if l)],
+            ['TLC Base', obj.base or 'Pending verification'],
+        ]
 
     def get_cost(self, obj):
         return unicode(obj.solo_cost)
 
     def get_cost_time(self, obj):
         return 'a week'
+
+    def _available_string(self, obj):
+        if obj.next_available_date and obj.next_available_date > datetime.date.today():
+            return '{d.month}/{d.day}'.format(d = obj.next_available_date)
+        return "Now"
 
 
 class UserAccountSerializer(serializers.ModelSerializer):

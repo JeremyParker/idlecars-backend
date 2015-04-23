@@ -23,13 +23,15 @@ class Car(models.Model):
         blank=True,
         null=True
     )
+    hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
     YEARS = [(y, unicode(y)) for y in range((datetime.datetime.now().year+1), 1995, -1)]
     year = models.IntegerField(choices=YEARS, max_length=4, blank=True, null=True)
     plate = models.CharField(max_length=24, blank=True)
-    solo_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    solo_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    split_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    split_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    base = models.CharField(max_length=64, blank=True)
+    solo_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    solo_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    split_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    split_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _00_unknown='Unknown',

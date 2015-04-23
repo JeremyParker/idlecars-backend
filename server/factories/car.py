@@ -8,7 +8,7 @@ from decimal import Decimal
 from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
 
-from idlecars.factory_helpers import Factory
+from idlecars.factory_helpers import Factory, faker
 from server.factories import Owner, MakeModel
 
 class Car(Factory):
@@ -22,5 +22,8 @@ class Car(Factory):
     plate = LazyAttribute(lambda o: ''.join(
         [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
     ))
-    solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 5000) / Decimal(100))
+    solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
     solo_deposit = SelfAttribute('solo_cost')
+
+    hybrid = LazyAttribute(lambda o: random.choice([True, False]))
+    base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)))
