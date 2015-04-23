@@ -62,7 +62,7 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_details(self, obj):
         return [
-            ['Hybrid', '\u2611' if obj.hybrid else '\u2610'],  # checkbox with or without check
+            ['Hybrid', '☑' if obj.hybrid else '☐'],  # checkbox with or without check
             ['Location', ', '.join(l for l in [obj.owner.city, obj.owner.state_code] if l)],
             ['TLC Base', obj.base or 'Pending verification'],
         ]

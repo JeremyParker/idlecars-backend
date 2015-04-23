@@ -50,7 +50,7 @@ class CarTest(APITestCase):
                     ),
                     (u'details', 
                         [
-                            [u'Hybrid', u'\u2610'],
+                            [u'Hybrid', u'☐'],
                             [u'Location', u'Howeland, MP'],
                             [u'TLC Base', u'Pending verification']
                         ]
@@ -91,7 +91,7 @@ class CarTest(APITestCase):
                     ),
                     ('details',
                         [
-                            ['Hybrid', '\u2611' if self.car.hybrid else '\u2610'],
+                            ['Hybrid', '☑' if self.car.hybrid else '☐'],
                             ['Location', '{}, {}'.format(
                                 self.car.owner.city,
                                 self.car.owner.state_code,
