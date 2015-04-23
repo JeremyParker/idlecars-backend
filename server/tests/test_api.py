@@ -100,7 +100,8 @@ class CarTest(APITestCase):
                         ]
                     ),
                     ('cost', '{0:.0f}'.format(self.car.solo_cost)),
-                    ('cost_time', 'a week')
+                    ('cost_time', 'a week'),
+                    ('image_url', 'https://s3.amazonaws.com/images.idlecars.com/toyota_avalon.jpg')
                 ]
             )
         ]

@@ -8,14 +8,14 @@ import idlecars.model_helpers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0016_auto_20150423_1123'),
+        ('server', '0015_booking'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='car',
-            name='hybrid',
-            field=models.BooleanField(default=False, verbose_name='This car is a hybrid'),
+            model_name='makemodel',
+            name='image_filename',
+            field=models.CharField(max_length=128, blank=True),
             preserve_default=True,
         ),
         migrations.AlterField(

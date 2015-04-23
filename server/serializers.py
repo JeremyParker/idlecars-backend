@@ -16,6 +16,7 @@ class CarSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -28,6 +29,7 @@ class CarSerializer(serializers.ModelSerializer):
             'details',
             'cost',
             'cost_time',
+            'image_url',
         )
 
     def get_name(self, obj):
@@ -77,6 +79,11 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.next_available_date and obj.next_available_date > datetime.date.today():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
+    def get_image_url(self, obj):
+        if obj.make_model and obj.make_model.image_filename:
+            return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(obj.make_model.image_filename)
+        else:
+            return 'https://s3.amazonaws.com/images.idlecars.com/toyota_avalon.jpg' # TODO - slugbug
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
