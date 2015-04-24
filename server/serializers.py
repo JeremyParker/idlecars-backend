@@ -33,7 +33,7 @@ class CarSerializer(serializers.ModelSerializer):
         )
 
     def get_name(self, obj):
-        return unicode(obj.make_model)
+        return '{} {}'.format(obj.year, obj.make_model)
 
     def get_listing_features(self, obj):
         return '{} minimum lease ∙ Available {} ∙ {}, {}'.format(
@@ -47,27 +47,25 @@ class CarSerializer(serializers.ModelSerializer):
         return [
             'Available {}'.format(self._available_string(obj)),
             '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
-            '{} deposit'.format(obj.solo_deposit),
+            '${} deposit'.format(obj.solo_deposit),
         ]
 
     def get_certifications(self, obj):
-        certs = [
+        return [
+            'Base registration verified',
+            'Vehicle has TLC plates',
             'Insurance is included',
             'Maintainance is included',
         ]
-        if obj.base:
-            certs = ['Base registration has been confirmed by idlecars'] + certs
-        if obj.plate:
-            certs = certs + ['Vehicle has TLC plates']
-        return certs
-
 
     def get_details(self, obj):
-        return [
-            ['Hybrid', '☑' if obj.hybrid else '☐'],  # checkbox with or without check
+        details = [
             ['Location', ', '.join(l for l in [obj.owner.city, obj.owner.state_code] if l)],
             ['TLC Base', obj.base or 'Pending verification'],
         ]
+        if obj.hybrid:
+            details = [['Hybrid ☑', ''],] + details
+        return details
 
     def get_cost(self, obj):
         return unicode(obj.solo_cost)
