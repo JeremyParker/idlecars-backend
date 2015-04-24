@@ -18,7 +18,7 @@ from server.serializers import UserAccountSerializer, BookingSerializer
 
 class CarTest(APITestCase):
     def setUp(self):
-        owner = factories.Owner()
+        owner = factories.Owner(state_code='NY')
         owner.save()
 
         make_model = factories.MakeModel()
@@ -26,8 +26,10 @@ class CarTest(APITestCase):
 
         self.car = factories.Car(
             owner=owner,
-            make_model = make_model,
+            make_model=make_model,
+            status='busy',
             next_available_date=datetime.date.today() + datetime.timedelta(days=1),
+            min_lease='_03_two_weeks',
         )
         self.car.save()
 
@@ -35,7 +37,6 @@ class CarTest(APITestCase):
         url = reverse('server:cars-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
         [OrderedDict(
                 [
