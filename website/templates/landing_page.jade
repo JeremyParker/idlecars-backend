@@ -45,34 +45,36 @@ extends ./base.jade
 
   section.form
     .container
-      form(action="#{ action }", method="post")
+      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
         - csrf_token
 
         ul.role
           li
-            #{ contact_form.role.0 }
+            input#id_role_0(name='role', type='radio', value='driver', checked)
             div
               label(for='id_role_0') I want to drive.
               p Send me an invitation so I can rent.
           li
-            #{ contact_form.role.1 }
+            input#id_role_1(name='role', type='radio', value='owner')
             div
               label(for='id_role_1') I own a car.
               p I want my car to make me money.
 
         ul.contact
           li
-            label(for='id_email') Email Address
-            div(class="#{ 'error' if 'email' in contact_form.errors else '' }")
-              #{ contact_form.email }
-              #{ contact_form.email.errors }
-          li
-            label(for='id_zipcode') Zipcode
-            div(class="#{ 'error' if 'zipcode' in contact_form.errors else '' }")
-              #{ contact_form.zipcode }
-              #{ contact_form.zipcode.errors }
+            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
+              
+            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
 
-        input.button(type="submit", value="Let's Talk")
+          li
+            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
+              
+            input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
+          
+
+        input.button(type="submit", value="Let's Talk", ng-click='validation($event)')
+        
+  
 
   footer
     .container

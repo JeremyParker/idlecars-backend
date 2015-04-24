@@ -209,6 +209,10 @@ li {
   flex: 1;
 }
 
+.red {
+  color: red;
+}
+
 .role {
   padding: 0 0 4rem;
   border-bottom: 1px solid #666;
