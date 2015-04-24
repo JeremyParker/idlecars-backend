@@ -26,4 +26,4 @@ class Car(Factory):
     solo_deposit = SelfAttribute('solo_cost')
 
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
-    base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)))
+    base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
