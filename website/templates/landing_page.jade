@@ -3,7 +3,7 @@ extends ./base.jade
 - block content
   section.headline
     .container
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
+      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
       .content
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
@@ -21,7 +21,8 @@ extends ./base.jade
       h2 Get more rides
       p.strong Our cars allow you to drive for any base.
       p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
-      img(src="#{ settings.STATIC_URL }img/services.jpg", alt="uber lift and others")
+      img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
+      img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
 
   section.keep-more
     .container
@@ -80,5 +81,6 @@ extends ./base.jade
     .container
       p.ask
         a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      | <p>© {% now 'Y' %} idlecars</p>
-      p.tm All trademarks and images are copyright of their respective owners.
+        div.last_content
+          | <p class='tm'>© {% now 'Y' %} idlecars</p>
+          p.tm All trademarks and images are copyright of their respective owners.

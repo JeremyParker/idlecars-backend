@@ -99,7 +99,7 @@ section {
 }
 
 .headline {
-  background: url(img/loadingscreen.png) no-repeat #222222;
+  background: url(img/loadingscreen.png) no-repeat #141414;
   background-position: calc(50% + 300px) center;
 }
 
@@ -110,7 +110,7 @@ section {
 
 .headline h1 {
   margin-top: 8rem;
-  margin-bottom: 14px;
+  margin-bottom: 0.75rem;
 }
 
 .headline .button {
@@ -130,11 +130,15 @@ section {
 
 .select {
   background: url(img/selectthebest.jpg) no-repeat black;
-  background-position: calc(50% + 300px) center;
+  background-position: calc(50% + 336px) center;
 }
 
 .select .container {
   height: 522px
+}
+
+.select p {
+  width: 360px;
 }
 
 .get-more {
@@ -148,11 +152,11 @@ section {
   flex-direction: column;
   -webkit-justify-content: center;
   justify-content: center;
-  min-height: 400px;
+  padding: 5rem 1rem
 }
 
 .get-more p {
-  max-width: 35rem;
+  max-width: 33rem;
 }
 
 p.strong {
@@ -177,7 +181,7 @@ p.strong {
 }
 
 .convenient .container {
-  min-height: 400px;
+  min-height: 500px;
 }
 
 .form {
@@ -280,6 +284,8 @@ footer .container {
 
 .ask {
   margin-bottom: 6rem;
+  font-size: 14px;
+  text-align: center;
 }
 
 .ask a {
@@ -292,18 +298,35 @@ footer .container {
   font-size: 0.7rem;
 }
 
+.service-logos-small {
+  display: none;
+}
+
+.service-logos-big {
+  margin-top: 2rem;
+  max-width: 100%;
+}
+
 @media (max-width: 415px) {
   h1, h2 {
     font-size: 1.8rem;
     line-height: 1em;
+    margin-bottom: 15px;
   }
 
   h3 {
     line-height: 1rem;
+    font-size: 8px;
   }
 
   p {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
+    width: 19em;
+  }
+
+  .logo {
+    height: 2.7em;
+    margin-top: 0.8em;
   }
 
   .button {
@@ -329,14 +352,42 @@ footer .container {
     background-position: calc(50% + 150px) center;
   }
 
+  .select {
+    background-position: calc(50% + 205px) center;
+  }
+
+  .select p {
+    width: 22em;
+  }
+
   .convenient .container {
-    height: 350px;
+    min-height: initial;
   }
 
   .headline .container, .select .container, .keep-more .container {
     background: rgba(0,0,0,0.5);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
     height: 350px;
+  }
+
+  .get-more p {
+    text-align: center;
+    margin-bottom: 0em;
+    width: 23em;
+  }
+
+  .service-logos-big {
+    display: none;
+  }
+
+  .service-logos-small {
+    display: inline;
+    height: 13em;
+    margin-top: 1em;
+  }
+
+  .keep-more h2 {
+    width: 8em;
   }
 
   .role {
@@ -361,6 +412,18 @@ footer .container {
 
   .contact li {
     margin: 1rem 0 0;
+  }
+
+  footer p {
+    width: 20em;
+  }
+
+  .last_content {
+    margin-top: 2.5em;
+  }
+
+  .keep-more .content {
+    margin-right: 0;
   }
 }
 
