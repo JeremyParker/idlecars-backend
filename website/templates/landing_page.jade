@@ -8,7 +8,8 @@ extends ./base.jade
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
         p Earn more by renting luxury cars and working as a rideshare driver.
-        a.button(href="#lets-talk") LEARN MORE
+        a.button(href="http://app.idlecars.com.s3-website-us-east-1.amazonaws.com/
+") FIND YOUR CAR
 
   section.select
     .container
@@ -64,18 +65,18 @@ extends ./base.jade
         ul.contact
           li
             label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
-              
+
             input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
 
           li
             label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
-              
+
             input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
-          
+
 
         input.button(type="submit", value="Let's Talk", ng-click='validation($event)')
-        
-  
+
+
 
   footer
     .container

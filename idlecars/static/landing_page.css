@@ -329,10 +329,6 @@ footer .container {
     margin-top: 0.8em;
   }
 
-  .button {
-    width: 100%;
-  }
-
   .container {
     padding: 3rem 1.75rem;
   }
@@ -344,7 +340,8 @@ footer .container {
   }
 
   .headline .button {
-    display: none;
+    margin-bottom: 2rem;
+    text-shadow: none
   }
 
   .headline, .select, .keep-more {
@@ -412,6 +409,10 @@ footer .container {
 
   .contact li {
     margin: 1rem 0 0;
+  }
+
+  .form .button {
+    width: 100%;
   }
 
   footer p {
