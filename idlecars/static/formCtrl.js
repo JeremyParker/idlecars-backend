@@ -6,17 +6,15 @@ app.controller('formCtrl', function($scope){
   $scope.emailLabel = 'Email:';
 
   $scope.validation = function(event){
-
-  $scope.validateZipCode();
-  $scope.validateEmail();
+    validateZipCode();
+    validateEmail();
   }
 
-  $scope.validateZipCode = function(){
+  var validateZipCode = function(){
 
     var zipcode_required = $scope.myForm.zipcode.$error.required;
     var zipcode_pattern = $scope.myForm.zipcode.$error.pattern;
 
-    // zip code input validation
     if (zipcode_required) {
       $scope.zipLabel = 'Zipcode is required';
       $scope.zipRed = true;
@@ -31,15 +29,14 @@ app.controller('formCtrl', function($scope){
     else{
       $scope.zipLabel = 'Zipcode:';
       $scope.zipRed = false;
-    };
+    }
   }
 
-    $scope.validateEmail = function(){
+  var validateEmail = function(){
 
     var email_required = $scope.myForm.email.$error.required;
     var email_invalid = $scope.myForm.email.$invalid;
 
-    // email input validation
     if (email_required) {
       $scope.emailLabel = 'Email is required';
       $scope.emailRed = true;
@@ -53,7 +50,7 @@ app.controller('formCtrl', function($scope){
     else{
       $scope.emailLabel = 'Email:';
       $scope.emailRed = false;
-    };
+    }
   }
 
-})
+});
