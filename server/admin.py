@@ -100,6 +100,7 @@ class CarAdmin(admin.ModelAdmin):
         'solo_deposit',
         'owner_link',
         'owner_rating',
+        'plate',
     ]
     fieldsets = (
         (None, {
