@@ -50,7 +50,7 @@ extends ./base.jade
 
         ul.role
           li
-            input#id_role_0(name='role', type='radio', value='driver',checked)
+            input#id_role_0(name='role', type='radio', value='driver', checked)
             div
               label(for='id_role_0') I want to drive.
               p Send me an invitation so I can rent.
@@ -62,17 +62,17 @@ extends ./base.jade
 
         ul.contact
           li
-            label(for='id_email', ng-bind='emailBind', ng-class='{red:emailRed}')
+            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
               
-            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com',required='')
+            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
 
           li
-            label(for='id_zipcode', ng-bind='zipBind', ng-class='{red:zipRed}')
+            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
               
             input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
           
 
-        input.button(type="submit", value="Let's Talk", ng-click='val($event)')
+        input.button(type="submit", value="Let's Talk", ng-click='validation($event)')
         
   
 
