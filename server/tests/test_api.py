@@ -30,6 +30,7 @@ class CarTest(APITestCase):
             status='busy',
             next_available_date=datetime.date.today() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
+            hybrid=True,
         )
         self.car.save()
 
@@ -38,61 +39,37 @@ class CarTest(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        [OrderedDict(
-                [
-                    (u'id', 5),
-                    (u'name', u'Renner Lebsack'),
-                    (u'listing_features', u'Two Months minimum lease \u2219 Howeland, MP, \u2219 Idlecars Certified'),
-                    (u'headline_features', 
-                        [u'Available Now', u'Two Months minimum', u'400 deposit']
-                    ), 
-                    (u'certifications', 
-                        [u'Insurance is included', u'Maintainance is included', u'Vehicle has TLC plates']
-                    ),
-                    (u'details', 
-                        [
-                            [u'Hybrid', u'☐'],
-                            [u'Location', u'Howeland, MP'],
-                            [u'TLC Base', u'Pending verification']
-                        ]
-                    ),
-                    (u'cost', u'400'),
-                    (u'cost_time', u'a week')
-                ]
-                )]
-
-
         listing_features = '{} minimum lease ∙ Available {} ∙ {}, {}'
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         expected = [
             OrderedDict(
                 [
                     ('id', self.car.pk),
-                    ('name', unicode(self.car.make_model)),
+                    ('name', '{} {}'.format(self.car.year, self.car.make_model)),
                     ('listing_features', listing_features.format(
                             models.Car.MIN_LEASE_CHOICES[self.car.min_lease],
                             '{d.month}/{d.day}'.format(d = tomorrow),
                             self.car.owner.city,
                             self.car.owner.state_code,
                         )),
-                    ('headline_features', 
+                    ('headline_features',
                         [
                             'Available {d.month}/{d.day}'.format(d = tomorrow),
                             '{} minimum'.format(models.Car.MIN_LEASE_CHOICES[self.car.min_lease]),
-                            '{} deposit'.format(self.car.solo_deposit),
+                            '${} deposit'.format(self.car.solo_deposit),
                         ]
                     ), 
                     ('certifications',
                         [
-                            'Base registration has been confirmed by idlecars',
+                            'Base registration verified',
+                            'Vehicle has TLC plates',
                             'Insurance is included',
                             'Maintainance is included',
-                            'Vehicle has TLC plates'
                         ]
                     ),
                     ('details',
                         [
-                            ['Hybrid', '☑' if self.car.hybrid else '☐'],
+                            ['Hybrid ☑', ''],
                             ['Location', '{}, {}'.format(
                                 self.car.owner.city,
                                 self.car.owner.state_code,
