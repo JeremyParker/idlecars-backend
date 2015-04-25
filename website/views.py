@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404
 from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
 
 import forms
 import models
@@ -51,6 +52,7 @@ def index(request):
         'action': urlresolvers.reverse('website:index') + '#lets-talk',
         'contact_form': contact_form,
         'show_thanks': _show_thanks(),
+        'webapp_url': settings.WEBAPP_URL,
     }
     return render(request, 'landing_page.jade', context)
 
