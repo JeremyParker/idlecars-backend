@@ -24,6 +24,8 @@ def link(obj, text=None):
 class UserAccountInline(admin.StackedInline):
     model = models.UserAccount
     verbose_name = "Contact"
+
+    # If there are 0 user_accounts, show an extra inline form for entry
     def get_extra(self, request, obj=None, **kwargs):
         if obj:
             return 0
@@ -125,6 +127,7 @@ class CarAdmin(admin.ModelAdmin):
 
     def description(self, instance):
         return instance.__unicode__()
+
     def owner_link(self, instance):
         if instance.owner:
             return link(instance.owner, instance.owner.__unicode__())
@@ -143,10 +146,77 @@ class CarAdmin(admin.ModelAdmin):
             return instance.owner.last_engagement
 
 
+class BookingAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (
+                'first_name',
+                'last_name',
+                'phone_number',
+                'email',
+            ),
+        }),
+    )
+    list_display = [
+        'user_account',
+        'car_link',
+        'owner_link',
+        'created_time',
+    ]
+    readonly_fields = [
+        'owner_link',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'email',
+        'user_account',
+        'car_link',
+        'owner_link',
+        'created_time',
+    ]
+
+    def owner_link(self, instance):
+        if instance.car and instance.car.owner:
+            return link(instance.car.owner, instance.car.owner.__unicode__())
+        else:
+            return None
+    owner_link.short_description = 'Owner'
+
+    def car_link(self, instance):
+        if instance.car:
+            return link(instance.car, instance.car.__unicode__())
+        else:
+            return None
+
+    def first_name(self, instance):
+        if instance.user_account:
+            return instance.user_account.first_name
+        else:
+            return None
+
+    def last_name(self, instance):
+        if instance.user_account:
+            return instance.user_account.last_name
+        else:
+            return None
+
+    def phone_number(self, instance):
+        if instance.user_account:
+            return instance.user_account.phone_number
+        else:
+            return None
+
+    def email(self, instance):
+        if instance.user_account:
+            return instance.user_account.email
+        else:
+            return None
+
+
 admin.site.register(models.Owner, OwnerAdmin)
 admin.site.register(models.Car, CarAdmin)
+admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.MakeModel)
-admin.site.register(models.Booking)
 
 admin.site.site_header = "Idle Cars Operations"
 admin.site.site_title = ''
