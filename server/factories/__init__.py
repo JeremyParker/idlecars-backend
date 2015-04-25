@@ -6,3 +6,4 @@ from user_account import UserAccount
 from make_model import MakeModel
 from car import Car
 from staff_user import StaffUser
+from booking import Booking

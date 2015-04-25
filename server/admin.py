@@ -150,28 +150,28 @@ class BookingAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                'first_name',
-                'last_name',
-                'phone_number',
-                'email',
+                'state',
+                ('full_name', 'phone_number', 'email'),
+                'car_link',
+                'owner_link',
+                'created_time',
             ),
         }),
     )
     list_display = [
+        'state',
         'user_account',
         'car_link',
         'owner_link',
         'created_time',
     ]
     readonly_fields = [
-        'owner_link',
-        'first_name',
-        'last_name',
-        'phone_number',
-        'email',
         'user_account',
         'car_link',
         'owner_link',
+        'full_name',
+        'phone_number',
+        'email',
         'created_time',
     ]
 
@@ -187,16 +187,11 @@ class BookingAdmin(admin.ModelAdmin):
             return link(instance.car, instance.car.__unicode__())
         else:
             return None
+    car_link.short_description = 'Car'
 
-    def first_name(self, instance):
+    def full_name(self, instance):
         if instance.user_account:
-            return instance.user_account.first_name
-        else:
-            return None
-
-    def last_name(self, instance):
-        if instance.user_account:
-            return instance.user_account.last_name
+            return instance.user_account.full_name()
         else:
             return None
 
