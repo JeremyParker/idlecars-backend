@@ -32,9 +32,9 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
         next_available_date__isnull=True,
         status='busy',
     ).exclude(
-         plate='',
+        plate='',
     ).exclude(
-         base='',
+        base='',
     ).exclude(
         owner__city='',
     ).exclude(
