@@ -11,13 +11,6 @@ import services.car
 from serializers import CarSerializer, BookingSerializer
 
 
-@api_view(('GET',))
-def api_root(request, format=None):
-    return Response({
-        'cars': reverse('car-list', request=request, format=format),
-    })
-
-
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = services.Car.queryset
     serializer_class = CarSerializer
