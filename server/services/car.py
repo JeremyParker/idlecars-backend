@@ -25,4 +25,6 @@ class Car:
         owner__city='',
     ).exclude(
         owner__state_code='',
+    ).exclude(
+        booking__state=models.Booking.REQUESTED
     )
