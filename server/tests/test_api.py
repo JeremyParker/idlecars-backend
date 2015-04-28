@@ -85,6 +85,42 @@ class CarTest(APITestCase):
         ]
         self.assertEqual(response.data, expected)
 
+    def test_car_filtered_if_booking_in_progress(self):
+        ''' verify that a car is not listed when it has a booking in progress '''
+        booking = factories.Booking.create(car = self.car)
+        for state in [
+            models.Booking.COMPLETE,
+            models.Booking.REQUESTED,
+            models.Booking.ACCEPTED,
+        ]:
+            booking.state = state
+            booking.save()
+
+            url = reverse('server:cars-list')
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), 0)
+
+    def test_car_shows_if_no_booking_in_progress(self):
+        ''' verify that a car is not listed when it has a booking in progress '''
+        for state in [
+                models.Booking.PENDING,
+                models.Booking.BOOKED,
+                models.Booking.FLAKE,
+                models.Booking.TOO_SLOW,
+                models.Booking.OWNER_REJECTED,
+                models.Booking.DRIVER_REJECTED,
+                models.Booking.MISSED,
+        ]:
+            factories.Booking.create(
+                car = self.car,
+                state = state,
+            )
+            url = reverse('server:cars-list')
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), 1)
+
 
 class UserAccountSerializerTest(TestCase):
     def test_deserialize(self):
