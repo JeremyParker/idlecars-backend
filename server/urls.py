@@ -2,23 +2,26 @@
 from __future__ import unicode_literals
 
 from django.conf.urls import include, url
+from django.conf import settings
 
 from rest_framework.routers import DefaultRouter
-from rest_framework.permissions import IsAdminUser
+from rest_framework.renderers import BrowsableAPIRenderer
 
 import views
 
 
-class PrivateBrowsableDefaultRouter(DefaultRouter):
+class OptionalApiRootDefaultRouter(DefaultRouter):
     '''
-    Class to override permissions for the root API browser view
+    This class doesn't provide a root-api view if BrowsableAPIRenderer isn't in the renderers
     '''
-    def get_api_root_view(self):
-        view = super(PrivateBrowsableDefaultRouter, self).get_api_root_view()
-        view.cls.permission_classes = (IsAdminUser,)
-        return view
+    def __init__(self, *args, **kwargs):
+        super(OptionalApiRootDefaultRouter, self).__init__(*args, **kwargs)
+        renderers_conf = settings.REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES']
+        if 'rest_framework.renderers.BrowsableAPIRenderer' not in renderers_conf:
+            self.include_root_view = False
 
-router = PrivateBrowsableDefaultRouter()
+
+router = OptionalApiRootDefaultRouter()
 router.register(r'cars', views.CarViewSet, base_name='cars')
 router.register(r'bookings', views.CreateBookingView, base_name='bookings')
 
