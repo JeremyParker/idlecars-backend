@@ -1,9 +1,12 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from server import models
 
 class Car:
+    date_threshold = datetime.date.today() + datetime.timedelta(days=30)
     queryset = models.Car.objects.filter(
         owner__isnull=False,
         make_model__isnull=False,
@@ -15,7 +18,7 @@ class Car:
     ).exclude(
         status='unknown',
     ).exclude(
-        next_available_date__isnull=True,
+        next_available_date__gt=date_threshold,
         status='busy',
     ).exclude(
         plate='',
