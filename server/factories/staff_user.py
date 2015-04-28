@@ -7,12 +7,13 @@ import random
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
-from factory import LazyAttribute
+from factory import LazyAttribute, PostGenerationMethodCall
+from factory.django import DjangoModelFactory
 
 from idlecars.factory_helpers import Factory, faker
 
 
-class StaffUser(Factory):
+class StaffUser(DjangoModelFactory):
     class Meta:
         model = 'auth.User'
         django_get_or_create = ('username',)
@@ -29,3 +30,4 @@ class StaffUser(Factory):
     last_login = LazyAttribute(
         lambda o: o.date_joined + datetime.timedelta(days=4, hours=random.randint(0, 23))
     )
+    password = PostGenerationMethodCall('set_password', 'mysecret')
