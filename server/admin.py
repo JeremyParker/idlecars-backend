@@ -155,6 +155,7 @@ class BookingAdmin(admin.ModelAdmin):
                 'car_link',
                 'owner_link',
                 'created_time',
+                'notes',
             ),
         }),
     )
