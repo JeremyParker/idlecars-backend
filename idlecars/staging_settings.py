@@ -6,7 +6,7 @@ from settings import *
 # heap analytics tracking for staging
 HEAP_APP_ID = '1900221263'
 
-WEBAPP_URL = 'staging.app.idlecars.com'
+WEBAPP_URL = 'app.staging.idlecars.com'
 
 # Allow cross origin requests from these domains
 CORS_ORIGIN_WHITELIST = (
