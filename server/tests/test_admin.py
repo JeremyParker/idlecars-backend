@@ -38,6 +38,7 @@ class AdminTest(TestCase):
             # (slug, factory) pairs for all the admin-accessible models in the app:
             ('owner', factories.Owner),
             ('car', factories.Car),
+            ('booking', factories.Booking),
         ]:
             # get the views that don't need an existing object
             for view in [

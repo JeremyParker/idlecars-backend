@@ -3,7 +3,7 @@ extends ./base.jade
 - block content
   section.headline
     .container
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars")
+      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
       .content
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
@@ -21,7 +21,8 @@ extends ./base.jade
       h2 Get more rides
       p.strong Our cars allow you to drive for any base.
       p No matter which vehicle you rent, you can accept rides from any rideshare, limousine, or dispatch company.
-      img(src="#{ settings.STATIC_URL }img/services.jpg", alt="uber lift and others")
+      img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
+      img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
 
   section.keep-more
     .container
@@ -45,38 +46,41 @@ extends ./base.jade
 
   section.form
     .container
-      form(action="#{ action }", method="post")
+      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
         - csrf_token
 
         ul.role
           li
-            #{ contact_form.role.0 }
+            input#id_role_0(name='role', type='radio', value='driver', checked)
             div
               label(for='id_role_0') I want to drive.
               p Send me an invitation so I can rent.
           li
-            #{ contact_form.role.1 }
+            input#id_role_1(name='role', type='radio', value='owner')
             div
               label(for='id_role_1') I own a car.
               p I want my car to make me money.
 
         ul.contact
           li
-            label(for='id_email') Email Address
-            div(class="#{ 'error' if 'email' in contact_form.errors else '' }")
-              #{ contact_form.email }
-              #{ contact_form.email.errors }
-          li
-            label(for='id_zipcode') Zipcode
-            div(class="#{ 'error' if 'zipcode' in contact_form.errors else '' }")
-              #{ contact_form.zipcode }
-              #{ contact_form.zipcode.errors }
+            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
 
-        input.button(type="submit", value="Let's Talk")
+            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
+
+          li
+            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
+
+            input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
+
+
+        input.button(type="submit", value="Let's Talk", ng-click='validation($event)')
+
+
 
   footer
     .container
       p.ask
         a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      | <p>© {% now 'Y' %} idlecars</p>
-      p.tm All trademarks and images are copyright of their respective owners.
+        div.last_content
+          | <p class='tm'>© {% now 'Y' %} idlecars</p>
+          p.tm All trademarks and images are copyright of their respective owners.
