@@ -52,7 +52,6 @@ def index(request):
         'action': urlresolvers.reverse('website:index') + '#lets-talk',
         'contact_form': contact_form,
         'show_thanks': _show_thanks(),
-        'webapp_url': settings.WEBAPP_URL,
     }
     return render(request, 'landing_page.jade', context)
 
