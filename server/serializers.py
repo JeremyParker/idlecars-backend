@@ -81,7 +81,7 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.make_model and obj.make_model.image_filename:
             return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(obj.make_model.image_filename)
         else:
-            return 'https://s3.amazonaws.com/images.idlecars.com/toyota_avalon.jpg' # TODO - slugbug
+            return None
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
@@ -94,7 +94,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return UserAccount.objects.create(**validated_data)
- 
+
 
 class BookingSerializer(serializers.ModelSerializer):
     car_id = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())

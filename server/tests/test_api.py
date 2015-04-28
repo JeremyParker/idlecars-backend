@@ -58,7 +58,7 @@ class CarTest(APITestCase):
                             '{} minimum'.format(models.Car.MIN_LEASE_CHOICES[self.car.min_lease]),
                             '${} deposit'.format(self.car.solo_deposit),
                         ]
-                    ), 
+                    ),
                     ('certifications',
                         [
                             'Base registration verified',
@@ -79,7 +79,7 @@ class CarTest(APITestCase):
                     ),
                     ('cost', '{0:.0f}'.format(self.car.solo_cost)),
                     ('cost_time', 'a week'),
-                    ('image_url', 'https://s3.amazonaws.com/images.idlecars.com/toyota_avalon.jpg')
+                    ('image_url', None)
                 ]
             )
         ]
