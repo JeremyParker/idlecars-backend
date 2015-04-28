@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404
 from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
 
 import forms
 import models
