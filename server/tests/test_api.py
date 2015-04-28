@@ -18,13 +18,9 @@ from server.serializers import UserAccountSerializer, BookingSerializer
 
 class CarTest(APITestCase):
     def setUp(self):
-        owner = factories.Owner(state_code='NY')
-        owner.save()
-
-        make_model = factories.MakeModel()
-        make_model.save()
-
-        self.car = factories.Car(
+        owner = factories.Owner.create(state_code='NY')
+        make_model = factories.MakeModel.create()
+        self.car = factories.Car.create(
             owner=owner,
             make_model=make_model,
             status='busy',
@@ -32,7 +28,6 @@ class CarTest(APITestCase):
             min_lease='_03_two_weeks',
             hybrid=True,
         )
-        self.car.save()
 
     def test_get_cars(self):
         url = reverse('server:cars-list')
@@ -120,8 +115,7 @@ class UserAccountSerializerTest(TestCase):
 
 class BookingSerializerTest(TestCase):
     def test_deserialize(self):
-        car = factories.Car()
-        car.save()
+        car = factories.Car.create()
 
         user = factories.UserAccount()
         json = '''{{
@@ -154,8 +148,7 @@ class BookingSerializerTest(TestCase):
 
 class BookingTest(APITestCase):
     def setUp(self):
-        self.car = factories.Car()
-        self.car.save()
+        self.car = factories.Car.create()
         self.data = {
             'user_account': {
                 'first_name': 'Alexandra',

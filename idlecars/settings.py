@@ -140,3 +140,9 @@ SETTINGS_EXPORT = [
     'STATIC_URL',
     'HEAP_APP_ID',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
