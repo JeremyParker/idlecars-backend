@@ -36,3 +36,4 @@ class Booking(models.Model):
         (MISSED, 'Missed - car rented out before we found a driver'),
     )
     state = models.IntegerField(choices=STATE, max_length=64, default=PENDING)
+    notes = models.TextField(blank=True)
