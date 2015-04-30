@@ -22,6 +22,7 @@ class UserAccount(models.Model):
 
     # if this user is an owner, they have an owner profile
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
+    created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def clean(self, *args, **kwargs):
         self.email = self.email.lower().strip() or None

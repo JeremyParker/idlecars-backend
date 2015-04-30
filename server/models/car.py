@@ -58,6 +58,7 @@ class Car(models.Model):
         default='_00_unknown',
     )
     notes = models.TextField(blank=True)
+    created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def effective_status(self):
         if self.next_available_date and self.next_available_date < datetime.date.today():
