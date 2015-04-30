@@ -37,13 +37,13 @@ class CarTest(TestCase):
         ''' verify that a car is listed when it has no booking in progress '''
         models.Booking.objects.all().delete()  # make sure there are no bookings on our car
         for state in [
-                models.Booking.PENDING,
-                models.Booking.BOOKED,
-                models.Booking.FLAKE,
-                models.Booking.TOO_SLOW,
-                models.Booking.OWNER_REJECTED,
-                models.Booking.DRIVER_REJECTED,
-                models.Booking.MISSED,
+            models.Booking.PENDING,
+            models.Booking.BOOKED,
+            models.Booking.FLAKE,
+            models.Booking.TOO_SLOW,
+            models.Booking.OWNER_REJECTED,
+            models.Booking.DRIVER_REJECTED,
+            models.Booking.MISSED,
         ]:
             factories.Booking.create(
                 car = self.car,
@@ -53,14 +53,21 @@ class CarTest(TestCase):
 
     def test_car_avialable_a_month_away(self):
         ''' car is not listed when it isn't available for another month '''
-        self.car.next_available_date=datetime.date.today() + datetime.timedelta(days=31)
+        self.car.next_available_date = datetime.date.today() + datetime.timedelta(days=31)
+        self.car.status = 'busy'
+        self.car.save()
+        self.assertEqual(len(services.Car.queryset.all()), 0)
+
+    def test_car_unknown_availability_date(self):
+        ''' car is not listed when we don't know the available date '''
+        self.car.next_available_date = None
         self.car.status = 'busy'
         self.car.save()
         self.assertEqual(len(services.Car.queryset.all()), 0)
 
     def test_car_avialable_a_wee_away(self):
         ''' car is listed if it's busy but will become available soon'''
-        self.car.next_available_date=datetime.date.today() + datetime.timedelta(days=7)
+        self.car.next_available_date = datetime.date.today() + datetime.timedelta(days=7)
         self.car.status = 'busy'
         self.car.save()
         self.assertEqual(len(services.Car.queryset.all()), 1)
