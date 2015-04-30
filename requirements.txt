@@ -1,16 +1,17 @@
+-e git://github.com/syrusakbary/pyjade.git@4dbd2ffd7ccdf20c7de6ad7dd8e6b0942bee50eb#egg=pyjade
+
 coverage==3.7.1
 dj-database-url==0.3.0
 dj-static==0.0.6
-Django==1.7.5
+Django==1.8
 django-cors-headers==1.0.0
-django-nose==1.3
+django-nose==1.4
 django-toolbelt==0.0.1
 factory-boy==2.4.1
 fake-factory==0.5.0
 gunicorn==19.2.1
 nose==1.3.4
 psycopg2==2.6
-pyjade==3.0.0
 rq==0.5.1
 sendgrid==1.3.0
 static3==0.5.1
