@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.db.models import Q
+
 from server import models
 
 class Car:
@@ -13,13 +15,11 @@ class Car:
         year__isnull=False,
         solo_cost__isnull=False,
         solo_deposit__isnull=False,
+    ).filter(
+        Q(status=models.Car.STATUS_AVAILABLE) |
+        Q(status=models.Car.STATUS_BUSY, next_available_date__lt=date_threshold)
     ).exclude(
         min_lease='_00_unknown',
-    ).exclude(
-        status='unknown',
-    ).exclude(
-        next_available_date__gt=date_threshold,
-        status='busy',
     ).exclude(
         plate='',
     ).exclude(
@@ -29,9 +29,9 @@ class Car:
     ).exclude(
         owner__state_code='',
     ).exclude(
-        booking__state=models.Booking.COMPLETE
-    ).exclude(
-        booking__state=models.Booking.REQUESTED
-    ).exclude(
-        booking__state=models.Booking.ACCEPTED
+        booking__state__in=[
+            models.Booking.COMPLETE,
+            models.Booking.REQUESTED,
+            models.Booking.ACCEPTED,
+        ]
     )

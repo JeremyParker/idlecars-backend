@@ -13,7 +13,12 @@ from .make_model import MakeModel
 
 class Car(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
+
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
+    STATUS_AVAILABLE = 'available'
+    STATUS_UNKNOWN = 'unknown'
+    STATUS_BUSY = 'busy'
+
     status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
     next_available_date = models.DateField(blank=True, null=True)
     make_model = models.ForeignKey(
