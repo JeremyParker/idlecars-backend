@@ -29,9 +29,9 @@ class Car:
     ).exclude(
         owner__state_code='',
     ).exclude(
-        booking__state=models.Booking.COMPLETE
-    ).exclude(
-        booking__state=models.Booking.REQUESTED
-    ).exclude(
-        booking__state=models.Booking.ACCEPTED
+        booking__state__in=[
+            models.Booking.COMPLETE,
+            models.Booking.REQUESTED,
+            models.Booking.ACCEPTED,
+        ]
     )
