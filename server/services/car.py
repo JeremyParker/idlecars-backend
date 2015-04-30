@@ -16,8 +16,8 @@ class Car:
         solo_cost__isnull=False,
         solo_deposit__isnull=False,
     ).filter(
-        Q(status='available') |
-        Q(status='busy', next_available_date__lt=date_threshold)
+        Q(status=models.Car.STATUS_AVAILABLE) |
+        Q(status=models.Car.STATUS_BUSY, next_available_date__lt=date_threshold)
     ).exclude(
         min_lease='_00_unknown',
     ).exclude(
