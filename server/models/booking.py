@@ -8,7 +8,7 @@ from .car import Car
 
 
 class Booking(models.Model):
-    user_account = models.OneToOneField(UserAccount)
+    user_account = models.ForeignKey(UserAccount)
     car = models.ForeignKey(Car, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
 
@@ -35,5 +35,5 @@ class Booking(models.Model):
         (DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
         (MISSED, 'Missed - car rented out before we found a driver'),
     )
-    state = models.IntegerField(choices=STATE, max_length=64, default=PENDING)
+    state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)

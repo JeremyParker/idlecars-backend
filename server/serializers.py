@@ -6,6 +6,7 @@ import datetime
 from rest_framework import serializers
 
 from models import Car, UserAccount, Booking
+from services import booking as booking_service
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -110,10 +111,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_account_data = validated_data.pop('user_account')
-        user_account = UserAccount.objects.create(**user_account_data)
         car = validated_data['car_id']
-        booking = Booking.objects.create(
-            user_account = user_account,
-            car = car,
-        )
-        return booking
+        return booking_service.create_booking(user_account_data, car)
+        # TODO(JP) - error handling if car is already booked, or user is banned, ...etc
