@@ -8,7 +8,7 @@ from .car import Car
 
 
 class Booking(models.Model):
-    user_account = models.OneToOneField(UserAccount)
+    user_account = models.ForeignKey(UserAccount)
     car = models.ForeignKey(Car, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
 
