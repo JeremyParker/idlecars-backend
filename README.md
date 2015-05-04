@@ -80,7 +80,7 @@ python manage.py test server --nocapture
 There is a special setup for running e2e (integration) test from the angular web app client.
 Before you start the server, make sure you have created the test database in psql: `create database idlecars_test`.
 Then start the e2e test server:
-`python manage.py runserver 9999 --settings='idlecars.test_settings'`
+`python manage.py runserver 9999 --settings='idlecars.e2e_test_settings'`
 
 ### Deployment
 We have two apps on Heroku that we deploy to.

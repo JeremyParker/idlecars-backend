@@ -14,8 +14,7 @@ DATABASES = {
     }
 }
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 WEBAPP_URL = 'localhost:3000'
 
