@@ -108,3 +108,15 @@ Then to see diffs:
 ```
 git difftool
 ```
+
+### Upgrading up the database
+Here is an example of the command run to upgrade the database on May the Fourth, 2015.
+However, future upgrades can be performed by creating a follower then promoting the follower.
+```
+heroku maintenance:on -a idlecars
+heroku ps:scale worker=0 -a idlecars
+heroku pg:copy HEROKU_POSTGRESQL_CRIMSON_URL HEROKU_POSTGRESQL_GREEN_URL -a idlecars
+heroku ps:scale worker=1 -a idlecars
+heroku maintenance:off -a idlecars
+heroku promote HEROKU_POSTGRESQL_GREEN -a idlecars
+```
