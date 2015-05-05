@@ -74,7 +74,8 @@ class CarTest(APITestCase):
                     ),
                     ('cost', '{0:.0f}'.format(self.car.solo_cost)),
                     ('cost_time', 'a week'),
-                    ('image_url', None)
+                    ('image_url', None),
+                    ('zipcode', self.car.owner.zipcode),
                 ]
             )
         ]
