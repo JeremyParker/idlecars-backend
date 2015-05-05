@@ -10,6 +10,7 @@ from factory import SubFactory, SelfAttribute
 
 from idlecars.factory_helpers import Factory, faker
 from server.factories import Owner, MakeModel
+from server import models
 
 class Car(Factory):
     class Meta:
@@ -27,3 +28,7 @@ class Car(Factory):
 
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
     base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
+
+class BookableCar(Car):
+    status = models.Car.STATUS_AVAILABLE
+    min_lease = '_02_one_week'

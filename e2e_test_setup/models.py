@@ -30,5 +30,8 @@ class E2ETestSetup():
         self.cursor.execute('TRUNCATE TABLE {} CASCADE;'.format(table_list))
 
     def _setup_cars(self):
-        for i in xrange(5):
-            factories.Car.create()
+        '''
+            Create 3 cars (also creates three owners)
+        '''
+        for i in xrange(4):
+            factories.BookableCar.create()
