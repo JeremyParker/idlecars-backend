@@ -19,19 +19,15 @@ class Car:
         Q(status=models.Car.STATUS_AVAILABLE) |
         Q(status=models.Car.STATUS_BUSY, next_available_date__lt=date_threshold)
     ).exclude(
-        min_lease='_00_unknown',
-    ).exclude(
-        plate='',
-    ).exclude(
-        base='',
-    ).exclude(
-        owner__city='',
-    ).exclude(
-        owner__state_code='',
-    ).exclude(
-        booking__state__in=[
+        Q(min_lease='_00_unknown') |
+        Q(plate='') |
+        Q(base='') |
+        Q(owner__city='') |
+        Q(owner__state_code='') |
+        Q(owner__zipcode='') |
+        Q(booking__state__in=[
             models.Booking.COMPLETE,
             models.Booking.REQUESTED,
             models.Booking.ACCEPTED,
-        ]
+        ])
     )

@@ -65,9 +65,19 @@ class CarTest(TestCase):
         self.car.save()
         self.assertEqual(len(services.Car.queryset.all()), 0)
 
-    def test_car_avialable_a_wee_away(self):
+    def test_car_avialable_a_week_away(self):
         ''' car is listed if it's busy but will become available soon'''
         self.car.next_available_date = datetime.date.today() + datetime.timedelta(days=7)
         self.car.status = 'busy'
+        self.car.save()
+        self.assertEqual(len(services.Car.queryset.all()), 1)
+
+    def test_car_no_zipcode_no_show(self):
+        self.car.owner.zipcode = ''
+        self.car.owner.save()
+        self.assertEqual(len(services.Car.queryset.all()), 0)
+
+    def test_car_with_zipcode_included(self):
+        self.car.zipcode = '10022'
         self.car.save()
         self.assertEqual(len(services.Car.queryset.all()), 1)
