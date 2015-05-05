@@ -18,6 +18,7 @@ class CarSerializer(serializers.ModelSerializer):
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+    zipcode = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -31,6 +32,7 @@ class CarSerializer(serializers.ModelSerializer):
             'cost',
             'cost_time',
             'image_url',
+            'zipcode',
         )
 
     def get_name(self, obj):
@@ -83,6 +85,11 @@ class CarSerializer(serializers.ModelSerializer):
             return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(obj.make_model.image_filename)
         else:
             return None
+
+    def get_zipcode(self, obj):
+        if not obj.owner:
+            return None
+        return obj.owner.zipcode
 
 
 class UserAccountSerializer(serializers.ModelSerializer):

@@ -6,6 +6,11 @@ from django.test import TestCase
 from server import serializers, factories
 
 class TestCarSerializer(TestCase):
+    def test_car_has_zipcode(self):
+        car = factories.Car.create()
+        self.assertIsNotNone(serializers.CarSerializer(car).data['zipcode'])
+        self.assertEqual(car.owner.zipcode, serializers.CarSerializer(car).data['zipcode'])
+
     def test_car_without_image(self):
         car = factories.Car.create()
         self.assertEqual(self._image_url_for(car), None)
