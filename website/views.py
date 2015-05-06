@@ -111,5 +111,6 @@ def email_preview(request):
         'instruction_header': 'List your car',
         'instructions': 'We’ll walk you through the process step-by-step. Just let us know when you want to rent it, and let us take care of the rest.',
         'cta': 'List a car',
+        'cta_href': 'http://foo.com',
     }
     return render(request, 'welcome_email.html', context)
