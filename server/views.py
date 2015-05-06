@@ -12,7 +12,7 @@ from serializers import CarSerializer, BookingSerializer
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = services.Car.queryset
+    queryset = services.car.listing_queryset
     serializer_class = CarSerializer
 
 
