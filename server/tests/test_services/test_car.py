@@ -84,6 +84,6 @@ class CarTest(TestCase):
 
     def test_car_filtered_if_stale(self):
         ''' verify that a car is not listed when we haven't talked to the owner in a week'''
-        self.car.owner.last_engagement = datetime.date.today() - datetime.timedelta(days=7)
-        self.car.owner.save()
+        self.car.next_available_date = datetime.date.today() - datetime.timedelta(days=7)
+        self.car.save()
         self.assertEqual(len(services.car.listing_queryset.all()), 0)
