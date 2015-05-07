@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import os
+
 from settings import *
 
 # heap analytics tracking for staging
@@ -15,3 +17,5 @@ CORS_ORIGIN_WHITELIST = (
     'app.staging.idlecars.com.s3-website-us-east-1.amazonaws.com',
     'app.staging.idlecars.com',
 )
+
+SECRET_KEY = os.environ['SECRET_KEY']
