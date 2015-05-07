@@ -33,7 +33,7 @@ def _filter_data_complete(queryset):
 
 def _filter_bookable(queryset):
     '''
-    return cars whose status is known, aren't busy through elsewhere, and don't have a booking 
+    return cars whose status is known, aren't busy through elsewhere, and don't have a booking
     in progress.
     '''
     return queryset.filter(
@@ -51,11 +51,11 @@ def _filter_not_stale(queryset):
     '''
     return cars whose owners have been contacted in the last few days, so we know the car's state.
     '''
-    return queryset.filter(owner__last_engagement__gte=staleness_threshold)
+    return queryset.filter(next_available_date__gte=staleness_threshold)
 
 def _filter_stale(queryset):
     '''
-    return cars whose owners haven't been contacted in the last few days, so the car's state 
+    return cars whose owners haven't been contacted in the last few days, so the car's state
     is stale.
     '''
-    return queryset.filter(owner__last_engagement__lt=staleness_threshold)
+    return queryset.filter(next_available_date__lt=staleness_threshold)
