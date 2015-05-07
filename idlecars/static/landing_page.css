@@ -39,10 +39,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  color: #ddd;
-}
-
 input {
   border: 0;
   padding: 0.5rem;
@@ -291,6 +287,10 @@ footer .container {
 .ask a {
   font-weight: 500;
   text-decoration: underline;
+}
+
+.ask a:hover {
+  color: #ddd;
 }
 
 .tm {
