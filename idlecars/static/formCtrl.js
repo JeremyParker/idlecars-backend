@@ -6,43 +6,43 @@ app.controller('formCtrl', function($scope){
   $scope.emailLabel = 'Email:';
 
   $scope.validation = function(event){
-    validateZipCode();
-    validateEmail();
+    var emailIsValid = validateEmail();
+    var zipcodeIsValid = validateZipcode();
+    if (!(emailIsValid && zipcodeIsValid)) {
+        event.preventDefault();
+    }
   }
 
-  var validateZipCode = function(){
+  var validateZipcode = function(){
+    var zipcodeIsEmpty = $scope.myForm.zipcode.$error.required;
+    var zipcodeIsInvalid = $scope.myForm.zipcode.$error.pattern;
 
-    var zipcode_required = $scope.myForm.zipcode.$error.required;
-    var zipcode_pattern = $scope.myForm.zipcode.$error.pattern;
-
-    if (zipcode_required) {
+    if (zipcodeIsEmpty) {
       $scope.zipLabel = 'Zipcode is required';
       $scope.zipRed = true;
-      event.preventDefault();
-
     }
-    else if (zipcode_pattern) {
+    else if (zipcodeIsInvalid) {
       $scope.zipLabel = 'Please enter a valid zip code';
       $scope.zipRed = true;
-      event.preventDefault();
     }
     else{
       $scope.zipLabel = 'Zipcode:';
       $scope.zipRed = false;
     }
-  }
+
+    return !zipcodeIsEmpty && !zipcodeIsInvalid;
+  };
 
   var validateEmail = function(){
+    var emailIsEmpty = $scope.myForm.email.$error.required;
+    var emailIsInvalid = $scope.myForm.email.$invalid;
 
-    var email_required = $scope.myForm.email.$error.required;
-    var email_invalid = $scope.myForm.email.$invalid;
-
-    if (email_required) {
+    if (emailIsEmpty) {
       $scope.emailLabel = 'Email is required';
       $scope.emailRed = true;
       event.preventDefault();
     }
-    else if (email_invalid) {
+    else if (emailIsInvalid) {
       $scope.emailLabel = 'Please enter a valid email';
       $scope.emailRed = true;
       event.preventDefault();
@@ -51,6 +51,8 @@ app.controller('formCtrl', function($scope){
       $scope.emailLabel = 'Email:';
       $scope.emailRed = false;
     }
-  }
+
+    return !emailIsEmpty && !emailIsInvalid;
+  };
 
 });
