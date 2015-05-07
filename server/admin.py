@@ -99,7 +99,7 @@ class OwnerAdmin(admin.ModelAdmin):
 
 class CarStaleListFilter(admin.SimpleListFilter):
     '''
-    Filter to show cars that are complete and WOULD be listed on the site, except we need to talk 
+    Filter to show cars that are complete and WOULD be listed on the site, except we need to talk
     to the owner and refresh the listing.
     '''
     title = 'state'
@@ -145,6 +145,7 @@ class CarAdmin(admin.ModelAdmin):
         'solo_deposit',
         'owner_link',
         'owner_rating',
+        'next_available_date',
         'plate',
     ]
     list_filter = [
