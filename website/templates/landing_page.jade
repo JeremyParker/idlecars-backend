@@ -8,7 +8,7 @@ extends ./base.jade
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
         p Earn more by renting luxury cars and working as a rideshare driver.
-        a.button(href="http://#{ settings.WEBAPP_URL }") FIND YOUR CAR
+        a.button(href="http://#{ settings.WEBAPP_URL }") Find your car
 
   section.select
     .container
@@ -49,19 +49,19 @@ extends ./base.jade
       form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
         - csrf_token
 
-        ul.role
+        ul.role(ng-init="role = 'driver'")
           li
-            input#id_role_0(name='role', type='radio', value='driver', checked)
+            input#id_role_0(name='role', type='radio', value='driver', checked, ng-model='role')
             div
               label(for='id_role_0') I want to drive.
               p Send me an invitation so I can rent.
           li
-            input#id_role_1(name='role', type='radio', value='owner')
+            input#id_role_1(name='role', type='radio', value='owner', ng-model='role')
             div
               label(for='id_role_1') I own a car.
               p I want my car to make me money.
 
-        ul.contact
+        ul.contact(ng-show="role == 'owner'")
           li
             label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
 
@@ -73,7 +73,9 @@ extends ./base.jade
             input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
 
 
-        input.button(type="submit", value="Let's Talk", ng-click='validation($event)')
+        input.button(ng-show="role == 'owner'", type="submit", value="Let's Talk", ng-click='validation($event)')
+
+        a.button(ng-show="role == 'driver'", href="http://#{ settings.WEBAPP_URL }") Find your car
 
 
 
