@@ -6,7 +6,7 @@ import django.utils
 from django.core import urlresolvers
 
 from server import models
-from server.services import car as car_service
+from server import services
 
 
 # helper to make links on admin pages
@@ -113,13 +113,9 @@ class CarStaleListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'stale':
-            return car_service.filter_stale(
-                car_service.filter_data_complete(
-                    car_service.filter_bookable(queryset)))
+            return services.car.filter_needs_renewal(queryset)
         elif self.value() == 'live':
-            return car_service.filter_not_stale(
-                car_service.filter_data_complete(
-                    car_service.filter_bookable(queryset)))
+            return services.car.filter_live(queryset)
 
 class NoPlateFilter(admin.SimpleListFilter):
     '''
