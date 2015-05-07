@@ -219,7 +219,6 @@ li {
 
 .role {
   padding: 0 0 4rem;
-  border-bottom: 1px solid #666;
 }
 
 .role li {
@@ -253,7 +252,8 @@ li input {
 }
 
 ul.contact {
-  margin: 2rem 0 3rem;
+  padding: 2rem 0 3rem;
+  border-top: 1px solid #666;
 }
 
 .contact li {
