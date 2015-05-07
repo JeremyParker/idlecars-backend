@@ -18,4 +18,4 @@ CORS_ORIGIN_WHITELIST = (
     'app.idlecars.com.s3-website-us-east-1.amazonaws.com',
 )
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.getenv('SECRET_KEY')

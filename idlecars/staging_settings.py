@@ -18,4 +18,4 @@ CORS_ORIGIN_WHITELIST = (
     'app.staging.idlecars.com',
 )
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.getenv('SECRET_KEY')
