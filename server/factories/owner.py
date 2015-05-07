@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 import random
+import datetime
 
 from factory import LazyAttribute
+from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
@@ -19,3 +21,6 @@ class Owner(Factory):
     state_code = LazyAttribute(lambda o: faker.state_abbr())
     zipcode = LazyAttribute(lambda o: faker.zipcode())
     rating = random.choice(owner_model.RATING)[0]
+    last_engagement = LazyAttribute(
+        lambda o: timezone.now() - datetime.timedelta(days=random.randint(1, 2))
+    )

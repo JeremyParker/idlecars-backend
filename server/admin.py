@@ -6,6 +6,8 @@ import django.utils
 from django.core import urlresolvers
 
 from server import models
+from server import services
+
 
 # helper to make links on admin pages
 def link(obj, text=None):
@@ -82,6 +84,7 @@ class OwnerAdmin(admin.ModelAdmin):
         'cars_available',
         'total_cars',
     ]
+    search_fields = ['user_account__last_name', 'user_account__first_name', 'company_name']
     change_form_template = "change_form_inlines_at_top.html"
     def link_name(self, instance):
         return instance.__unicode__()
@@ -94,6 +97,46 @@ class OwnerAdmin(admin.ModelAdmin):
         return instance.cars.count()
 
 
+class CarStaleListFilter(admin.SimpleListFilter):
+    '''
+    Filter to show cars that are complete and WOULD be listed on the site, except we need to talk 
+    to the owner and refresh the listing.
+    '''
+    title = 'state'
+    parameter_name = 'state'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('stale', 'stale'),
+            ('live', 'live'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'stale':
+            return services.car.filter_needs_renewal(queryset)
+        elif self.value() == 'live':
+            return services.car.filter_live(queryset)
+
+class NoPlateFilter(admin.SimpleListFilter):
+    '''
+    Filter to show cars based on if we have the plate for the car.
+    '''
+    title = 'plate'
+    parameter_name = 'plate'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.exclude(plate='')
+        elif self.value() == 'no':
+            return queryset.filter(plate='')
+
+
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
@@ -103,6 +146,17 @@ class CarAdmin(admin.ModelAdmin):
         'owner_link',
         'owner_rating',
         'plate',
+    ]
+    list_filter = [
+        CarStaleListFilter,
+        'owner__rating',
+        'status',
+        NoPlateFilter,
+    ]
+    search_fields = [
+        'make_model__model',
+        'make_model__make',
+        'year'
     ]
     fieldsets = (
         (None, {
