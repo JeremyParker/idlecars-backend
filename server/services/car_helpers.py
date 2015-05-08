@@ -21,7 +21,6 @@ def _filter_data_complete(queryset):
             year__isnull=False,
             solo_cost__isnull=False,
             solo_deposit__isnull=False,
-            owner__last_engagement__isnull=False,
         ).exclude(
             Q(min_lease='_00_unknown') |
             Q(plate='') |
