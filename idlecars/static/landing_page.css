@@ -160,7 +160,7 @@ p.strong {
   margin: 0;
 }
 
-.keep-more {
+/*.keep-more {
   background: url(img/scheduler.png) no-repeat black;
   background-position: calc(50% - 300px) bottom;
 }
@@ -174,9 +174,11 @@ p.strong {
 .keep-more .content {
   width: 22rem;
   margin-right: 4rem;
-}
+}*/
 
 .convenient .container {
+  background: black;
+  color: white;
   min-height: 500px;
 }
 
@@ -383,9 +385,13 @@ footer .container {
     margin-top: 1em;
   }
 
-  .keep-more h2 {
+  /*.keep-more h2 {
     width: 8em;
   }
+
+  .keep-more .content {
+    margin-right: 0;
+  }*/
 
   .role {
     -webkit-flex-direction: column;
@@ -421,10 +427,6 @@ footer .container {
 
   .last_content {
     margin-top: 2.5em;
-  }
-
-  .keep-more .content {
-    margin-right: 0;
   }
 }
 

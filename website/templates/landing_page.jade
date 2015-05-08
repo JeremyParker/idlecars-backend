@@ -24,11 +24,11 @@ extends ./base.jade
       img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
       img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
 
-  section.keep-more
-    .container
-      .content
-        h2 Keep more of your earnings
-        p You only pay for the hours you rent.
+  //- section.keep-more
+  //-   .container
+  //-     .content
+  //-       h2 Keep more of your earnings
+  //-       p You only pay for the hours you rent.
 
   section.get-more.convenient
     .container
@@ -53,8 +53,8 @@ extends ./base.jade
           li
             input#id_role_0(name='role', type='radio', value='driver', checked, ng-model='role')
             div
-              label(for='id_role_0') I want to drive.
-              p Send me an invitation so I can rent.
+              label(for='id_role_0') I’m a driver.
+              p Show me the available cars.
           li
             input#id_role_1(name='role', type='radio', value='owner', ng-model='role')
             div
