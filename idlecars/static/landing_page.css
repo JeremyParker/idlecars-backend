@@ -39,10 +39,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  color: #ddd;
-}
-
 input {
   border: 0;
   padding: 0.5rem;
@@ -219,7 +215,6 @@ li {
 
 .role {
   padding: 0 0 4rem;
-  border-bottom: 1px solid #666;
 }
 
 .role li {
@@ -253,7 +248,8 @@ li input {
 }
 
 ul.contact {
-  margin: 2rem 0 3rem;
+  padding: 2rem 0 3rem;
+  border-top: 1px solid #666;
 }
 
 .contact li {
@@ -291,6 +287,10 @@ footer .container {
 .ask a {
   font-weight: 500;
   text-decoration: underline;
+}
+
+.ask a:hover {
+  color: #ddd;
 }
 
 .tm {

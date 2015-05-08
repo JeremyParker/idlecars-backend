@@ -31,7 +31,7 @@ class CarTest(TestCase):
         ]:
             booking.state = state
             booking.save()
-            self.assertEqual(len(services.Car.queryset.all()), 0)
+            self.assertEqual(len(services.car.listing_queryset.all()), 0)
 
     def test_car_shows_if_no_booking_in_progress(self):
         ''' verify that a car is listed when it has no booking in progress '''
@@ -49,35 +49,41 @@ class CarTest(TestCase):
                 car = self.car,
                 state = state,
             )
-            self.assertEqual(len(services.Car.queryset.all()), 1)
+            self.assertEqual(len(services.car.listing_queryset.all()), 1)
 
     def test_car_avialable_a_month_away(self):
         ''' car is not listed when it isn't available for another month '''
         self.car.next_available_date = datetime.date.today() + datetime.timedelta(days=31)
         self.car.status = 'busy'
         self.car.save()
-        self.assertEqual(len(services.Car.queryset.all()), 0)
+        self.assertEqual(len(services.car.listing_queryset.all()), 0)
 
     def test_car_unknown_availability_date(self):
         ''' car is not listed when we don't know the available date '''
         self.car.next_available_date = None
         self.car.status = 'busy'
         self.car.save()
-        self.assertEqual(len(services.Car.queryset.all()), 0)
+        self.assertEqual(len(services.car.listing_queryset.all()), 0)
 
     def test_car_avialable_a_week_away(self):
         ''' car is listed if it's busy but will become available soon'''
         self.car.next_available_date = datetime.date.today() + datetime.timedelta(days=7)
         self.car.status = 'busy'
         self.car.save()
-        self.assertEqual(len(services.Car.queryset.all()), 1)
+        self.assertEqual(len(services.car.listing_queryset.all()), 1)
 
     def test_car_no_zipcode_no_show(self):
         self.car.owner.zipcode = ''
         self.car.owner.save()
-        self.assertEqual(len(services.Car.queryset.all()), 0)
+        self.assertEqual(len(services.car.listing_queryset.all()), 0)
 
     def test_car_with_zipcode_included(self):
         self.car.zipcode = '10022'
         self.car.save()
-        self.assertEqual(len(services.Car.queryset.all()), 1)
+        self.assertEqual(len(services.car.listing_queryset.all()), 1)
+
+    def test_car_filtered_if_stale(self):
+        ''' verify that a car is not listed when we haven't talked to the owner in a week'''
+        self.car.next_available_date = datetime.date.today() - datetime.timedelta(days=7)
+        self.car.save()
+        self.assertEqual(len(services.car.listing_queryset.all()), 0)
