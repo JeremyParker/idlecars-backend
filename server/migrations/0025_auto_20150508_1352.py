@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='car',
             name='last_status_update',
-            field=models.DateTimeField(default=datetime.datetime(2015, 5, 7, 17, 52, 5, 541097, tzinfo=utc), auto_now_add=True),
+            field=models.DateTimeField(default=datetime.datetime(2015, 5, 10, 17, 52, 5, 541097, tzinfo=utc), auto_now_add=True),
             preserve_default=False,
         ),
     ]
