@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.utils import timezone
 from django.db.models import Q
 
 from server import models
 
 
-next_available_date_threshold = datetime.date.today() + datetime.timedelta(days=30)
-staleness_threshold = datetime.date.today() - datetime.timedelta(days=3)
+next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
+staleness_threshold = timezone.now() - datetime.timedelta(days=3)
 
 def _filter_data_complete(queryset):
     '''
@@ -50,11 +51,11 @@ def _filter_not_stale(queryset):
     '''
     return cars whose owners have been contacted in the last few days, so we know the car's state.
     '''
-    return queryset.filter(next_available_date__gte=staleness_threshold)
+    return queryset.filter(last_status_update__gte=staleness_threshold)
 
 def _filter_stale(queryset):
     '''
     return cars whose owners haven't been contacted in the last few days, so the car's state
     is stale.
     '''
-    return queryset.filter(next_available_date__lt=staleness_threshold)
+    return queryset.filter(last_status_update__lt=staleness_threshold)
