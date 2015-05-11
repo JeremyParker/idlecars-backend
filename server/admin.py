@@ -153,7 +153,8 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = [
         'make_model__model',
         'make_model__make',
-        'year'
+        'year',
+        'plate',
     ]
     fieldsets = (
         (None, {
