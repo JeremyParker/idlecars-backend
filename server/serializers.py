@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.utils import timezone
+
 from rest_framework import serializers
 
 from models import Car, UserAccount, Booking
@@ -77,7 +79,7 @@ class CarSerializer(serializers.ModelSerializer):
         return 'a week'
 
     def _available_string(self, obj):
-        if obj.next_available_date and obj.next_available_date > datetime.date.today():
+        if obj.next_available_date and obj.next_available_date > timezone.now().date():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
     def get_image_url(self, obj):

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 from collections import OrderedDict
 
+from django.utils import timezone
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.utils.six import BytesIO
@@ -24,7 +25,7 @@ class CarTest(APITestCase):
             owner=owner,
             make_model=make_model,
             status='busy',
-            next_available_date=datetime.date.today() + datetime.timedelta(days=1),
+            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
             hybrid=True,
         )
@@ -35,7 +36,7 @@ class CarTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         listing_features = '{} minimum lease ∙ Available {} ∙ {}, {}'
-        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
         expected = [
             OrderedDict(
                 [

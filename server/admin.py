@@ -53,9 +53,6 @@ class CarInline(admin.TabularInline):
     readonly_fields = ['detail_link']
     def detail_link(self, instance):
         return link(instance, 'details')
-    def status_date(self, instance):
-        if instance.owner:
-            return instance.owner.last_engagement
 
 
 class OwnerAdmin(admin.ModelAdmin):
@@ -67,7 +64,6 @@ class OwnerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('split_shift', 'rating'),
-                'last_engagement',
                 'notes',
                 'company_name',
                 'address1',
@@ -145,7 +141,7 @@ class CarAdmin(admin.ModelAdmin):
         'solo_deposit',
         'owner_link',
         'owner_rating',
-        'next_available_date',
+        'last_status_update',
         'plate',
     ]
     list_filter = [
@@ -165,7 +161,11 @@ class CarAdmin(admin.ModelAdmin):
                 ('make_model', 'hybrid', 'year'),
                 ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
-                ('status', 'status_date', 'next_available_date'),
+                (
+                    'status',
+                    'last_status_update',
+                    'next_available_date',
+                ),
                 ('solo_cost', 'solo_deposit'),
                 ('split_cost', 'split_deposit'),
                 'min_lease',
@@ -176,7 +176,6 @@ class CarAdmin(admin.ModelAdmin):
     readonly_fields = [
         'owner_link',
         'owner_rating',
-        'status_date',
         'effective_status',
     ]
 
@@ -195,10 +194,6 @@ class CarAdmin(admin.ModelAdmin):
             return models.Owner.RATING[instance.owner.rating][1]
         else:
             return 'unrated'
-
-    def status_date(self, instance):
-        if instance.owner:
-            return instance.owner.last_engagement
 
 
 class BookingAdmin(admin.ModelAdmin):

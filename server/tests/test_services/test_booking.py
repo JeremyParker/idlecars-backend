@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 from collections import OrderedDict
 
+from django.utils import timezone
 from django.test import TestCase
 
 from server.services import booking as booking_service
@@ -18,7 +19,7 @@ class BookingServiceTest(TestCase):
             owner=owner,
             make_model=make_model,
             status='available',
-            next_available_date=datetime.date.today() + datetime.timedelta(days=1),
+            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
             hybrid=True,
         )
