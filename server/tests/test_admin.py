@@ -40,6 +40,9 @@ class AdminTest(TestCase):
             ('car', factories.Car),
             ('booking', factories.Booking),
         ]:
+            # make sure there's at least one object for each model class
+            model[1].create()
+
             # get the views that don't need an existing object
             for view in [
                 'admin:server_{}_add',
