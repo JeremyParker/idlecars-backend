@@ -21,6 +21,7 @@ class Car(models.Model):
 
     status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
     next_available_date = models.DateField(blank=True, null=True)
+    last_status_update = models.DateTimeField()
     make_model = models.ForeignKey(
         MakeModel,
         related_name='+',
@@ -61,7 +62,7 @@ class Car(models.Model):
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def effective_status(self):
-        if self.next_available_date and self.next_available_date < datetime.date.today():
+        if self.next_available_date and self.next_available_date < timezone.now().date():
             return 'Available'
         else:
             return self.status
@@ -71,3 +72,8 @@ class Car(models.Model):
             return '{} {}'.format(self.year, self.make_model)
         else:
             return unicode(self.make_model)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and not self.last_status_update:
+            self.last_status_update = datetime.datetime.now()
+        super(Car, self).save(*args, **kwargs)

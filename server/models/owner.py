@@ -36,7 +36,6 @@ class Owner(models.Model):
         null = True,
         help_text="Owner's rating based on previous experience."
     )
-    last_engagement = models.DateField(blank=True, null=True)
     notes = models.TextField(blank=True)
 
     def name(self):
