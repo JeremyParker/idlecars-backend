@@ -15,6 +15,7 @@ DATABASES = {
 }
 
 DEBUG = False
+SSLIFY_DISABLE = True
 
 WEBAPP_URL = 'localhost:3000'
 
