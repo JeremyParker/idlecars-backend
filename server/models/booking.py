@@ -22,6 +22,7 @@ class Booking(models.Model):
     OWNER_REJECTED = 8
     DRIVER_REJECTED = 9
     MISSED = 10
+    TEST_BOOKING = 11
 
     STATE = (
         (PENDING, 'Pending - waiting for driver docs'),
@@ -34,6 +35,7 @@ class Booking(models.Model):
         (OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
         (DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
         (MISSED, 'Missed - car rented out before we found a driver'),
+        (TEST_BOOKING, 'Test - a booking that one of us created as a test'),
     )
     state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)
