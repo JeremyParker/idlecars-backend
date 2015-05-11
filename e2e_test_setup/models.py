@@ -27,7 +27,7 @@ class E2ETestSetup():
             models.UserAccount._meta.db_table,
         )
         table_list = ','.join(tables)
-        self.cursor.execute('TRUNCATE TABLE {} CASCADE;'.format(table_list))
+        self.cursor.execute('TRUNCATE TABLE {} RESTART IDENTITY CASCADE;'.format(table_list))
 
     def _setup_cars(self):
         '''
