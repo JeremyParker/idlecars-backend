@@ -3,10 +3,13 @@ from __future__ import unicode_literals
 
 import random
 import string
+import datetime
 from decimal import Decimal
 
 from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
+
+from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
 from server.factories import Owner, MakeModel
@@ -28,6 +31,9 @@ class Car(Factory):
 
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
     base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
+    next_available_date = LazyAttribute(
+        lambda o: timezone.now().date() - datetime.timedelta(days=random.randint(1, 10))
+    )
 
 class BookableCar(Car):
     status = models.Car.STATUS_AVAILABLE

@@ -5,7 +5,6 @@ import random
 import datetime
 
 from factory import LazyAttribute
-from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
