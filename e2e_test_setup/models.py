@@ -27,11 +27,14 @@ class E2ETestSetup():
             models.UserAccount._meta.db_table,
         )
         table_list = ','.join(tables)
-        self.cursor.execute('TRUNCATE TABLE {} CASCADE;'.format(table_list))
+        self.cursor.execute('TRUNCATE TABLE {} RESTART IDENTITY CASCADE;'.format(table_list))
 
     def _setup_cars(self):
         '''
-            Create 3 cars (also creates three owners)
+            Create 4 cars (also creates 4 owners)
         '''
-        for i in xrange(4):
+        delorean = factories.MakeModel.create(make='DMC', model='Delorean')
+        factories.BookableCar.create(make_model=delorean, year=1985)
+
+        for i in xrange(3):
             factories.BookableCar.create()
