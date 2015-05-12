@@ -11,6 +11,7 @@ from server import models
 
 next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
 staleness_threshold = timezone.now() - datetime.timedelta(days=3)
+stale_soon_threshold = staleness_threshold + datetime.timedelta(hours=3)
 
 def _filter_data_complete(queryset):
     '''
@@ -59,3 +60,9 @@ def _filter_stale(queryset):
     is stale.
     '''
     return queryset.filter(last_status_update__lt=staleness_threshold)
+
+def _filter_stale_soon(queryset):
+    '''
+    return cars whose state will be stale soon.
+    '''
+    return queryset.filter(last_status_update__lt=stale_soon_threshold)

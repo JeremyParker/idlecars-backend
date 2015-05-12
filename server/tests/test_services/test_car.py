@@ -88,3 +88,18 @@ class CarTest(TestCase):
         self.car.last_status_update = timezone.now() - datetime.timedelta(days=7)
         self.car.save()
         self.assertEqual(len(services.car.listing_queryset.all()), 0)
+
+    def test_get_stale_soon_none(self):
+        ''' verify that a car is not in the stale_soon results if it won't be stale soon. '''
+        self.car.last_status_update = timezone.now()
+        self.car.save()
+        self.assertEqual(len(services.car.get_stale_soon()), 0)
+
+    def test_get_stale_soon_exists(self):
+        ''' verify that stale_soon includes a car that is about to go stale. '''
+        # set the car's last status update to be 5 minutes from the age that would make it stale.
+        t = services.car_helpers.staleness_threshold + datetime.timedelta(minutes=5)
+        self.car.last_status_update = t
+        self.car.save()
+
+        self.assertEqual(len(services.car.get_stale_soon()), 1)
