@@ -116,8 +116,6 @@ SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
 
 X_FRAME_OPTIONS = 'DENY'
 
-# SESSION_COOKIE_SECURE = True
-
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
