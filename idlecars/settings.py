@@ -112,6 +112,8 @@ SECURE_BROWSER_XSS_FILTER = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
 
+SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
+
 X_FRAME_OPTIONS = 'DENY'
 
 # SESSION_COOKIE_SECURE = True
