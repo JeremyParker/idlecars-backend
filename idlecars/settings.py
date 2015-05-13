@@ -104,6 +104,18 @@ STATICFILES_DIRS = (
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# mark pages with a 'nosniff' header to stop browsers trying to determine the MIME type themselves
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# more CSRF security
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
+
+SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
+
+X_FRAME_OPTIONS = 'DENY'
+
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
