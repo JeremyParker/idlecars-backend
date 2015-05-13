@@ -19,3 +19,5 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+CSRF_COOKIE_SECURE = True  # if True, only sends the CSRF token over HTTPS

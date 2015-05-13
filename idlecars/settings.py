@@ -109,11 +109,12 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # more CSRF security
 SECURE_BROWSER_XSS_FILTER = True
-CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
 
 X_FRAME_OPTIONS = 'DENY'
-SESSION_COOKIE_SECURE = True
+
+# SESSION_COOKIE_SECURE = True
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
