@@ -10,10 +10,7 @@ class TestRenewal(TestCase):
         first_renewal = factories.Renewal.create()
         other_renewal = factories.Renewal.create()
 
-        first_token = first_renewal.token.strip()
-        other_token = other_renewal.token.strip()
+        self.assertNotEqual(first_renewal.token.strip(), '')
+        self.assertNotEqual(other_renewal.token.strip(), '')
 
-        self.assertNotEqual(first_token, '')
-        self.assertNotEqual(other_token, '')
-
-        self.assertNotEqual(first_token, other_token)
+        self.assertNotEqual(first_renewal, other_renewal)
