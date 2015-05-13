@@ -20,8 +20,8 @@ def filter_needs_renewal(queryset):
 listing_queryset = filter_live(models.Car.objects.all())
 
 
-def get_stale_soon():
+def get_stale_within(minutes_until_stale):
     '''
     Returns a list of cars whose listings will expire soon
     '''
-    return car_helpers._filter_stale_soon(models.Car.objects.all())
+    return car_helpers._filter_stale_within(minutes_until_stale, models.Car.objects.all())

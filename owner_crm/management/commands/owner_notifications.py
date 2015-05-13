@@ -9,5 +9,5 @@ class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'
 
     def handle(self, *args, **options):
-        for car in car_service.get_stale_soon():
+        for car in car_service.get_stale_within(60 * 2):
             self.stdout.write('car {} is about to be delisted.'.format(unicode(car)))
