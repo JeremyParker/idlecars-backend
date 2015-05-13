@@ -107,9 +107,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # mark pages with a 'nosniff' header to stop browsers trying to determine the MIME type themselves
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+# more CSRF security
 SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+
 X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_SECURE = True
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
