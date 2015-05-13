@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'server',
     'rest_framework',
     'website',
+    'owner_crm',
     'django_nose',
 )
 
