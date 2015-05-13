@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'website',
     'django_nose',
+    'djrill',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -151,3 +152,7 @@ REST_FRAMEWORK = {
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# default to the staging madrill api key
+MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'KTZ-YnwhVO6IL3M160Pk0g')
+EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
