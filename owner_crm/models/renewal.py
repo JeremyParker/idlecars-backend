@@ -31,5 +31,4 @@ class Renewal(models.Model):
         max_length=40,
         default=_generate_token,
         db_index=True,
-        unique=True,
     )
