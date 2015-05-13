@@ -14,10 +14,10 @@ def _generate_token():
 
 
 class Renewal(models.Model):
-    created_time = models.DateTimeField(auto_now_add=True, null=True)
-    updated_time = models.DateTimeField(auto_now=True, null=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
-    car = models.ForeignKey(server.models.Car, blank=True, null=True, related_name='renewals')
+    car = models.ForeignKey(server.models.Car, related_name='renewals')
 
     PENDING_STATE = 1
     RENEWED_STATE = 2
