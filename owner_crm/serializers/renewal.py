@@ -6,12 +6,16 @@ from rest_framework import serializers
 from owner_crm import models
 
 
-class Renewal(serializers.Serializer):
+class Renewal(serializers.ModelSerializer):
     class Meta:
         model = models.Renewal
 
     def update(self, instance, validated_data):
-        if validated_data.get('state') == 'Renewed':
-            instance.state = models.Renewal.STATE_RENEWED
-
+        instance.state = validated_data.get('state')
+        instance.save()
         return instance
+
+    def validate_state(self, value):
+        if value != models.Renewal.STATE_RENEWED:
+            raise serializers.ValidationError('State can only be renewed')
+        return value
