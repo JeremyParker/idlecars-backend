@@ -6,7 +6,7 @@ from rest_framework import serializers
 from owner_crm import models
 
 
-class Renewal(serializers.ModelSerializer):
+class Renewal(serializers.Serializer):
     class Meta:
         model = models.Renewal
 

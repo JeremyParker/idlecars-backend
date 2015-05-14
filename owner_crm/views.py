@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 from rest_framework import viewsets, mixins
 
-import serializers
+import serializers, models
 
 
 class UpdateRenewalView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    serializer = serializers.Renewal
+    queryset = models.Renewal.objects.all()
+    serializer_class = serializers.Renewal
+    lookup_field = 'token'

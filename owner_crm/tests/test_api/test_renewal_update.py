@@ -5,8 +5,7 @@ from django.core.urlresolvers import reverse
 from django.utils.six import BytesIO
 
 from rest_framework import status
-from rest_framework.parsers import JSONParser
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 
 from owner_crm import factories, models
 
@@ -16,6 +15,7 @@ class RenewalUpdateTest(APITestCase):
         self.renewal = factories.Renewal.create()
 
     def test_update_state(self):
-        url = reverse('owner_crm:renewals-detail', args=(self.renewal.id,))
+        url = reverse('owner_crm:renewals-detail', args=(self.renewal.token,))
+        response = APIClient().patch(url, {'state': 'Renewed'})
 
-        self.assertEqual(url, 'expected')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

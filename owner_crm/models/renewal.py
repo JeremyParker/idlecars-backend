@@ -1,8 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import uuid
-import base64
+import random, string
 
 from django.db import models
 
@@ -10,7 +9,8 @@ import server.models
 
 
 def _generate_token():
-    return base64.b64encode(uuid.uuid4().bytes).replace('=', '')
+    choices = string.uppercase + string.lowercase + string.digits
+    return ''.join(random.SystemRandom().choice(choices) for _ in xrange(20))
 
 
 class Renewal(models.Model):
