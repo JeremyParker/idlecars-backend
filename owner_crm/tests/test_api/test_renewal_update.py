@@ -13,9 +13,9 @@ from owner_crm import factories, models
 
 class RenewalUpdateTest(APITestCase):
     def setUp(self):
-        owner = factories.Renewal.create()
+        self.renewal = factories.Renewal.create()
 
     def test_update_state(self):
-        url = reverse('owner_crm:renewal-update')
+        url = reverse('owner_crm:renewals-detail', args=(self.renewal.id,))
 
         self.assertEqual(url, 'expected')
