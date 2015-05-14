@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from owner_crm import models
@@ -11,6 +12,12 @@ class Renewal(serializers.ModelSerializer):
         model = models.Renewal
 
     def update(self, instance, validated_data):
+        car = instance.car
+
+        car.next_available_date = timezone.now().date()
+        car.last_status_update = timezone.now()
+        car.save()
+
         instance.state = validated_data.get('state')
         instance.save()
         return instance
