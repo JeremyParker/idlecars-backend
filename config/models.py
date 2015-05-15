@@ -32,8 +32,8 @@ class Config(models.Model):
             INTEGER_TYPE: int,
             FLOATING_TYPE: float,
             STRING_TYPE: unicode,
-            # JSON_TYPE: json.loads,
-            # BOOLEAN_TYPE: json.loads,
+            JSON_TYPE: json.loads,
+            BOOLEAN_TYPE: json.loads,
         }
 
         return parsers[self.data_type](self.value)

@@ -6,11 +6,17 @@ import datetime
 from django.utils import timezone
 from django.db.models import Q
 
+from config import config_service
+
 from server import models
 
+next_available_date_threshold = timezone.now().date() + datetime.timedelta(
+    days=config_service.get('next_available_threshold', default=30)
+)
 
-next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
-staleness_threshold = timezone.now() - datetime.timedelta(days=3)
+staleness_threshold = timezone.now() - datetime.timedelta(
+    hours=config_service.get('staleness_threshold', default=3 * 24)
+)
 
 def _filter_data_complete(queryset):
     '''
