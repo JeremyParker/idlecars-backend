@@ -1,8 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-# TODO: JSON support
-# import simplejson as json
+import simplejson
 
 from django.db import models
 
@@ -32,8 +31,8 @@ class Config(models.Model):
             INTEGER_TYPE: int,
             FLOATING_TYPE: float,
             STRING_TYPE: unicode,
-            JSON_TYPE: json.loads,
-            BOOLEAN_TYPE: json.loads,
+            JSON_TYPE: simplejson.loads,
+            BOOLEAN_TYPE: simplejson.loads,
         }
 
         return parsers[self.data_type](self.value)
