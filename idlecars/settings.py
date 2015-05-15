@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'website',
     'owner_crm',
     'django_nose',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (

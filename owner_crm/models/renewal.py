@@ -1,8 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import uuid
-import base64
+import random, string
 
 from django.db import models
 
@@ -10,7 +9,8 @@ import server.models
 
 
 def _generate_token():
-    return base64.b64encode(uuid.uuid4().bytes).replace('=', '')
+    choices = string.uppercase + string.lowercase + string.digits
+    return ''.join(random.SystemRandom().choice(choices) for _ in xrange(20))
 
 
 class Renewal(models.Model):
@@ -19,13 +19,13 @@ class Renewal(models.Model):
 
     car = models.ForeignKey(server.models.Car, related_name='renewals')
 
-    PENDING_STATE = 1
-    RENEWED_STATE = 2
+    STATE_PENDING = 1
+    STATE_RENEWED = 2
     STATE = (
-        (PENDING_STATE, 'Pending'),
-        (RENEWED_STATE, 'Renewed'),
+        (STATE_PENDING, 'Pending'),
+        (STATE_RENEWED, 'Renewed'),
     )
-    state = models.IntegerField(choices=STATE, default=PENDING_STATE)
+    state = models.IntegerField(choices=STATE, default=STATE_PENDING)
 
     token = models.CharField(
         max_length=40,
