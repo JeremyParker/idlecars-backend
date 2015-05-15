@@ -14,7 +14,6 @@ class Renewal(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         car = instance.car
 
-        car.next_available_date = timezone.now().date()
         car.last_status_update = timezone.now()
         car.save()
 
