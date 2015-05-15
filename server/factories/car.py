@@ -38,3 +38,7 @@ class Car(Factory):
 class BookableCar(Car):
     status = models.Car.STATUS_AVAILABLE
     min_lease = '_02_one_week'
+
+class CarExpiredListing(BookableCar):
+    next_available_date = timezone.now().date() - datetime.timedelta(days=30)
+    last_status_update = timezone.now().date() - datetime.timedelta(days=30)
