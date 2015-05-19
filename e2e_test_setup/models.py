@@ -5,7 +5,9 @@ from django.db import connection
 from django.conf import settings
 
 from server import models
-from server import factories
+import server.factories
+
+import owner_crm.factories
 
 class E2ETestSetup():
     def __init__(self):
@@ -17,6 +19,7 @@ class E2ETestSetup():
     def perform(self):
         self._truncate_tables()
         self._setup_cars()
+        self._setup_renewals()
 
     def _truncate_tables(self):
         tables = (
@@ -33,8 +36,14 @@ class E2ETestSetup():
         '''
             Create 4 cars (also creates 4 owners)
         '''
-        delorean = factories.MakeModel.create(make='DMC', model='Delorean')
-        factories.BookableCar.create(make_model=delorean, year=1985)
+        dmc = server.factories.MakeModel.create(make='DMC', model='Delorean')
+        self.delorean = server.factories.BookableCar.create(make_model=dmc, year=1985)
 
         for i in xrange(3):
-            factories.BookableCar.create()
+            server.factories.BookableCar.create()
+
+    def _setup_renewals(self):
+        '''
+            Create a renewal
+        '''
+        owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
