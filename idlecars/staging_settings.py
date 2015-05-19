@@ -8,7 +8,7 @@ from settings import *
 # heap analytics tracking for staging
 HEAP_APP_ID = '1900221263'
 
-WEBAPP_URL = 'app.staging.idlecars.com'
+WEBAPP_URL = 'http://app.staging.idlecars.com'
 
 ALLOWED_HOSTS = ['staging.idlecars.com']
 SSLIFY_DISABLE = True
