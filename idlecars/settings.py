@@ -45,8 +45,10 @@ INSTALLED_APPS = (
     'server',
     'rest_framework',
     'website',
+    'owner_crm',
     'django_nose',
     'djrill',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -103,6 +105,18 @@ STATICFILES_DIRS = (
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# mark pages with a 'nosniff' header to stop browsers trying to determine the MIME type themselves
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# more CSRF security
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
+
+SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
+
+X_FRAME_OPTIONS = 'DENY'
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
@@ -161,3 +175,15 @@ DEFAULT_FROM_EMAIL = 'support@idlecars.com'
 
 # default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
 QUEUE_IMPLEMENTATION = 'FakeQueue'
+
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'cache-control',
+    'accept-encoding',
+    'dnt',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken',
+)

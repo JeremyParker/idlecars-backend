@@ -80,7 +80,12 @@ class OwnerAdmin(admin.ModelAdmin):
         'cars_available',
         'total_cars',
     ]
-    search_fields = ['user_account__last_name', 'user_account__first_name', 'company_name']
+    search_fields = [
+        'user_account__last_name',
+        'user_account__first_name',
+        'user_account__phone_number',
+        'company_name',
+    ]
     change_form_template = "change_form_inlines_at_top.html"
     def link_name(self, instance):
         return instance.__unicode__()
@@ -153,7 +158,8 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = [
         'make_model__model',
         'make_model__make',
-        'year'
+        'year',
+        'plate',
     ]
     fieldsets = (
         (None, {
