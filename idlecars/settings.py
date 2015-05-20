@@ -154,5 +154,10 @@ REST_FRAMEWORK = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # default to the staging madrill api key
+# TODO: vUHGKL3xlA9Lvk1bcB2pnQ <-- test key
 MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'KTZ-YnwhVO6IL3M160Pk0g')
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
+DEFAULT_FROM_EMAIL = 'support@idlecars.com'
+
+# default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
+QUEUE_IMPLEMENTATION = 'FakeQueue'

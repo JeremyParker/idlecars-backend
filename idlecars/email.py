@@ -2,8 +2,12 @@
 from __future__ import unicode_literals
 
 import os
-
 import sendgrid
+
+from django.core.mail import EmailMessage
+
+from idlecars.job_queue import job_queue
+
 
 class SendgridEmail(object):
     def __init__(self):
@@ -28,3 +32,19 @@ class SendgridEmail(object):
         message.set_from('idlecars <support@idlecars.com>')
         message.add_bcc('support@idlecars.com')
         return self.client.send(message)
+
+
+def _send_now(msg):
+    return msg.send()
+
+
+class MandrillEmail(object):
+    def send_async(self, template_name, subject, merge_vars):
+        msg = EmailMessage(
+            subject=subject,
+            from_email="support@idlecars.com",
+            to=merge_vars.keys()
+        )
+        msg.template_name = template_name
+        msg.merge_vars = merge_vars
+        return job_queue.enqueue(_send_now, msg)
