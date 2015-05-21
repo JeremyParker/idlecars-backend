@@ -15,10 +15,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # TODO - optimize this query
+        oustanding_renewal_ids = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
         notifiable_cars = car_service.get_stale_within(
             minutes_until_stale=60 * 2,
         ).exclude(
-            id__in = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)],
+            id__in = oustanding_renewal_ids,
         )
 
         for car in notifiable_cars:
