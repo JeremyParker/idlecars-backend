@@ -50,18 +50,18 @@ def setup_email(template_name, subject, merge_vars):
     return msg
 
 
-def send_async(template_name, subject, merge_vars):
+def send_async(*args, **kwargs):
     '''
     Send an email on a different thread.
     '''
-    msg = setup_email(template_name, subject, merge_vars)
+    msg = setup_email(*args, **kwargs)
     job_queue.enqueue(_send_now, msg)
 
 
-def send_sync(template_name, subject, merge_vars):
+def send_sync(*args, **kwargs):
     '''
     Send an email on this thread.
     '''
-    msg = setup_email(template_name, subject, merge_vars)
+    msg = setup_email(*args, **kwargs)
     _send_now(msg)
     return msg
