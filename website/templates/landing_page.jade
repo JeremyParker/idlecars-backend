@@ -8,7 +8,7 @@ extends ./base.jade
         h1 Revolutionizing Rideshare
         h3.subhead vehicles + sharing + technology + drivers
         p Earn more by renting luxury vehicles and working for rideshare and limousine services.
-        a.button(href="http://#{ settings.WEBAPP_URL }") Find your car
+        a.button#{ settings.WEBAPP_URL }") Find your car
 
   section.select
     .container
@@ -70,7 +70,7 @@ extends ./base.jade
 
         input.button(ng-show="role == 'owner'", type="submit", value="Let's Talk", ng-click='validation($event)')
 
-        a.button(ng-show="role == 'driver'", href="http://#{ settings.WEBAPP_URL }") Find your car
+        a.button(ng-show="role == 'driver'", href="#{ settings.WEBAPP_URL }") Find your car
 
 
 
