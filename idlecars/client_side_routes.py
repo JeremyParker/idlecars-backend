@@ -5,5 +5,5 @@ from django.conf import settings
 
 
 def renewal_url(renewal):
-    parts = (settings.WEBAPP_URL, '#', 'cars', renewal.car.id, 'renewals', renewal.id)
+    parts = (settings.WEBAPP_URL, '#', 'cars', renewal.car.id, 'renewals', renewal.token)
     return '/'.join(parts)
