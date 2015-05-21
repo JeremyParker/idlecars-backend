@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+
 import sendgrid
 
 from django.core.mail import EmailMessage

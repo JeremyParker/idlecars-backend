@@ -16,9 +16,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # TODO - optimize this query
         notifiable_cars = car_service.get_stale_within(
-            60 * 2 * 24
+            minutes_until_stale=60 * 2,
         ).exclude(
-            id__in = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
+            id__in = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)],
         )
 
         for car in notifiable_cars:
