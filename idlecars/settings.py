@@ -167,9 +167,7 @@ REST_FRAMEWORK = {
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# default to the staging madrill api key
-# TODO: vUHGKL3xlA9Lvk1bcB2pnQ <-- test key
-MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'KTZ-YnwhVO6IL3M160Pk0g')
+MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ')  # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'support@idlecars.com'
 
