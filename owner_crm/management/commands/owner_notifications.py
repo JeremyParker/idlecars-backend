@@ -14,15 +14,7 @@ class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'
 
     def handle(self, *args, **options):
-        # TODO - optimize this query
-        oustanding_renewal_ids = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
-        notifiable_cars = car_service.get_stale_within(
-            minutes_until_stale=60 * 2,
-        ).exclude(
-            id__in = oustanding_renewal_ids,
-        )
-
-        for car in notifiable_cars:
+        for car in self.notifiable_cars():
             for user in car.owner.user_account.all():
                 renewal = Renewal.objects.create(car=car)
                 renewal_url = client_side_routes.renewal_url(renewal)
@@ -36,6 +28,15 @@ class Command(BaseCommand):
                     }
                 }
                 email.send_async('single_cta', 'Your idlecars listing is about to expire.', merge_vars)
+
+    def notifiable_cars(self):
+        # TODO - optimize this query
+        oustanding_renewal_ids = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
+        return car_service.get_stale_within(
+            minutes_until_stale=60 * 2,
+        ).exclude(
+            id__in = oustanding_renewal_ids,
+        )
 
     def render_body(self, car):
         template_data = {
