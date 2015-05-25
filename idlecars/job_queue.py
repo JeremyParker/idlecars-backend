@@ -4,4 +4,18 @@ from __future__ import unicode_literals
 from rq import Queue
 from worker import conn
 
-job_queue = Queue(connection=conn)
+from django.conf import settings
+
+
+class RealQueue(Queue):
+    pass
+
+
+class FakeQueue(object):
+    def __init__(self, connection):
+        pass
+
+    def enqueue(self, func, *args, **kwargs):
+        return func(*args, **kwargs)
+
+job_queue = vars()[settings.QUEUE_IMPLEMENTATION](connection=conn)
