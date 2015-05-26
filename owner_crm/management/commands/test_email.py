@@ -21,7 +21,11 @@ class Command(BaseCommand):
 
     def test_template(self, template, merge_vars):
         try:
-            msg = email.send_sync('single_cta', "testing cross-Mandrill sending", merge_vars)
+            msg = email.send_sync(
+                template_name='single_cta',
+                subject="testing cross-Mandrill sending",
+                merge_vars=merge_vars
+            )
         except MandrillAPIError as e:
             self.report_error(unicode(e))
             return

@@ -15,10 +15,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for car in self.notifiable_cars():
+            renewal = Renewal.objects.create(car=car)
+            renewal_url = client_side_routes.renewal_url(renewal)
+            body = self.render_body(car)
+
             for user in car.owner.user_account.all():
-                renewal = Renewal.objects.create(car=car)
-                renewal_url = client_side_routes.renewal_url(renewal)
-                body = self.render_body(car)
                 merge_vars = {
                     user.email: {
                         'FNAME': user.first_name or None,
@@ -27,7 +28,11 @@ class Command(BaseCommand):
                         'CTA_URL': renewal_url,
                     }
                 }
-                email.send_async('single_cta', 'Your idlecars listing is about to expire.', merge_vars)
+                email.send_async(
+                    template_name='single_cta',
+                    subject='Your idlecars listing is about to expire.',
+                    merge_vars=merge_vars,
+                )
 
     def notifiable_cars(self):
         # TODO - optimize this query
