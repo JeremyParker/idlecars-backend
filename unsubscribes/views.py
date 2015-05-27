@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import mandrill
 import json
 
+from django.core import urlresolvers
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
@@ -27,21 +28,17 @@ def index(request):
             unsubscribe.get('created_at'),
             unsubscribe.get('email'),
             unsubscribe.get('reason'),
-            '/admin/unsubscribes',
+            urlresolvers.reverse('unsubscribes:ununsubscribe')
             )
 
-    def _index(request):
-        unsubscribes = (_templatify(unsub) for unsub in Unsubscribes().all())
-        return render(request, 'index.jade', {'unsubscribes': unsubscribes})
+    unsubscribes = (_templatify(unsub) for unsub in Unsubscribes().all())
+    return render(request, 'index.jade', {'unsubscribes': unsubscribes})
 
-    def _delete(request):
+@staff_member_required
+def ununsubscribe(request):
+    if request.method == 'POST':
         email = request.POST.get('email')
-        print request.POST
         if email:
             Unsubscribes().ununsubscribe(email)
-        return redirect('/admin/unsubscribes')
 
-    if request.method == 'POST':
-        return _delete(request)
-    else:
-        return _index(request)
+    return redirect('unsubscribes:index')

@@ -8,4 +8,5 @@ import views
 
 urlpatterns = patterns('',
     url(r'^unsubscribes$', views.index, name='index'),
+    url(r'^ununsubscribe$', views.ununsubscribe, name='ununsubscribe'),
 )
