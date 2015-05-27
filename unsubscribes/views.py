@@ -27,4 +27,4 @@ def index(request):
             )
 
     unsubscribes = (_templatify(unsub) for unsub in Unsubscribes().all())
-    return render(request, 'index.html', {'unsubscribes': unsubscribes})
+    return render(request, 'index.jade', {'unsubscribes': unsubscribes})
