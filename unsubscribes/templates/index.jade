@@ -1,6 +1,12 @@
+h1 Unsubscribes
 table
-  for created_at, email, reason in unsubscribes
+  for created_at, email, reason, form_action in unsubscribes
     tr
       td= created_at
       td= email
       td= reason
+      td
+        form(action="#{form_action}", method="POST")
+            - csrf_token
+            input(type="hidden", value="#{email}", name="email")
+            input(type="submit", value="delete")

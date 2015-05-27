@@ -5,7 +5,7 @@ import mandrill
 import json
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 
 
@@ -16,6 +16,9 @@ class Unsubscribes(object):
     def all(self):
         return self.client.rejects.list(include_expired=False)
 
+    def ununsubscribe(self, email):
+        self.client.rejects.delete(email)
+
 
 @staff_member_required
 def index(request):
@@ -24,7 +27,21 @@ def index(request):
             unsubscribe.get('created_at'),
             unsubscribe.get('email'),
             unsubscribe.get('reason'),
+            '/admin/unsubscribes',
             )
 
-    unsubscribes = (_templatify(unsub) for unsub in Unsubscribes().all())
-    return render(request, 'index.jade', {'unsubscribes': unsubscribes})
+    def _index(request):
+        unsubscribes = (_templatify(unsub) for unsub in Unsubscribes().all())
+        return render(request, 'index.jade', {'unsubscribes': unsubscribes})
+
+    def _delete(request):
+        email = request.POST.get('email')
+        print request.POST
+        if email:
+            Unsubscribes().ununsubscribe(email)
+        return redirect('/admin/unsubscribes')
+
+    if request.method == 'POST':
+        return _delete(request)
+    else:
+        return _index(request)
