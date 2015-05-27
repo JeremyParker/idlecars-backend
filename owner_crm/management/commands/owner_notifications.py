@@ -36,11 +36,11 @@ class Command(BaseCommand):
 
     def notifiable_cars(self):
         # TODO - optimize this query
-        oustanding_renewal_ids = [r.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
+        oustanding_renewal_cars = [r.car.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
         return car_service.get_stale_within(
             minutes_until_stale=60 * 2,
         ).exclude(
-            id__in = oustanding_renewal_ids,
+            id__in = oustanding_renewal_cars,
         )
 
     def render_body(self, car):
