@@ -8,9 +8,13 @@ from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
 
+import idlecars.client_side_routes
 import server.models
+import owner_crm.models
 import server.factories
 import owner_crm.factories
+from owner_crm.management.commands import owner_notifications
+from owner_crm.tests import sample_merge_vars
 
 
 class TestOwnerNotifications(TestCase):
@@ -23,17 +27,19 @@ class TestOwnerNotifications(TestCase):
         server.factories.UserAccount.create(owner=owner)
         return car
 
-    def test_whole_enchilada(self):
-        now = timezone.now()
+    def _update_time_about_to_go_stale(self):
         # TODO - get the stale_threshold from config
-        last_update = now - datetime.timedelta(days=2, hours=23, minutes=50)
+        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
+
+    def test_whole_enchilada(self):
+        last_update = self._update_time_about_to_go_stale()
 
         cars = []
         for i in xrange(2):  # two cars about to go stale
             cars.append(self._setup_car_with_update_time(last_update))
 
         # one car just renewed to make sure filtering is working
-        self._setup_car_with_update_time(now)
+        self._setup_car_with_update_time(timezone.now())
  
         call_command('owner_notifications')
 
@@ -43,10 +49,36 @@ class TestOwnerNotifications(TestCase):
 
         subjects = [m.subject for m in outbox]
         for car in cars:
-            self.assertTrue('Your idlecars listing is about to expire.' in subjects)
+            self.assertTrue('Your {} listing is about to expire.'.format(car.__unicode__()) in subjects)
 
-        # outbox[0].merge_vars
-        # {u'LSteuber@domain.com': {u'CTA_LABEL': u'Renew Listing Now',
-        #                           u'CTA_URL': u'localhost:3000/#/cars/4/renewals/SkZDrqMQ8QskcpWzchEY',
-        #                           u'FNAME': u'Lakisha',
-        #                           u'TEXT': u'<p>You have a listing on idlecars that will expire soon. But don\u2019t worry - you can always renew your listing for free with one tap!</p>\n<p>Hit the link below to renew your 2009 Thompson Gleichner with license plate ID3298OT.</p>\n<p>Thanks for keeping us in the loop!<br>- Your idlecars team\n</p>'}}
+        template_dict = owner_crm.tests.sample_merge_vars.merge_vars[outbox[0].template_name]
+        expected_keys = set(template_dict.values()[0])
+
+        # validate that the merge vars are being set correctly:
+        for message in outbox:
+            email = message.merge_vars.keys()[0]
+            user = server.models.UserAccount.objects.get(email=email)
+            car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
+            renewal = owner_crm.models.Renewal.objects.get(car=car)            
+            var = message.merge_vars[email]
+
+            self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
+            self.assertEqual(var['CTA_URL'], idlecars.client_side_routes.renewal_url(renewal))
+            self.assertEqual(var['FNAME'], user.first_name)
+            self.assertTrue(car.plate in var['TEXT'])
+            self.assertTrue(car.__unicode__() in var['TEXT'])
+
+            # Make sure the merge vars are the ones we're testing against in the integration test
+            self.assertEqual(set([]), set(var.keys()) - expected_keys)
+
+
+    def test_notifiable_cars(self):
+        '''
+        Make sure cars that have an outstanding renewal token don't get included
+        '''
+        last_update = self._update_time_about_to_go_stale()
+        car = self._setup_car_with_update_time(last_update)
+        owner_crm.models.Renewal.objects.create(car=car)
+
+        command = owner_notifications.Command()
+        self.assertFalse(command.notifiable_cars())
