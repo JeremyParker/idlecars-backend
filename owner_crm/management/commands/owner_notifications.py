@@ -28,7 +28,7 @@ class Command(BaseCommand):
                         'CTA_URL': renewal_url,
                     }
                 }
-                email.send_sync(
+                email.send_async(
                     template_name='single_cta',
                     subject='Your {} listing is about to expire.'.format(car.__unicode__()),
                     merge_vars=merge_vars,
