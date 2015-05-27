@@ -78,7 +78,7 @@ class TestOwnerNotifications(TestCase):
         '''
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        owner_crm.models.Renewal.objects.create(car=car)
+        owner_crm.models.Renewal.objects.create(car=car, pk=666)
 
         command = owner_notifications.Command()
         self.assertFalse(command.notifiable_cars())
