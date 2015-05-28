@@ -1,0 +1,14 @@
+h1 Unsubscribes
+p(style="color:red;") WARNING: you can resubscribe people who have explicitly unsubscribed here.
+p Also watch out because this data is live production data, even locally and staging.
+table
+  for created_at, email, reason, form_action in unsubscribes
+    tr
+      td= created_at
+      td= email
+      td= reason
+      td
+        form(action="#{form_action}", method="POST")
+            - csrf_token
+            input(type="hidden", value="#{email}", name="email")
+            input(type="submit", value="Resubscribe")
