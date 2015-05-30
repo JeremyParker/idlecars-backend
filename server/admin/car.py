@@ -11,6 +11,28 @@ from server import models
 from server import services
 
 
+class BookingInline(admin.TabularInline):
+    model = models.Booking
+    verbose_name = "Booking"
+    extra = 0
+    fields = [
+        'detail_link',
+        'state',
+        'user_account',
+        'created_time',
+    ]
+    readonly_fields = [
+        'detail_link',
+        'state',
+        'user_account',
+        'created_time',
+    ]
+    def detail_link(self, instance):
+        return link(instance, 'details')
+    can_delete = False
+    def has_add_permission(self, request):
+        return False
+
 class CarStaleListFilter(admin.SimpleListFilter):
     '''
     Filter to show cars that are complete and WOULD be listed on the site, except we need to talk
@@ -97,6 +119,9 @@ class CarAdmin(admin.ModelAdmin):
         'owner_link',
         'owner_rating',
         'effective_status',
+    ]
+    inlines = [
+        BookingInline,
     ]
 
     def description(self, instance):
