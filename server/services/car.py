@@ -17,6 +17,10 @@ def filter_needs_renewal(queryset):
             car_helpers._filter_bookable(queryset)))
 
 
+def filter_booking_in_progress(queryset):
+    return queryset.filter(car_helpers.q_booking_in_progress)
+
+
 listing_queryset = filter_live(models.Car.objects.all())
 
 

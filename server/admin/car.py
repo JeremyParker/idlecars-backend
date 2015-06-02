@@ -45,6 +45,7 @@ class CarStaleListFilter(admin.SimpleListFilter):
         return (
             ('stale', 'stale'),
             ('live', 'live'),
+            ('reserved', 'booking in progress'),
         )
 
     def queryset(self, request, queryset):
@@ -52,6 +53,8 @@ class CarStaleListFilter(admin.SimpleListFilter):
             return services.car.filter_needs_renewal(queryset)
         elif self.value() == 'live':
             return services.car.filter_live(queryset)
+        elif self.value() == 'reserved':
+            return services.car.filter_booking_in_progress(queryset)
 
 
 class NoPlateFilter(admin.SimpleListFilter):
