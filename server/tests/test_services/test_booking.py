@@ -41,6 +41,15 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.user_account.email, self.user_data['email'])
         self.assertEqual(new_booking.car, self.car)
 
+        # check the email that got sent
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'New Booking from Joe Tested')
+        self.assertEqual(
+            outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
+            unicode(new_booking.pk),
+        )
+
     def test_booking_from_existing_driver(self):
         ''' verify that an existing driver user can create a booking on a valid car '''
         first_booking = booking_service.create_booking(self.user_data, self.car)
