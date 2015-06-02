@@ -31,10 +31,7 @@ def index(request):
             except models.Contact.DoesNotExist:
                 new_contact = contact_form.save()
 
-            if new_contact.role == 'driver':
-                jobs.queue_driver_welcome_email(new_contact.email)
-            else:
-                jobs.queue_owner_welcome_email(new_contact.email)
+            jobs.queue_owner_welcome_email(new_contact.email)
 
             # NOTE(jefk): survey is not ready yet, so now redirect to home
             url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
