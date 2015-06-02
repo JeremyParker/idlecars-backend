@@ -9,6 +9,25 @@ from server.services import user_account as user_account_service
 from server.models import Booking
 
 
+# TODO - move this to CRM app
+def notify_ops(user_account, booking):
+    merge_vars = {
+        'support@idlecars.com': {
+            'FNAME': 'guys',
+            'TEXT': '{} created a new booking.'.format(user_account.full_name()),
+            'CTA_LABEL': 'Check it out',
+            'CTA_URL': 'https://www.idlecars.com{}'.format(
+                reverse('admin:server_booking_change', args=(booking.pk,))
+            ),
+        }
+    }
+    email.send_async(
+        template_name='single_cta',
+        subject='New Booking from {}'.format(user_account.full_name()),
+        merge_vars=merge_vars,
+    )
+
+
 def create_booking(user_account_data, car):
     '''
     Creates a new booking
@@ -23,23 +42,7 @@ def create_booking(user_account_data, car):
         user_account = user_account,
         car = car,
     )
-
-    # send our ops team an email to let them know
     if booking:
-        merge_vars = {
-            'support@idlecars.com': {
-                'FNAME': 'guys',
-                'TEXT': '{} created a new booking.'.format(user_account.full_name()),
-                'CTA_LABEL': 'Check it out',
-                'CTA_URL': 'https://www.idlecars.com{}'.format(
-                    reverse('admin:server_booking_change', args=(booking.pk,))
-                ),
-            }
-        }
-        email.send_async(
-            template_name='single_cta',
-            subject='New Booking from {}'.format(user_account.full_name()),
-            merge_vars=merge_vars,
-        )
+        notify_ops(user_account, booking)
 
     return booking
