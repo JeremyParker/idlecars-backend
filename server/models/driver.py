@@ -8,4 +8,13 @@ from . import UserAccount
 
 class Driver(models.Model):
     user_account = models.OneToOneField(UserAccount, primary_key=True)
-    documentation_complete = models.BooleanField(default=False)
+    documentation_complete = models.BooleanField(default=False, verbose_name='docs confirmed')
+
+    def full_name(self):
+        return self.user_account.full_name()
+
+    def phone_number(self):
+        return self.user_account.phone_number
+
+    def email(self):
+        return self.user_account.email

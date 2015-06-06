@@ -9,29 +9,8 @@ from idlecars.admin_helpers import link
 
 from server import models
 from server import services
+from server.admin.booking import BookingInline
 
-
-class BookingInline(admin.TabularInline):
-    model = models.Booking
-    verbose_name = "Booking"
-    extra = 0
-    fields = [
-        'detail_link',
-        'state',
-        'user_account',
-        'created_time',
-    ]
-    readonly_fields = [
-        'detail_link',
-        'state',
-        'user_account',
-        'created_time',
-    ]
-    def detail_link(self, instance):
-        return link(instance, 'details')
-    can_delete = False
-    def has_add_permission(self, request):
-        return False
 
 class CarStaleListFilter(admin.SimpleListFilter):
     '''

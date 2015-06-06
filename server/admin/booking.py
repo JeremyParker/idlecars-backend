@@ -5,6 +5,8 @@ from django.contrib import admin
 
 from idlecars.admin_helpers import link
 
+from server import models
+
 
 class BookingAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -67,3 +69,26 @@ class BookingAdmin(admin.ModelAdmin):
             return instance.user_account.email
         else:
             return None
+
+
+class BookingInline(admin.TabularInline):
+    model = models.Booking
+    verbose_name = "Booking"
+    extra = 0
+    fields = [
+        'detail_link',
+        'state',
+        'user_account',
+        'created_time',
+    ]
+    readonly_fields = [
+        'detail_link',
+        'state',
+        'user_account',
+        'created_time',
+    ]
+    def detail_link(self, instance):
+        return link(instance, 'details')
+    can_delete = False
+    def has_add_permission(self, request):
+        return False
