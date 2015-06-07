@@ -7,8 +7,8 @@ from . import Car, UserAccount, Driver
 
 
 class Booking(models.Model):
-    user_account = models.ForeignKey(UserAccount)
-    driver = models.ForeignKey(Driver, null=True)
+    user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
+    driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
 

@@ -12,8 +12,8 @@ class BookingAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                ('driver_link', 'driver_phone', 'driver_email'),
                 'state',
-                ('full_name', 'phone_number', 'email'),
                 'car_link',
                 'owner_link',
                 'created_time',
@@ -23,18 +23,18 @@ class BookingAdmin(admin.ModelAdmin):
     )
     list_display = [
         'state',
-        'user_account',
+        'driver_link',
         'car_link',
         'owner_link',
         'created_time',
     ]
     readonly_fields = [
-        'user_account',
+        'driver',
         'car_link',
         'owner_link',
-        'full_name',
-        'phone_number',
-        'email',
+        'driver_link',
+        'driver_phone',
+        'driver_email',
         'created_time',
     ]
 
@@ -45,6 +45,13 @@ class BookingAdmin(admin.ModelAdmin):
             return None
     owner_link.short_description = 'Owner'
 
+    def driver_link(self, instance):
+        if instance.driver:
+            return link(instance.driver, instance.driver.full_name())
+        else:
+            return None
+    driver_link.short_description = 'Driver'
+
     def car_link(self, instance):
         if instance.car:
             return link(instance.car, instance.car.__unicode__())
@@ -52,21 +59,15 @@ class BookingAdmin(admin.ModelAdmin):
             return None
     car_link.short_description = 'Car'
 
-    def full_name(self, instance):
-        if instance.user_account:
-            return instance.user_account.full_name()
+    def driver_phone(self, instance):
+        if instance.driver:
+            return instance.driver.phone_number()
         else:
             return None
 
-    def phone_number(self, instance):
-        if instance.user_account:
-            return instance.user_account.phone_number
-        else:
-            return None
-
-    def email(self, instance):
-        if instance.user_account:
-            return instance.user_account.email
+    def driver_email(self, instance):
+        if instance.driver:
+            return instance.driver.email()
         else:
             return None
 
@@ -78,13 +79,13 @@ class BookingInline(admin.TabularInline):
     fields = [
         'detail_link',
         'state',
-        'user_account',
+        'driver',
         'created_time',
     ]
     readonly_fields = [
         'detail_link',
         'state',
-        'user_account',
+        'driver',
         'created_time',
     ]
     def detail_link(self, instance):
