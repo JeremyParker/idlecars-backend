@@ -10,8 +10,6 @@ from server.factories import UserAccount
 class Driver(Factory):
     class Meta:
         model = 'server.Driver'
-
-    user_account = SubFactory(UserAccount)
     documentation_complete = False
 
 

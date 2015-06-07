@@ -5,11 +5,27 @@ from django.contrib import admin
 
 from server import models
 from server.admin.booking import BookingInline
+from server.admin.user_account import UserAccountInline
+
+class UserAccountInline(admin.StackedInline):
+    model = models.UserAccount
+    verbose_name = "Contact Info"
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('first_name', 'last_name'),
+                ('phone_number'),
+                ('email'),
+            )
+        }),
+    )
+    def get_extra(self, request, obj=None, **kwargs):
+        return 0
 
 
 class DriverAdmin(admin.ModelAdmin):
     list_display = [
-        'full_name',
+        'link_name',
         'documentation_complete',
         'booking_count',
     ]
@@ -23,13 +39,6 @@ class DriverAdmin(admin.ModelAdmin):
         'user_account__email',
     ]
     fieldsets = (
-        (None, {
-            'fields': (
-                ('full_name'),
-                ('phone_number'),
-                ('email'),
-            )
-        }),
         ('Documentation', {
             'fields': (
                 ('documentation_complete'),
@@ -42,16 +51,20 @@ class DriverAdmin(admin.ModelAdmin):
     )
     readonly_fields = [
         'full_name',
-        'email',
-        'phone_number',
         'dmv_license',
         'fhv_license',
         'dd_cert',
         'proof_of_address',
     ]
     inlines = [
+        UserAccountInline,
         BookingInline,
     ]
+    change_form_template = "change_form_inlines_at_top.html"
+
+    def link_name(self, instance):
+        return instance.user_account.full_name()
+    link_name.short_description = "Name"
 
     def booking_count(self, instance):
         return models.Booking.objects.filter(driver=instance).count()

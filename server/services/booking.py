@@ -38,7 +38,11 @@ def create_booking(user_account_data, car):
     - car: an existing car object
     '''
     user_account = user_account_service.find_or_create(user_account_data)
-    driver = driver_service.find_or_create(user_account)
+    driver = user_account.driver
+    if not driver:
+        driver = driver_service.create()
+        user_account.driver = driver
+        user_account.save()
 
     booking = Booking.objects.create(
         user_account=user_account, # TODO(JP): remove this deprecated field

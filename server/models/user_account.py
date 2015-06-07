@@ -6,6 +6,7 @@ from django.core.validators import EmailValidator
 
 from idlecars import model_helpers
 from .owner import Owner
+from .driver import Driver
 
 
 class UserAccount(models.Model):
@@ -22,6 +23,7 @@ class UserAccount(models.Model):
 
     # if this user is an owner, they have an owner profile
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
+    driver = models.OneToOneField(Driver, blank=True, null=True, related_name="user_account")
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def clean(self, *args, **kwargs):

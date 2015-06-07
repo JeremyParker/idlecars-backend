@@ -118,8 +118,8 @@ class UserAccountSerializerTest(TestCase):
 class BookingSerializerTest(TestCase):
     def test_deserialize(self):
         car = factories.Car.create()
-        user = factories.UserAccount.create()
-        driver = factories.Driver(user_account=user)
+        driver = factories.Driver.create()
+        user = factories.UserAccount.create(driver=driver)
 
         json = '''{{
             "user_account": {{
