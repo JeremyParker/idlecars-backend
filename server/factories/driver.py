@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from factory import SubFactory
 
 from idlecars.factory_helpers import Factory
-from server.factories import UserAccount
 
 
 class Driver(Factory):
