@@ -1,14 +1,11 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
-
 from django.utils import timezone
 
 from rest_framework import serializers
 
-from models import Car, UserAccount, Booking
-from services import booking as booking_service
+from server.models import Car
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -92,34 +89,3 @@ class CarSerializer(serializers.ModelSerializer):
         if not obj.owner:
             return None
         return obj.owner.zipcode
-
-
-class UserAccountSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(required=True)
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
-
-    class Meta:
-        model = UserAccount
-
-    def create(self, validated_data):
-        return UserAccount.objects.create(**validated_data)
-
-
-class BookingSerializer(serializers.ModelSerializer):
-    car_id = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())
-    user_account = UserAccountSerializer(read_only=False)
-
-    class Meta:
-        model = Booking
-        fields = ('user_account', 'car_id')
-
-    def is_valid(self, raise_exception=False):
-        # TODO - check that the car is available to be booked
-        super(BookingSerializer, self).is_valid(raise_exception=True)
-
-    def create(self, validated_data):
-        user_account_data = validated_data.pop('user_account')
-        car = validated_data['car_id']
-        return booking_service.create_booking(user_account_data, car)
-        # TODO(JP) - error handling if car is already booked, or user is banned, ...etc
