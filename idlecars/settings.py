@@ -186,3 +186,6 @@ CORS_ALLOW_HEADERS = (
     'authorization',
     'x-csrftoken',
 )
+
+# Heap Analytics uses the DEBUG app id in development/testing
+HEAP_APP_ID = '655181858'
