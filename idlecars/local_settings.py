@@ -19,9 +19,6 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 SSLIFY_DISABLE = True
 
-# Heap Analytics uses the DEBUG app id in development/testing
-HEAP_APP_ID = '655181858'
-
 WEBAPP_URL = 'http://localhost:3000'
 
 # Allow cross origin requests from these domains
