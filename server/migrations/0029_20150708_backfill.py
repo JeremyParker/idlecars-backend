@@ -11,7 +11,6 @@ def backfill_drivers(apps, schema_editor):
     Driver = apps.get_model("server", "Driver")
     UserAccount = apps.get_model("server", "UserAccount")
 
-    import pdb; pdb.set_trace()
     for booking in Booking.objects.all():
         user_account = UserAccount.objects.get(pk=booking.user_account.pk)
         if user_account.driver:
