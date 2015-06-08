@@ -36,6 +36,7 @@ class AdminTest(TestCase):
         '''
         for model in [
             # (slug, factory) pairs for all the admin-accessible models in the app:
+            ('driver', factories.Driver),
             ('owner', factories.Owner),
             ('car', factories.Car),
             ('booking', factories.Booking),

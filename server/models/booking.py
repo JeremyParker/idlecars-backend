@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from .user_account import UserAccount
-from .car import Car
+from . import Car, UserAccount, Driver
 
 
 class Booking(models.Model):
-    user_account = models.ForeignKey(UserAccount)
+    user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
+    driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
 

@@ -118,8 +118,9 @@ class UserAccountSerializerTest(TestCase):
 class BookingSerializerTest(TestCase):
     def test_deserialize(self):
         car = factories.Car.create()
+        driver = factories.Driver.create()
+        user = factories.UserAccount.create(driver=driver)
 
-        user = factories.UserAccount()
         json = '''{{
             "user_account": {{
                 "first_name": "{}",
@@ -129,10 +130,10 @@ class BookingSerializerTest(TestCase):
             }},
             "car_id": {}
         }}'''.format(
-            user.first_name,
-            user.last_name,
-            user.phone_number,
-            user.email,
+            driver.user_account.first_name,
+            driver.user_account.last_name,
+            driver.user_account.phone_number,
+            driver.user_account.email,
             car.pk
         )
 
@@ -142,10 +143,10 @@ class BookingSerializerTest(TestCase):
         serializer.is_valid()
         booking = serializer.save()
         self.assertEqual(booking.car.pk, car.pk)
-        self.assertEqual(booking.user_account.first_name, user.first_name)
-        self.assertEqual(booking.user_account.last_name, user.last_name)
-        self.assertEqual(booking.user_account.phone_number, user.phone_number)
-        self.assertEqual(booking.user_account.email, user.email)
+        self.assertEqual(booking.driver.first_name, driver.first_name)
+        self.assertEqual(booking.driver.last_name, driver.last_name)
+        self.assertEqual(booking.driver.phone_number, driver.phone_number)
+        self.assertEqual(booking.driver.email, driver.email)
 
 
 class BookingTest(APITestCase):

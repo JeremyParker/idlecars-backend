@@ -17,7 +17,6 @@ data_type_functions = {
 }
 
 def _get_value(data_type):
-    import pdb; pdb.set_trace()
     return data_type_functions[self.data_type]()
 
 class Config(Factory):

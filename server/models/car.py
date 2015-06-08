@@ -8,8 +8,7 @@ from django.utils import timezone
 
 from idlecars import model_helpers
 
-from .owner import Owner
-from .make_model import MakeModel
+from . import Owner, MakeModel
 
 
 class Car(models.Model):
