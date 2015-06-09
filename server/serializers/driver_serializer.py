@@ -8,13 +8,17 @@ from server import models
 
 
 class DriverSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(max_length=20)
+
     class Meta:
-        model = models.Car
+        model = models.Driver
 
     def update(self, instance, validated_data):
         user_account = instance.user_account
 
-        user_account.phone_number = validated_data.get('phone_number')
+        if validated_data.get('phone_number'):
+            user_account.phone_number = validated_data.get('phone_number')
+
         user_account.save()
 
         return instance

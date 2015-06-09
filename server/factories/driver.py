@@ -5,6 +5,8 @@ from factory import SubFactory
 
 from idlecars.factory_helpers import Factory
 
+from server.factories import UserAccount as UserAccountFactory
+
 
 class Driver(Factory):
     class Meta:
