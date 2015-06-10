@@ -2,9 +2,11 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User as AuthUser
 
 
 class Driver(models.Model):
+    auth_user = models.OneToOneField(AuthUser, null=True) #TODO: null=False
     documentation_complete = models.BooleanField(default=False, verbose_name='docs confirmed')
 
     def first_name(self):
