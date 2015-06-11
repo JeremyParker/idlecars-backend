@@ -12,16 +12,22 @@ from server import factories, models
 class DriverUpdateTest(APITestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
+        self.url = reverse('server:drivers-detail', args=(self.driver.id,))
         factories.UserAccount.create(driver=self.driver)
 
-    def test_update_state(self):
-        url = reverse('server:drivers-detail', args=(self.driver.id,))
-        response = APIClient().patch(url, {'phone_number': 'newphone'})
+    def test_update_user_account_field(self):
+        response = APIClient().patch(self.url, {'phone_number': 'newphone'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self._driver_reloaded().phone_number(), 'newphone')
 
-        self._assert_updated()
+    def test_update_image_field(self):
+        self.assertEqual(self.driver.driver_license_image, '')
 
-    def _assert_updated(self):
-        driver = models.Driver.objects.get(id=self.driver.id)
-        self.assertEqual(driver.phone_number(), 'newphone')
+        response = APIClient().patch(self.url, {'driver_license_image': 'newurl'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self._driver_reloaded().driver_license_image, 'newurl')
+
+    def _driver_reloaded(self):
+        return models.Driver.objects.get(id=self.driver.id)
