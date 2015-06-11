@@ -12,6 +12,13 @@ class DriverSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Driver
+        fields = (
+            'driver_license_image',
+            'fhv_license_image',
+            'address_proof_image',
+            'defensive_cert_image',
+            'phone_number',
+            )
 
     def update(self, instance, validated_data):
         user_account = instance.user_account
