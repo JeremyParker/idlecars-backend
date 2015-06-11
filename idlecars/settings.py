@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'server',
     'rest_framework',
+    'rest_framework.authtoken',
     'website',
     'owner_crm',
     'unsubscribes',
@@ -163,7 +164,11 @@ SETTINGS_EXPORT = [
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-    )
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication', # TODO(JP): remove in prod
+    ),
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

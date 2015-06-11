@@ -6,6 +6,7 @@ from django.conf import settings
 
 import idlecars.routers
 
+from rest_framework.authtoken import views as auth_views
 import views
 
 router = idlecars.routers.OptionalApiRootDefaultRouter()
@@ -14,4 +15,5 @@ router.register(r'bookings', views.CreateBookingView, base_name='bookings')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^token-auth/', auth_views.obtain_auth_token),
 ]
