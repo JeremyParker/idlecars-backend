@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 import models
 import services.car
-from serializers import CarSerializer, BookingSerializer
+from serializers import CarSerializer, BookingSerializer, DriverSerializer
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
@@ -28,3 +28,7 @@ class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class CreateBookingView(CreateViewSet):
     serializer_class = BookingSerializer
     queryset = models.Booking.objects.all()
+
+class UpdateDriverView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = models.Driver.objects.all()
+    serializer_class = DriverSerializer

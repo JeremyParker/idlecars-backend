@@ -71,10 +71,6 @@ ROOT_URLCONF = 'idlecars.urls'
 WSGI_APPLICATION = 'idlecars.wsgi.application'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=server',
-]
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
