@@ -10,6 +10,11 @@ from .driver import Driver
 
 
 class UserAccount(models.Model):
+    '''
+    Account info for Owners. These first four fields, and created_time will soon 
+    be replaced by auth.User. We'll still need this model to store additional info
+    related to individuals who work for Owner companies.
+    '''
     first_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     last_name = model_helpers.StrippedCharField(max_length=30, blank=True)
     phone_number = models.CharField(max_length=40, blank=True)
@@ -23,7 +28,10 @@ class UserAccount(models.Model):
 
     # if this user is an owner, they have an owner profile
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name="user_account")
+
+    # driver is deprecated
     driver = models.OneToOneField(Driver, blank=True, null=True, related_name="user_account")
+
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def clean(self, *args, **kwargs):
