@@ -23,9 +23,13 @@ class DriverSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_account = instance.user_account
 
-        if validated_data.get('phone_number'):
-            user_account.phone_number = validated_data.get('phone_number')
-
+        user_account.phone_number = validated_data.get('phone_number', user_account.phone_number)
         user_account.save()
+
+        instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
+        instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)
+        instance.address_proof_image = validated_data.get('address_proof_image', instance.address_proof_image)
+        instance.defensive_cert_image = validated_data.get('defensive_cert_image', instance.defensive_cert_image)
+        instance.save()
 
         return instance
