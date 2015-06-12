@@ -9,7 +9,7 @@ from idlecars.admin_helpers import link
 
 from server import models
 from server import services
-from server.admin.booking import BookingInline
+from server.admin.booking import BookingForCarInline
 
 
 class CarStaleListFilter(admin.SimpleListFilter):
@@ -103,7 +103,7 @@ class CarAdmin(admin.ModelAdmin):
         'effective_status',
     ]
     inlines = [
-        BookingInline,
+        BookingForCarInline,
     ]
 
     def description(self, instance):

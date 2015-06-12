@@ -72,7 +72,7 @@ class BookingAdmin(admin.ModelAdmin):
             return None
 
 
-class BookingInline(admin.TabularInline):
+class BookingForCarInline(admin.TabularInline):
     model = models.Booking
     verbose_name = "Booking"
     extra = 0
@@ -84,8 +84,29 @@ class BookingInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
-        'state',
         'driver',
+        'created_time',
+    ]
+    def detail_link(self, instance):
+        return link(instance, 'details')
+    can_delete = False
+    def has_add_permission(self, request):
+        return False
+
+
+class BookingForDriverInline(admin.TabularInline):
+    model = models.Booking
+    verbose_name = "Booking"
+    extra = 0
+    fields = [
+        'detail_link',
+        'state',
+        'car',
+        'created_time',
+    ]
+    readonly_fields = [
+        'detail_link',
+        'car',
         'created_time',
     ]
     def detail_link(self, instance):

@@ -4,23 +4,8 @@ from __future__ import unicode_literals
 from django.contrib import admin
 
 from server import models
-from server.admin.booking import BookingInline
-from server.admin.user_account import UserAccountInline
-
-class UserAccountInline(admin.StackedInline):
-    model = models.UserAccount
-    verbose_name = "Contact Info"
-    fieldsets = (
-        (None, {
-            'fields': (
-                ('first_name', 'last_name'),
-                ('phone_number'),
-                ('email'),
-            )
-        }),
-    )
-    def get_extra(self, request, obj=None, **kwargs):
-        return 0
+from server.admin.booking import BookingForDriverInline
+from server.admin.user_account import UserAccountForDriverInline
 
 
 class DriverAdmin(admin.ModelAdmin):
@@ -57,8 +42,8 @@ class DriverAdmin(admin.ModelAdmin):
         'proof_of_address',
     ]
     inlines = [
-        UserAccountInline,
-        BookingInline,
+        UserAccountForDriverInline,
+        BookingForDriverInline,
     ]
     change_form_template = "change_form_inlines_at_top.html"
 
