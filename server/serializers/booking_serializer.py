@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-from server.models import Car, Booking
+from server.models import Car, Booking, Driver
 from server.services import booking as booking_service
 from server.serializers import UserAccountSerializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
     car_id = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())
+    driver_id = serializers.PrimaryKeyRelatedField(queryset=Driver.objects.all())  #TODO - all?
     user_account = UserAccountSerializer(read_only=False)
 
     class Meta:

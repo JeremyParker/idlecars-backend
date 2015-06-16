@@ -17,16 +17,19 @@ class Driver(models.Model):
     defensive_cert_image = model_helpers.StrippedCharField(max_length=100, blank=True)
 
     def first_name(self):
-        return self.user_account.first_name()
+        return self.auth_user.first_name
 
     def last_name(self):
-        return self.user_account.last_name()
+        return self.auth_user.last_name
 
     def full_name(self):
-        return self.user_account.full_name()
+        return self.auth_user.get_full_name()
 
     def phone_number(self):
-        return self.user_account.phone_number
+        return self.auth_user.username
+
+    def password(self):
+        return self.auth_user.password
 
     def email(self):
-        return self.user_account.email
+        return self.auth_user.email
