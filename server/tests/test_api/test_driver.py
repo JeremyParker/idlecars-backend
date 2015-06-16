@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase, APIClient
 from server import factories, models
 
 
-class DriverUpdateTest(APITestCase):
+class AuthenticatedDriverTest(APITestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
 
@@ -22,6 +22,35 @@ class DriverUpdateTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:drivers-detail', args=(self.driver.id,))
 
+
+class DriverGetTest(AuthenticatedDriverTest):
+    def _test_successful_get(self, response):
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        stream = BytesIO(response.content)
+        response_data = JSONParser().parse(stream)
+
+        for k, v in response_data.iteritems():
+            driver_val = getattr(self.driver, k)
+            if callable(driver_val):
+                driver_val = driver_val()
+            self.assertEqual(response_data[k], driver_val)
+
+    def test_get_driver_as_me(self):
+        response = self.client.get(self.url, {'pk': 'me'})
+        self._test_successful_get(response)
+
+    def test_get_driver_by_id(self):
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self._test_successful_get(response)
+
+    def test_get_driver_fails_unauthorized(self):
+        self.client.credentials()
+        response = self.client.get(self.url, {'pk': 'me'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class DriverUpdateTest(AuthenticatedDriverTest):
     def test_update_auth_user_field(self):
         response = self.client.patch(self.url, {'phone_number': 'newphone'})
 
@@ -75,6 +104,18 @@ class DriverCreateTest(APITestCase):
         self.client.logout()
         self.assertTrue(self.client.login(username='212-413-1234', password='test'))
 
+    def test_create_driver_fails_with_existing_auth_user(self):
+        self.auth_user = factories.AuthUser.create()
+
+        self.client = APIClient()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        data = {'phone_number': self.auth_user.username, 'password': 'new_password'}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_driver_fails_with_no_password(self):
         data = {'phone_number': '212-413-1234'}
         response = APIClient().post(self.url, data)
@@ -84,8 +125,3 @@ class DriverCreateTest(APITestCase):
         data = {'password': 'test'}
         response = APIClient().post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-class DriverGetTest(APITestCase):
-    def setUp(self):
-        pass

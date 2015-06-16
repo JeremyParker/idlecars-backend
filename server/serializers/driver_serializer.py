@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth import models as auth_models
-from rest_framework.serializers import ModelSerializer, CharField, EmailField
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 
 from server import models
 from server.serializers import AuthUserSerializer
@@ -40,8 +41,8 @@ class DriverSerializer(ModelSerializer):
         phone_number = validated_data.get('phone_number')
         try:
             auth_user = auth_models.User.objects.get(username=phone_number)
-            if models.Driver.objects.get(auth_user=existing).exists():
-                raise ValidationError("This phone number already has a driver.")
+            # TODO(JP): allow driver creation if you are authrorized as this user
+            raise ValidationError("This phone number already has a user.")
         except auth_models.User.DoesNotExist:
             password = validated_data.get('password')
             auth_user = auth_models.User.objects.create_user(
