@@ -4,12 +4,12 @@ from __future__ import unicode_literals
 from rest_framework import permissions
 
 
-class IsOwner(permissions.BasePermission):
-    """a user can edit only their own stuff"""
+class OwnsDriver(permissions.BasePermission):
+    """a user can edit or get only their own driver"""
     def has_object_permission(self, request, view, obj):
         return request.user == obj.auth_user
 
-
-class ReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.method in ('GET', 'HEAD')
+class OwnsBooking(permissions.BasePermission):
+    """a user can edit or get only their own bookings"""
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.driver.auth_user

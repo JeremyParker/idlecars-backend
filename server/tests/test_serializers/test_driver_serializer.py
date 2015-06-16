@@ -7,3 +7,4 @@ from server import serializers, factories
 
 class TestDriver(TestCase):
     def test_create(self):
+        pass

@@ -23,7 +23,7 @@ class AuthenticatedDriverTest(APITestCase):
         self.url = reverse('server:drivers-detail', args=(self.driver.id,))
 
 
-class DriverGetTest(AuthenticatedDriverTest):
+class DriverRetrieveTest(AuthenticatedDriverTest):
     def _test_successful_get(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -71,6 +71,12 @@ class DriverUpdateTest(AuthenticatedDriverTest):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().driver_license_image, 'newurl')
+
+    def test_fails_when_not_owner(self):
+        other_driver = factories.Driver.create()
+        url = reverse('server:drivers-detail', args=(other_driver.id,))
+        response = self.client.patch(url, {'driver_license_image': 'newurl'})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_fails_when_logged_out(self):
         self.client.logout()  # we have to call logout in test too, because 

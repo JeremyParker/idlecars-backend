@@ -11,7 +11,7 @@ import views
 
 router = idlecars.routers.OptionalApiRootDefaultRouter()
 router.register(r'cars', views.CarViewSet, base_name='cars')
-router.register(r'bookings', views.CreateBookingView, base_name='bookings')
+router.register(r'bookings', views.BookingViewSet, base_name='bookings')
 router.register(r'drivers', views.DriverViewSet, base_name='drivers')
 
 urlpatterns = [

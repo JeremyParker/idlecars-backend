@@ -5,7 +5,6 @@ from django.contrib.auth import login, logout
 from django.contrib.auth import models as auth_models
 
 from rest_framework import viewsets, mixins
-from rest_framework.views import APIView
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,7 +13,7 @@ import models
 import authentication
 import services.car
 from serializers import CarSerializer, BookingSerializer, DriverSerializer, AuthUserSerializer
-from permissions import IsOwner
+from permissions import OwnsDriver, OwnsBooking
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,20 +21,18 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CarSerializer
 
 
-class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    """
-    A viewset that provides `create` action
-
-    To use it, override the class and set the `.queryset` and
-    `.serializer_class` attributes.
-    """
-    pass
-
-
-class CreateBookingView(CreateViewSet):
-    permission_classes = (IsAuthenticated,)
+class BookingViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, OwnsBooking,)
     serializer_class = BookingSerializer
     queryset = models.Booking.objects.all()
+
+    def get_permissions(self):
+        return (IsAuthenticated() if self.request.method == 'POST' else OwnsBooking()),
+
+    def perform_create(self, serializer):
+
+        driver = models.Driver.objects.get(auth_user=self.request.user)
+        serializer.save(driver=driver)
 
 
 class DriverViewSet(mixins.CreateModelMixin,
@@ -49,8 +46,7 @@ class DriverViewSet(mixins.CreateModelMixin,
 
     def get_permissions(self):
         # allow non-authenticated user to create a Driver
-        return (AllowAny() if self.request.method == 'POST'
-                else IsOwner()),
+        return (AllowAny() if self.request.method == 'POST' else OwnsDriver()),
 
     def get_object(self):
         ''' override to map 'me' to the current user's driver object '''

@@ -23,37 +23,26 @@ class BookingServiceTest(TestCase):
             min_lease='_03_two_weeks',
             hybrid=True,
         )
-        self.user_data = OrderedDict([
-            ('email', 'joe@tester.org'),
-            ('first_name', 'Joe'),
-            ('last_name', 'Tested'),
-            ('phone_number', '212 123 4567')
-        ])
+        self.driver = factories.Driver.create()
 
-    def test_booking_from_new_driver(self):
-        ''' verify that a new driver user can create a booking on a valid car '''
-        with self.assertRaises(models.UserAccount.DoesNotExist):
-            # make sure the user doesn't already exist
-            models.UserAccount.objects.get(email=self.user_data['email'])
+    def test_create_booking_success(self):
+        # make sure the user doesn't already have any active bookings
+        with self.assertRaises(models.Booking.DoesNotExist):
+            models.Booking.objects.get(driver=self.driver)
 
-        new_booking = booking_service.create_booking(self.user_data, self.car)
+        new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertIsNotNone(new_booking)
-        self.assertEqual(new_booking.user_account.email, self.user_data['email'])
+        self.assertEqual(new_booking.driver.phone_number(), self.driver.phone_number())
         self.assertEqual(new_booking.car, self.car)
 
         # check the email that got sent
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].subject, 'New Booking from Joe Tested')
+        self.assertEqual(
+            outbox[0].subject,
+            'New Booking from {} {}'.format(self.driver.first_name(), self.driver.last_name())
+        )
         self.assertEqual(
             outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
             unicode(new_booking.pk),
         )
-
-    def test_booking_from_existing_driver(self):
-        ''' verify that an existing driver user can create a booking on a valid car '''
-        first_booking = booking_service.create_booking(self.user_data, self.car)
-        second_booking = booking_service.create_booking(self.user_data, self.car)
-
-        # they should both be the same user
-        self.assertEqual(first_booking.user_account.pk, second_booking.user_account.pk)
