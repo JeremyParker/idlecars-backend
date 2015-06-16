@@ -48,3 +48,40 @@ class CreateBookingTest(APITestCase):
         stream = BytesIO(response.content)
         response_data = JSONParser().parse(stream)
         self.assertEqual(response_data['detail'], 'You already have a booking in progress.')
+
+
+class ListBookingTest(APITestCase):
+    def setUp(self):
+        self.driver = factories.Driver.create()
+        self.booking = factories.Booking.create(driver=self.driver)
+
+        # populate the db with a bunch of bookings not related to this driver
+        for i in range(20):
+            factories.Booking.create()
+
+        # Include an appropriate `Authorization:` header on all requests.
+        self.client = APIClient()
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:bookings-list')
+
+    def test_get_booking_list(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        stream = BytesIO(response.content)
+        response_data = JSONParser().parse(stream)
+        self.assertEqual(len(response_data), 1)
+        for booking_data in response_data:
+            self.assertEqual(booking_data['driver'], self.driver.pk)
+
+    def test_get_booking_list_one_pending_one_booked(self):
+        self.booking.status = models.Booking.BOOKED
+        booking2 = factories.Booking.create(driver=self.driver, state=models.Booking.PENDING)
+
+        response = self.client.get(self.url, format='json') 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        stream = BytesIO(response.content)
+        response_data = JSONParser().parse(stream)
+        self.assertEqual(len(response_data), 2)
+        for booking_data in response_data:
+            self.assertEqual(booking_data['driver'], self.driver.pk)

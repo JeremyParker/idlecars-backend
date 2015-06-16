@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth import models as auth_models
 from django.utils.six import BytesIO
 
 from rest_framework import status
@@ -51,9 +52,24 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
 
 
 class DriverUpdateTest(AuthenticatedDriverTest):
-    def test_update_auth_user_field(self):
-        response = self.client.patch(self.url, {'phone_number': 'newphone'})
+    def test_update_incomplete_model(self):
+        # set up a driver with nothing more than phone number and password
+        auth_user = auth_models.User.objects.create(username='1112223333')
+        auth_user.set_password('test_pass')
+        driver = models.Driver.objects.create(auth_user=auth_user)
 
+        self.client = APIClient()
+        token = Token.objects.get(user__username=driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:drivers-detail', args=(driver.id,))
+
+        response = self.client.patch(self.url, {'email': 'test@testing.com'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        driver_reloaded = models.Driver.objects.get(id=driver.id)
+        self.assertEqual(driver_reloaded.email(), 'test@testing.com')
+
+    def test_update_username_field(self):
+        response = self.client.patch(self.url, {'phone_number': 'newphone'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().phone_number(), 'newphone')
 

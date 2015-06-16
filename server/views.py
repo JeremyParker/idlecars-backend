@@ -30,9 +30,12 @@ class BookingViewSet(viewsets.ModelViewSet):
         return (IsAuthenticated() if self.request.method == 'POST' else OwnsBooking()),
 
     def perform_create(self, serializer):
-
         driver = models.Driver.objects.get(auth_user=self.request.user)
         serializer.save(driver=driver)
+
+    def get_queryset(self):
+        driver = models.Driver.objects.get(auth_user=self.request.user)
+        return models.Booking.objects.filter(driver=driver)
 
 
 class DriverViewSet(mixins.CreateModelMixin,
