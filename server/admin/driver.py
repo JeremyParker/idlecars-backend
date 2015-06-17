@@ -2,28 +2,37 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from django.contrib import auth
 
+from idlecars.reverse_admin import ReverseInlineModelAdmin, ReverseModelAdmin
 from server import models
 from server.admin.booking import BookingInline
 from server.admin.user_account import UserAccountInline
 
-class UserAccountInline(admin.StackedInline):
-    model = models.UserAccount
-    verbose_name = "Contact Info"
-    fieldsets = (
-        (None, {
-            'fields': (
-                ('first_name', 'last_name'),
-                ('phone_number'),
-                ('email'),
-            )
+# class UserAccountInline(ReverseInlineModelAdmin):
+#     model = auth.models.User
+#     verbose_name = "Contact Info"
+#     def get_extra(self, request, obj=None, **kwargs):
+#         return 0
+
+
+class DriverAdmin(ReverseModelAdmin):
+    inline_type = 'tabular'
+    inline_reverse = (
+        ('auth_user', {
+            # 'form': auth.forms.UserChangeForm,
+            'fieldsets': (
+                (None, {
+                    'fields': (
+                        ('first_name', 'last_name'),
+                        ('username'),
+                        ('email'),
+                    )
+                }),
+            ),
+            'exclude': ()
         }),
     )
-    def get_extra(self, request, obj=None, **kwargs):
-        return 0
-
-
-class DriverAdmin(admin.ModelAdmin):
     list_display = [
         'link_name',
         'documentation_complete',
@@ -33,10 +42,10 @@ class DriverAdmin(admin.ModelAdmin):
         'documentation_complete'
     ]
     search_fields = [
-        'user_account__first_name',
-        'user_account__last_name',
-        'user_account__phone_number',
-        'user_account__email',
+        'auth_user__first_name',
+        'auth_user__last_name',
+        'auth_user__username',
+        'auth_user__email',
     ]
     fieldsets = (
         ('Documentation', {
@@ -56,10 +65,7 @@ class DriverAdmin(admin.ModelAdmin):
         'dd_cert',
         'proof_of_address',
     ]
-    inlines = [
-        UserAccountInline,
-        BookingInline,
-    ]
+    inlines = [BookingInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def link_name(self, instance):
