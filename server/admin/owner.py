@@ -6,7 +6,7 @@ from django.contrib import admin
 from idlecars.admin_helpers import link
 
 from server import models
-from server.admin.user_account import UserAccountInline
+from server.admin.user_account import UserAccountForOwnerInline
 
 
 class CarInline(admin.TabularInline):
@@ -32,7 +32,7 @@ class CarInline(admin.TabularInline):
 
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
-        UserAccountInline,
+        UserAccountForOwnerInline,
         CarInline,
     ]
     fieldsets = (

@@ -6,8 +6,8 @@ from django.contrib import auth
 
 from idlecars.reverse_admin import ReverseInlineModelAdmin, ReverseModelAdmin
 from server import models
-from server.admin.booking import BookingInline
-from server.admin.user_account import UserAccountInline
+from server.admin.booking import BookingForDriverInline
+from server.admin.user_account import UserAccountForDriverInline
 
 
 class DriverAdmin(ReverseModelAdmin):
@@ -58,7 +58,7 @@ class DriverAdmin(ReverseModelAdmin):
         'dd_cert',
         'proof_of_address',
     ]
-    inlines = [BookingInline,]
+    inlines = [BookingForDriverInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def link_name(self, instance):
