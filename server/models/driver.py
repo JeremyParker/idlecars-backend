@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User as AuthUser
+from django.contrib import auth
 
 from idlecars import model_helpers
 
 
 class Driver(models.Model):
-    auth_user = models.OneToOneField(AuthUser, null=True) #TODO: null=False
+    auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_complete = models.BooleanField(default=False, verbose_name='docs confirmed')
 
     driver_license_image = model_helpers.StrippedCharField(max_length=100, blank=True)
@@ -27,9 +27,6 @@ class Driver(models.Model):
 
     def phone_number(self):
         return self.auth_user.username
-
-    def password(self):
-        return self.auth_user.password
 
     def email(self):
         return self.auth_user.email

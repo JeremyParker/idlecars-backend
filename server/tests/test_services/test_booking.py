@@ -26,13 +26,9 @@ class BookingServiceTest(TestCase):
         self.driver = factories.Driver.create()
 
     def test_create_booking_success(self):
-        # make sure the user doesn't already have any active bookings
-        with self.assertRaises(models.Booking.DoesNotExist):
-            models.Booking.objects.get(driver=self.driver)
-
         new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertIsNotNone(new_booking)
-        self.assertEqual(new_booking.driver.phone_number(), self.driver.phone_number())
+        self.assertEqual(new_booking.driver, self.driver)
         self.assertEqual(new_booking.car, self.car)
 
         # check the email that got sent

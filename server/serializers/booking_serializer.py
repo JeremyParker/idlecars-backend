@@ -26,7 +26,8 @@ class BookingSerializer(serializers.ModelSerializer):
         # TODO(JP): make this booking-check aware of end-times, so we can book after booking ends.
         if self.context['request'].method == 'POST':
             driver = Driver.objects.get(auth_user=self.context['request'].user)
-            if Booking.objects.filter(driver=driver, state__in=range(1, 5)):
+            # look for bookings up to but not including "BOOKED" state. I.e. bookings in progress.
+            if Booking.objects.filter(driver=driver, state__in=range(Booking.BOOKED)):
                 self._errors.update({'detail': 'You already have a booking in progress.'})
 
         # TODO(JP): double-check the car is available

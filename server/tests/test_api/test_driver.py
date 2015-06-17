@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
-from django.contrib.auth import models as auth_models
+from django.contrib import auth
 from django.utils.six import BytesIO
 
 from rest_framework import status
@@ -54,7 +54,7 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
 class DriverUpdateTest(AuthenticatedDriverTest):
     def test_update_incomplete_model(self):
         # set up a driver with nothing more than phone number and password
-        auth_user = auth_models.User.objects.create(username='1112223333')
+        auth_user = auth.models.User.objects.create(username='1112223333')
         auth_user.set_password('test_pass')
         driver = models.Driver.objects.create(auth_user=auth_user)
 
@@ -95,7 +95,6 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_fails_when_logged_out(self):
-        self.client.logout()  # we have to call logout in test too, because 
         self.client.credentials()
         response = self.client.patch(self.url, {'driver_license_image': 'newurl'})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -130,10 +129,6 @@ class DriverCreateTest(APITestCase):
         self.auth_user = factories.AuthUser.create()
 
         self.client = APIClient()
-        # Include an appropriate `Authorization:` header on all requests.
-        token = Token.objects.get(user__username=self.auth_user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
         data = {'phone_number': self.auth_user.username, 'password': 'new_password'}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

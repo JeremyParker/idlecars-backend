@@ -9,18 +9,11 @@ from server import models
 from server.admin.booking import BookingInline
 from server.admin.user_account import UserAccountInline
 
-# class UserAccountInline(ReverseInlineModelAdmin):
-#     model = auth.models.User
-#     verbose_name = "Contact Info"
-#     def get_extra(self, request, obj=None, **kwargs):
-#         return 0
-
 
 class DriverAdmin(ReverseModelAdmin):
     inline_type = 'tabular'
     inline_reverse = (
         ('auth_user', {
-            # 'form': auth.forms.UserChangeForm,
             'fieldsets': (
                 (None, {
                     'fields': (
