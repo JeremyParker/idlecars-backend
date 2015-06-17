@@ -32,10 +32,12 @@ class BookingViewSet(viewsets.ModelViewSet):
         return models.Booking.objects.filter(driver=driver)
 
 
-class DriverViewSet(mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   viewsets.GenericViewSet):
+class DriverViewSet(
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        viewsets.GenericViewSet
+    ):
     serializer_class = DriverSerializer
     model = models.Driver
     queryset = models.Driver.objects.all()

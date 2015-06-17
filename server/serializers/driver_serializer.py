@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from django.contrib import auth
+from django.core.exceptions import PermissionDenied
+
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 
 from server import models
@@ -50,13 +52,13 @@ class DriverSerializer(ModelSerializer):
         return new_driver
 
     def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            raise PermissionDenied()
         auth_user = instance.auth_user
         auth_user.username = validated_data.get('phone_number', auth_user.username)
         auth_user.email = validated_data.get('email', auth_user.email)
         auth_user.first_name = validated_data.get('first_name', auth_user.first_name)
         auth_user.last_name = validated_data.get('last_name', auth_user.last_name)
-        if 'password' in validated_data:
-            auth_user.set_password(validated_data.get('password'))
         auth_user.save()
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)

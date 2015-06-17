@@ -56,7 +56,7 @@ class ListBookingTest(APITestCase):
         self.booking = factories.Booking.create(driver=self.driver)
 
         # populate the db with a bunch of bookings not related to this driver
-        for i in range(20):
+        for i in range(10):
             factories.Booking.create()
 
         # Include an appropriate `Authorization:` header on all requests.

@@ -73,12 +73,13 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().phone_number(), 'newphone')
 
-    def test_update_password(self):
+    def test_update_password_forbidden(self):
         response = self.client.patch(self.url, {'password': 'new_password'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # check that the old password still works
         self.client.credentials()
-        result = self.client.login(username=self.driver.phone_number(), password='new_password')
+        result = self.client.login(username=self.driver.phone_number(), password='password')
         self.assertTrue(result)
 
     def test_update_image_field(self):
