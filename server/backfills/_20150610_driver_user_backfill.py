@@ -12,8 +12,9 @@ def run_backfill():
     User = get_user_model()
 
     for driver in models.Driver.objects.all():
-        user_account = models.UserAccount.objects.get(driver=driver)
-        if not user_account:
+        try:
+            user_account = models.UserAccount.objects.get(driver=driver)
+        except models.UserAccount.DoesNotExist:
             print('what the hell? No user account for driver {}!'.format(unicode(driver)))
             continue
 
@@ -49,5 +50,5 @@ def run_backfill():
 
             driver.auth_user = new_user
             driver.save()
-        models.UserAccount.objects.get(driver=driver).delete()
+            models.UserAccount.objects.get(driver=driver).delete()
         print('.')
