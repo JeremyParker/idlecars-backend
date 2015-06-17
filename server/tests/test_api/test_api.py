@@ -81,35 +81,3 @@ class CarTest(APITestCase):
             )
         ]
         self.assertEqual(response.data, expected)
-
-
-class UserAccountSerializerTest(TestCase):
-    def test_deserialize(self):
-        json = '''{
-            "first_name": "Alexandra",
-            "last_name": "Higgins",
-            "phone_number": "212-123-4567",
-            "email": "someone@somewhere.com"
-        }'''
-        stream = BytesIO(json)
-        data = JSONParser().parse(stream)
-        serializer = UserAccountSerializer(data=data)
-        serializer.is_valid()
-        user_account = serializer.save()
-        self.assertEqual(user_account.first_name, "Alexandra")
-        self.assertEqual(user_account.last_name, "Higgins")
-        self.assertEqual(user_account.phone_number, "212-123-4567")
-        self.assertEqual(user_account.email, "someone@somewhere.com")
-
-    def test_deserialize_Fail(self):
-        json = '''{
-            "first_name": "Alexandra",
-            "last_name": "Higgins",
-            "phone_number": "212-123-4567",
-            "email": ""
-        }'''
-        stream = BytesIO(json)
-        data = JSONParser().parse(stream)
-        serializer = UserAccountSerializer(data=data)
-        serializer.is_valid()
-        self.assertEqual(serializer.errors, {'email': [u'This field may not be blank.']})
