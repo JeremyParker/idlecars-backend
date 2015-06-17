@@ -2,12 +2,10 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
-from django.utils.six import BytesIO
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
-from rest_framework.parsers import JSONParser
 
 from server import factories, models
 
@@ -45,9 +43,7 @@ class CreateBookingTest(APITestCase):
         existing_booking.save()
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-        self.assertEqual(response_data['detail'], 'You already have a booking in progress.')
+        self.assertEqual(response.data['detail'], 'You already have a booking in progress.')
 
 
 class ListBookingTest(APITestCase):
@@ -68,10 +64,8 @@ class ListBookingTest(APITestCase):
     def test_get_booking_list(self):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-        self.assertEqual(len(response_data), 1)
-        for booking_data in response_data:
+        self.assertEqual(len(response.data), 1)
+        for booking_data in response.data:
             self.assertEqual(booking_data['driver'], self.driver.pk)
 
     def test_get_booking_list_one_pending_one_booked(self):
@@ -80,8 +74,6 @@ class ListBookingTest(APITestCase):
 
         response = self.client.get(self.url, format='json') 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-        self.assertEqual(len(response_data), 2)
-        for booking_data in response_data:
+        self.assertEqual(len(response.data), 2)
+        for booking_data in response.data:
             self.assertEqual(booking_data['driver'], self.driver.pk)

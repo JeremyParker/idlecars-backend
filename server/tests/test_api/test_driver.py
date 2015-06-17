@@ -3,10 +3,8 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.contrib import auth
-from django.utils.six import BytesIO
 
 from rest_framework import status
-from rest_framework.parsers import JSONParser
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
@@ -27,15 +25,11 @@ class AuthenticatedDriverTest(APITestCase):
 class DriverRetrieveTest(AuthenticatedDriverTest):
     def _test_successful_get(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-
-        for k, v in response_data.iteritems():
+        for k, v in response.data.iteritems():
             driver_val = getattr(self.driver, k)
             if callable(driver_val):
                 driver_val = driver_val()
-            self.assertEqual(response_data[k], driver_val)
+            self.assertEqual(response.data[k], driver_val)
 
     def test_get_driver_as_me(self):
         response = self.client.get(self.url, {'pk': 'me'})
@@ -111,15 +105,12 @@ class DriverCreateTest(APITestCase):
     def test_create_driver(self):
         data = {'phone_number': '212-413-1234', 'password': 'test'}
         response = APIClient().post(self.url, data)
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['phone_number'], data['phone_number'])
-        self.assertFalse('password' in response_data)
+        self.assertEqual(response.data['phone_number'], data['phone_number'])
+        self.assertFalse('password' in response.data)
 
         # check that it was created in the db
-        new_driver = models.Driver.objects.get(auth_user__username=response_data['phone_number'])
+        new_driver = models.Driver.objects.get(auth_user__username=response.data['phone_number'])
         self.assertIsNotNone(new_driver)
 
         #check that the password works

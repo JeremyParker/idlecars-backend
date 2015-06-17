@@ -7,10 +7,8 @@ from collections import OrderedDict
 from django.utils import timezone
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.utils.six import BytesIO
 
 from rest_framework import status
-from rest_framework.parsers import JSONParser
 from rest_framework.test import APITestCase
 
 from server import factories, models
