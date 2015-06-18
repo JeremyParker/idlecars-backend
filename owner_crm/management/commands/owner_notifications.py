@@ -14,7 +14,6 @@ class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'
 
     def handle(self, *args, **options):
-        import pdb; pdb.set_trace()
         for car in self.notifiable_cars():
             renewal = Renewal.objects.create(car=car)
             renewal_url = client_side_routes.renewal_url(renewal)
