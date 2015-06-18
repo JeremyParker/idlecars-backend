@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from server.models import Car
+from server.services import car as car_service
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -79,9 +80,10 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
+
     def get_image_url(self, obj):
         if obj.make_model and obj.make_model.image_filename:
-            return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(obj.make_model.image_filename)
+            return car_service.get_image_url(obj)
         else:
             return None
 
