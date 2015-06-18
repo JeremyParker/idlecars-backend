@@ -1,13 +1,15 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.http import Http404
+
+from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-import models
-import services
-from serializers import CarSerializer, BookingSerializer, DriverSerializer
+import models, services, fields
+from serializers import CarSerializer, BookingSerializer, DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
 
 
@@ -52,3 +54,14 @@ class DriverViewSet(
         if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
             self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
         return super(DriverViewSet, self).get_object()
+
+
+class PhoneNumberDetailView(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            driver = models.Driver.objects.get(auth_user__username=fields.parse_phone_number(pk))
+        except models.Driver.DoesNotExist:
+            raise Http404
+
+        serializer = PhoneNumberSerializer(driver, many=False)
+        return Response(serializer.data)

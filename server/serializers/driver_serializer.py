@@ -6,12 +6,12 @@ from django.core.exceptions import PermissionDenied
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 
-from server import models
+from server import models, fields
 
 
 class DriverSerializer(ModelSerializer):
     # we must add fields that are mapped to auth_user
-    phone_number = CharField(max_length=30)
+    phone_number = fields.PhoneNumberField(max_length=30)
     password = CharField(max_length=128, write_only=True)
     email = EmailField(required=False)
     first_name = CharField(max_length=30, required=False)
