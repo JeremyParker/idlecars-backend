@@ -18,6 +18,7 @@ class Command(BaseCommand):
             renewal = Renewal.objects.create(car=car)
             renewal_url = client_side_routes.renewal_url(renewal)
             body = self.render_body(car)
+            car_desc = car.__unicode__()
 
             for user in car.owner.user_account.all():
                 merge_vars = {
@@ -26,11 +27,13 @@ class Command(BaseCommand):
                         'TEXT': body,
                         'CTA_LABEL': 'Renew Listing Now',
                         'CTA_URL': renewal_url,
+                        'HEADLINE': 'Your {} listing is about to expire'.format(car_desc),
+                        'CAR_IMAGE_URL': car_service.get_image_url(car),
                     }
                 }
                 email.send_async(
-                    template_name='single_cta',
-                    subject='Your {} listing is about to expire.'.format(car.__unicode__()),
+                    template_name='owner_renewal',
+                    subject='Your {} listing is about to expire.'.format(car_desc),
                     merge_vars=merge_vars,
                 )
 

@@ -14,4 +14,14 @@ merge_vars = {
             'CTA_URL': 'http://idlecars.com',
         },
     },
+    'owner_renewal': {
+        'jeremy@idlecars.com': {
+            'FNAME': 'Bob',
+            'TEXT': 'a bunch of text',
+            'CTA_LABEL': 'Renew Now',
+            'CTA_URL': 'http://idlecars.com',
+            'HEADLINE': 'Your 2015 Rolls Royce is about to expire',
+            'CAR_IMAGE_URL': 'https://s3.amazonaws.com/images.idlecars.com/lincoln_towncar.jpg',
+        },
+    },
 }

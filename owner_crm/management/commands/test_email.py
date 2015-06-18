@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from djrill.exceptions import MandrillAPIError
 
@@ -14,6 +15,7 @@ class Command(BaseCommand):
     '''
 
     def handle(self, *args, **options):
+        settings.MANDRILL_API_KEY = 'wUlUoJdWVPOZp7FDvHbIEg'
         for template in merge_vars.keys():
             self.test_template(template, merge_vars[template])
             self.stdout.write('.')
@@ -22,7 +24,7 @@ class Command(BaseCommand):
     def test_template(self, template, merge_vars):
         try:
             msg = email.send_sync(
-                template_name='single_cta',
+                template_name=template,
                 subject="testing cross-Mandrill sending",
                 merge_vars=merge_vars
             )

@@ -33,3 +33,7 @@ def get_stale_within(minutes_until_stale):
         car_helpers._filter_data_complete(
             car_helpers._filter_bookable(
                 models.Car.objects.all())))
+
+
+def get_image_url(car):
+    return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(car.make_model.image_filename)
