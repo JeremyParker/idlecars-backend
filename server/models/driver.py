@@ -32,7 +32,7 @@ class Driver(models.Model):
         return self.auth_user.email
 
     def all_docs_uploaded(self):
-        return (
+        return bool(
             self.driver_license_image and
             self.fhv_license_image and
             self.address_proof_image and

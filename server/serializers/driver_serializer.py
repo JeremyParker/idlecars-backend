@@ -16,7 +16,6 @@ class DriverSerializer(ModelSerializer):
     email = EmailField(required=False)
     first_name = CharField(max_length=30, required=False)
     last_name = CharField(max_length=30, required=False)
-    all_docs_uploaded = BooleanField()
 
     class Meta:
         model = models.Driver
@@ -36,7 +35,7 @@ class DriverSerializer(ModelSerializer):
             'last_name',
         )
         extra_kwargs={'password': {'write_only': True}}
-        read_only_fields = ('id',)
+        read_only_fields = ('id', 'all_docs_uploaded',)
 
     def create(self, validated_data):
         phone_number = validated_data.get('phone_number')
