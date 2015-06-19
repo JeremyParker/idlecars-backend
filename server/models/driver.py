@@ -30,3 +30,11 @@ class Driver(models.Model):
 
     def email(self):
         return self.auth_user.email
+
+    def all_docs_uploaded(self):
+        return (
+            self.driver_license_image and
+            self.fhv_license_image and
+            self.address_proof_image and
+            self.defensive_cert_image
+            )

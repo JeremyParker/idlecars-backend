@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import auth
 from django.core.exceptions import PermissionDenied
 
-from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError, BooleanField
 
 from server import models
 
@@ -16,6 +16,7 @@ class DriverSerializer(ModelSerializer):
     email = EmailField(required=False)
     first_name = CharField(max_length=30, required=False)
     last_name = CharField(max_length=30, required=False)
+    all_docs_uploaded = BooleanField()
 
     class Meta:
         model = models.Driver
@@ -25,6 +26,7 @@ class DriverSerializer(ModelSerializer):
             'fhv_license_image',
             'address_proof_image',
             'defensive_cert_image',
+            'all_docs_uploaded',
 
             # stuff from auth_user
             'phone_number',
