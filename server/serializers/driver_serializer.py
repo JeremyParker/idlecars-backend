@@ -25,6 +25,7 @@ class DriverSerializer(ModelSerializer):
             'fhv_license_image',
             'address_proof_image',
             'defensive_cert_image',
+            'all_docs_uploaded',
 
             # stuff from auth_user
             'phone_number',
@@ -34,7 +35,7 @@ class DriverSerializer(ModelSerializer):
             'last_name',
         )
         extra_kwargs={'password': {'write_only': True}}
-        read_only_fields = ('id',)
+        read_only_fields = ('id', 'all_docs_uploaded',)
 
     def create(self, validated_data):
         phone_number = validated_data.get('phone_number')
