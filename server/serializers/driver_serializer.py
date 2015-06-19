@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import auth
 from django.core.exceptions import PermissionDenied
 
-from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError, BooleanField
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 
 from server import models
 
