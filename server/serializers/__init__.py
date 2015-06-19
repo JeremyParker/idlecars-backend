@@ -5,3 +5,4 @@ from car_serializer import CarSerializer
 from user_account_serializer import UserAccountSerializer
 from booking_serializer import BookingSerializer
 from driver_serializer import DriverSerializer
+from phone_number_serializer import PhoneNumberSerializer

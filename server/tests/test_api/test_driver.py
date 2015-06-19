@@ -3,14 +3,12 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.contrib import auth
-from django.utils.six import BytesIO
 
 from rest_framework import status
-from rest_framework.parsers import JSONParser
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
-from server import factories, models
+from server import factories, models, fields
 
 
 class AuthenticatedDriverTest(APITestCase):
@@ -27,15 +25,13 @@ class AuthenticatedDriverTest(APITestCase):
 class DriverRetrieveTest(AuthenticatedDriverTest):
     def _test_successful_get(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-
-        for k, v in response_data.iteritems():
+        for k, v in response.data.iteritems():
             driver_val = getattr(self.driver, k)
             if callable(driver_val):
                 driver_val = driver_val()
-            self.assertEqual(response_data[k], driver_val)
+            if k == 'phone_number':
+                driver_val = fields.format_phone_number(driver_val)
+            self.assertEqual(response.data[k], driver_val)
 
     def test_get_driver_as_me(self):
         response = self.client.get(self.url, {'pk': 'me'})
@@ -69,9 +65,9 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.assertEqual(driver_reloaded.email(), 'test@testing.com')
 
     def test_update_username_field(self):
-        response = self.client.patch(self.url, {'phone_number': 'newphone'})
+        response = self.client.patch(self.url, {'phone_number': '123 555 1212'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self._driver_reloaded().phone_number(), 'newphone')
+        self.assertEqual(self._driver_reloaded().phone_number(), '1235551212')
 
     def test_update_password_forbidden(self):
         response = self.client.patch(self.url, {'password': 'new_password'})
@@ -109,22 +105,21 @@ class DriverCreateTest(APITestCase):
         self.url = reverse('server:drivers-list')
 
     def test_create_driver(self):
-        data = {'phone_number': '212-413-1234', 'password': 'test'}
+        data = {'phone_number': '212 413 1234', 'password': 'test'}
         response = APIClient().post(self.url, data)
-        stream = BytesIO(response.content)
-        response_data = JSONParser().parse(stream)
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['phone_number'], data['phone_number'])
-        self.assertFalse('password' in response_data)
+        self.assertEqual(response.data['phone_number'], '(212) 413-1234')
+        self.assertFalse('password' in response.data)
+
+        stored_phone_number = ''.join([n for n in response.data['phone_number'] if n.isdigit()])
 
         # check that it was created in the db
-        new_driver = models.Driver.objects.get(auth_user__username=response_data['phone_number'])
+        new_driver = models.Driver.objects.get(auth_user__username=stored_phone_number)
         self.assertIsNotNone(new_driver)
 
         #check that the password works
         self.client.logout()
-        self.assertTrue(self.client.login(username='212-413-1234', password='test'))
+        self.assertTrue(self.client.login(username=stored_phone_number, password='test'))
 
     def test_create_driver_fails_with_existing_auth_user(self):
         self.auth_user = factories.AuthUser.create()

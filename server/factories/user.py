@@ -20,7 +20,7 @@ class AuthUser(DjangoModelFactory):
 
     first_name = LazyAttribute(lambda o: faker.first_name())
     last_name = LazyAttribute(lambda o:faker.last_name())
-    username = LazyAttribute(lambda o: faker.phone_number())
+    username = LazyAttribute(lambda o: unicode(faker.random_number(10)))
     email = LazyAttribute(lambda o: faker.free_email())
 
     @post_generation
