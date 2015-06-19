@@ -37,4 +37,4 @@ class Driver(models.Model):
             self.fhv_license_image and
             self.address_proof_image and
             self.defensive_cert_image
-            )
+        )
