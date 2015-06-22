@@ -11,10 +11,10 @@ class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_complete = models.BooleanField(default=False, verbose_name='docs confirmed')
 
-    driver_license_image = model_helpers.StrippedCharField(max_length=100, blank=True)
-    fhv_license_image = model_helpers.StrippedCharField(max_length=100, blank=True)
-    address_proof_image = model_helpers.StrippedCharField(max_length=100, blank=True)
-    defensive_cert_image = model_helpers.StrippedCharField(max_length=100, blank=True)
+    driver_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+    fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+    address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+    defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
 
     def first_name(self):
         return self.auth_user.first_name
