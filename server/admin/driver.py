@@ -28,11 +28,12 @@ class DriverAdmin(ReverseModelAdmin):
     )
     list_display = [
         'link_name',
+        'all_docs_uploaded',
         'documentation_complete',
         'booking_count',
     ]
     list_filter = [
-        'documentation_complete'
+        'documentation_complete',
     ]
     search_fields = [
         'auth_user__first_name',
@@ -44,25 +45,25 @@ class DriverAdmin(ReverseModelAdmin):
         ('Documentation', {
             'fields': (
                 ('documentation_complete'),
-                ('dmv_license'),
-                ('fhv_license'),
-                ('dd_cert'),
-                ('proof_of_address'),
+                ('driver_license_image'),
+                ('fhv_license_image'),
+                ('defensive_cert_image'),
+                ('address_proof_image'),
             )
         }),
     )
     readonly_fields = [
         'full_name',
-        'dmv_license',
-        'fhv_license',
-        'dd_cert',
-        'proof_of_address',
+        'driver_license_image',
+        'fhv_license_image',
+        'defensive_cert_image',
+        'address_proof_image',
     ]
     inlines = [BookingForDriverInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def link_name(self, instance):
-        return instance.user_account.full_name()
+        return instance.auth_user.get_full_name()
     link_name.short_description = "Name"
 
     def booking_count(self, instance):
