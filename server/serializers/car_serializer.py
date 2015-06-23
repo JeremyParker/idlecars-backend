@@ -38,7 +38,7 @@ class CarSerializer(serializers.ModelSerializer):
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_listing_features(self, obj):
-        return '{} minimum lease ∙ Available {} ∙ {}, {}'.format(
+        return '{} minimum rental ∙ Available {} ∙ {}, {}'.format(
             Car.MIN_LEASE_CHOICES[obj.min_lease],
             self._available_string(obj),
             obj.owner.city,

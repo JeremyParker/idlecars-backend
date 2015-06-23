@@ -33,7 +33,7 @@ class CarTest(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        listing_features = '{} minimum lease ∙ Available {} ∙ {}, {}'
+        listing_features = '{} minimum rental ∙ Available {} ∙ {}, {}'
         tomorrow = timezone.now().date() + datetime.timedelta(days=1)
         expected = [
             OrderedDict(

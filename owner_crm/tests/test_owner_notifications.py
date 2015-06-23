@@ -29,7 +29,7 @@ class TestOwnerNotifications(TestCase):
 
     def _update_time_about_to_go_stale(self):
         # TODO - get the stale_threshold from config
-        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
+        return timezone.now() - datetime.timedelta(days=3, hours=23, minutes=50)
 
     def test_whole_enchilada(self):
         last_update = self._update_time_about_to_go_stale()
@@ -40,7 +40,7 @@ class TestOwnerNotifications(TestCase):
 
         # one car just renewed to make sure filtering is working
         self._setup_car_with_update_time(timezone.now())
- 
+
         call_command('owner_notifications')
 
         # check what got sent
@@ -59,7 +59,7 @@ class TestOwnerNotifications(TestCase):
             email = message.merge_vars.keys()[0]
             user = server.models.UserAccount.objects.get(email=email)
             car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
-            renewal = owner_crm.models.Renewal.objects.get(car=car)            
+            renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
             self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
