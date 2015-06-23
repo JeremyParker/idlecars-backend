@@ -10,7 +10,7 @@ from server import models
 
 
 next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
-staleness_threshold = timezone.now() - datetime.timedelta(days=3)
+staleness_threshold = timezone.now() - datetime.timedelta(days=4)
 
 q_booking_in_progress = Q(booking__state__in=[
     models.Booking.COMPLETE,
