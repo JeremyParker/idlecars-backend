@@ -6,7 +6,6 @@ from rest_framework.exceptions import ValidationError
 
 from server.models import Car, Booking, Driver
 from server.services import booking as booking_service
-from server.serializers import UserAccountSerializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
