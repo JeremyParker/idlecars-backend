@@ -50,5 +50,4 @@ def run_backfill():
 
             driver.auth_user = new_user
             driver.save()
-            models.UserAccount.objects.get(driver=driver).delete()
         print('.')
