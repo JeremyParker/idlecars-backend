@@ -5,6 +5,6 @@ from user_account import UserAccount
 from owner import Owner
 from make_model import MakeModel
 from car import Car, BookableCar, CarExpiredListing
-from staff_user import StaffUser
+from user import AuthUser, StaffUser
 from driver import Driver
 from booking import Booking
