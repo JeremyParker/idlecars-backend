@@ -12,10 +12,10 @@ class BookingAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('driver_link', 'driver_phone', 'driver_email'),
-                'state',
-                'car_link',
-                'owner_link',
+                ('state', 'driver_docs_uploaded',),
+                ('driver_link', 'driver_phone', 'driver_email',),
+                ('car_link', 'car_plate',),
+                ('owner_link', 'owner_phone', 'owner_email',),
                 'created_time',
                 'notes',
             ),
@@ -23,15 +23,20 @@ class BookingAdmin(admin.ModelAdmin):
     )
     list_display = [
         'state',
+        'driver_docs_uploaded',
         'driver_link',
         'car_link',
         'owner_link',
         'created_time',
     ]
     readonly_fields = [
+        'driver_docs_uploaded',
         'driver',
         'car_link',
+        'car_plate',
         'owner_link',
+        'owner_phone',
+        'owner_email',
         'driver_link',
         'driver_phone',
         'driver_email',
@@ -45,9 +50,29 @@ class BookingAdmin(admin.ModelAdmin):
             return None
     owner_link.short_description = 'Owner'
 
+    def owner_phone(self, instance):
+        if instance.car and instance.car.owner:
+            return instance.car.owner.number()
+        else:
+            return None
+    owner_phone.short_description = 'Phone Number'
+
+    def owner_email(self, instance):
+        if instance.car and instance.car.owner:
+            return instance.car.owner.email()
+        else:
+            return None
+    owner_email.short_description = 'Email'
+
+    def driver_docs_uploaded(self, instance):
+        if instance.driver:
+            return instance.driver.all_docs_uploaded()
+        return False
+    driver_docs_uploaded.short_description = "Docs uploaded"
+
     def driver_link(self, instance):
         if instance.driver:
-            return link(instance.driver, instance.driver.full_name())
+            return link(instance.driver, instance.driver.admin_display())
         else:
             return None
     driver_link.short_description = 'Driver'
@@ -58,6 +83,13 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
     car_link.short_description = 'Car'
+
+    def car_plate(self, instance):
+        if instance.car:
+            return instance.car.plate
+        else:
+            return None
+    car_plate.short_description = 'Plate'
 
     def driver_phone(self, instance):
         if instance.driver:
