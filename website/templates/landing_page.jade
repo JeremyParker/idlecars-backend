@@ -5,30 +5,29 @@ extends ./base.jade
     .container
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
       .content
-        h1 Revolutionizing Rideshare
-        h3.subhead vehicles + sharing + technology + drivers
-        p Earn more by renting luxury vehicles and working for rideshare and limousine services.
+        h1 Start renting Start earning
+        p A safe and reliable marketplace for professional drivers to rent for-hire vehicles, on-demand.
         a.button(href="#{ settings.WEBAPP_URL }") Find your car
 
   section.select
     .container
       .content
         h2 Ready to drive
-        p Every car is inspected and has a validated TLC license. Find your car and start driving in as little as 24 hours.
-        p No leases or long-term commitments.
+        p Every idlecar is inspected and is already registered with the TLC.
+        p Find a car and start driving the next day. No leases, loans or long-term commitments.
 
   section.get-more
     .container
-      h2 Get more rides
-      p.strong Our cars allow you to drive for any base.
-      p Whatever rideshare, limousine or dispatch company you want to work for, you’ll find a vehicle that works for you.
+      h2 It’s your choice
+      p Our cars allow you to drive for any base.
       img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
       img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
 
   section.get-more.convenient
     .container
       h2 Convenient for you
-      p Idlecars takes care of all the paperwork, insurance, and maintenance. The listed price is all you pay.
+      p We take care of all the paperwork, insurance, and maintenance.
+      p The listed price is all you pay.
 
   #lets-talk
   - if show_thanks

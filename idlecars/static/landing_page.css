@@ -299,7 +299,7 @@ footer .container {
 @media (max-width: 415px) {
   h1, h2 {
     font-size: 1.8rem;
-    line-height: 1em;
+    line-height: 1.25em;
     margin-bottom: 15px;
   }
 
@@ -326,6 +326,10 @@ footer .container {
     top: 1rem;
     left: 2rem;
     max-width: 40%;
+  }
+
+  .headline h1 {
+    width: 15rem;
   }
 
   .headline .button {
