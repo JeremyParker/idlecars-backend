@@ -131,7 +131,7 @@ heroku promote HEROKU_POSTGRESQL_GREEN -a idlecars
 
 ### Restoring db from backup
 ```
-heroku pg:reset DATABASE_URL --app -idlecars
+heroku pg:reset DATABASE_URL --app staging-idlecars
 heroku pg:backups restore 'quoted_url_from_backup_service.dump' DATABASE_URL --app staging-idlecars
 heroku run python manage.py migrate
 heroku run python manage.py shell
