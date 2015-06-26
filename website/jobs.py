@@ -13,7 +13,7 @@ from idlecars.job_queue import job_queue
 def queue_owner_welcome_email(email_address):
     text = '''
     Find more drivers for your idle cars. <br>
-    Fill out this form to add your car our listings. When a qualified driver requests your car, we will contact you directly. <br>
+    Fill out this form to add your car to our listings. When a qualified driver requests your car, we will contact you directly. <br>
     Questions? Contact us at support@idlecars.com, or 1-844-IDLECAR.
     '''
     merge_vars = {
