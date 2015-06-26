@@ -16,6 +16,9 @@ class Driver(models.Model):
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
 
+    def admin_display(self):
+        return self.auth_user.get_full_name() or self.phone_number()
+
     def first_name(self):
         return self.auth_user.first_name
 

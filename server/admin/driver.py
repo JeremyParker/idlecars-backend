@@ -17,9 +17,7 @@ class DriverAdmin(ReverseModelAdmin):
             'fieldsets': (
                 (None, {
                     'fields': (
-                        ('first_name', 'last_name'),
-                        ('username'),
-                        ('email'),
+                        ('first_name', 'last_name', 'username', 'email'),
                     )
                 }),
             ),
@@ -28,6 +26,8 @@ class DriverAdmin(ReverseModelAdmin):
     )
     list_display = [
         'link_name',
+        'phone_number',
+        'email',
         'all_docs_uploaded',
         'documentation_complete',
         'booking_count',
@@ -63,8 +63,8 @@ class DriverAdmin(ReverseModelAdmin):
     change_form_template = "change_form_inlines_at_top.html"
 
     def link_name(self, instance):
-        return instance.auth_user.get_full_name()
-    link_name.short_description = "Name"
+        return instance.admin_display()
+    link_name.short_description = "Driver"
 
     def booking_count(self, instance):
         return models.Booking.objects.filter(driver=instance).count()

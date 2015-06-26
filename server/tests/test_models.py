@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from server import models
+from server import models, factories
 from idlecars import model_helpers
 
 class TestUserAccount(TestCase):
@@ -78,3 +78,10 @@ class TestOwner(TestCase):
                 owner = owner,
             )
             person.save()
+
+
+class TestDriver(TestCase):
+    def test_admin_display(self):
+        auth_user = factories.AuthUser(first_name='', last_name='')
+        driver = factories.Driver(auth_user=auth_user)
+        self.assertEqual(driver.auth_user.username, driver.admin_display())
