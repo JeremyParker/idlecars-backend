@@ -25,4 +25,3 @@ class TestCarSerializer(TestCase):
 
     def _image_url_for(self, car):
         return serializers.CarSerializer(car).data['image_url']
-
