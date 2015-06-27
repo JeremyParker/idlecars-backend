@@ -79,6 +79,18 @@ class TestOwner(TestCase):
             )
             person.save()
 
+class CarTest(TestCase):
+    def test_set_status_sets_date(self):
+        # we have to have real dependent objects so save() will work
+        owner = factories.Owner.create()
+        make_model = factories.MakeModel.create()
+        car = models.Car(
+            owner = owner,
+            make_model = make_model,
+        )
+        car.save()
+        self.assertIsNotNone(car.last_status_update)
+
 
 class TestDriver(TestCase):
     def test_admin_display(self):
