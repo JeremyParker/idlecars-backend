@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
+from django.utils import timezone
+
 from server import models, factories
 from idlecars import model_helpers
 
@@ -79,7 +81,15 @@ class TestOwner(TestCase):
             )
             person.save()
 
-class CarTest(TestCase):
+
+class TestDriver(TestCase):
+    def test_admin_display(self):
+        auth_user = factories.AuthUser(first_name='', last_name='')
+        driver = factories.Driver(auth_user=auth_user)
+        self.assertEqual(driver.auth_user.username, driver.admin_display())
+
+
+class TestCar(TestCase):
     def test_set_status_sets_date(self):
         # we have to have real dependent objects so save() will work
         owner = factories.Owner.create()
@@ -91,23 +101,20 @@ class CarTest(TestCase):
         car.save()
         self.assertIsNotNone(car.last_status_update)
 
-
-class TestDriver(TestCase):
-    def test_admin_display(self):
-        auth_user = factories.AuthUser(first_name='', last_name='')
-        driver = factories.Driver(auth_user=auth_user)
-        self.assertEqual(driver.auth_user.username, driver.admin_display())
-
-
-class TestCar(TestCase):
     def test_save_updates_mileage_date(self):
         car = factories.Car.create()
         car.last_known_mileage = 10345
         car.save()
-        self.assertEqual(car.last_mileage_update, timezone.now())
+        self.assertEqual(
+            car.last_mileage_update.replace(microsecond=0),
+            timezone.now().replace(microsecond=0),
+        )
 
     def test_save_updates_status_date(self):
         car = factories.Car.create()
         car.status = models.Car.STATUS_AVAILABLE
         car.save()
-        self.assertEqual(car.last_status_update, timezone.now())
+        self.assertEqual(
+            car.last_status_update.replace(microsecond=0),
+            timezone.now().replace(microsecond=0),
+        )

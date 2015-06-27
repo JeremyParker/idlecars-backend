@@ -84,7 +84,11 @@ class Car(models.Model):
     insurance = models.ForeignKey(Insurance, blank=True, null=True)
 
     def display_mileage(self):
-        return self.last_known_mileage  # TODO(JP): have this change with time based on past data
+        # TODO(JP): have this change with time based on past data?
+        if self.last_known_mileage:
+            return '{},000'.format(self.last_known_mileage / 1000)
+        else:
+            return None
 
     def effective_status(self):
         if self.next_available_date and self.next_available_date < timezone.now().date():
@@ -99,8 +103,9 @@ class Car(models.Model):
             return unicode(self.make_model)
 
     def save(self, *args, **kwargs):
-        if self.pk is None and not self.last_status_update:
-            self.last_status_update = timezone.now()
+        if self.pk is None:
+            if not self.last_status_update:
+                self.last_status_update = timezone.now()
         else:
             orig = Car.objects.get(pk=self.pk)  # TODO(JP): maybe use __class__ to be more flexible
             if orig.status != self.status:

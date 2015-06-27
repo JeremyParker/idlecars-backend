@@ -12,7 +12,7 @@ from factory import SubFactory, SelfAttribute
 from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Owner, MakeModel
+from server.factories import Owner, MakeModel, Insurance
 from server import models
 
 class Car(Factory):
@@ -51,6 +51,6 @@ class CompleteCar(BookableCar):
     hybrid = True
     exterior_color = LazyAttribute(lambda o: random.choice(range(5)))
     interior_color = LazyAttribute(lambda o: random.choice(range(5)))
-    last_known_mileage = LazyAttribute(lambda o: random.int(10000, 80000))
+    last_known_mileage = LazyAttribute(lambda o: random.randint(10000, 80000))
     last_mileage_update = LazyAttribute(lambda o: faker.date_time_this_month())
     insurance = SubFactory(Insurance)

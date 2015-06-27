@@ -66,14 +66,15 @@ class CarTest(APITestCase):
                 ('zipcode', car.owner.zipcode),
             ]
         )
+
+        if car.interior_color is not None:
+            expected['details'] = [['Interior color', models.Car.COLOR_CHOICES[car.interior_color][1]],] + expected['details']
+        if car.exterior_color is not None:
+            expected['details'] = [['Exterior color', models.Car.COLOR_CHOICES[car.exterior_color][1]],] + expected['details']
+        if car.display_mileage():
+            expected['details'] = [['Mileage', '{},000'.format(car.last_known_mileage / 1000)],] + expected['details']
         if car.hybrid:
             expected['details'] = [['Hybrid ☑', ''],] + expected['details']
-        if car.mileage:
-            expected['details'] = [['Mileage', car.display_mileage()],] + expected['details']
-        if car.exterior_color:
-            expected['details'] = [['Exterior color', car.exterior_color],] + expected['details']
-        if car.interior_color:
-            expected['details'] = [['Interior color', car.interior_color],] + expected['details']
         return dict(expected)
 
     def test_get_cars(self):
@@ -92,9 +93,16 @@ class CarTest(APITestCase):
 
     def test_get_car_with_all_fields(self):
         self.car = factories.CompleteCar.create(
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1)
+            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            exterior_color=0,
+            interior_color=0,
         )
         url = reverse('server:cars-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self._get_expected_representation(self.car))
+
+        expected = self._get_expected_representation(self.car)
+        expected['details'][2] = ['Exterior color', 'Black']
+        expected['details'][3] = ['Interior color', 'Black']
+
+        self.assertEqual(response.data, expected)
