@@ -12,7 +12,7 @@ from factory import SubFactory, SelfAttribute
 from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Owner, MakeModel
+from server.factories import Owner, MakeModel, Insurance
 from server import models
 
 class Car(Factory):
@@ -35,10 +35,22 @@ class Car(Factory):
         lambda o: timezone.now().date() - datetime.timedelta(days=random.randint(1, 10))
     )
 
+
 class BookableCar(Car):
     status = models.Car.STATUS_AVAILABLE
     min_lease = '_02_one_week'
 
+
 class CarExpiredListing(BookableCar):
     next_available_date = timezone.now().date() - datetime.timedelta(days=30)
     last_status_update = timezone.now().date() - datetime.timedelta(days=30)
+
+
+class CompleteCar(BookableCar):
+    ''' creates a car with all optional fields filled in '''
+    hybrid = True
+    exterior_color = LazyAttribute(lambda o: random.choice(range(5)))
+    interior_color = LazyAttribute(lambda o: random.choice(range(5)))
+    last_known_mileage = LazyAttribute(lambda o: random.randint(10000, 80000))
+    last_mileage_update = LazyAttribute(lambda o: faker.date_time_this_month())
+    insurance = SubFactory(Insurance)

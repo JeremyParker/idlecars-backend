@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from owner_crm import models
+from server import models as server_models
 
 
 class Renewal(serializers.ModelSerializer):
@@ -14,6 +15,7 @@ class Renewal(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         car = instance.car
 
+        car.status = server_models.Car.STATUS_AVAILABLE
         car.last_status_update = timezone.now()
         car.save()
 

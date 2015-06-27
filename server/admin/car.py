@@ -83,8 +83,11 @@ class CarAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('make_model', 'hybrid', 'year'),
+                ('exterior_color', 'interior_color'),
                 ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
+                ('insurance', 'insurance_link'),
+                ('last_known_mileage', 'last_mileage_update'),
                 (
                     'status',
                     'last_status_update',
@@ -99,6 +102,8 @@ class CarAdmin(admin.ModelAdmin):
     )
     readonly_fields = [
         'owner_link',
+        'insurance_link',
+        'last_mileage_update',
         'owner_rating',
         'effective_status',
     ]
@@ -115,6 +120,13 @@ class CarAdmin(admin.ModelAdmin):
         else:
             return None
     owner_link.short_description = 'Owner'
+
+    def insurance_link(self, instance):
+        if instance.insurance:
+            return link(instance.insurance, instance.insurance.__unicode__())
+        else:
+            return None
+    insurance_link.short_description = 'Insurance'
 
     def owner_rating(self, instance):
         if instance.owner and instance.owner.rating:

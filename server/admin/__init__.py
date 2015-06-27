@@ -15,6 +15,7 @@ admin.site.register(models.Car, CarAdmin)
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.MakeModel)
 admin.site.register(models.Driver, DriverAdmin)
+admin.site.register(models.Insurance)
 
 admin.site.site_header = "idlecars operations"
 admin.site.site_title = ''

@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from idlecars import model_helpers
 
-from . import Owner, MakeModel
+from . import Owner, MakeModel, Insurance
 
 
 class Car(models.Model):
@@ -61,6 +61,35 @@ class Car(models.Model):
     notes = models.TextField(blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
+    COLOR_CHOICES = [
+        (0, 'Black'),
+        (1, 'Charcoal'),
+        (2, 'Grey'),
+        (3, 'Dark Blue'),
+        (4, 'Blue'),
+        (5, 'Tan'),
+    ]
+    exterior_color = models.IntegerField(
+        choices=COLOR_CHOICES,
+        blank=True,
+        null = True,
+    )
+    interior_color = models.IntegerField(
+        choices=COLOR_CHOICES,
+        blank=True,
+        null = True,
+    )
+    last_known_mileage = models.IntegerField(blank=True, null=True)
+    last_mileage_update = models.DateTimeField(blank=True, null=True)
+    insurance = models.ForeignKey(Insurance, blank=True, null=True)
+
+    def display_mileage(self):
+        # TODO(JP): have this change with time based on past data?
+        if self.last_known_mileage:
+            return '{},000'.format(self.last_known_mileage / 1000)
+        else:
+            return None
+
     def effective_status(self):
         if self.next_available_date and self.next_available_date < timezone.now().date():
             return 'Available'
@@ -74,6 +103,14 @@ class Car(models.Model):
             return unicode(self.make_model)
 
     def save(self, *args, **kwargs):
-        if self.pk is None and not self.last_status_update:
-            self.last_status_update = datetime.datetime.now()
+        if self.pk is None:
+            if not self.last_status_update:
+                self.last_status_update = timezone.now()
+        else:
+            orig = Car.objects.get(pk=self.pk)  # TODO(JP): maybe use __class__ to be more flexible
+            if orig.status != self.status:
+                self.last_status_update = timezone.now()
+            if orig.last_known_mileage != self.last_known_mileage:
+                self.last_mileage_update = timezone.now()
+
         super(Car, self).save(*args, **kwargs)
