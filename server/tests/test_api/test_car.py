@@ -16,65 +16,80 @@ from server import factories, models
 
 class CarTest(APITestCase):
     def setUp(self):
-        owner = factories.Owner.create(state_code='NY')
-        make_model = factories.MakeModel.create()
-        self.car = factories.Car.create(
-            owner=owner,
-            make_model=make_model,
+        self.car = factories.BookableCar.create(
             status='busy',
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
-            min_lease='_03_two_weeks',
-            hybrid=True,
+            hybrid=False,
         )
+
+    def _get_expected_representation(self, car):
+        ''' returns the expected API response for a given car '''
+        listing_features = '{} minimum rental ∙ Available {} ∙ {}, {}'
+        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
+        expected = OrderedDict(
+            [
+                ('id', car.pk),
+                ('name', '{} {}'.format(car.year, car.make_model)),
+                ('listing_features', listing_features.format(
+                        models.Car.MIN_LEASE_CHOICES[car.min_lease],
+                        '{d.month}/{d.day}'.format(d = tomorrow),
+                        car.owner.city,
+                        car.owner.state_code,
+                    )),
+                ('headline_features',
+                    [
+                        'Available {d.month}/{d.day}'.format(d = tomorrow),
+                        '{} minimum'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
+                        '${} deposit'.format(car.solo_deposit),
+                    ]
+                ),
+                ('certifications',
+                    [
+                        'Base registration verified',
+                        'Vehicle has TLC plates',
+                        'Insurance is included',
+                        'Maintainance is included',
+                    ]
+                ),
+                ('details',
+                    [
+                        ['Location', '{}, {}'.format(
+                            car.owner.city,
+                            car.owner.state_code,
+                        )],
+                        ['TLC Base', car.base]
+                    ]
+                ),
+                ('cost', '{0:.0f}'.format(car.solo_cost)),
+                ('cost_time', 'a week'),
+                ('image_url', None),
+                ('zipcode', car.owner.zipcode),
+            ]
+        )
+        if car.hybrid:
+            expected['details'] = [['Hybrid ☑', ''],] + expected['details']
+
+        return dict(expected)
 
     def test_get_cars(self):
         url = reverse('server:cars-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        listing_features = '{} minimum rental ∙ Available {} ∙ {}, {}'
-        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
-        expected = [
-            OrderedDict(
-                [
-                    ('id', self.car.pk),
-                    ('name', '{} {}'.format(self.car.year, self.car.make_model)),
-                    ('listing_features', listing_features.format(
-                            models.Car.MIN_LEASE_CHOICES[self.car.min_lease],
-                            '{d.month}/{d.day}'.format(d = tomorrow),
-                            self.car.owner.city,
-                            self.car.owner.state_code,
-                        )),
-                    ('headline_features',
-                        [
-                            'Available {d.month}/{d.day}'.format(d = tomorrow),
-                            '{} minimum'.format(models.Car.MIN_LEASE_CHOICES[self.car.min_lease]),
-                            '${} deposit'.format(self.car.solo_deposit),
-                        ]
-                    ),
-                    ('certifications',
-                        [
-                            'Base registration verified',
-                            'Vehicle has TLC plates',
-                            'Insurance is included',
-                            'Maintainance is included',
-                        ]
-                    ),
-                    ('details',
-                        [
-                            ['Hybrid ☑', ''],
-                            ['Location', '{}, {}'.format(
-                                self.car.owner.city,
-                                self.car.owner.state_code,
-                            )],
-                            ['TLC Base', self.car.base]
-                        ]
-                    ),
-                    ('cost', '{0:.0f}'.format(self.car.solo_cost)),
-                    ('cost_time', 'a week'),
-                    ('image_url', None),
-                    ('zipcode', self.car.owner.zipcode),
-                ]
-            )
-        ]
-        self.assertEqual(response.data, expected)
+        rep = self._get_expected_representation(self.car)
+        self.assertEqual([rep], response.data)
+
+    def test_get_car(self):
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, self._get_expected_representation(self.car))
+
+    def test_get_car_with_optional_fields(self):
+        self.car = factories.CompleteCar.create(
+            next_available_date=timezone.now().date() + datetime.timedelta(days=1)
+        )
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, self._get_expected_representation(self.car))

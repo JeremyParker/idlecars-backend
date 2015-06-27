@@ -35,10 +35,17 @@ class Car(Factory):
         lambda o: timezone.now().date() - datetime.timedelta(days=random.randint(1, 10))
     )
 
+
 class BookableCar(Car):
     status = models.Car.STATUS_AVAILABLE
     min_lease = '_02_one_week'
 
+
 class CarExpiredListing(BookableCar):
     next_available_date = timezone.now().date() - datetime.timedelta(days=30)
     last_status_update = timezone.now().date() - datetime.timedelta(days=30)
+
+
+class CompleteCar(BookableCar):
+    ''' creates a car with all optional fields filled in '''
+    hybrid = True
