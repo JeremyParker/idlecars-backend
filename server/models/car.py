@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from idlecars import model_helpers
 
-from . import Owner, MakeModel
+from . import Owner, MakeModel, Insurance
 
 
 class Car(models.Model):
@@ -80,7 +80,7 @@ class Car(models.Model):
         null = True,
     )
     last_known_mileage = models.IntegerField(blank=True, null=True)
-    last_mileage_update = models.DateTimeField()
+    last_mileage_update = models.DateTimeField(blank=True, null=True)
     insurance = models.ForeignKey(Insurance, blank=True, null=True)
 
     def display_mileage(self):
