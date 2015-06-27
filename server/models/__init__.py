@@ -12,6 +12,8 @@ from make_model import MakeModel
 from car import Car
 from driver import Driver
 from booking import Booking
+from insurance import Insurance
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

@@ -85,3 +85,17 @@ class TestDriver(TestCase):
         auth_user = factories.AuthUser(first_name='', last_name='')
         driver = factories.Driver(auth_user=auth_user)
         self.assertEqual(driver.auth_user.username, driver.admin_display())
+
+
+class TestCar(TestCase):
+    def test_save_updates_mileage_date(self):
+        car = factories.Car.create()
+        car.last_known_mileage = 10345
+        car.save()
+        self.assertEqual(car.last_mileage_update, timezone.now())
+
+    def test_save_updates_status_date(self):
+        car = factories.Car.create()
+        car.status = models.Car.STATUS_AVAILABLE
+        car.save()
+        self.assertEqual(car.last_status_update, timezone.now())

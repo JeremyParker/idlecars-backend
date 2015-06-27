@@ -8,3 +8,4 @@ from car import Car, BookableCar, CarExpiredListing, CompleteCar
 from user import AuthUser, StaffUser
 from driver import Driver
 from booking import Booking
+from insurance import insurance

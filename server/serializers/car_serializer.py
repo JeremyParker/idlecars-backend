@@ -68,6 +68,12 @@ class CarSerializer(serializers.ModelSerializer):
         ]
         if obj.hybrid:
             details = [['Hybrid ☑', ''],] + details
+        if obj.mileage:
+            details = [['Mileage', obj.display_mileage()],] + details
+        if obj.exterior_color:
+            details = [['Exterior Color:', obj.exterior_color],] + details
+        if obj.interior_color:
+            details = [['Interior Color:', obj.interior_color],] + details
         return details
 
     def get_cost(self, obj):

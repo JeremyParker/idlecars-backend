@@ -68,7 +68,12 @@ class CarTest(APITestCase):
         )
         if car.hybrid:
             expected['details'] = [['Hybrid ☑', ''],] + expected['details']
-
+        if car.mileage:
+            expected['details'] = [['Mileage', car.display_mileage()],] + expected['details']
+        if car.exterior_color:
+            expected['details'] = [['Exterior color', car.exterior_color],] + expected['details']
+        if car.interior_color:
+            expected['details'] = [['Interior color', car.interior_color],] + expected['details']
         return dict(expected)
 
     def test_get_cars(self):
@@ -85,7 +90,7 @@ class CarTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._get_expected_representation(self.car))
 
-    def test_get_car_with_optional_fields(self):
+    def test_get_car_with_all_fields(self):
         self.car = factories.CompleteCar.create(
             next_available_date=timezone.now().date() + datetime.timedelta(days=1)
         )
