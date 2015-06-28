@@ -2,42 +2,21 @@
 from __future__ import unicode_literals
 
 from django.core.management.base import BaseCommand
-from django.template import Context
-from django.template.loader import render_to_string
-from django.conf import settings
 
-from idlecars import email, client_side_routes
 from server.services import car as car_service
 from crm.models import Renewal
+from crm.services import owner_emails
+
 
 class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'
 
     def handle(self, *args, **options):
-        for car in self.notifiable_cars():
+        for car in self._renewable_cars():
             renewal = Renewal.objects.create(car=car)
-            renewal_url = client_side_routes.renewal_url(renewal)
-            body = self.render_body(car)
-            car_desc = car.__unicode__()
+            owner_emails.renewal_email(car=car, renewal=renewal)
 
-            for user in car.owner.user_account.all():
-                merge_vars = {
-                    user.email: {
-                        'FNAME': user.first_name or None,
-                        'TEXT': body,
-                        'CTA_LABEL': 'Renew Listing Now',
-                        'CTA_URL': renewal_url,
-                        'HEADLINE': 'Your {} listing is about to expire'.format(car_desc),
-                        'CAR_IMAGE_URL': car_service.get_image_url(car),
-                    }
-                }
-                email.send_async(
-                    template_name='owner_renewal',
-                    subject='Your {} listing is about to expire.'.format(car_desc),
-                    merge_vars=merge_vars,
-                )
-
-    def notifiable_cars(self):
+    def _renewable_cars(self):
         # TODO - optimize this query
         oustanding_renewal_cars = [r.car.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
         return car_service.get_stale_within(
@@ -45,11 +24,3 @@ class Command(BaseCommand):
         ).exclude(
             id__in = oustanding_renewal_cars,
         )
-
-    def render_body(self, car):
-        template_data = {
-            'CAR_NAME': car.__unicode__(),
-            'CAR_PLATE': car.plate,
-        }
-        context = Context(autoescape=False)
-        return render_to_string("car_expiring.jade", template_data, context)

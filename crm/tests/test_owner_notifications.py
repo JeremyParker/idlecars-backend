@@ -72,7 +72,7 @@ class TestOwnerNotifications(TestCase):
             self.assertEqual(set([]), set(var.keys()) - expected_keys)
 
 
-    def test_notifiable_cars(self):
+    def test_renewable_cars(self):
         '''
         Make sure cars that have an outstanding renewal token don't get included
         '''
@@ -81,4 +81,4 @@ class TestOwnerNotifications(TestCase):
         crm.models.Renewal.objects.create(car=car, pk=666)
 
         command = owner_notifications.Command()
-        self.assertFalse(command.notifiable_cars())
+        self.assertFalse(command._renewable_cars())

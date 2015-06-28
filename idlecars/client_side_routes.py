@@ -11,3 +11,7 @@ def renewal_url(renewal):
 def doc_upload_url():
     parts = (settings.WEBAPP_URL, '#', 'bookings')
     return '/'.join(parts)
+
+def car_listing_url(renewal):
+    parts = (settings.WEBAPP_URL, '#', 'cars')
+    return '/'.join(parts)
