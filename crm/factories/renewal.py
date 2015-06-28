@@ -6,10 +6,10 @@ from factory import SubFactory
 import idlecars.factory_helpers
 import server.factories
 
-import owner_crm.models
+import crm.models
 
 class Renewal(idlecars.factory_helpers.Factory):
     class Meta:
-        model = 'owner_crm.Renewal'
+        model = 'crm.Renewal'
 
     car = SubFactory(server.factories.Car)

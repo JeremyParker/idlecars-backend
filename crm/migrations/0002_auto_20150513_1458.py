@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('owner_crm', '0001_initial'),
+        ('crm', '0001_initial'),
     ]
 
     operations = [

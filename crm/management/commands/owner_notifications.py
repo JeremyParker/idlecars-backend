@@ -8,7 +8,7 @@ from django.conf import settings
 
 from idlecars import email, client_side_routes
 from server.services import car as car_service
-from owner_crm.models import Renewal
+from crm.models import Renewal
 
 class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'

@@ -10,11 +10,11 @@ from django.core.management import call_command
 
 import idlecars.client_side_routes
 import server.models
-import owner_crm.models
+import crm.models
 import server.factories
-import owner_crm.factories
-from owner_crm.management.commands import owner_notifications
-from owner_crm.tests import sample_merge_vars
+import crm.factories
+from crm.management.commands import owner_notifications
+from crm.tests import sample_merge_vars
 
 
 class TestOwnerNotifications(TestCase):
@@ -51,7 +51,7 @@ class TestOwnerNotifications(TestCase):
         for car in cars:
             self.assertTrue('Your {} listing is about to expire.'.format(car.__unicode__()) in subjects)
 
-        template_dict = owner_crm.tests.sample_merge_vars.merge_vars[outbox[0].template_name]
+        template_dict = crm.tests.sample_merge_vars.merge_vars[outbox[0].template_name]
         expected_keys = set(template_dict.values()[0])
 
         # validate that the merge vars are being set correctly:
@@ -59,7 +59,7 @@ class TestOwnerNotifications(TestCase):
             email = message.merge_vars.keys()[0]
             user = server.models.UserAccount.objects.get(email=email)
             car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
-            renewal = owner_crm.models.Renewal.objects.get(car=car)
+            renewal = crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
             self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
@@ -78,7 +78,7 @@ class TestOwnerNotifications(TestCase):
         '''
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        owner_crm.models.Renewal.objects.create(car=car, pk=666)
+        crm.models.Renewal.objects.create(car=car, pk=666)
 
         command = owner_notifications.Command()
         self.assertFalse(command.notifiable_cars())

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from owner_crm import factories
+from crm import factories
 
 class TestRenewal(TestCase):
     def test_token_is_unique(self):
