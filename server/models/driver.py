@@ -41,3 +41,14 @@ class Driver(models.Model):
             self.address_proof_image and
             self.defensive_cert_image
         )
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            orig = Driver.objects.get(pk=self.pk)
+            if (orig.driver_license_image != self.driver_license_image
+                or orig.fhv_license_image != self.fhv_license_image
+                or orig.address_proof_image != self.address_proof_image
+                or orig.defensive_cert_image != self.defensive_cert_image):
+                self.documentation_complete = False
+
+        super(Driver, self).save(*args, **kwargs)
