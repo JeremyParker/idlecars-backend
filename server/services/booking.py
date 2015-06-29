@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 
 from crm.services import ops_emails
 
-from server.services import user_account as user_account_service
 from server.services import driver as driver_service
 from server.models import Booking
 
@@ -23,3 +22,15 @@ def create_booking(car, driver):
     )
     ops_emails.new_booking_email(booking)
     return booking
+
+
+def documents_uploaded(driver):
+    # fire a notification to ops
+    pass
+
+
+def documents_approved(driver):
+    # if the driver has an outstanding booking,
+    # fire a notification to the owner
+    # and to the driver
+    pass

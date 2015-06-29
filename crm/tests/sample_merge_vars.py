@@ -25,3 +25,17 @@ merge_vars = {
         },
     },
 }
+
+
+def check_template_keys(outbox):
+    '''
+    Returns true if all emails in the given outbox have the correct keys for their template
+    '''
+    template_dict = merge_vars[outbox[0].template_name]
+    expected_keys = set(template_dict.values()[0])
+    for message in outbox:
+        email = message.merge_vars.keys()[0]
+        var = message.merge_vars[email]
+        if set([]) != set(var.keys()) - expected_keys:
+            return False;
+    return True

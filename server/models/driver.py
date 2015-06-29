@@ -9,7 +9,11 @@ from idlecars import model_helpers
 
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
-    documentation_complete = models.BooleanField(default=False, verbose_name='docs confirmed')
+    documentation_approved = models.BooleanField(
+        default=False,
+        verbose_name='docs approved',
+        db_column='documentation_complete'
+    )
 
     driver_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
@@ -43,12 +47,6 @@ class Driver(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        if self.pk is not None:
-            orig = Driver.objects.get(pk=self.pk)
-            if (orig.driver_license_image != self.driver_license_image
-                or orig.fhv_license_image != self.fhv_license_image
-                or orig.address_proof_image != self.address_proof_image
-                or orig.defensive_cert_image != self.defensive_cert_image):
-                self.documentation_complete = False
-
+        import server.services.driver
+        self = server.services.driver.pre_save(self)
         super(Driver, self).save(*args, **kwargs)

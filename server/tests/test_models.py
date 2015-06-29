@@ -92,7 +92,7 @@ class TestDriver(TestCase):
         driver = factories.CompletedDriver.create()
         driver.driver_license_image = 'http://wondernuts.com/9d80dec789a7b.jpg'
         driver.save()
-        self.assertFalse(driver.documentation_complete)
+        self.assertFalse(driver.documentation_approved)
 
 
 class TestCar(TestCase):

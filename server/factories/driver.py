@@ -10,7 +10,7 @@ from . import AuthUser
 class Driver(Factory):
     class Meta:
         model = 'server.Driver'
-    documentation_complete = False
+    documentation_approved = False
     auth_user = SubFactory(AuthUser, password='password')
 
 
@@ -19,4 +19,4 @@ class CompletedDriver(Driver):
     fhv_license_image = LazyAttribute(lambda o: faker.url())
     address_proof_image = LazyAttribute(lambda o: faker.url())
     defensive_cert_image = LazyAttribute(lambda o: faker.url())
-    documentation_complete = True
+    documentation_approved = True

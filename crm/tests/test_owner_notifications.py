@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import mock
 
 from django.utils import timezone
 from django.test import TestCase
@@ -46,13 +45,11 @@ class TestOwnerNotifications(TestCase):
         # check what got sent
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
         subjects = [m.subject for m in outbox]
         for car in cars:
             self.assertTrue('Your {} listing is about to expire.'.format(car.__unicode__()) in subjects)
-
-        template_dict = crm.tests.sample_merge_vars.merge_vars[outbox[0].template_name]
-        expected_keys = set(template_dict.values()[0])
 
         # validate that the merge vars are being set correctly:
         for message in outbox:
@@ -67,10 +64,6 @@ class TestOwnerNotifications(TestCase):
             self.assertEqual(var['FNAME'], user.first_name)
             self.assertTrue(car.plate in var['TEXT'])
             self.assertTrue(car.__unicode__() in var['TEXT'])
-
-            # Make sure the merge vars are the ones we're testing against in the integration test
-            self.assertEqual(set([]), set(var.keys()) - expected_keys)
-
 
     def test_renewable_cars(self):
         '''

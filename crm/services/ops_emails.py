@@ -22,3 +22,6 @@ def new_booking_email(booking):
         subject='New Booking from {}'.format(booking.driver.full_name()),
         merge_vars=merge_vars,
     )
+
+def documents_uploaded(driver):
+    pass

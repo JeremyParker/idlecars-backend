@@ -60,11 +60,12 @@ class DriverSerializer(ModelSerializer):
         auth_user.email = validated_data.get('email', auth_user.email)
         auth_user.first_name = validated_data.get('first_name', auth_user.first_name)
         auth_user.last_name = validated_data.get('last_name', auth_user.last_name)
+        auth_user.save()
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)
         instance.address_proof_image = validated_data.get('address_proof_image', instance.address_proof_image)
         instance.defensive_cert_image = validated_data.get('defensive_cert_image', instance.defensive_cert_image)
-        services.driver.update(instance)
+        instance.save()
 
         return instance

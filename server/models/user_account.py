@@ -11,7 +11,7 @@ from .driver import Driver
 
 class UserAccount(models.Model):
     '''
-    Account info for Owners. These first four fields, and created_time will soon 
+    Account info for Owners. These first four fields, and created_time will soon
     be replaced by auth.User. We'll still need this model to store additional info
     related to individuals who work for Owner companies.
     '''

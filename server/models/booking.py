@@ -23,6 +23,7 @@ class Booking(models.Model):
     DRIVER_REJECTED = 9
     MISSED = 10
     TEST_BOOKING = 11
+    CANCELED = 12
 
     STATE = (
         (PENDING, 'Pending - waiting for driver docs'),
@@ -30,12 +31,13 @@ class Booking(models.Model):
         (REQUESTED, 'Requested - waiting for owner/insurance'),
         (ACCEPTED, 'Accepted - waiting for deposit, ssn, contract'),
         (BOOKED, 'Booked - car marked busy with new available_time'),
-        (FLAKE, 'Flake - Never Submitted Docs'),
-        (TOO_SLOW, 'Too Slow - driver took too long to submit docs'),
+        (FLAKE, 'Flake - Didn\'t Submit Docs in 24 hours'),
+        (TOO_SLOW, 'Too Slow - somebody else booked your car'),
         (OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
         (DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
         (MISSED, 'Missed - car rented out before we found a driver'),
         (TEST_BOOKING, 'Test - a booking that one of us created as a test'),
+        (CANCELED, 'Canceled - driver canceled the booking thru the app'),
     )
     state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)
