@@ -19,9 +19,25 @@ def new_booking_email(booking):
     }
     email.send_async(
         template_name='single_cta',
-        subject='New Booking from {}'.format(booking.driver.full_name()),
+        subject='New Booking from {}'.format(booking.driver.phone_number()),
         merge_vars=merge_vars,
     )
 
 def documents_uploaded(driver):
-    pass
+    merge_vars = {
+        'support@idlecars.com': {
+            'FNAME': 'dudes',
+            'TEXT': 'Someone with the number {} uploaded all thier docs. Please see if they\'re legit'.format(
+                driver.phone_number()
+            ),
+            'CTA_LABEL': 'Check \'em out',
+            'CTA_URL': 'https://www.idlecars.com{}'.format(
+                reverse('admin:server_driver_change', args=(driver.pk,))
+            ),
+        }
+    }
+    email.send_async(
+        template_name='single_cta',
+        subject='Uploaded documents from {}'.format(driver.phone_number()),
+        merge_vars=merge_vars,
+    )

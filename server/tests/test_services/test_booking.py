@@ -36,7 +36,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'New Booking from {} {}'.format(self.driver.first_name(), self.driver.last_name())
+            'New Booking from {}'.format(self.driver.phone_number())
         )
         self.assertEqual(
             outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
