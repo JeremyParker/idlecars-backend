@@ -27,13 +27,17 @@ def documents_approved_no_booking(driver):
     )
 
 
-def _render_reminder_body(booking):
-    doc_names = driver_service.get_missing_docs(booking.driver)
+def _missing_documents_text(driver):
+    doc_names = driver_service.get_missing_docs(driver)
     docs = ''
     for name in doc_names[:-1]:
         docs = docs + name + ', '
     docs = docs + 'and ' + doc_names[-1]
+    return docs
 
+
+def _render_reminder_body(booking):
+    docs = _missing_documents_text(booking.driver)
     template_data = {
         'CAR_NAME': booking.car.__unicode__(),
         'DOCS_LIST': docs,
@@ -47,7 +51,7 @@ def documents_reminder(booking):
     cta_url = client_side_routes.doc_upload_url()
     merge_vars = {
         booking.driver.email(): {
-            'FNAME': booking.driver.first_name or None,
+            'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': cta_url,
@@ -58,5 +62,45 @@ def documents_reminder(booking):
     email.send_async(
         template_name='owner_renewal',
         subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
+        merge_vars=merge_vars,
+    )
+
+
+def documents_approved(booking):
+    template_data = {
+        'CAR_NAME': booking.car.__unicode__(),
+    }
+    context = Context(autoescape=False)
+    body = render_to_string("driver_docs_approved.jade", template_data, context)
+
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'TEXT': body,
+            'CTA_LABEL': 'See your reservation',
+            'CTA_URL': client_side_routes.car_details_url(),
+            'HEADLINE': 'Your {} is waiting'.format(booking.car.__unicode__()),
+            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+        }
+    }
+    email.send_async(
+        template_name='owner_renewal',
+        subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
+        merge_vars=merge_vars,
+    )
+
+
+def documents_approved_no_booking(driver):
+    merge_vars = {
+        'support@idlecars.com': {
+            'FNAME': driver.first_name() or None,
+            'TEXT': 'Someone else rented your car while we were waiting for you to finish uploading your documents. ',
+            'CTA_LABEL': 'Find a new car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='single_cta',
+        subject='Someone else rented your {}'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )

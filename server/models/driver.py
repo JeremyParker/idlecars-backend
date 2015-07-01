@@ -48,5 +48,6 @@ class Driver(models.Model):
 
     def save(self, *args, **kwargs):
         import server.services.driver
+        import pdb; pdb.set_trace()
         self = server.services.driver.pre_save(self)
         super(Driver, self).save(*args, **kwargs)

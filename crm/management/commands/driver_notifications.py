@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from server import models as server_models
+from server.services import booking as booking_service
 from crm.services import driver_emails
 
 
@@ -16,8 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # send reminders to drivers who started booking a car, and never submitted docs
         for booking in self.remindable_bookings():
-            driver_emails.documents_reminder(booking)
-            booking.state = server_models.Booking.FLAKE
+            booking = booking_service.update(booking, REMINDER_DELAY_PASSED)
             booking.save()
 
     def remindable_bookings(self):

@@ -38,3 +38,7 @@ def renewal_email(car, renewal):
             subject='Your {} listing is about to expire.'.format(car_desc),
             merge_vars=merge_vars,
         )
+
+
+def new_booking_email(car, renewal):
+    pass
