@@ -86,14 +86,14 @@ def documents_approved(booking):
     }
     email.send_async(
         template_name='one_button_one_image',
-        subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
+        subject='Your documents have been reviewed and approved',
         merge_vars=merge_vars,
     )
 
 
 def someone_else_booked(booking):
     merge_vars = {
-        'support@idlecars.com': {
+        booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'HEADLINE': 'Someone else rented your car!',
             'TEXT': '''While we were waiting for you to finish uploading your documents,
@@ -105,6 +105,6 @@ def someone_else_booked(booking):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Someone else rented your {}'.format(booking.car.__unicode__()),
+        subject='Someone else rented your {}.'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )

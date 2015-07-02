@@ -76,7 +76,7 @@ def new_booking_email(booking):
                     booking.driver.address_proof_image
                 ),
                 'TEXT5': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',
-            },
+            }
         }
         email.send_async(
             template_name='no_button_four_images',

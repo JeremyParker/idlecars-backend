@@ -44,7 +44,7 @@ def on_documents_uploaded(driver):
 def on_documents_approved(driver):
     bookings = Booking.objects.filter(
         driver=driver,
-        state_in=Booking.COMPLETE,
+        state=Booking.COMPLETE,
     )
     if not bookings:
         driver_emails.documents_approved_no_booking(driver)
@@ -57,13 +57,14 @@ def on_documents_approved(driver):
 
 def someone_else_booked(booking):
     booking.state = Booking.TOO_SLOW
-    driver_email.someone_else_booked(booking)
+    driver_emails.someone_else_booked(booking)
     return booking
 
 
 def request_insurance(booking):
     owner_emails.new_booking_email(booking)
     booking.state = Booking.REQUESTED
+    booking.save()
 
     # cancel other conflicting in-progress bookings and notify those drivers
     conflicting_bookings = Booking.objects.filter(
