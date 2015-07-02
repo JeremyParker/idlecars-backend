@@ -54,7 +54,7 @@ def new_booking_email(booking):
 
     for user in booking.car.owner.user_account.all():
         merge_vars = {
-            booking.car.owner.email: {
+            booking.car.owner.email(): {
                 'PREVIEW': headline,
                 'FNAME': user.first_name,
                 'HEADLINE': headline,
@@ -80,7 +80,7 @@ def new_booking_email(booking):
         }
         email.send_async(
             template_name='no_button_four_images',
-            subject='A driver has booked your {}.'.format(car_desc),
+            subject='A driver has booked your {}.'.format(booking.car.__unicode__()),
             merge_vars=merge_vars,
         )
 

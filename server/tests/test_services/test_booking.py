@@ -10,10 +10,14 @@ from django.test import TestCase
 from server.services import booking as booking_service
 from server import factories, models
 
+from crm.tests import sample_merge_vars
+
 
 class BookingServiceTest(TestCase):
     def setUp(self):
-        owner = factories.Owner.create(state_code='NY')
+        owner = factories.Owner.create(state_code='NY',)
+        user_account = factories.UserAccount.create(owner=owner)
+
         make_model = factories.MakeModel.create()
         self.car = factories.Car.create(
             owner=owner,
@@ -32,7 +36,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.car, self.car)
         self.assertEqual(new_booking.state, models.Booking.PENDING)
 
-        # check the email that got sent
+        # we should have sent an email to ops telling them about the new booking
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
@@ -43,8 +47,10 @@ class BookingServiceTest(TestCase):
             outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
             unicode(new_booking.pk),
         )
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
-    def test_create_completed_booking(self):
+
+    def test_create_booking_docs_complete(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertIsNotNone(new_booking)
@@ -52,18 +58,29 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.car, self.car)
         self.assertEqual(new_booking.state, models.Booking.COMPLETE)
 
-        # check we didn't send an email
+        # we should have sent an email to ops telling them about the new booking
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(
+            outbox[0].subject,
+            'New Booking from {}'.format(self.driver.phone_number())
+        )
+        self.assertEqual(
+            outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
+            unicode(new_booking.pk),
+        )
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
-    # def test_create_requested_booking(self):
-    #     self.driver = factories.CompletedDriver.create()
-    #     new_booking = booking_service.create_booking(self.car, self.driver)
-    #     self.assertIsNotNone(new_booking)
-    #     self.assertEqual(new_booking.driver, self.driver)
-    #     self.assertEqual(new_booking.car, self.car)
-    #     self.assertEqual(new_booking.state, models.Booking.COMPLETE)
+    def test_create_booking_docs_approved(self):
+        self.driver = factories.ApprovedDriver.create()
+        new_booking = booking_service.create_booking(self.car, self.driver)
+        self.assertIsNotNone(new_booking)
+        self.assertEqual(new_booking.driver, self.driver)
+        self.assertEqual(new_booking.car, self.car)
+        self.assertEqual(new_booking.state, models.Booking.REQUESTED)
 
-    #     # check we didn't send an email
-    #     from django.core.mail import outbox
-    #     self.assertEqual(len(outbox), 0)
+        # check we sent the right email
+        from django.core.mail import outbox
+        # TODO - driver_emails.new_booking_insurance_requested()
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'A driver has booked your {}.'.format(new_booking.car.__unicode__()))
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
