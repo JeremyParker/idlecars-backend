@@ -33,7 +33,7 @@ def pre_save(modified_driver):
             modified_driver.documentation_approved = False
             if modified_driver.all_docs_uploaded():
                 ops_emails.documents_uploaded(modified_driver)
-                server.services.booking.documents_uploaded(modified_driver)
+                server.services.booking.on_documents_uploaded(modified_driver)
                 # TODO(JP): maybe send a welcome email to the Driver immediately?
 
         if modified_driver.documentation_approved and not orig.documentation_approved:

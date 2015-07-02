@@ -25,11 +25,12 @@ class BookingServiceTest(TestCase):
         )
         self.driver = factories.Driver.create()
 
-    def test_create_booking_success(self):
+    def test_create_pending_booking(self):
         new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertIsNotNone(new_booking)
         self.assertEqual(new_booking.driver, self.driver)
         self.assertEqual(new_booking.car, self.car)
+        self.assertEqual(new_booking.state, models.Booking.PENDING)
 
         # check the email that got sent
         from django.core.mail import outbox
@@ -42,3 +43,27 @@ class BookingServiceTest(TestCase):
             outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
             unicode(new_booking.pk),
         )
+
+    def test_create_completed_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        new_booking = booking_service.create_booking(self.car, self.driver)
+        self.assertIsNotNone(new_booking)
+        self.assertEqual(new_booking.driver, self.driver)
+        self.assertEqual(new_booking.car, self.car)
+        self.assertEqual(new_booking.state, models.Booking.COMPLETE)
+
+        # check we didn't send an email
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    # def test_create_requested_booking(self):
+    #     self.driver = factories.CompletedDriver.create()
+    #     new_booking = booking_service.create_booking(self.car, self.driver)
+    #     self.assertIsNotNone(new_booking)
+    #     self.assertEqual(new_booking.driver, self.driver)
+    #     self.assertEqual(new_booking.car, self.car)
+    #     self.assertEqual(new_booking.state, models.Booking.COMPLETE)
+
+    #     # check we didn't send an email
+    #     from django.core.mail import outbox
+    #     self.assertEqual(len(outbox), 0)

@@ -6,77 +6,63 @@ from crm.services import ops_emails, driver_emails, owner_emails
 from server.models import Booking
 
 
-# list of trigger events
-CREATED = 1
-ALL_DOCS_UPLOADED = 2
-SOMEONE_ELSE_BOOKED = 3
-REMINDER_DELAY_PASSED = 4
-DOCUMENTS_APPROVED = 5
+def pending_actions(booking):
+    ops_emails.new_booking_email(booking)
 
 
-def update_non_existent(booking, event):
-    if event == CREATED:
-        booking.state = Booking.PENDING
-        ops_emails.new_booking_email(booking)
-    return booking
+def complete_actions(booking):
+    pass # note: don't email ops here. The driver service takes care of that.
 
 
-def update_pending(booking, event):
-    if event == ALL_DOCS_UPLOADED:
-        booking.state = Booking.COMPLETE
-        # note: don't email ops here. The driver service takes care of that.
-    elif event == REMINDER_DELAY_PASSED:
-        driver_emails.documents_reminder(booking)
-        booking.state = server_models.Booking.FLAKE
-    elif event == SOMEONE_ELSE_BOOKED:
-        driver_email.someone_else_booked(booking)
-        booking.state = server_models.Booking.TOO_SLOW
-    return booking
+def requested_actions(booking):
+    owner_emails.new_booking_email(booking)
+    driver_emails.documents_approved(booking)
 
 
-def update_complete(booking, event):
-    if event == DOCUMENTS_APPROVED:
-        owner_emails.new_booking_email(booking)
-        driver_emails.docs_approved_email(booking)
-        booking.state = Booking.REQUESTED
-    return booking
+def flake_actions(booking):
+    driver_emails.documents_reminder(booking)
 
 
-def update_flake(booking, event):
-    if event == ALL_DOCS_UPLOADED:
-        booking.state = Booking.COMPLETE
-        # note: don't email ops here. The driver service takes care of that.
-    elif event == SOMEONE_ELSE_BOOKED:
-        driver_email.someone_else_booked(booking)
-        booking.state = server_models.Booking.TOO_SLOW
-    return booking
+def too_slow_actions(booking):
+    driver_email.someone_else_booked(booking)
 
 
-def do_nothing(booking, event):
-    return booking
-
-
-update_functions = {
-    0: update_non_existent,
-    Booking.PENDING: update_pending,
-    Booking.COMPLETE: update_complete,
-    Booking.REQUESTED: do_nothing,
-    Booking.ACCEPTED: do_nothing,
-    Booking.BOOKED: do_nothing,
-    Booking.FLAKE: update_flake,
-    Booking.TOO_SLOW: do_nothing,
-    Booking.OWNER_REJECTED: do_nothing,
-    Booking.DRIVER_REJECTED: do_nothing,
-    Booking.MISSED : do_nothing,
-    Booking.TEST_BOOKING : do_nothing,
-    Booking.CANCELED : do_nothing,
+state_actions = {
+    Booking.PENDING: pending_actions,
+    Booking.COMPLETE: complete_actions,
+    Booking.REQUESTED: requested_actions,
+    Booking.FLAKE: flake_actions,
+    Booking.TOO_SLOW: too_slow_actions,
 }
 
 
-def update(booking, event):
-    origininal_state = booking.state
-    booking = update_functions[origininal_state](booking)
-    if booking.state == origininal_state:
-        return booking
+def set_state(booking, state):
+    if state in state_actions:
+        state_actions[state](booking)
+    booking.state = state
+    return booking
+
+
+def on_created(booking):
+    if booking.driver.documentation_approved:
+        return set_state(booking, Booking.REQUESTED)
+    elif booking.driver.all_docs_uploaded():
+        return set_state(booking, Booking.COMPLETE)
     else:
-        return update(booking)
+        return set_state(booking, Booking.PENDING)
+
+
+def on_delay_passed(booking):
+    return set_state(booking, Booking.FLAKE)
+
+
+def on_documents_uploaded(booking):
+    return set_state(booking, Booking.COMPLETE)
+
+
+def on_documents_approved(booking):
+    return set_state(booking, Booking.REQUESTED)
+
+
+def on_someone_else_booked(booking):
+    return set_state(booking, Booking.TOO_SLOW)

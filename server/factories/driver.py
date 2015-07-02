@@ -19,4 +19,7 @@ class CompletedDriver(Driver):
     fhv_license_image = LazyAttribute(lambda o: faker.url())
     address_proof_image = LazyAttribute(lambda o: faker.url())
     defensive_cert_image = LazyAttribute(lambda o: faker.url())
+    documentation_approved = False
+
+class ApprovedDriver(CompletedDriver):
     documentation_approved = True

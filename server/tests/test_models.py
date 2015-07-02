@@ -89,7 +89,7 @@ class TestDriver(TestCase):
         self.assertEqual(driver.auth_user.username, driver.admin_display())
 
     def test_changing_docs_unchecks_confirmation(self):
-        driver = factories.CompletedDriver.create()
+        driver = factories.ApprovedDriver.create()
         driver.driver_license_image = 'http://wondernuts.com/9d80dec789a7b.jpg'
         driver.save()
         self.assertFalse(driver.documentation_approved)

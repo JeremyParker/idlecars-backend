@@ -40,5 +40,9 @@ def renewal_email(car, renewal):
         )
 
 
-def new_booking_email(car, renewal):
+def new_booking_email(booking):
+    pass
+
+
+def insurance_follow_up_email(booking):
     pass

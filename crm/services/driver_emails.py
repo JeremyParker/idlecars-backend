@@ -78,7 +78,7 @@ def documents_approved(booking):
             'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
             'CTA_LABEL': 'See your reservation',
-            'CTA_URL': client_side_routes.car_details_url(),
+            'CTA_URL': client_side_routes.car_details_url(booking.car),
             'HEADLINE': 'Your {} is waiting'.format(booking.car.__unicode__()),
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
         }
