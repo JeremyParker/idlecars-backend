@@ -10,7 +10,11 @@ def new_booking_email(booking):
     merge_vars = {
         'support@idlecars.com': {
             'FNAME': 'guys',
-            'TEXT': 'Someone with the number {} created a new booking.'.format(booking.driver.phone_number()),
+            'HEADLINE': 'New Booking!',
+            'TEXT': 'Driver {} booked {}\'s {}.'.format(
+                booking.driver.phone_number(),
+                booking.car.owner.name(),
+                booking.car.__unicode__()),
             'CTA_LABEL': 'Check it out',
             'CTA_URL': 'https://www.idlecars.com{}'.format(
                 reverse('admin:server_booking_change', args=(booking.pk,))
@@ -18,7 +22,7 @@ def new_booking_email(booking):
         }
     }
     email.send_async(
-        template_name='single_cta',
+        template_name='one_button_no_image',
         subject='New Booking from {}'.format(booking.driver.phone_number()),
         merge_vars=merge_vars,
     )
@@ -27,6 +31,7 @@ def documents_uploaded(driver):
     merge_vars = {
         'support@idlecars.com': {
             'FNAME': 'dudes',
+            'HEADLINE': 'Driver Docs uploaded!',
             'TEXT': 'Someone with the number {} uploaded all thier docs. Please see if they\'re legit'.format(
                 driver.phone_number()
             ),
@@ -37,7 +42,7 @@ def documents_uploaded(driver):
         }
     }
     email.send_async(
-        template_name='single_cta',
+        template_name='one_button_no_image',
         subject='Uploaded documents from {}'.format(driver.phone_number()),
         merge_vars=merge_vars,
     )

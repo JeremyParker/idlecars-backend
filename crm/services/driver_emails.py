@@ -15,13 +15,14 @@ def documents_approved_no_booking(driver):
     merge_vars = {
         'support@idlecars.com': {
             'FNAME': driver.first_name(),
-            'TEXT': 'Your uploaded documents have been reviewed and approved. You are now ready to rent any car on idlecars with one tap!',
+            'HEADLINE': 'Your documents have been reviewed and approved.',
+            'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
             'CTA_LABEL': 'Rent a car now',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
     }
     email.send_async(
-        template_name='single_cta',
+        template_name='one_button_no_image',
         subject='Welcome to idlecars, {}'.format(booking.driver.full_name()),
         merge_vars=merge_vars,
     )
@@ -60,7 +61,7 @@ def documents_reminder(booking):
         }
     }
     email.send_async(
-        template_name='owner_renewal',
+        template_name='one_button_one_image',
         subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )
@@ -84,23 +85,26 @@ def documents_approved(booking):
         }
     }
     email.send_async(
-        template_name='owner_renewal',
+        template_name='one_button_one_image',
         subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )
 
 
-def documents_approved_no_booking(driver):
+def someone_else_booked(booking):
     merge_vars = {
         'support@idlecars.com': {
-            'FNAME': driver.first_name() or None,
-            'TEXT': 'Someone else rented your car while we were waiting for you to finish uploading your documents. ',
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Someone else rented your car!',
+            'TEXT': '''While we were waiting for you to finish uploading your documents,
+                another driver rented your car. But don't worry,
+                there are plenty more cars available.'''.format(booking.car.__unicode__()),
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
     }
     email.send_async(
-        template_name='single_cta',
+        template_name='one_button_no_image',
         subject='Someone else rented your {}'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )

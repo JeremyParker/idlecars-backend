@@ -12,11 +12,17 @@ class EmailTest(TestCase):
     '''
     def test_send(self):
         merge_vars = {
-            'jeremy@idlecars.com': {'FNAME': "Jeremy"},
+            'jeremy@idlecars.com': {
+                'FNAME': 'Robert',
+                'TEXT': 'have lunch with me',
+                'CTA_LABEL': 'Press a button',
+                'CTA_URL': 'http://idlecars.com',
+                'HEADLINE': 'Welcome to the End Of The World!',
+            },
         }
 
         result = email.send_async(
-            template_name='single_cta',
+            template_name='one_button_no_image',
             subject='Tested!',
             merge_vars=merge_vars,
         )
@@ -28,7 +34,7 @@ class EmailTest(TestCase):
         # make sure all the values made it to the sent message
         self.assertEqual(outbox[0].subject, 'Tested!')
         self.assertEqual(outbox[0].merge_vars, merge_vars)
-        self.assertEqual(outbox[0].template_name, 'single_cta')
+        self.assertEqual(outbox[0].template_name, 'one_button_no_image')
 
     def test_multiple_recipients(self):
         merge_vars = {
@@ -37,7 +43,7 @@ class EmailTest(TestCase):
         }
 
         result = email.send_async(
-            template_name='single_cta',
+            template_name='one_button_no_image',
             subject='Tested!',
             merge_vars=merge_vars,
         )
