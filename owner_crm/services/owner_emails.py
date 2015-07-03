@@ -23,6 +23,8 @@ def renewal_email(car, renewal):
     car_desc = car.__unicode__()
 
     for user in car.owner.user_account.all():
+        if not user.email:
+            continue
         merge_vars = {
             user.email: {
                 'FNAME': user.first_name or None,
@@ -53,6 +55,8 @@ def new_booking_email(booking):
     they are able to start driving tomorrow.'''.format(booking.driver.first_name())
 
     for user in booking.car.owner.user_account.all():
+        if not user.email:
+            continue
         merge_vars = {
             booking.car.owner.email(): {
                 'PREVIEW': headline,
@@ -85,4 +89,5 @@ def new_booking_email(booking):
         )
 
 def insurance_follow_up_email(booking):
+    # TODO(JP)
     pass

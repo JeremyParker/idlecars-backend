@@ -12,6 +12,8 @@ from server.services import driver as driver_service
 
 
 def documents_approved_no_booking(driver):
+    if not driver.email():
+        return
     merge_vars = {
         driver.email(): {
             'FNAME': driver.first_name(),
@@ -48,6 +50,9 @@ def _render_reminder_body(booking):
 
 
 def documents_reminder(booking):
+    if not booking.driver.email():
+        return
+
     body = _render_reminder_body(booking)
     cta_url = client_side_routes.doc_upload_url()
     merge_vars = {
@@ -68,6 +73,8 @@ def documents_reminder(booking):
 
 
 def documents_approved(booking):
+    if not booking.driver.email():
+        return
     template_data = {
         'CAR_NAME': booking.car.__unicode__(),
     }
@@ -92,6 +99,8 @@ def documents_approved(booking):
 
 
 def someone_else_booked(booking):
+    if not booking.driver.email():
+        return
     merge_vars = {
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
