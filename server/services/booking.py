@@ -6,10 +6,9 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
-from crm.services import ops_emails, driver_emails, owner_emails
+from owner_crm.services import ops_emails, driver_emails, owner_emails
 
 from server.services import driver as driver_service
-from server.services import _booking_state_machine as state_machine
 from server.models import Booking
 
 

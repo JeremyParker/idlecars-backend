@@ -11,7 +11,7 @@ from server.services import booking as booking_service
 from server.services import driver as driver_service
 from server import factories, models
 
-from crm.tests import sample_merge_vars
+from owner_crm.tests import sample_merge_vars
 
 
 class BookingServiceTest(TestCase):

@@ -46,7 +46,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'website',
-    'crm',
+    'owner_crm',
     'unsubscribes',
     'django_nose',
     'djrill',

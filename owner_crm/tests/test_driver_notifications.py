@@ -11,7 +11,7 @@ import idlecars.client_side_routes
 import server.models
 import server.factories
 
-from crm.tests import sample_merge_vars
+from owner_crm.tests import sample_merge_vars
 
 
 class TestDriverNotifications(TestCase):

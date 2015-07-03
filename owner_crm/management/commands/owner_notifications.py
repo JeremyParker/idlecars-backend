@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from django.core.management.base import BaseCommand
 
 from server.services import car as car_service
-from crm.models import Renewal
-from crm.services import owner_emails
+from owner_crm.models import Renewal
+from owner_crm.services import owner_emails
 
 
 class Command(BaseCommand):

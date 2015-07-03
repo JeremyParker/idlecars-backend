@@ -1,7 +1,7 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from crm.services import ops_emails
+from owner_crm.services import ops_emails
 import server.models.driver
 import server.services.booking
 

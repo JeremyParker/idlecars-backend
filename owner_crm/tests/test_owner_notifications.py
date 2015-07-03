@@ -9,11 +9,11 @@ from django.core.management import call_command
 
 import idlecars.client_side_routes
 import server.models
-import crm.models
+import owner_crm.models
 import server.factories
-import crm.factories
-from crm.management.commands import owner_notifications
-from crm.tests import sample_merge_vars
+import owner_crm.factories
+from owner_crm.management.commands import owner_notifications
+from owner_crm.tests import sample_merge_vars
 
 
 class TestOwnerNotifications(TestCase):
@@ -56,7 +56,7 @@ class TestOwnerNotifications(TestCase):
             email = message.merge_vars.keys()[0]
             user = server.models.UserAccount.objects.get(email=email)
             car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
-            renewal = crm.models.Renewal.objects.get(car=car)
+            renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
             self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
@@ -71,7 +71,7 @@ class TestOwnerNotifications(TestCase):
         '''
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        crm.models.Renewal.objects.create(car=car, pk=666)
+        owner_crm.models.Renewal.objects.create(car=car, pk=666)
 
         command = owner_notifications.Command()
         self.assertFalse(command._renewable_cars())

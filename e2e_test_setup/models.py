@@ -7,7 +7,7 @@ from django.conf import settings
 from server import models
 import server.factories
 
-import crm.factories
+import owner_crm.factories
 
 class E2ETestSetup():
     def __init__(self):
@@ -46,4 +46,4 @@ class E2ETestSetup():
         '''
             Create a renewal
         '''
-        crm.factories.Renewal.create(car=self.delorean, token='faketoken')
+        owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')

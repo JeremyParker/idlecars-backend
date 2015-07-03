@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from rest_framework import serializers
 
-from crm import models
+from owner_crm import models
 from server import models as server_models
 
 

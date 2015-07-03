@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from djrill.exceptions import MandrillAPIError
 
 from idlecars import email
-from crm.tests.sample_merge_vars import merge_vars
+from owner_crm.tests.sample_merge_vars import merge_vars
 
 class Command(BaseCommand):
     help = '''
