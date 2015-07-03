@@ -19,7 +19,7 @@ class TestDriverNotifications(TestCase):
 
     def test_docs_reminder(self):
         now = timezone.now()
-        booking_time = now - datetime.timedelta(hours=24, minutes=1)  # TODO(JP): get the 24 from config
+        booking_time = now - datetime.timedelta(hours=1, minutes=1)  # TODO(JP): get the time from config
 
         driver = server.factories.Driver.create()
         car = server.factories.Car.create()

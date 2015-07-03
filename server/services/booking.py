@@ -14,7 +14,7 @@ from server.models import Booking
 
 def send_reminders():
     # send reminders to drivers who started booking a car, and never submitted docs
-    docs_reminder_delay_hours = 24  # TODO(JP): get from config
+    docs_reminder_delay_hours = 1  # TODO(JP): get from config
 
     reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
     remindable_bookings = Booking.objects.filter(
