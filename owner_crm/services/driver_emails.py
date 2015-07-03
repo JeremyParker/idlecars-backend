@@ -13,7 +13,7 @@ from server.services import driver as driver_service
 
 def documents_approved_no_booking(driver):
     merge_vars = {
-        'support@idlecars.com': {
+        driver.email(): {
             'FNAME': driver.first_name(),
             'HEADLINE': 'Your documents have been reviewed and approved.',
             'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
@@ -23,7 +23,7 @@ def documents_approved_no_booking(driver):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Welcome to idlecars, {}'.format(booking.driver.full_name()),
+        subject='Welcome to idlecars, {}!'.format(driver.full_name()),
         merge_vars=merge_vars,
     )
 
