@@ -8,7 +8,6 @@ from django.template.loader import render_to_string
 from idlecars import email, client_side_routes
 
 from server.services import car as car_service
-from server.services import driver as driver_service
 
 
 def documents_approved_no_booking(driver):
@@ -31,6 +30,7 @@ def documents_approved_no_booking(driver):
 
 
 def _missing_documents_text(driver):
+    from server.services import driver as driver_service
     doc_names = driver_service.get_missing_docs(driver)
     docs = ''
     for name in doc_names[:-1]:
