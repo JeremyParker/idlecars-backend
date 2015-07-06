@@ -68,15 +68,15 @@ def new_booking_email(booking):
                     booking.driver.driver_license_image
                 ),
                 'IMAGE_2_URL': booking.driver.fhv_license_image,
-                'TEXT2': 'Caption for <a href="{}">(click here to download)</a>'.format(
+                'TEXT2': 'FHV/Hack License <a href="{}">(click here to download)</a>'.format(
                     booking.driver.fhv_license_image
                 ),
                 'IMAGE_3_URL': booking.driver.defensive_cert_image,
-                'TEXT3': 'Caption for <a href="{}">(click here to download)</a>'.format(
+                'TEXT3': 'Defensive Driving Certificate <a href="{}">(click here to download)</a>'.format(
                     booking.driver.defensive_cert_image
                 ),
                 'IMAGE_4_URL': booking.driver.address_proof_image,
-                'TEXT4': 'Caption for <a href="{}">(click here to download)</a>'.format(
+                'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                     booking.driver.address_proof_image
                 ),
                 'TEXT5': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',

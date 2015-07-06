@@ -6,6 +6,7 @@ import os
 import sendgrid
 
 from django.core.mail import EmailMessage
+from django.conf import settings
 
 from idlecars.job_queue import job_queue
 
@@ -17,7 +18,7 @@ def _send_now(msg):
 def setup_email(template_name, subject, merge_vars):
     msg = EmailMessage(
         subject=subject,
-        from_email="support@idlecars.com",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=merge_vars.keys()
     )
     msg.template_name = template_name

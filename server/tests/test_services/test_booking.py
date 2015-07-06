@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.utils import timezone
 from django.test import TestCase
+from django.conf import settings
 
 from server.services import booking as booking_service
 from server.services import driver as driver_service
@@ -44,9 +45,9 @@ class BookingServiceTest(TestCase):
             outbox[0].subject,
             'New Booking from {}'.format(self.driver.phone_number())
         )
-        self.assertEqual(outbox[0].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
-            outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
+            outbox[0].merge_vars[settings.OPS_EMAIL]['CTA_URL'].split('/')[-2],
             unicode(new_booking.pk),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
@@ -62,13 +63,13 @@ class BookingServiceTest(TestCase):
 
         # we should have sent an email to ops telling them about the new booking
         from django.core.mail import outbox
-        self.assertEqual(outbox[0].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
             outbox[0].subject,
             'New Booking from {}'.format(self.driver.phone_number())
         )
         self.assertEqual(
-            outbox[0].merge_vars['support@idlecars.com']['CTA_URL'].split('/')[-2],
+            outbox[0].merge_vars[settings.OPS_EMAIL]['CTA_URL'].split('/')[-2],
             unicode(new_booking.pk),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
@@ -111,7 +112,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 3)
 
         # an email to support that there's a new booking
-        self.assertEqual(outbox[0].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
             outbox[0].subject,
             'New Booking from {}'.format(self.other_driver.phone_number())
@@ -145,14 +146,14 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 2)
 
         # we should have sent an email to ops telling them about the new booking
-        self.assertEqual(outbox[0].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
             outbox[0].subject,
             'New Booking from {}'.format(self.driver.phone_number())
         )
 
         # an email to ops to let them know when the documents were all uploaded
-        self.assertEqual(outbox[1].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[1].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
             outbox[1].subject,
             'Uploaded documents from {}'.format(self.driver.phone_number())
@@ -171,7 +172,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 3)
 
         # we should have sent an email to ops telling them about the new booking
-        self.assertEqual(outbox[0].merge_vars.keys()[0], 'support@idlecars.com')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
         self.assertEqual(
             outbox[0].subject,
             'New Booking from {}'.format(self.driver.phone_number())

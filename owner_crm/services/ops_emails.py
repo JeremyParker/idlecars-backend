@@ -2,13 +2,14 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from idlecars import email
 
 
 def new_booking_email(booking):
     merge_vars = {
-        'support@idlecars.com': {
+        settings.OPS_EMAIL: {
             'FNAME': 'guys',
             'HEADLINE': 'New Booking!',
             'TEXT': 'Driver {} booked {}\'s {}.'.format(
@@ -29,7 +30,7 @@ def new_booking_email(booking):
 
 def documents_uploaded(driver):
     merge_vars = {
-        'support@idlecars.com': {
+        settings.OPS_EMAIL: {
             'FNAME': 'dudes',
             'HEADLINE': 'Driver Docs uploaded!',
             'TEXT': 'Someone with the number {} uploaded all thier docs. Please see if they\'re legit'.format(

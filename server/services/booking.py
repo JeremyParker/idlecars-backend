@@ -12,6 +12,13 @@ from server.services import driver as driver_service
 from server.models import Booking
 
 
+def conflicting_bookings(booking):
+    return Booking.objects.filter(
+        car=booking.car,
+        state__in=[Booking.PENDING, Booking.FLAKE, Booking.COMPLETE],
+    )
+
+
 def send_reminders():
     # send reminders to drivers who started booking a car, and never submitted docs
     docs_reminder_delay_hours = 1  # TODO(JP): get from config
@@ -23,6 +30,8 @@ def send_reminders():
     )
 
     for booking in remindable_bookings:
+        if not booking.driver.email():
+            continue
         driver_emails.documents_reminder(booking)
         booking.state = Booking.FLAKE
         booking.save()
@@ -66,11 +75,7 @@ def request_insurance(booking):
     booking.save()
 
     # cancel other conflicting in-progress bookings and notify those drivers
-    conflicting_bookings = Booking.objects.filter(
-        car=booking.car,
-        state__in=[Booking.PENDING, Booking.FLAKE, Booking.COMPLETE],
-    )
-    for conflicting_booking in conflicting_bookings:
+    for conflicting_booking in conflicting_bookings(booking):
         conflicting_booking = someone_else_booked(conflicting_booking)
         conflicting_booking.save()
 

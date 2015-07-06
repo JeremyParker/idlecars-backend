@@ -85,9 +85,9 @@ def documents_approved(booking):
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
-            'CTA_LABEL': 'See your reservation',
+            'CTA_LABEL': 'See more cars',  # TODO: send them to their booking details
             'CTA_URL': client_side_routes.car_details_url(booking.car),
-            'HEADLINE': 'Your {} is waiting'.format(booking.car.__unicode__()),
+            'HEADLINE': 'Your documents have been reviewed and approved',
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
         }
     }
