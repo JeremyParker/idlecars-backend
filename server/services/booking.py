@@ -8,7 +8,6 @@ from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
-from server.services import driver as driver_service
 from server.models import Booking
 
 
