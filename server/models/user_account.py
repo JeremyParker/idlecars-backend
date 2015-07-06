@@ -21,7 +21,6 @@ class UserAccount(models.Model):
     email = models.CharField(
         blank=True,
         max_length=128,
-        unique=True,
         null=True,
         validators=[EmailValidator()],
     )
