@@ -170,7 +170,7 @@ REST_FRAMEWORK = {
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93w')  # if not in env, test_key
+MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ')  # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'test@idlecars.com'
 OPS_EMAIL = 'test@idlecars.com'
