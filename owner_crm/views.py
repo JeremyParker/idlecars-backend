@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import mandrill
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, Http404
 from rest_framework import viewsets, mixins
 
 from tests import sample_merge_vars

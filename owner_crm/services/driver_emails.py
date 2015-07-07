@@ -1,7 +1,6 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
 from django.template import Context
 from django.template.loader import render_to_string
 

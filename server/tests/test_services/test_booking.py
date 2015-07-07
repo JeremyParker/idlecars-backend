@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import datetime
-from collections import OrderedDict
 
 from django.utils import timezone
 from django.test import TestCase
@@ -17,7 +16,7 @@ from owner_crm.tests import sample_merge_vars
 
 class BookingServiceTest(TestCase):
     def setUp(self):
-        owner = factories.Owner.create(state_code='NY',)
+        owner = factories.Owner.create(state_code='NY')
         user_account = factories.UserAccount.create(owner=owner)
 
         make_model = factories.MakeModel.create()

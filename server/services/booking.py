@@ -99,10 +99,10 @@ def create_booking(car, driver):
 
     if booking.driver.all_docs_uploaded():
         booking.state = Booking.COMPLETE
+        # TODO - driver_emails.new_booking_complete()
     else:
         booking.state = Booking.PENDING
     booking.save()
 
     ops_emails.new_booking_email(booking)
-    # TODO - driver_emails.new_booking()
     return booking

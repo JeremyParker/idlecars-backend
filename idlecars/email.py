@@ -1,10 +1,6 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import os
-
-import sendgrid
-
 from django.core.mail import EmailMessage
 from django.conf import settings
 

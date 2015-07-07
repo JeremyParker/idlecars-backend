@@ -7,8 +7,6 @@ from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
 
-import idlecars.client_side_routes
-import server.models
 import server.factories
 
 from owner_crm.tests import sample_merge_vars
