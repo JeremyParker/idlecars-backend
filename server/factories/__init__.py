@@ -7,5 +7,5 @@ from owner import Owner
 from make_model import MakeModel
 from car import Car, BookableCar, CarExpiredListing, CompleteCar
 from user import AuthUser, StaffUser
-from driver import Driver
+from driver import Driver, CompletedDriver, ApprovedDriver
 from booking import Booking

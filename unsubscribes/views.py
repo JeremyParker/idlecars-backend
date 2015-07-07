@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import mandrill
-import json
 
 from django.core import urlresolvers
 from django.conf import settings

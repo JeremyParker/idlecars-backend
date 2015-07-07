@@ -14,17 +14,18 @@ def queue_owner_welcome_email(email_address):
     text = '''
     Find more drivers for your idle cars. <br>
     Fill out this form to add your car to our listings. When a qualified driver requests your car, we will contact you directly. <br>
-    Questions? Contact us at support@idlecars.com, or 1-844-IDLECAR.
+    Questions? Email us at support@idlecars.com, or call 1-844-IDLECAR (1-844-435-3227).
     '''
     merge_vars = {
         email_address: {
+            'HEADLINE': 'Welcome To Idlecars!',
             'TEXT': text,
             'CTA_LABEL': 'List a car',
             'CTA_URL': 'http://goo.gl/forms/4s26I6GUQY',
         }
     }
     email.send_async(
-        template_name='single_cta',
+        template_name='one_button_no_image',
         subject='Welcome to idlecars',
         merge_vars=merge_vars,
     )

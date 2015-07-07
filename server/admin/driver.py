@@ -29,11 +29,11 @@ class DriverAdmin(ReverseModelAdmin):
         'phone_number',
         'email',
         'all_docs_uploaded',
-        'documentation_complete',
+        'documentation_approved',
         'booking_count',
     ]
     list_filter = [
-        'documentation_complete',
+        'documentation_approved',
     ]
     search_fields = [
         'auth_user__first_name',
@@ -44,7 +44,7 @@ class DriverAdmin(ReverseModelAdmin):
     fieldsets = (
         ('Documentation', {
             'fields': (
-                ('documentation_complete'),
+                ('documentation_approved'),
                 ('driver_license_image'),
                 ('fhv_license_image'),
                 ('defensive_cert_image'),
