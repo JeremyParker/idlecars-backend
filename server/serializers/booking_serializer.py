@@ -26,7 +26,7 @@ class BookingSerializer(serializers.ModelSerializer):
         if self.context['request'].method == 'POST':
             driver = Driver.objects.get(auth_user=self.context['request'].user)
             # look for bookings up to but not including "BOOKED" state. I.e. bookings in progress.
-            if Booking.objects.filter(driver=driver, state__in=range(Booking.BOOKED)):
+            if Booking.objects.filter(driver=driver, state__in=range(Booking.FLAKE)):
                 self._errors.update({
                     'detail': 'You already have a booking in progress.',
                     '_app_notifications': ['You already have a booking in progress.'],
