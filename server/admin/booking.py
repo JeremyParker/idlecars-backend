@@ -14,7 +14,7 @@ class BookingAdmin(admin.ModelAdmin):
             'fields': (
                 ('state', 'driver_docs_uploaded',),
                 ('driver_link', 'driver_phone', 'driver_email',),
-                ('car_link', 'car_plate',),
+                ('car_link', 'car_plate', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
                 'created_time',
                 'notes',
@@ -27,6 +27,7 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_link',
         'car_link',
         'owner_link',
+        'car_cost',
         'created_time',
     ]
     readonly_fields = [
@@ -34,6 +35,7 @@ class BookingAdmin(admin.ModelAdmin):
         'driver',
         'car_link',
         'car_plate',
+        'car_cost',
         'owner_link',
         'owner_phone',
         'owner_email',
@@ -41,6 +43,12 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_phone',
         'driver_email',
         'created_time',
+    ]
+    search_fields = [
+        'driver__auth_user__username',
+        'driver__auth_user__email',
+        'driver__auth_user__first_name',
+        'driver__auth_user__last_name',
     ]
 
     def owner_link(self, instance):
@@ -90,6 +98,13 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
     car_plate.short_description = 'Plate'
+
+    def car_cost(self, instance):
+        if instance.car:
+            return '${}'.format(instance.car.solo_cost)
+        else:
+            return None
+    car_cost.short_description = 'Rent'
 
     def driver_phone(self, instance):
         if instance.driver:

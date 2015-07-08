@@ -20,6 +20,8 @@ class Driver(models.Model):
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
 
+    notes = models.TextField(blank=True)
+
     def admin_display(self):
         return self.auth_user.get_full_name() or self.phone_number()
 
