@@ -56,19 +56,40 @@ class NoPlateFilter(admin.SimpleListFilter):
             return queryset.filter(plate='')
 
 
+class InsuranceFilter(admin.SimpleListFilter):
+    title = 'Insurance'
+    parameter_name = 'insurance'
+
+    def lookups(self, request, model_admin):
+        lookups = []
+        list_of_insurances = models.Insurance.objects.all()
+        for ins in list_of_insurances:
+            lookups.append((
+                ins.pk,
+                ins.insurer_name,
+            ))
+        return tuple(lookups)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(insurance_id=self.value())
+        else:
+            return queryset
+
+
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
-        'effective_status',
         'solo_cost',
-        'solo_deposit',
         'owner_link',
         'owner_rating',
         'last_status_update',
         'plate',
+        'insurance',
     ]
     list_filter = [
         CarStaleListFilter,
+        InsuranceFilter,
         'owner__rating',
         'status',
         NoPlateFilter,
