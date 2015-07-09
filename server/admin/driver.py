@@ -8,6 +8,7 @@ from idlecars.reverse_admin import ReverseInlineModelAdmin, ReverseModelAdmin
 from server import models
 from server.admin.booking import BookingForDriverInline
 from server.admin.user_account import UserAccountForDriverInline
+from idlecars.admin_helpers import link
 
 
 class DriverAdmin(ReverseModelAdmin):
@@ -45,19 +46,24 @@ class DriverAdmin(ReverseModelAdmin):
         ('Documentation', {
             'fields': (
                 ('documentation_approved'),
-                ('driver_license_image'),
-                ('fhv_license_image'),
-                ('defensive_cert_image'),
-                ('address_proof_image'),
+                ('driver_license_image', 'dmv_link'),
+                ('fhv_license_image', 'fhv_link'),
+                ('defensive_cert_image', 'dd_link'),
+                ('address_proof_image', 'poa_link'),
             )
+        }),
+        ('None', {
+            'fields': (
+               ('notes'),
+            ),
         }),
     )
     readonly_fields = [
         'full_name',
-        'driver_license_image',
-        'fhv_license_image',
-        'defensive_cert_image',
-        'address_proof_image',
+        'dmv_link',
+        'fhv_link',
+        'dd_link',
+        'poa_link',
     ]
     inlines = [BookingForDriverInline,]
     change_form_template = "change_form_inlines_at_top.html"
@@ -69,7 +75,22 @@ class DriverAdmin(ReverseModelAdmin):
     def booking_count(self, instance):
         return models.Booking.objects.filter(driver=instance).count()
 
-    def dmv_license(self, instance): return 'placeholder'
-    def fhv_license(self, instance): return 'placeholder'
-    def dd_cert(self, instance): return 'placeholder'
-    def proof_of_address(self, instance): return 'placeholder'
+    def dmv_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.driver_license_image)
+    dmv_link.short_description = ''
+    dmv_link.allow_tags = True
+
+    def fhv_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.fhv_license_image)
+    fhv_link.short_description = ''
+    fhv_link.allow_tags = True
+
+    def dd_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.defensive_cert_image)
+    dd_link.short_description = ''
+    dd_link.allow_tags = True
+
+    def poa_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
+    poa_link.short_description = ''
+    poa_link.allow_tags = True
