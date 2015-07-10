@@ -28,6 +28,7 @@ class BookingAdmin(admin.ModelAdmin):
         'car_link',
         'owner_link',
         'car_cost',
+        'car_insurance',
         'created_time',
     ]
     readonly_fields = [
@@ -36,6 +37,7 @@ class BookingAdmin(admin.ModelAdmin):
         'car_link',
         'car_plate',
         'car_cost',
+        'car_insurance',
         'owner_link',
         'owner_phone',
         'owner_email',
@@ -105,6 +107,12 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
     car_cost.short_description = 'Rent'
+    car_cost.admin_order_field = 'car__solo_cost'
+
+    def car_insurance(self, instance):
+        return instance.car.insurance
+    car_insurance.admin_order_field = 'car__insurance'
+
 
     def driver_phone(self, instance):
         if instance.driver:
