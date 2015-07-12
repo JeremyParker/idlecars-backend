@@ -19,8 +19,6 @@ class TestDriverNotifications(TestCase):
         now = timezone.now()
         booking_time = now - datetime.timedelta(hours=1, minutes=1)  # TODO(JP): get the time from config
 
-        driver = server.factories.Driver.create()
-        car = server.factories.Car.create()
         booking = server.factories.Booking.create()
         booking.created_time = booking_time
         booking.save()

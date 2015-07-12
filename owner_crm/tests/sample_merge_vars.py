@@ -22,7 +22,7 @@ merge_vars = {
     'one_button_one_image': {
         'jeremy@idlecars.com': {
             'FNAME': 'Bob',
-            'TEXT': 'a bunch of text that explains what the hell is going on.',
+            'TEXT': "<p>Don't forget! To rent your 2014 Toyota Camry you still need to upload:</p>\n<ul><li>your Drivers License, and<li>your TLC License</ul>\n<p>You can also email photographs of your documents to support@idlecars.com. Once we have all your documents, you will be added to the car's insurance. Then you can start driving and start earning!</p>",
             'CTA_LABEL': 'Renew Now',
             'CTA_URL': 'http://idlecars.com',
             'HEADLINE': 'Your 2015 Rolls Royce is about to expire',

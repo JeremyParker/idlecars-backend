@@ -33,8 +33,10 @@ def _missing_documents_text(driver):
     doc_names = driver_service.get_missing_docs(driver)
     docs = ''
     for name in doc_names[:-1]:
-        docs = docs + name + ', '
-    docs = docs + 'and ' + doc_names[-1]
+        docs = docs + '<li>' + name + ', '
+    if docs:
+        docs = docs + 'and'
+    docs = docs + '<li>' + doc_names[-1]
     return docs
 
 
@@ -49,7 +51,7 @@ def _render_reminder_body(booking):
 
 
 def documents_reminder(booking):
-    if not booking.driver.email():
+    if not booking.driver.email() or booking.driver.all_docs_uploaded():
         return
 
     body = _render_reminder_body(booking)
