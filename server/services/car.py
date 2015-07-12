@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from server import models
-from . import car_helpers
+
+from . import car_helpers, make_model_service
 
 
 def filter_live(queryset):
@@ -36,4 +37,4 @@ def get_stale_within(minutes_until_stale):
 
 
 def get_image_url(car):
-    return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(car.make_model.image_filename)
+    return make_model_service.get_image_url(car.make_model, car.pk)

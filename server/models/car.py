@@ -24,10 +24,9 @@ class Car(models.Model):
     last_status_update = models.DateTimeField()
     make_model = models.ForeignKey(
         MakeModel,
-        related_name='+',
         verbose_name="Make & Model",
-        blank=True,
-        null=True
+        null=False,
+        default=1,
     )
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
     YEARS = [(y, unicode(y)) for y in range((datetime.datetime.now().year+1), 1995, -1)]

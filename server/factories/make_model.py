@@ -12,3 +12,9 @@ class MakeModel(Factory):
         model = 'server.MakeModel'
     make = LazyAttribute(lambda o: faker.last_name())
     model = LazyAttribute(lambda o: faker.last_name())
+
+class MakeModelWithImage(MakeModel):
+    image_filenames = 'tacocat.jpg'
+
+class MakeModelWithImages(MakeModel):
+    image_filenames = 'tacocat.jpg, oprah_amazing.gif'
