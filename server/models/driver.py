@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib import auth
+from django.core import exceptions
 
 from idlecars import model_helpers
 
@@ -47,6 +48,20 @@ class Driver(models.Model):
             self.address_proof_image and
             self.defensive_cert_image
         )
+
+    def clean(self, *args, **kwargs):
+        super(Driver, self).clean()
+
+        if self.documentation_approved and not self.all_docs_uploaded():
+            raise exceptions.ValidationError(
+                "You can't mark docs approved until all documents are uploaded."
+            )
+
+        if self.documentation_approved:
+            if not self.auth_user.first_name or not self.auth_user.last_name:
+                raise exceptions.ValidationError(
+                    "Please fill in the user's name and save, then set documentation approved."
+                )
 
     def save(self, *args, **kwargs):
         import server.services.driver
