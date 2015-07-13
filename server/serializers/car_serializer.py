@@ -88,10 +88,7 @@ class CarSerializer(serializers.ModelSerializer):
         return "Now"
 
     def get_image_url(self, obj):
-        if obj.make_model and obj.make_model.image_filename:
-            return car_service.get_image_url(obj)
-        else:
-            return None
+        return car_service.get_image_url(obj)
 
     def get_zipcode(self, obj):
         if not obj.owner:

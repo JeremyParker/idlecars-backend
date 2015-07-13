@@ -17,7 +17,7 @@ class TestCarSerializer(TestCase):
 
     def test_car_with_image(self):
         filename = 'cat_eating_a_taco.jpg'
-        make_model = factories.MakeModel.create(image_filename=filename)
+        make_model = factories.MakeModel.create(image_filenames=filename)
         car = factories.Car.create(make_model=make_model)
 
         expected = 'https://s3.amazonaws.com/images.idlecars.com/' + filename
