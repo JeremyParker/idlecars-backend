@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 import models, services, fields
-from serializers import CarSerializer, BookingSerializer, DriverSerializer, PhoneNumberSerializer
+from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
+from serializers import DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
 
 
@@ -18,9 +19,17 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CarSerializer
 
 
-class BookingViewSet(viewsets.ModelViewSet):
-    serializer_class = BookingSerializer
-    queryset = models.Booking.objects.all()
+class BookingViewSet(
+        mixins.CreateModelMixin,
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        viewsets.GenericViewSet
+    ):
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return BookingDetailsSerializer
+        return BookingSerializer
 
     def get_permissions(self):
         return (IsAuthenticated() if self.request.method == 'POST' else OwnsBooking()),

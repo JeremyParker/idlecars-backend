@@ -66,14 +66,15 @@ class ListBookingTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         for booking_data in response.data:
-            self.assertEqual(booking_data['driver'], self.driver.pk)
+            self.assertEqual(booking_data['car']['id'], self.booking.car.pk)
 
     def test_get_booking_list_one_pending_one_booked(self):
         self.booking.status = models.Booking.BOOKED
         booking2 = factories.Booking.create(driver=self.driver, state=models.Booking.PENDING)
 
-        response = self.client.get(self.url, format='json') 
+        response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        for booking_data in response.data:
-            self.assertEqual(booking_data['driver'], self.driver.pk)
+        ids = [b['car']['id'] for b in response.data]
+        self.assertTrue(booking2.car.pk in ids)
+        self.assertTrue(self.booking.car.pk in ids)
