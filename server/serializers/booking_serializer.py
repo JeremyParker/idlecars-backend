@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from server.models import Car, Booking, Driver
 from server.services import booking as booking_service
+from server.serializers import car_serializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -44,3 +45,16 @@ class BookingSerializer(serializers.ModelSerializer):
         car = validated_data['car']
         driver = validated_data['driver']
         return booking_service.create_booking(car, driver)
+
+
+class BookingDetailsSerializer(serializers.ModelSerializer):
+    car = car_serializer.CarSerializer()
+
+    class Meta:
+        model = Booking
+        fields = (
+            'id',
+            'car',
+            'state',
+        )
+        read_only_fields = ('car', 'state')
