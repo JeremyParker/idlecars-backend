@@ -52,12 +52,12 @@ class Driver(models.Model):
     def clean(self, *args, **kwargs):
         super(Driver, self).clean()
 
-        if self.documentation_approved and not self.all_docs_uploaded():
-            raise exceptions.ValidationError(
-                "You can't mark docs approved until all documents are uploaded."
-            )
-
         if self.documentation_approved:
+            if not self.all_docs_uploaded():
+                raise exceptions.ValidationError(
+                    "You can't mark docs approved until all documents are uploaded."
+                )
+
             if not self.auth_user.first_name or not self.auth_user.last_name:
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
