@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from rest_framework import serializers
 
-from owner_crm import models
+from owner_crm.models import ConsumableToken
 from server import models as server_models
 
 
@@ -24,6 +24,6 @@ class Renewal(serializers.ModelSerializer):
         return instance
 
     def validate_state(self, value):
-        if value != models.Renewal.STATE_RENEWED:
-            raise serializers.ValidationError('State can only be renewed')
+        if value != ConsumableToken.STATE_CONSUMED and value != ConsumableToken.STATE_RETRACTED:
+            raise serializers.ValidationError('State can only be consumed, or retraced')
         return value

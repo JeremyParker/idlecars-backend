@@ -22,7 +22,7 @@ class RenewalUpdateTest(APITestCase):
         self.assertEqual(self._listed_cars_count(), 0)
 
         url = reverse('owner_crm:renewals-detail', args=(self.renewal.token,))
-        response = APIClient().patch(url, {'state': models.Renewal.STATE_RENEWED})
+        response = APIClient().patch(url, {'state': models.ConsumableToken.STATE_CONSUMED})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -31,7 +31,7 @@ class RenewalUpdateTest(APITestCase):
 
     def _assert_renewed(self):
         renewal = models.Renewal.objects.get(id=self.renewal.id)
-        self.assertEqual(renewal.state, models.Renewal.STATE_RENEWED)
+        self.assertEqual(renewal.state, models.ConsumableToken.STATE_CONSUMED)
 
     def _listed_cars_count(self):
         return server.services.car.listing_queryset.all().count()
