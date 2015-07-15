@@ -77,9 +77,13 @@ class CarSerializer(serializers.ModelSerializer):
         return details
 
     def get_cost(self, obj):
+        if obj.min_lease in ['_01_no_min', '_02_one_week']:
+            return unicode(int((obj.solo_cost + 6) / 7))
         return unicode(obj.solo_cost)
 
     def get_cost_time(self, obj):
+        if obj.min_lease in ['_01_no_min', '_02_one_week']:
+            return 'a day'
         return 'a week'
 
     def _available_string(self, obj):

@@ -20,6 +20,7 @@ class CarTest(APITestCase):
             status='busy',
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             hybrid=False,
+            min_lease='_03_two_weeks',
         )
 
     def _get_expected_representation(self, car):
@@ -96,6 +97,7 @@ class CarTest(APITestCase):
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             exterior_color=0,
             interior_color=0,
+            min_lease='_03_two_weeks',
         )
         url = reverse('server:cars-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')
