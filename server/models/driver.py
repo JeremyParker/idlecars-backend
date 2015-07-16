@@ -26,6 +26,9 @@ class Driver(models.Model):
     def admin_display(self):
         return self.auth_user.get_full_name() or self.phone_number()
 
+    def client_display(self):
+        return self.auth_user.get_full_name() or self.phone_number()
+
     def first_name(self):
         return self.auth_user.first_name
 

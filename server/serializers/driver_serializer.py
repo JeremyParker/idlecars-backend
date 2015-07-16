@@ -33,7 +33,7 @@ class DriverSerializer(ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'admin_display',
+            'client_display',
         )
         extra_kwargs={'password': {'write_only': True}}
         read_only_fields = ('id', 'all_docs_uploaded',)
