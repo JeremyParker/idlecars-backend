@@ -12,6 +12,7 @@ from server.services import car as car_service
 class CarSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     listing_features = serializers.SerializerMethodField()
+    booked_features = serializers.SerializerMethodField()
     headline_features = serializers.SerializerMethodField()
     certifications = serializers.SerializerMethodField()
     details = serializers.SerializerMethodField()
@@ -26,6 +27,7 @@ class CarSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'listing_features',
+            'booked_features',
             'headline_features',
             'certifications',
             'details',
@@ -42,6 +44,13 @@ class CarSerializer(serializers.ModelSerializer):
         return '{} minimum rental ∙ Available {} ∙ {}, {}'.format(
             Car.MIN_LEASE_CHOICES[obj.min_lease],
             self._available_string(obj),
+            obj.owner.city,
+            obj.owner.state_code,
+        )
+
+    def get_booked_features(self, obj):
+        return '{} minimum ∙ {}, {}'.format(
+            Car.MIN_LEASE_CHOICES[obj.min_lease],
             obj.owner.city,
             obj.owner.state_code,
         )
