@@ -18,6 +18,7 @@ class CarSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
+    cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
 
@@ -33,6 +34,7 @@ class CarSerializer(serializers.ModelSerializer):
             'details',
             'cost',
             'cost_time',
+            'cost_bucket',
             'image_url',
             'zipcode',
         )
@@ -87,8 +89,17 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_cost(self, obj):
         if obj.min_lease in ['_01_no_min', '_02_one_week']:
-            return unicode(int((obj.solo_cost + 6) / 7))
+            return unicode(self._normalized_cost(obj))
         return unicode(obj.solo_cost)
+
+    def get_cost_bucket(self, obj):
+        norm = self._normalized_cost(obj)
+        if norm < 50:
+            return '$'
+        elif norm < 80:
+            return '$$'
+        else:
+            return '$$$'
 
     def get_cost_time(self, obj):
         if obj.min_lease in ['_01_no_min', '_02_one_week']:
@@ -107,3 +118,6 @@ class CarSerializer(serializers.ModelSerializer):
         if not obj.owner:
             return None
         return obj.owner.zipcode
+
+    def _normalized_cost(self, obj):
+        return int((obj.solo_cost + 6) / 7)
