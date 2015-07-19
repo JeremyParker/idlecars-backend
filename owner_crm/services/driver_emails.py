@@ -118,3 +118,23 @@ def someone_else_booked(booking):
         subject='Someone else rented your {}.'.format(booking.car.__unicode__()),
         merge_vars=merge_vars,
     )
+
+
+def password_reset(password_reset):
+    merge_vars = {
+        password_reset.auth_user.email: {
+            'FNAME': password_reset.auth_user.first_name or None,
+            'HEADLINE': 'Reset your password',
+            'TEXT': '''
+            We've received a request to reset your password.
+            If you didn't make the request, just ignore this email.
+            Otherwise, you can reset your password using this link:''',
+            'CTA_LABEL': 'Reset password',
+            'CTA_URL': client_side_routes.password_reset(password_reset),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='Reset your password on idlecars.',
+        merge_vars=merge_vars,
+    )
