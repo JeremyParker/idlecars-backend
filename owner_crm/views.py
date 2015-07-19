@@ -10,6 +10,7 @@ from django.http import HttpResponse, Http404
 from rest_framework import viewsets, mixins, views, permissions
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from services import driver_emails
 from tests import sample_merge_vars
@@ -62,8 +63,13 @@ class PasswordResetView(views.APIView):
                 content = {'detail': 'Sorry, this link doen\'t work any more.'}
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-            password_reset.auth_user.set_password(password)
-            password_reset.auth_user.save()
+            user = password_reset.auth_user
+            user.set_password(password)
+            user.save()
+
+            Token.objects.filter(user=user).delete()
+            Token.objects.create(user=user)
+
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)

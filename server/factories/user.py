@@ -25,7 +25,7 @@ class AuthUser(DjangoModelFactory):
 
     @post_generation
     def password(self, create, value, **kwargs):
-        self.set_password(value)
+        self.set_password(value or 'password')
         if create:
             self.save()
 
