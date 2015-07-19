@@ -16,57 +16,64 @@ from tests import sample_merge_vars
 import serializers, models
 
 
-class PasswordResetSetups(views.APIView):
+class PasswordResetSetupView(views.APIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = serializers.PasswordResetSetupSerializer
 
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.DATA)
-
-        if serializer.is_valid():
-            phone_number = serializer.validated_data['phone_number']
-            try:
-                auth_user = auth.models.User.objects.get(username=phone_number)
-                if auth_user.is_active:
-                    password_reset = models.PasswordReset.objects.create(auth_user=auth_user)
-                    driver_emails.password_reset(password_reset)
-                    content = {'phone_number': phone_number}
-                    return Response(content, status=status.HTTP_201_CREATED)
-
-            except auth.models.User.DoesNotExist:
-                pass
-
-            # Since this is AllowAny, don't give away error.
-            content = {'detail': 'Password reset not allowed.'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        phone_number = serializer.validated_data['phone_number']
+        try:
+            auth_user = auth.models.User.objects.get(username=phone_number)
+            if auth_user.is_active:
+                password_reset = models.PasswordReset.objects.create(auth_user=auth_user)
+                driver_emails.password_reset(password_reset)
+                content = {'phone_number': phone_number}
+                return Response(content, status=status.HTTP_201_CREATED)
 
-class PasswordResetExecutions(views.APIView):
+        except auth.models.User.DoesNotExist:
+            pass
+
+        # Since this is AllowAny, don't give away the error.
+        content = {'detail': 'Password reset not allowed.'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasswordResetView(views.APIView):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = serializers.PasswordResetExecutionSerializer
+    serializer_class = serializers.PasswordResetSerializer
 
-    def post(self, request, format=None):
+    def patch(self, request, format=None):
         serializer = self.serializer_class(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if serializer.is_valid():
-            token = serializer.data['token']
-            password = serializer.data['password']
+        token = serializer.data['token']
+        password = serializer.data['password']
 
-            try:
-                password_reset = PasswordResetCode.objects.get(token=token)
-                password_reset.auth_user.set_password(password)
-                password_reset.auth_user.save()
-                password_reset.state = STATE_CONSUMED
-                content = {'success': 'Password reset.'}
-                return Response(content, status=status.HTTP_200_OK)
-            except PasswordResetCode.DoesNotExist:
-                content = {'detail': 'Unable to verify user.'}
+        try:
+            password_reset = models.PasswordReset.objects.get(token=token)
+            if password_reset.state != models.ConsumableToken.STATE_PENDING:
+                # TODO(JP) - we should expire the token after a couple of hours
+                # TODO(JP) - it'd be cool if we could just send them a new link here.
+                content = {'detail': 'Sorry, this link doen\'t work any more.'}
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+
+            password_reset.auth_user.set_password(password)
+            password_reset.auth_user.save()
+            password_reset.state = models.ConsumableToken.STATE_CONSUMED
+            password_reset.save()
+            driver_emails.password_reset_confirmation(password_reset)
+
+            content = {'success': 'Password reset.'}
+            return Response(content, status=status.HTTP_200_OK)
+
+        except models.PasswordReset.DoesNotExist:
+            content = {'detail': 'Unable to verify user.'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateRenewalView(mixins.UpdateModelMixin, viewsets.GenericViewSet):

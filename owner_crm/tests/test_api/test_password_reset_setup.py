@@ -20,7 +20,7 @@ class PasswordResetSetupTest(APITestCase):
         self.assertEqual(models.PasswordReset.objects.count(), 0)
 
         data = {'phone_number': self.driver.phone_number()}
-        url = reverse('owner_crm:password_setups')
+        url = reverse('owner_crm:password_reset_setups')
         response = APIClient().post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -30,22 +30,30 @@ class PasswordResetSetupTest(APITestCase):
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
+    def test_success_with_busy_phone_number(self):
+        p = self.driver.phone_number()
+        # note: this is different from formatting in our PhoneNumberField
+        busy_number = "({}).{}.{}".format(p[:3], p[3:6], p[6:])
+        data = {'phone_number': busy_number}
+        url = reverse('owner_crm:password_reset_setups')
+        response = APIClient().post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_setup_bad_phone_data(self):
         data = {'phone_number': '12345'}
-        url = reverse('owner_crm:password_setups')
+        url = reverse('owner_crm:password_reset_setups')
         response = APIClient().post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_setup_wrong_number(self):
         data = {'phone_number': '666-666-6666'}
-        url = reverse('owner_crm:password_setups')
+        url = reverse('owner_crm:password_reset_setups')
         response = APIClient().post(url, data)
-        import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_setup_wrong_number(self):
         data = {'phone_number': '666-666-6666'}
-        url = reverse('owner_crm:password_setups')
+        url = reverse('owner_crm:password_reset_setups')
         response = APIClient().post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

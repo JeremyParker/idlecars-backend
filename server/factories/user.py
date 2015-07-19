@@ -10,7 +10,7 @@ from django.utils import timezone
 from factory import LazyAttribute, PostGenerationMethodCall, post_generation
 from factory.django import DjangoModelFactory
 
-from idlecars.factory_helpers import Factory, faker
+from idlecars.factory_helpers import Factory, faker, random_phone
 
 
 class AuthUser(DjangoModelFactory):
@@ -20,7 +20,7 @@ class AuthUser(DjangoModelFactory):
 
     first_name = LazyAttribute(lambda o: faker.first_name())
     last_name = LazyAttribute(lambda o:faker.last_name())
-    username = LazyAttribute(lambda o: unicode(faker.random_number(10)))
+    username = LazyAttribute(lambda o: random_phone())
     email = LazyAttribute(lambda o: faker.free_email())
 
     @post_generation
