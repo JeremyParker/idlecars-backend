@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-from server import models, fields
+from idlecars import fields
+from server import models
 
 
 class PasswordResetSerializer(serializers.Serializer):
