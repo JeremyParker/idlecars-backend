@@ -6,7 +6,9 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from server import factories, models, fields
+from idlecars import fields
+
+from server import factories, models
 
 
 class PhoneNumberTest(APITestCase):

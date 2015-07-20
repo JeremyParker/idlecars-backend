@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from idlecars import model_helpers
-from server import fields
+from idlecars import model_helpers, fields
+
 
 class TestPhoneNumberField(TestCase):
     def test_good_number_to_value(self):
