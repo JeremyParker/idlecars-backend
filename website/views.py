@@ -6,6 +6,8 @@ from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 
+from idlecars import client_side_routes
+
 import forms
 import models
 import jobs
@@ -49,6 +51,7 @@ def index(request):
         'action': urlresolvers.reverse('website:index') + '#lets-talk',
         'contact_form': contact_form,
         'show_thanks': _show_thanks(),
+        'login_url': client_side_routes.driver_account()
     }
     return render(request, 'landing_page.jade', context)
 
