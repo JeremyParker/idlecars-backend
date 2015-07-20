@@ -1,6 +1,7 @@
 extends ./base.jade
 
 - block content
+  a.login(href="#{ settings.LOGIN_URL }") log in
   section.headline
     .container
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")

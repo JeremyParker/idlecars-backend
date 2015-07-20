@@ -20,6 +20,7 @@ TEMPLATE_DEBUG = True
 SSLIFY_DISABLE = True
 
 WEBAPP_URL = 'http://localhost:3000'
+LOGIN_URL = 'http://localhost:3000/#/login'
 
 # Allow cross origin requests from these domains
 CORS_ORIGIN_WHITELIST = ('localhost:3000',)

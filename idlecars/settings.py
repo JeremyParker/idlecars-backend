@@ -157,6 +157,7 @@ SETTINGS_EXPORT = [
     'STATIC_URL',
     'HEAP_APP_ID',
     'WEBAPP_URL',
+    'LOGIN_URL',
 ]
 
 REST_FRAMEWORK = {
