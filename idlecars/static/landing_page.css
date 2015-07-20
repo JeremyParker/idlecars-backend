@@ -49,6 +49,15 @@ section {
   overflow: hidden;
 }
 
+.login {
+  position: absolute;
+  z-index: 9999;
+  background: none;
+  text-decoration: underline;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
 .container {
   max-width: 54rem;
   margin: 0 auto;
