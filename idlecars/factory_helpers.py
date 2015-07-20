@@ -1,6 +1,9 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import string
+import random
+
 from factory import BUILD_STRATEGY
 from factory import DjangoModelFactory
 import faker
@@ -16,3 +19,6 @@ class Factory(DjangoModelFactory):
     class Meta:
         abstract = True
         strategy = BUILD_STRATEGY
+
+def random_phone():
+    return ''.join(random.SystemRandom().choice(string.digits) for _ in xrange(10))

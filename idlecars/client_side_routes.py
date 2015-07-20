@@ -19,3 +19,11 @@ def car_listing_url():
 def car_details_url(car):
     parts = (car_listing_url(), unicode(car.pk))
     return '/'.join(parts)
+
+def password_reset(password_reset):
+    parts = (settings.WEBAPP_URL, '#', 'account', 'update', 'password', password_reset.token)
+    return '/'.join(parts)
+
+def driver_account():
+    parts = (settings.WEBAPP_URL, '#', 'account')
+    return '/'.join(parts)

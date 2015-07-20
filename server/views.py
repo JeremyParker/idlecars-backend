@@ -70,6 +70,7 @@ class PhoneNumberDetailView(APIView):
         try:
             driver = models.Driver.objects.get(auth_user__username=fields.parse_phone_number(pk))
         except models.Driver.DoesNotExist:
+            # TODO(JP) create a new Driver, call start_set_password(auth_user).
             raise Http404
 
         serializer = PhoneNumberSerializer(driver, many=False)

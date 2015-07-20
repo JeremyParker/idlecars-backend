@@ -6,7 +6,8 @@ from django.core.exceptions import PermissionDenied
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 
-from server import models, fields
+from idlecars import fields
+from server import models
 
 
 class DriverSerializer(ModelSerializer):

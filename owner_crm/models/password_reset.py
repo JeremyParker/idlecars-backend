@@ -1,11 +1,11 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib import auth
 from django.db import models
 
 from consumable_token import ConsumableToken
-import server.models
 
 
-class Renewal(ConsumableToken):
-    car = models.ForeignKey(server.models.Car, related_name='renewals')
+class PasswordReset(ConsumableToken):
+    auth_user = models.ForeignKey(auth.models.User)
