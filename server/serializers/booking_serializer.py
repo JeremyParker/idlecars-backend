@@ -49,16 +49,27 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
+    state_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
         fields = (
             'id',
             'car',
-            'state',
+            'state_details',
         )
         read_only_fields = (
             'id',
             'car',
-            'state',
+            'state_details',
         )
+
+    def get_state_details (self, obj):
+        state_details = {
+            1: {"status": "Awaiting Documents", "content": "Please upload the required documents."},
+            2: {"status": "Awaiting Approval", "content": "We'll notify you once you are approved."},
+        }
+        default_details = {"status": "Not found", "content": "Your status is not found."}
+        return state_details.get(obj.state, default_details)
+
+
