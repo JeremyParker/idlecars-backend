@@ -8,7 +8,9 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-import models, services, fields
+from idlecars import fields
+
+import models, services
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
 from serializers import DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking

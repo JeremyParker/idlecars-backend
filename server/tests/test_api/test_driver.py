@@ -8,7 +8,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
-from server import factories, models, fields
+from idlecars import fields
+from server import factories, models
 
 
 class AuthenticatedDriverTest(APITestCase):
