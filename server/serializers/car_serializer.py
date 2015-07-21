@@ -94,7 +94,7 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_cost_bucket(self, obj):
         norm = self._normalized_cost(obj)
-        if norm < 50:
+        if norm < 60:
             return 'cheap'
         elif norm < 80:
             return 'medium'
