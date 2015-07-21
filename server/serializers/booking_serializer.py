@@ -59,7 +59,6 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'car',
-            # 'state',
         )
 
     def update(self, instance, validated_data):
