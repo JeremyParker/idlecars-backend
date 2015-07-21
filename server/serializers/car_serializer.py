@@ -95,11 +95,11 @@ class CarSerializer(serializers.ModelSerializer):
     def get_cost_bucket(self, obj):
         norm = self._normalized_cost(obj)
         if norm < 50:
-            return '$'
+            return 'cheap'
         elif norm < 80:
-            return '$$'
+            return 'medium'
         else:
-            return '$$$'
+            return 'pricey'
 
     def get_cost_time(self, obj):
         if obj.min_lease in ['_01_no_min', '_02_one_week']:
