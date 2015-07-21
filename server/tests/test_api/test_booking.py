@@ -78,3 +78,17 @@ class ListBookingTest(APITestCase):
         ids = [b['car']['id'] for b in response.data]
         self.assertTrue(booking2.car.pk in ids)
         self.assertTrue(self.booking.car.pk in ids)
+
+
+class UpdateBookingTest(APITestCase):
+    def setUp(self):
+        self.booking = factories.Booking.create()
+
+        self.client = APIClient()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.booking.driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+
+    def test_cancel_booking_success(self):
+        pass
