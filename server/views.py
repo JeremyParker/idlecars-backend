@@ -29,7 +29,7 @@ class BookingViewSet(
         viewsets.GenericViewSet
     ):
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ['list', 'retrieve', 'partial_update']:
             return BookingDetailsSerializer
         return BookingSerializer
 

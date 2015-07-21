@@ -91,4 +91,11 @@ class UpdateBookingTest(APITestCase):
         self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
 
     def test_cancel_booking_success(self):
+        data = { 'state': models.Booking.CANCELED }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.booking = models.Booking.objects.get(id=self.booking.pk)
+        self.assertEqual(self.booking.state, models.Booking.CANCELED)
+
+    def test_not_cancel_anothers_booking(self):
         pass

@@ -40,7 +40,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
         return not bool(self._errors)
 
-
     def create(self, validated_data):
         car = validated_data['car']
         driver = validated_data['driver']
@@ -60,5 +59,12 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'car',
-            'state',
+            # 'state',
         )
+
+    def update(self, instance, validated_data):
+        new_state = validated_data['state']
+        old_state = instance.state
+        if new_state != old_state and new_state == Booking.CANCELED:
+            return booking_service.cancel_booking(instance)
+        return instance
