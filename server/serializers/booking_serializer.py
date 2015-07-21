@@ -74,7 +74,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         state_details = {
             1: {"status": "Awaiting document upload", "content": "Please upload your documents.", "color": "rgb(255,51,51)"},
             2: {"status": "Awaiting idlecars approval", "content": "We'll notify you once you are approved.", "color": "rgb(255,128,0)"},
-            3: {"status": "Awaiting insurance approval", "content": "We'll notify you once you are approved.", "color": "color": "rgb(255,128,0)"},
+            3: {"status": "Awaiting insurance approval", "content": "We'll notify you once you are approved.", "color": "rgb(255,128,0)"},
             4: {"status": "Awaiting pickup", "content": "Please call us if you need assistance. 1-844-435-3227", "color": "rgb(255,51,51)"},
             5: {"status": "Booked", "content": "Enjoy your ride.", "color": "rgb(0,204,0)"},
         }
