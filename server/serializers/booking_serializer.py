@@ -55,6 +55,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'car',
+            'state',
             'state_details',
         )
         read_only_fields = (
