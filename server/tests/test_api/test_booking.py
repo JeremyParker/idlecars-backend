@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
-
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
@@ -98,4 +97,13 @@ class UpdateBookingTest(APITestCase):
         self.assertEqual(self.booking.state, models.Booking.CANCELED)
 
     def test_not_cancel_anothers_booking(self):
-        pass
+        another_booking = factories.Booking.create()
+        data = { 'state': models.Booking.CANCELED }
+        url = reverse('server:bookings-detail', args=(another_booking.pk,))
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_cannot_set_booking_to_non_cancel(self):
+        data = { 'state': models.Booking.BOOKED }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

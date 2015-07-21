@@ -41,8 +41,3 @@ class Booking(models.Model):
     )
     state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)
-
-    def save(self, *args, **kwargs):
-        import server.services.booking
-        self = server.services.booking.pre_save(self)
-        super(Booking, self).save(*args, **kwargs)

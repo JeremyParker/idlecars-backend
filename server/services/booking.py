@@ -109,15 +109,12 @@ def create_booking(car, driver):
 
 
 def cancel_booking(booking):
+    if Booking.REQUESTED == booking.state:
+        owner_emails.booking_canceled(booking)
+
     booking.state = Booking.CANCELED
     booking.save()
+
+    ops_emails.booking_canceled(booking)
+    driver_emails.booking_canceled(booking)
     return booking
-
-
-def pre_save(modified_booking):
-    if modified_booking.pk is not None:
-        orig = Booking.objects.get(pk=modified_booking.pk)
-    # TODO - check if it's being canceled. Then confirm the cancelation to the driver.
-    # if the canceled booking was REQUESTED, then email the owner to tell them to cancel
-    # the insurance request.
-    return modified_booking

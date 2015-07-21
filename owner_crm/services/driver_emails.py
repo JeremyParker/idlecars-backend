@@ -86,7 +86,7 @@ def documents_approved(booking):
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
-            'CTA_LABEL': 'See more cars',  # TODO: send them to their booking details
+            'CTA_LABEL': 'See your car',  # TODO: send them to their booking details
             'CTA_URL': client_side_routes.car_details_url(booking.car),
             'HEADLINE': 'Your documents have been reviewed and approved',
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
@@ -116,6 +116,29 @@ def someone_else_booked(booking):
     email.send_async(
         template_name='one_button_no_image',
         subject='Someone else rented your {}.'.format(booking.car.__unicode__()),
+        merge_vars=merge_vars,
+    )
+
+
+def booking_canceled(booking):
+    if not booking.driver.email():
+        return
+    body = '''
+    Your {} rental has been canceled. Now you can go back to idlecars and rent another car!
+    '''
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'TEXT': body.format(booking.car.__unicode__()),
+            'CTA_LABEL': 'Find another car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+            'HEADLINE': 'Your rental has been canceled',
+            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+        }
+    }
+    email.send_async(
+        template_name='one_button_one_image',
+        subject='Confirmation: Your rental has been canceled.',
         merge_vars=merge_vars,
     )
 

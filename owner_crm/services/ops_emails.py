@@ -47,3 +47,26 @@ def documents_uploaded(driver):
         subject='Uploaded documents from {}'.format(driver.phone_number()),
         merge_vars=merge_vars,
     )
+
+
+def booking_canceled(booking):
+    merge_vars = {
+        settings.OPS_EMAIL: {
+            'FNAME': 'dudes',
+            'HEADLINE': 'Someone canceled their booking :(',
+            'TEXT': 'the driver with phone {} decided not to rent {}\'s {}'.format(
+                booking.driver.phone_number(),
+                booking.car.owner.__unicode__(),
+                booking.car.__unicode__(),
+            ),
+            'CTA_LABEL': 'Booking details',
+            'CTA_URL': 'https://www.idlecars.com{}'.format(
+                reverse('admin:server_booking_change', args=(booking.pk,))
+            ),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='A booking got canceled.',
+        merge_vars=merge_vars,
+    )
