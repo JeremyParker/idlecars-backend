@@ -21,6 +21,7 @@ class CarTest(APITestCase):
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             hybrid=False,
             min_lease='_03_two_weeks',
+            solo_cost=400,
         )
 
     def _get_expected_representation(self, car):
@@ -71,6 +72,7 @@ class CarTest(APITestCase):
                 ),
                 ('cost', '{0:.0f}'.format(car.solo_cost)),
                 ('cost_time', 'a week'),
+                ('cost_bucket', 'cheap'),
                 ('image_url', None),
                 ('zipcode', car.owner.zipcode),
             ]

@@ -48,13 +48,14 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
+    state_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
         fields = (
             'id',
             'car',
-            'state',
+            'state_details',
         )
         read_only_fields = (
             'id',
@@ -67,3 +68,14 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         if new_state != old_state and new_state == Booking.CANCELED:
             return booking_service.cancel_booking(instance)
         return instance
+
+    def get_state_details (self, obj):
+        state_details = {
+            1: {"status": "Awaiting document upload", "content": "Please upload your documents."},
+            2: {"status": "Awaiting idlecars approval", "content": "We'll notify you once you are approved."},
+            3: {"status": "Awaiting insurance approval", "content": "We'll notify you once you are approved."},
+            4: {"status": "Awaiting pickup", "content": "Please call us if you need assistance. 1-844-435-3227"},
+            5: {"status": "Booked", "content": "Enjoy your ride."},
+        }
+        default_details = {"status": "Booking expired", "content": "Sorry, your booking has expired."}
+        return state_details.get(obj.state, default_details)
