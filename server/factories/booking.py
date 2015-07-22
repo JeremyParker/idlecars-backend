@@ -5,12 +5,11 @@ from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Car, Driver, UserAccount
+from server.factories import BookableCar, ApprovedDriver, UserAccount
 
 class Booking(Factory):
     class Meta:
         model = 'server.Booking'
 
-    car = SubFactory(Car)
-    driver = SubFactory(Driver)
-    user_account = SubFactory(UserAccount) #TODO(JP): remove
+    car = SubFactory(BookableCar)
+    driver = SubFactory(ApprovedDriver)

@@ -21,7 +21,7 @@ class CarTest(APITestCase):
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             hybrid=False,
             min_lease='_03_two_weeks',
-            solo_cost=400,
+            solo_cost=100,
         )
 
     def _get_expected_representation(self, car):
@@ -36,12 +36,6 @@ class CarTest(APITestCase):
                 ('listing_features', listing_features.format(
                         models.Car.MIN_LEASE_CHOICES[car.min_lease],
                         '{d.month}/{d.day}'.format(d = tomorrow),
-                        car.owner.city,
-                        car.owner.state_code,
-                    )
-                ),
-                ('booked_features', booked_features.format(
-                        models.Car.MIN_LEASE_CHOICES[car.min_lease],
                         car.owner.city,
                         car.owner.state_code,
                     )
@@ -73,6 +67,12 @@ class CarTest(APITestCase):
                 ('cost', '{0:.0f}'.format(car.solo_cost)),
                 ('cost_time', 'a week'),
                 ('cost_bucket', 'cheap'),
+                ('booked_features', booked_features.format(
+                        models.Car.MIN_LEASE_CHOICES[car.min_lease],
+                        car.owner.city,
+                        car.owner.state_code,
+                    )
+                ),
                 ('image_url', None),
                 ('zipcode', car.owner.zipcode),
             ]
@@ -108,6 +108,7 @@ class CarTest(APITestCase):
             exterior_color=0,
             interior_color=0,
             min_lease='_03_two_weeks',
+            solo_cost=100, # make it ridiculously cheap, so it's always in the 'cheap' bucket
         )
         url = reverse('server:cars-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')

@@ -29,7 +29,7 @@ class BookingViewSet(
         viewsets.GenericViewSet
     ):
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ['list', 'retrieve', 'partial_update']:
             return BookingDetailsSerializer
         return BookingSerializer
 
@@ -41,8 +41,10 @@ class BookingViewSet(
         serializer.save(driver=driver)
 
     def get_queryset(self):
-        driver = models.Driver.objects.get(auth_user=self.request.user)
-        return models.Booking.objects.filter(driver=driver)
+        return models.Booking.objects.filter(
+            driver=models.Driver.objects.get(auth_user=self.request.user),
+            state__in=services.booking.visible_states
+        )
 
 
 class DriverViewSet(
