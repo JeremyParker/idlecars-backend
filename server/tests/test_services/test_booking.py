@@ -205,3 +205,29 @@ class BookingServiceTest(TestCase):
             outbox[0].subject,
             'Welcome to idlecars, {}!'.format(self.driver.full_name())
         )
+
+    def test_cancel_pending_booking(self):
+        new_booking = booking_service.create_booking(self.car, self.driver)
+        booking_service.cancel_booking(new_booking)
+
+        ''' we should have sent
+        - one email to ops when the booking was created,
+        - one email to ops when the booking was canceled,
+        - one emial to the driver to confirm the booking was canceled.
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 3)
+
+    def test_cancel_requested_booking(self):
+        approved_driver = factories.ApprovedDriver.create()
+        new_booking = booking_service.create_booking(self.car, approved_driver)
+        booking_service.cancel_booking(new_booking)
+
+        ''' we should have sent
+        - message to the owner to send the insurance docs,
+        - message to the owner to cancel the insurance request.
+        - message to ops when the booking was canceled,
+        - message to the driver to confirm the booking was canceled,
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 4)
