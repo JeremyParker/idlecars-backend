@@ -46,6 +46,22 @@ class BookingSerializer(serializers.ModelSerializer):
         return booking_service.create_booking(car, driver)
 
 
+booking_state_details = {
+    Booking.PENDING: {"status": "Waiting for documents", "content": "You must upload your documents to rent this car.", "color": "rgb(255,51,51)"},
+    Booking.COMPLETE: {"status": "Documents uploaded", "content": "Your documents are being reviewed.", "color": "rgb(255,128,0)"},
+    Booking.REQUESTED: {"status": "Insurance processing", "content": "You are being added to this car's insurance.", "color": "rgb(255,128,0)"},
+    Booking.ACCEPTED: {"status": "Ready for pickup", "content": "Please call us if you need assistance. 1-844-435-3227", "color": "rgb(255,51,51)"},
+    Booking.BOOKED: {"status": "In progress", "content": "Happy driving!", "color": "rgb(0,204,0)"},
+    Booking.FLAKE: {"status": "Waiting for documents", "content": "Please upload your driver documents.", "color": "rgb(255,51,51)"},
+    Booking.TOO_SLOW: {"status": "Booked by another driver", "content": "Sorry, someone else booked this car.", "color": "rgb(0,0,0)"},
+    Booking.OWNER_REJECTED: {"status": "Rejected by insurance", "content": "Sorry, you couldn't be added to the insurance.", "color": "rgb(0,0,0)"},
+    Booking.DRIVER_REJECTED: {"status": "Canceled", "content": "Canceled by the driver.", "color": "rgb(0,0,0)"},
+    Booking.MISSED: {"status": "Booked by another driver", "content": "Sorry, someone else booked this car.", "color": "rgb(0,0,0)"},
+    Booking.TEST_BOOKING: {"status": "Test", "content": "This was marked as a test.", "color": "rgb(0,0,0)"},
+    Booking.CANCELED: {"status": "Canceled", "content": "Canceled by the driver.", "color": "rgb(0,0,0)"},
+}
+
+
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
     state_details = serializers.SerializerMethodField()
@@ -61,6 +77,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'car',
+            'state_details',
         )
 
     def update(self, instance, validated_data):
@@ -77,12 +94,4 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return booking_service.cancel_booking(instance)
 
     def get_state_details (self, obj):
-        state_details = {
-            1: {"status": "Awaiting document upload", "content": "Please upload your documents.", "color": "rgb(255,51,51)"},
-            2: {"status": "Awaiting idlecars approval", "content": "We'll notify you once you are approved.", "color": "rgb(255,128,0)"},
-            3: {"status": "Awaiting insurance approval", "content": "We'll notify you once you are approved.", "color": "rgb(255,128,0)"},
-            4: {"status": "Awaiting pickup", "content": "Please call us if you need assistance. 1-844-435-3227", "color": "rgb(255,51,51)"},
-            5: {"status": "Booked", "content": "Enjoy your ride.", "color": "rgb(0,204,0)"},
-        }
-        default_details = {"status": "Booking expired", "content": "Sorry, your booking has expired.", "color": "rgb(255,51,51)"}
-        return state_details.get(obj.state, default_details)
+        return booking_state_details[obj.state]

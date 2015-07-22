@@ -78,6 +78,13 @@ class ListBookingTest(APITestCase):
         self.assertTrue(booking2.car.pk in ids)
         self.assertTrue(self.booking.car.pk in ids)
 
+    def test_canceled_booking_excluded(self):
+        self.booking.state = models.Booking.CANCELED
+        self.booking.save()
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
 
 class UpdateBookingTest(APITestCase):
     def setUp(self):

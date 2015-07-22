@@ -41,8 +41,10 @@ class BookingViewSet(
         serializer.save(driver=driver)
 
     def get_queryset(self):
-        driver = models.Driver.objects.get(auth_user=self.request.user)
-        return models.Booking.objects.filter(driver=driver)
+        return models.Booking.objects.filter(
+            driver=models.Driver.objects.get(auth_user=self.request.user),
+            state__in=services.booking.visible_states
+        )
 
 
 class DriverViewSet(
