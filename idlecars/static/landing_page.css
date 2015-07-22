@@ -115,20 +115,16 @@ section {
   margin: 2rem 0;
 }
 
-.login p {
-  font-size: 0.7rem
+.login {
+  font-size: 0.8rem;
   font-weight: 200;
-  margin: 0;
 }
 
-.login div {
+.login span {
+  font-size: 1rem;
   font-weight: 500;
   color: #008aff;
-  text-decoration: underline;
-}
-
-.headline p {
-  max-width: 20rem;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
 }
 
 .headline img {
