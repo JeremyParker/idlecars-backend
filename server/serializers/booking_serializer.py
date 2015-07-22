@@ -85,7 +85,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         Right now we only allow the API to update a booking's status to CANCELED. The booking
         must be in a state that can be canceled.
         '''
-        if instance.state not in [Booking.PENDING, Booking.COMPLETE, Booking.REQUESTED]:
+        if instance.state not in booking_service.cancelable_states:
             raise ValidationError('This booking can\'t be canceled at this time.')
 
         if 'state' not in validated_data or validated_data['state'] != Booking.CANCELED:
@@ -94,4 +94,6 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return booking_service.cancel_booking(instance)
 
     def get_state_details (self, obj):
-        return booking_state_details[obj.state]
+        deets = booking_state_details[obj.state]
+        deets.update({"cancelable": obj.state in booking_service.cancelable_states})
+        return deets
