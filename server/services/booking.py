@@ -20,6 +20,12 @@ visible_states = [
     Booking.FLAKE,
 ]
 
+cancelable_states = [
+    Booking.PENDING,
+    Booking.COMPLETE,
+    Booking.REQUESTED,
+    Booking.FLAKE,
+]
 
 def conflicting_bookings(booking):
     return Booking.objects.filter(

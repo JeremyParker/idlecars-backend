@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
-from server import factories, models
+from server import factories, models, services
 
 
 class CreateBookingTest(APITestCase):
@@ -84,6 +84,25 @@ class ListBookingTest(APITestCase):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
+
+    def test_cancelable_bookings(self):
+        for state in services.booking.cancelable_states:
+            self.booking.state = state
+            self.booking.save()
+            response = self.client.get(self.url, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertTrue(response.data[0]['state_details']['cancelable'])
+
+        visible = services.booking.visible_states
+        cancelable = services.booking.cancelable_states
+        un_cancelable = [s for s in visible if s not in cancelable]
+
+        for state in un_cancelable:
+            self.booking.state = state
+            self.booking.save()
+            response = self.client.get(self.url, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertFalse(response.data[0]['state_details']['cancelable'])
 
 
 class UpdateBookingTest(APITestCase):
