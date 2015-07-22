@@ -10,6 +10,22 @@ from owner_crm.services import ops_emails, driver_emails, owner_emails
 
 from server.models import Booking
 
+''' These are the states where the user sees the booking in their bookings page '''
+visible_states = [
+    Booking.PENDING,
+    Booking.COMPLETE,
+    Booking.REQUESTED,
+    Booking.ACCEPTED,
+    Booking.BOOKED,
+    Booking.FLAKE,
+]
+
+cancelable_states = [
+    Booking.PENDING,
+    Booking.COMPLETE,
+    Booking.REQUESTED,
+    Booking.FLAKE,
+]
 
 def conflicting_bookings(booking):
     return Booking.objects.filter(
@@ -105,4 +121,16 @@ def create_booking(car, driver):
     booking.save()
 
     ops_emails.new_booking_email(booking)
+    return booking
+
+
+def cancel_booking(booking):
+    if Booking.REQUESTED == booking.state:
+        owner_emails.booking_canceled(booking)
+
+    booking.state = Booking.CANCELED
+    booking.save()
+
+    ops_emails.booking_canceled(booking)
+    driver_emails.booking_canceled(booking)
     return booking

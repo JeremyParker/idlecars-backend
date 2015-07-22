@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from owner_crm.services import ops_emails
-import server.models.driver
+import server.models
 import server.services.booking
 
 
@@ -15,7 +15,7 @@ doc_fields_and_names = {
 
 
 def create():
-    return server.models.driver.Driver.objects.create()
+    return server.models.Driver.objects.create()
 
 
 def documents_changed(original, modified):
@@ -28,7 +28,7 @@ def documents_changed(original, modified):
 
 def pre_save(modified_driver):
     if modified_driver.pk is not None:
-        orig = server.models.driver.Driver.objects.get(pk=modified_driver.pk)
+        orig = server.models.Driver.objects.get(pk=modified_driver.pk)
         if documents_changed(orig, modified_driver):
             modified_driver.documentation_approved = False
             if modified_driver.all_docs_uploaded():
