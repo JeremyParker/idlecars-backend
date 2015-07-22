@@ -49,15 +49,6 @@ section {
   overflow: hidden;
 }
 
-.login {
-  position: absolute;
-  z-index: 9999;
-  background: none;
-  text-decoration: underline;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-
 .container {
   max-width: 54rem;
   margin: 0 auto;
@@ -114,18 +105,26 @@ section {
 }
 
 .headline h1 {
-  margin-top: 8rem;
+  margin-top: 4rem;
   margin-bottom: 0.75rem;
 }
 
 .headline .button {
   background: white;
   color: black;
-  margin-top: 2rem;
+  margin: 2rem 0;
 }
 
-.headline p {
-  max-width: 20rem;
+.login {
+  font-size: 0.8rem;
+  font-weight: 200;
+}
+
+.login span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #008aff;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
 }
 
 .headline img {
@@ -342,7 +341,6 @@ footer .container {
   }
 
   .headline .button {
-    margin-bottom: 2rem;
     text-shadow: none
   }
 

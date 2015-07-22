@@ -1,17 +1,18 @@
 extends ./base.jade
 
 - block content
-  a.login(href="#{ login_url }") log in
   section.headline
     .container
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
       .content
-        h1
-          | Start renting
-          br
-          | Start earning
-        p A safe and reliable marketplace for professional drivers to rent for-hire vehicles, on-demand.
+        h1 Start renting #[br] Start earning
         a.button(href="#{ settings.WEBAPP_URL }") Find your car
+        a.login(href="#{ login_url }") Have an account? #[span Log in]
+
+  section.get-more
+    .container
+      h2 A better marketplace
+      p for professional drivers to rent for-hire vehicles, on-demand.
 
   section.select
     .container
