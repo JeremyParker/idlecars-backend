@@ -68,13 +68,13 @@ class PasswordResetView(views.APIView):
             user.save()
 
             Token.objects.filter(user=user).delete()
-            Token.objects.create(user=user)
+            token = Token.objects.create(user=user)
 
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'success': 'Password reset.'}
+            content = {'success': 'Password reset.', 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:
