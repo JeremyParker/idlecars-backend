@@ -6,4 +6,4 @@ class CarCompatibility(object):
         self.car = car
 
     def uber_x(self):
-        return 'uberX'
+        return True
