@@ -21,7 +21,7 @@ def car_details_url(car):
     return '/'.join(parts)
 
 def password_reset(password_reset):
-    parts = (settings.WEBAPP_URL, '#', 'account', 'update', 'password', password_reset.token)
+    parts = (settings.WEBAPP_URL, '#', 'reset_password', password_reset.token)
     return '/'.join(parts)
 
 def driver_account():
