@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import mandrill
 
-from django.contrib import auth
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
@@ -12,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from services import driver_emails
+from services import driver_emails, password_reset_service
 from tests import sample_merge_vars
 import serializers, models
 
@@ -27,19 +26,12 @@ class PasswordResetSetupView(views.APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         phone_number = serializer.validated_data['phone_number']
-        try:
-            auth_user = auth.models.User.objects.get(username=phone_number)
-            if auth_user.is_active:
-                pending_resets = models.PasswordReset.objects.filter(auth_user=auth_user)
-                pending_resets.update(state=models.ConsumableToken.STATE_RETRACTED)
+        password_reset = password_reset_service.create(phone_number)
+        if password_reset:
+            driver_emails.password_reset(password_reset)
+            content = {'phone_number': phone_number}
+            return Response(content, status=status.HTTP_201_CREATED)
 
-                password_reset = models.PasswordReset.objects.create(auth_user=auth_user)
-                driver_emails.password_reset(password_reset)
-                content = {'phone_number': phone_number}
-                return Response(content, status=status.HTTP_201_CREATED)
-
-        except auth.models.User.DoesNotExist:
-            pass
 
         # Since this is AllowAny, don't give away the error.
         content = {'detail': 'Password reset not allowed.'}
