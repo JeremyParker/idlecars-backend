@@ -26,8 +26,8 @@ class CarTest(APITestCase):
 
     def _get_expected_representation(self, car):
         ''' returns the expected API response for a given car '''
-        listing_features = '{} minimum rental ∙ Available {} ∙ {}, {}'
-        booked_features = '{} minimum ∙ {}, {}'
+        listing_features = '{} minimum ∙ Available {} ∙ {}, {}'
+        booked_features = '{} minimum rental ∙ {}, {}'
         tomorrow = timezone.now().date() + datetime.timedelta(days=1)
         expected = OrderedDict(
             [
@@ -43,7 +43,7 @@ class CarTest(APITestCase):
                 ('headline_features',
                     [
                         'Available {d.month}/{d.day}'.format(d = tomorrow),
-                        '{} minimum'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
+                        '{} minimum rental'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
                         '${} deposit'.format(car.solo_deposit),
                     ]
                 ),
@@ -64,8 +64,8 @@ class CarTest(APITestCase):
                         ['TLC Base', car.base]
                     ]
                 ),
-                ('cost', '{0:.0f}'.format(car.solo_cost)),
-                ('cost_time', 'a week'),
+                ('cost', '{0:.0f}'.format(int((car.solo_cost) + 6) / 7)),
+                ('cost_time', 'a day'),
                 ('cost_bucket', 'cheap'),
                 ('booked_features', booked_features.format(
                         models.Car.MIN_LEASE_CHOICES[car.min_lease],
