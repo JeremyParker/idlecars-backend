@@ -30,6 +30,9 @@ class PasswordResetSetupView(views.APIView):
         try:
             auth_user = auth.models.User.objects.get(username=phone_number)
             if auth_user.is_active:
+                pending_resets = models.PasswordReset.objects.filter(auth_user=auth_user)
+                pending_resets.update(state=models.ConsumableToken.STATE_RETRACTED)
+
                 password_reset = models.PasswordReset.objects.create(auth_user=auth_user)
                 driver_emails.password_reset(password_reset)
                 content = {'phone_number': phone_number}
@@ -68,13 +71,13 @@ class PasswordResetView(views.APIView):
             user.save()
 
             Token.objects.filter(user=user).delete()
-            Token.objects.create(user=user)
+            token = Token.objects.create(user=user)
 
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'success': 'Password reset.'}
+            content = {'success': 'Password reset.', 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:

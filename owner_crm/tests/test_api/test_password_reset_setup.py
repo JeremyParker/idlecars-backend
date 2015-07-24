@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 import server.factories
+import owner_crm.factories
 from owner_crm import models
 
 
@@ -29,6 +30,21 @@ class PasswordResetSetupTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+
+    def test_revokes_other_tokens(self):
+        auth_user = server.factories.AuthUser.create()
+        reset = owner_crm.factories.PasswordReset.create(auth_user=auth_user)
+        data = {'phone_number': auth_user.username}
+        url = reverse('owner_crm:password_reset_setups')
+        response = APIClient().post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(models.PasswordReset.objects.count(), 2)
+
+        # check that our original password reset object was revoked.
+        reset = models.PasswordReset.objects.get(pk=reset.pk)
+        self.assertEqual(reset.state, models.ConsumableToken.STATE_RETRACTED)
+
 
     def test_success_with_busy_phone_number(self):
         p = self.driver.phone_number()
