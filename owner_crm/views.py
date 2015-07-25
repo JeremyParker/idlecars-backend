@@ -42,7 +42,7 @@ class PasswordResetSetupView(views.APIView):
             pass
 
         # Since this is AllowAny, don't give away the error.
-        content = {'detail': 'Password reset not allowed.'}
+        content = {'_app_notifications': ['Password reset not allowed.']}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -63,7 +63,7 @@ class PasswordResetView(views.APIView):
             if password_reset.state != models.ConsumableToken.STATE_PENDING:
                 # TODO(JP) - we should expire the token after a couple of hours
                 # TODO(JP) - it'd be cool if we could just send them a new link here.
-                content = {'detail': 'Sorry, this link doen\'t work any more.'}
+                content = {'_app_notifications': ['Sorry, this link doen\'t work any more.']}
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
             user = password_reset.auth_user
@@ -77,11 +77,11 @@ class PasswordResetView(views.APIView):
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'success': 'Password reset.', 'token': token.key}
+            content = {'_app_notifications': ['Your password has been set.'], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:
-            content = {'detail': 'Unable to verify user.'}
+            content = {'_app_notifications': ['Unable to verify user.']}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
