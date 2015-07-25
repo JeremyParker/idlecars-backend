@@ -8,6 +8,7 @@ from server.models import MakeModel
 
 class RideshareProvider(models.Model):
     name = models.CharField(max_length=128, blank=False)
+    frieldly_id = models.CharField(max_length=32, blank=False)
     compatible_models = models.ManyToManyField(MakeModel)
 
     def __unicode__(self):
