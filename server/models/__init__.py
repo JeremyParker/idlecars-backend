@@ -13,7 +13,7 @@ from make_model import MakeModel
 from car import Car
 from driver import Driver
 from booking import Booking
-from fhv_provider import FhvProvider
+from rideshare_provider import RideshareProvider
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

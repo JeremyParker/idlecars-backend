@@ -6,7 +6,7 @@ from django.db import models
 from server.models import MakeModel
 
 
-class FhvProvider(models.Model):
+class RideshareProvider(models.Model):
     name = models.CharField(max_length=128, blank=False)
     compatible_models = models.ManyToManyField(MakeModel)
 
