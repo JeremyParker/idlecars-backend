@@ -30,6 +30,7 @@ class PasswordResetTest(APITestCase):
         old_password = self.auth_user.password
         response = self._make_request()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in response.content)
 
         self.assertEqual(models.PasswordReset.objects.count(), 1)
         password_reset = models.PasswordReset.objects.first()

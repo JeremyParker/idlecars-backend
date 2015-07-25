@@ -46,7 +46,7 @@ class CarSerializer(serializers.ModelSerializer):
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_listing_features(self, obj):
-        return '{} minimum rental ∙ Available {} ∙ {}, {}'.format(
+        return '{} minimum ∙ Available {} ∙ {}, {}'.format(
             Car.MIN_LEASE_CHOICES[obj.min_lease],
             self._available_string(obj),
             obj.owner.city,
@@ -54,7 +54,7 @@ class CarSerializer(serializers.ModelSerializer):
         )
 
     def get_booked_features(self, obj):
-        return '{} minimum ∙ {}, {}'.format(
+        return '{} minimum rental ∙ {}, {}'.format(
             Car.MIN_LEASE_CHOICES[obj.min_lease],
             obj.owner.city,
             obj.owner.state_code,
@@ -63,7 +63,7 @@ class CarSerializer(serializers.ModelSerializer):
     def get_headline_features(self, obj):
         return [
             'Available {}'.format(self._available_string(obj)),
-            '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
+            '{} minimum rental'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
             '${} deposit'.format(obj.solo_deposit),
         ]
 
@@ -91,9 +91,7 @@ class CarSerializer(serializers.ModelSerializer):
         return details
 
     def get_cost(self, obj):
-        if obj.min_lease in ['_01_no_min', '_02_one_week']:
-            return unicode(self._normalized_cost(obj))
-        return unicode(obj.solo_cost)
+        return unicode(self._normalized_cost(obj))
 
     def get_cost_bucket(self, obj):
         norm = self._normalized_cost(obj)
@@ -105,9 +103,7 @@ class CarSerializer(serializers.ModelSerializer):
             return 'pricey'
 
     def get_cost_time(self, obj):
-        if obj.min_lease in ['_01_no_min', '_02_one_week']:
-            return 'a day'
-        return 'a week'
+        return 'a day'
 
     def get_image_url(self, obj):
         return car_service.get_image_url(obj)

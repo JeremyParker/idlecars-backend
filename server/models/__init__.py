@@ -14,6 +14,7 @@ from car import Car
 from car_compatibility import CarCompatibility
 from driver import Driver
 from booking import Booking
+from rideshare_provider import RideshareProvider
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
