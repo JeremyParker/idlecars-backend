@@ -6,7 +6,7 @@ from django.test import TestCase
 from server import serializers, factories, models
 
 class TestCarCompatibilitySerializer(TestCase):
-    def test_all_docs_uploaded_false(self):
+    def test_serializer(self):
         car = factories.Car.create()
         car_compatibility = models.CarCompatibility(car)
         serialized = serializers.CarCompatibilitySerializer(car_compatibility)
