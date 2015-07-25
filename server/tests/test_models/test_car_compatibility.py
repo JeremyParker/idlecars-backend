@@ -7,11 +7,16 @@ from server.factories import RideshareProviderFactory, Car, MakeModel
 from server.models import CarCompatibility
 
 class TestCarCompatibility(TestCase):
+    def setUp(self):
+        self.delorean_2 = MakeModel.create(make='DMC', model='Delorean 2')
+
+        self.uber_x = RideshareProviderFactory.create(name='uberX', frieldly_id='uber_x')
+        self.uber_x.compatible_models.add(self.delorean_2)
+
     def test_new_car(self):
-        delorean_2 = MakeModel.create(make='DMC', model='Delorean 2')
-        rideshare_provider = RideshareProviderFactory.create(name='uberX', frieldly_id='uber_x')
-        rideshare_provider.compatible_models.add(delorean_2)
-        new_car = Car.create(year=2021, make_model=delorean_2)
+        car = Car.create(year=2021, make_model=self.delorean_2)
+        self.assertTrue(CarCompatibility(car).uber_x())
 
-        self.assertTrue(CarCompatibility(new_car).uber_x())
-
+    def test_old_car(self):
+        car = Car.create(year=1985, make_model=self.delorean_2)
+        self.assertFalse(CarCompatibility(car).uber_x())
