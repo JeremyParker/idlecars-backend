@@ -10,4 +10,4 @@ class RideshareProviderFactory(Factory):
     class Meta:
         model = 'server.RideshareProvider'
     name = LazyAttribute(lambda o: faker.last_name())
-    frieldly_id = LazyAttribute(lambda o: faker.last_name())
+    friendly_id = LazyAttribute(lambda o: faker.last_name())

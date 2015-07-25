@@ -10,7 +10,7 @@ class TestCarCompatibility(TestCase):
     def setUp(self):
         self.delorean_2 = MakeModel.create(make='DMC', model='Delorean 2')
 
-        self.uber_x = RideshareProviderFactory.create(name='uberX', frieldly_id='uber_x')
+        self.uber_x = RideshareProviderFactory.create(name='uberX', friendly_id='uber_x')
         self.uber_x.compatible_models.add(self.delorean_2)
 
     def test_new_car(self):

@@ -8,5 +8,5 @@ class CarCompatibility(object):
     def uber_x(self):
         return self._model_is_compatible('uber_x') and self.car.year > 2009
 
-    def _model_is_compatible(self, frieldly_id):
-        return self.car.make_model.rideshareprovider_set.filter(frieldly_id=frieldly_id).exists()
+    def _model_is_compatible(self, friendly_id):
+        return self.car.make_model.rideshareprovider_set.filter(friendly_id=friendly_id).exists()
