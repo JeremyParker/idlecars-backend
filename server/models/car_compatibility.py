@@ -6,7 +6,7 @@ class CarCompatibility(object):
         self.car = car
 
     def uber_x(self):
-        return _model_is_compatible('uber_x') and self.car.year > 2009
+        return self._model_is_compatible('uber_x') and self.car.year > 2009
 
     def _model_is_compatible(self, frieldly_id):
         return self.car.make_model.rideshare_provider_set.filter(frieldly_id=frieldly_id).exists()
