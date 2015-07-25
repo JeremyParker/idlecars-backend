@@ -75,7 +75,7 @@ class CarTest(APITestCase):
                 ),
                 ('image_url', None),
                 ('zipcode', car.owner.zipcode),
-                ('compatibility', {'uber_x': 'uberX'})
+                ('compatibility', {'uber_x': ''})
             ]
         )
 

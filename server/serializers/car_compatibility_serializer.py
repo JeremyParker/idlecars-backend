@@ -9,4 +9,10 @@ class CarCompatibilitySerializer(serializers.Serializer):
     uber_x = serializers.SerializerMethodField()
 
     def get_uber_x(self, obj):
-        return RideshareProvider.objects.get(friendly_id='uber_x').name if obj.uber_x else None
+        return self._rideshare_provider_name('uber_x') if obj.uber_x else None
+
+    def _rideshare_provider_name(self, friendly_id):
+        try:
+            return RideshareProvider.objects.get(friendly_id=friendly_id).name
+        except RideshareProvider.DoesNotExist:
+            return ""
