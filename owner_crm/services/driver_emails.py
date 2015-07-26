@@ -167,10 +167,10 @@ def password_reset_confirmation(password_reset):
     merge_vars = {
         password_reset.auth_user.email: {
             'FNAME': password_reset.auth_user.first_name or None,
-            'HEADLINE': 'Your password has been reset',
+            'HEADLINE': 'Your password has been set',
             'TEXT': '''
             Your password has been set. Welcome back! If you didn't
-            reset your password, or if you think something funny is going
+            set your password, or if you think something funny is going
             on, please call us any time at 1-844-IDLECAR (1-844-435-3227).
             ''',
             'CTA_LABEL': 'Find your car',
@@ -179,7 +179,7 @@ def password_reset_confirmation(password_reset):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Your idlecars password has been reset.',
+        subject='Your idlecars password has been set.',
         merge_vars=merge_vars,
     )
 
@@ -201,6 +201,6 @@ def account_created(password_reset):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Reset your password on idlecars.',
+        subject='An account has been created for you at idlecars',
         merge_vars=merge_vars,
     )
