@@ -169,9 +169,9 @@ def password_reset_confirmation(password_reset):
             'FNAME': password_reset.auth_user.first_name or None,
             'HEADLINE': 'Your password has been set',
             'TEXT': '''
-            Your password has been set. Welcome back! If you didn't
-            set your password, or if you think something funny is going
-            on, please call us any time at 1-844-IDLECAR (1-844-435-3227).
+            Welcome back! If you didn't set your password, or if you think something funny is going
+            on, please call us any time at 1-844-IDLECAR (1-844-435-3227). Now you can rent any car you
+            need, any time you need it.
             ''',
             'CTA_LABEL': 'Find your car',
             'CTA_URL': client_side_routes.car_listing_url(),
