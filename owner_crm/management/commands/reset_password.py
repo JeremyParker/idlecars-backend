@@ -8,7 +8,7 @@ from owner_crm.services import password_reset_service, driver_emails
 
 class Command(BaseCommand):
     help = '''
-    This command will invite the given user to come set their password in the app.
+    This command will start the password rest process manually for a given user.
     args
     - phone_number: the phone number for the user to send an invite to.
     '''
