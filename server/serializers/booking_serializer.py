@@ -26,11 +26,9 @@ class BookingSerializer(serializers.ModelSerializer):
         # TODO(JP): make this booking-check aware of end-times, so we can book after booking ends.
         if self.context['request'].method == 'POST':
             driver = Driver.objects.get(auth_user=self.context['request'].user)
-            # look for bookings up to but not including "BOOKED" state. I.e. bookings in progress.
             if Booking.objects.filter(driver=driver, state__in=range(Booking.FLAKE + 1)):
                 self._errors.update({
-                    'detail': 'You already have a booking in progress.',
-                    '_app_notifications': ['You already have a booking in progress.'],
+                    '_app_notifications': ['You have a conflicting rental.'],
                 })
 
         # TODO(JP): double-check the car is available
@@ -86,10 +84,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         must be in a state that can be canceled.
         '''
         if instance.state not in booking_service.cancelable_states:
-            raise ValidationError('This booking can\'t be canceled at this time.')
+            raise ValidationError('This rental can\'t be canceled at this time.')
 
         if 'state' not in validated_data or validated_data['state'] != Booking.CANCELED:
-            raise ValidationError('This is not a valid state for a booking.')
+            raise ValidationError('This is not a valid state for a rental.')
 
         return booking_service.cancel_booking(instance)
 

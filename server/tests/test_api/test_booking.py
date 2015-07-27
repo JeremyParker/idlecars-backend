@@ -42,7 +42,7 @@ class CreateBookingTest(APITestCase):
         existing_booking.save()
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['detail'], 'You already have a booking in progress.')
+        self.assertEqual(response.data['_app_notifications'], ['You have a conflicting rental.'])
 
 
 class ListBookingTest(APITestCase):

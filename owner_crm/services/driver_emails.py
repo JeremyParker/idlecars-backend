@@ -191,9 +191,9 @@ def account_created(password_reset):
             'FNAME': password_reset.auth_user.first_name or None,
             'HEADLINE': 'An account has been created for you at idlecars.',
             'TEXT': '''
-            All your documents have been approved and added to your profile. To claim your idlecars
-            account all you need to do is tap the button below. Add a password in the form
-            and your account will be secured. Then you can rent any car you need, any time you need it.
+            Your documents and details have been stored in your idlecars account. To claim your
+            account just tap the button below. Add a password, and your account  will be secured.
+            Then you can rent any car you need, any time you need it.
             ''',
             'CTA_LABEL': 'Claim your account',
             'CTA_URL': client_side_routes.password_reset(password_reset),
