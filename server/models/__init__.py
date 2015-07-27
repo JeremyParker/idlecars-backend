@@ -11,6 +11,7 @@ from user_account import UserAccount
 from owner import Owner
 from make_model import MakeModel
 from car import Car
+from car_compatibility import CarCompatibility
 from driver import Driver
 from booking import Booking
 from rideshare_provider import RideshareProvider

@@ -5,8 +5,9 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
-from server.models import Car
+from server.models import Car, CarCompatibility
 from server.services import car as car_service
+from server.serializers import CarCompatibilitySerializer
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -21,6 +22,7 @@ class CarSerializer(serializers.ModelSerializer):
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
+    compatibility = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -37,6 +39,7 @@ class CarSerializer(serializers.ModelSerializer):
             'cost_bucket',
             'image_url',
             'zipcode',
+            'compatibility',
         )
 
     def get_name(self, obj):
@@ -102,11 +105,6 @@ class CarSerializer(serializers.ModelSerializer):
     def get_cost_time(self, obj):
         return 'a day'
 
-    def _available_string(self, obj):
-        if obj.next_available_date and obj.next_available_date > timezone.now().date():
-            return '{d.month}/{d.day}'.format(d = obj.next_available_date)
-        return "Now"
-
     def get_image_url(self, obj):
         return car_service.get_image_url(obj)
 
@@ -115,5 +113,13 @@ class CarSerializer(serializers.ModelSerializer):
             return None
         return obj.owner.zipcode
 
+    def get_compatibility(self, obj):
+        return CarCompatibilitySerializer(CarCompatibility(obj)).data
+
     def _normalized_cost(self, obj):
         return int((obj.solo_cost + 6) / 7)
+
+    def _available_string(self, obj):
+        if obj.next_available_date and obj.next_available_date > timezone.now().date():
+            return '{d.month}/{d.day}'.format(d = obj.next_available_date)
+        return "Now"
