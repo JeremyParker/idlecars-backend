@@ -7,9 +7,10 @@ class CarCompatibility(object):
         self._compatible_flavors = None
 
     def uber_x(self):
-        return self._model_is_compatible('uber_x') and self.car.year > 2009
+        if self.car.year > 2009:
+            return self._compatible_flavor_name('uber_x')
 
-    def _model_is_compatible(self, friendly_id):
+    def _compatible_flavor_name(self, friendly_id):
         if not self._compatible_flavors:
             self._compatible_flavors = self._get_compatible_flavors()
 
@@ -17,5 +18,5 @@ class CarCompatibility(object):
 
     def _get_compatible_flavors(self):
         return {
-            flavor.friendly_id: True for flavor in self.car.make_model.rideshareflavor_set.all()
+            flavor.friendly_id: flavor.name for flavor in self.car.make_model.rideshareflavor_set.all()
         }
