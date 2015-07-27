@@ -7,10 +7,11 @@ from server import serializers, factories, models
 
 class TestCarCompatibilitySerializer(TestCase):
     def setUp(self):
-        factories.RideshareProviderFactory.create(friendly_id='uber_x', name='TacoRide')
+        uber_x = factories.RideshareProviderFactory.create(friendly_id='uber_x', name='TacoRide')
+        car = factories.Car.create()
+        uber_x.compatible_models.add(car.make_model)
+        self.car_compatibility = models.CarCompatibility(car)
 
     def test_serializer(self):
-        car = factories.Car.create()
-        car_compatibility = models.CarCompatibility(car)
-        serialized = serializers.CarCompatibilitySerializer(car_compatibility)
+        serialized = serializers.CarCompatibilitySerializer(self.car_compatibility)
         self.assertEqual(serialized.data['uber_x'], 'TacoRide')
