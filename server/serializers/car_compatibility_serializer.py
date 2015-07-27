@@ -15,4 +15,4 @@ class CarCompatibilitySerializer(serializers.Serializer):
         try:
             return RideshareProvider.objects.get(friendly_id=friendly_id).name
         except RideshareProvider.DoesNotExist:
-            return ""
+            return None
