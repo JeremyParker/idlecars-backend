@@ -9,4 +9,4 @@ from car import Car, BookableCar, CarExpiredListing, CompleteCar
 from user import AuthUser, StaffUser
 from driver import Driver, CompletedDriver, ApprovedDriver
 from booking import Booking
-from rideshare_provider_factory import RideshareProviderFactory
+from rideshare_flavor_factory import RideshareFlavorFactory

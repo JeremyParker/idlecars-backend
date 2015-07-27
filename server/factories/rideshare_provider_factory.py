@@ -6,8 +6,8 @@ from factory import LazyAttribute
 from idlecars.factory_helpers import Factory, faker
 
 
-class RideshareProviderFactory(Factory):
+class RideshareFlavorFactory(Factory):
     class Meta:
-        model = 'server.RideshareProvider'
+        model = 'server.RideshareFlavor'
     name = LazyAttribute(lambda o: faker.last_name())
     friendly_id = LazyAttribute(lambda o: faker.last_name())
