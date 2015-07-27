@@ -34,7 +34,9 @@ class PasswordResetSetupView(views.APIView):
 
 
         # Since this is AllowAny, don't give away the error.
-        content = {'_app_notifications': ['Password reset not allowed.']}
+        content = {'_app_notifications': [
+            'Sorry, that didn\'t work. Please double-check your phone number.'
+        ],}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
