@@ -1,7 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from car_compatibility_serializer import CarCompatibilitySerializer
+from rideshare_flavor_serializer import RideshareFlavorSerializer
 from car_serializer import CarSerializer
 from booking_serializer import BookingSerializer, BookingDetailsSerializer
 from driver_serializer import DriverSerializer

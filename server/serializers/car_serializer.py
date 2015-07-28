@@ -7,7 +7,8 @@ from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
 from server.services import car as car_service
-from server.serializers import CarCompatibilitySerializer
+from server.services import rideshare_flavor_service
+from server.serializers import RideshareFlavorSerializer
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class CarSerializer(serializers.ModelSerializer):
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
-    compatibility = serializers.SerializerMethodField()
+    compatibility = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Car
@@ -114,7 +115,8 @@ class CarSerializer(serializers.ModelSerializer):
         return obj.owner.zipcode
 
     def get_compatibility(self, obj):
-        return CarCompatibilitySerializer(CarCompatibility(obj)).data
+        compatible_flavors = rideshare_flavor_service.get_rideshare_flavors(obj)
+        return RideshareFlavorSerializer(compatible_flavors, many=True).data
 
     def _normalized_cost(self, obj):
         return int((obj.solo_cost + 6) / 7)

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from server import models
 
 
 class MakeModelAdmin(admin.ModelAdmin):
@@ -9,3 +10,12 @@ class MakeModelAdmin(admin.ModelAdmin):
     'make',
     'model',
     ]
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('make', 'model'),
+                'image_filenames',
+            )
+        }),
+    )
