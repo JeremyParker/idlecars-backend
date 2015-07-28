@@ -25,7 +25,10 @@ CORS_ORIGIN_WHITELIST = ('localhost:3000',)
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-    )
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
 }
 
 WARNING__ENABLE_TEST_SETUP_ENDPOINT__TEST_MODE_ONLY = True
