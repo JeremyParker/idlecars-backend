@@ -71,12 +71,12 @@ class Car(models.Model):
     exterior_color = models.IntegerField(
         choices=COLOR_CHOICES,
         blank=True,
-        null = True,
+        null=True,
     )
     interior_color = models.IntegerField(
         choices=COLOR_CHOICES,
         blank=True,
-        null = True,
+        null=True,
     )
     last_known_mileage = models.IntegerField(blank=True, null=True)
     last_mileage_update = models.DateTimeField(blank=True, null=True)
