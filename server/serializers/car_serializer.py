@@ -22,7 +22,6 @@ class CarSerializer(serializers.ModelSerializer):
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
-    compatibility = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -39,7 +38,6 @@ class CarSerializer(serializers.ModelSerializer):
             'cost_bucket',
             'image_url',
             'zipcode',
-            'compatibility',
         )
 
     def get_name(self, obj):
@@ -112,9 +110,6 @@ class CarSerializer(serializers.ModelSerializer):
         if not obj.owner:
             return None
         return obj.owner.zipcode
-
-    def get_compatibility(self, obj):
-        return CarCompatibilitySerializer(CarCompatibility(obj)).data
 
     def _normalized_cost(self, obj):
         return int((obj.solo_cost + 6) / 7)

@@ -7,8 +7,44 @@ class CarCompatibility(object):
         self._compatible_flavors = None
 
     def uber_x(self):
-        if self.car.year > 2009:
-            return self._compatible_flavor_name('uber_x')
+        # TODO: implement proper logic
+        # if self.car.year > 2009:
+        #     return self._compatible_flavor_name('uber_x')
+        return False
+
+    def uber_xl(self):
+        return False
+
+    def uber_plus(self):
+        return False
+
+    def uber_black(self):
+        return False
+
+    def uber_suv(self):
+        return False
+
+    def uber_lux(self):
+        return False
+
+    def lyft_standard(self):
+        return False
+
+    def lyft_suv(self):
+        return False
+
+    def via_standard(self):
+        return False
+
+    def via_suv(self):
+        return False
+
+    def gett_standard(self):
+        return False
+
+    def gett_suv(self):
+        return False
+
 
     def _compatible_flavor_name(self, friendly_id):
         if not self._compatible_flavors:
