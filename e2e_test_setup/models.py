@@ -22,6 +22,7 @@ class E2ETestSetup():
         self._setup_cars()
         self._setup_renewals()
         self._setup_drivers()
+        self._setup_booking()
 
     def _truncate_tables(self):
         tables = (
@@ -52,6 +53,12 @@ class E2ETestSetup():
         '''
         owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
 
+    def _setup_booking(self):
+        '''
+            Create a booking
+        '''
+        server.factories.Booking.create(car=self.delorean, driver=self.driver)
+
     def _setup_drivers(self):
         '''
             Create 1 driver
@@ -59,5 +66,5 @@ class E2ETestSetup():
         driver_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-7b33baf8-4aee-4e75-b7e1-0f591017251c-image.jpg"
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
 
-        user = server.factories.AuthUser.create(username='1234567891', email='user@test.com', first_name='Tom', last_name='Cat')
-        server.factories.Driver.create(auth_user=user, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
+        self.user = server.factories.AuthUser.create(username='1234567891', email='user@test.com', first_name='Tom', last_name='Cat')
+        self.driver = server.factories.Driver.create(auth_user=self.user, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
