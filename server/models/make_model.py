@@ -17,13 +17,13 @@ class MakeModel(models.Model):
         (0, 'Standard'),
         (1, 'Luxury'),
     ]
-    lux_level = models.IntegerField(choices=LUX_LEVEL_CHOICES, blank=True, null=True)
+    lux_level = models.IntegerField(choices=LUX_LEVEL_CHOICES, blank=False, null=False, default=0)
 
     BODY_TYPE_CHOICES = [
         (0, 'Sedan'),
         (1, 'SUV'),
     ]
-    body_type = models.IntegerField(choices=BODY_TYPE_CHOICES, blank=True, null=True)
+    body_type = models.IntegerField(choices=BODY_TYPE_CHOICES, blank=False, null=False, default=0)
 
 
     def __unicode__(self):
