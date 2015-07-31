@@ -36,7 +36,6 @@ class DriverSerializer(ModelSerializer):
             'last_name',
             'client_display',
         )
-        # extra_kwargs={'password': {'write_only': True}}
         read_only_fields = ('id', 'all_docs_uploaded',)
 
     def create(self, validated_data):
