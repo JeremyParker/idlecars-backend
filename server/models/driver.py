@@ -27,7 +27,7 @@ class Driver(models.Model):
         return self.auth_user.get_full_name() or fields.format_phone_number(self.phone_number())
 
     def client_display(self):
-        return self.auth_user.get_full_name() or 'New User'
+        return self.auth_user.get_full_name() or 'New Driver'
 
     def first_name(self):
         return self.auth_user.first_name
