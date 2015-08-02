@@ -77,7 +77,7 @@ class DriverUpdateTest(AuthenticatedDriverTest):
             'client_display': "1112220987",
             'defensive_cert_image': "",
             'driver_license_image': "",
-            'email': "asedf@asdf.com",
+            'email': "",
             'fhv_license_image': "",
             'first_name': "",
             'id': 201,
