@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib import auth
 from django.core import exceptions
 
-from idlecars import model_helpers
+from idlecars import model_helpers, fields
 
 
 class Driver(models.Model):
@@ -24,10 +24,10 @@ class Driver(models.Model):
     notes = models.TextField(blank=True)
 
     def admin_display(self):
-        return self.auth_user.get_full_name() or self.phone_number()
+        return self.auth_user.get_full_name() or fields.format_phone_number(self.phone_number())
 
     def client_display(self):
-        return self.auth_user.get_full_name() or self.phone_number()
+        return self.auth_user.get_full_name() or 'New User'
 
     def first_name(self):
         return self.auth_user.first_name
