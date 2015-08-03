@@ -95,6 +95,9 @@ class Car(models.Model):
         else:
             return self.status
 
+    def normalized_cost(self):
+        return int((self.solo_cost + 6) / 7)
+
     def __unicode__(self):
         if self.year:
             return '{} {}'.format(self.year, self.make_model)
