@@ -97,6 +97,17 @@ class CarTest(APITestCase):
         rep = self._get_expected_representation(self.car)
         self.assertEqual([rep], response.data)
 
+    def test_get_cars_sorted(self):
+        for _ in range(20):
+            factories.BookableCar.create()
+        url = reverse('server:cars-list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        previous_car_cost = 0
+        for car in response.data:
+            self.assertTrue(int(car['cost']) >= previous_car_cost)
+            previous_car_cost = int(car['cost'])
+
     def test_get_car(self):
         url = reverse('server:cars-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')
