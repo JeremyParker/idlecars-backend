@@ -17,7 +17,7 @@ from permissions import OwnsDriver, OwnsBooking
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = services.car.listing_queryset
+    queryset = services.car.listing_queryset.order_by('solo_cost')
     serializer_class = CarSerializer
 
 
