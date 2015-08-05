@@ -23,6 +23,7 @@ class CarSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
     searchable = serializers.SerializerMethodField()
+    compatibility = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -40,6 +41,7 @@ class CarSerializer(serializers.ModelSerializer):
             'image_url',
             'zipcode',
             'searchable',
+            'compatibility',
         )
 
     def get_name(self, obj):
@@ -110,6 +112,12 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_searchable(self, obj):
         return car_search.search_attrs(obj)
+
+    def get_compatibility(self, obj):
+        # TODO: use CarCompatibility model if more complicated logic is needed
+        return {
+            flavor.friendly_id: flavor.name for flavor in obj.make_model.rideshareflavor_set.all()
+        }
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
