@@ -44,7 +44,10 @@ class E2ETestSetup():
         dmc = server.factories.MakeModel.create(make='DMC', model='Delorean')
         self.delorean = server.factories.BookableCar.create(make_model=dmc, year=1985)
 
-        for i in xrange(3):
+        luxy = server.factories.MakeModel.create(make='Venus', model='Xtravaganza', lux_level=1)
+        server.factories.BookableCar.create(make_model=luxy)
+
+        for i in xrange(2):
             server.factories.BookableCar.create()
 
     def _setup_renewals(self):
