@@ -5,8 +5,9 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
-from server.models import Car
+from server.models import Car, CarCompatibility
 from server.services import car as car_service, car_search
+from server.serializers import CarCompatibilitySerializer
 
 
 class CarSerializer(serializers.ModelSerializer):
