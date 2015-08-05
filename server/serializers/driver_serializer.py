@@ -14,9 +14,9 @@ class DriverSerializer(ModelSerializer):
     # we must add fields that are mapped to auth_user
     phone_number = fields.PhoneNumberField(max_length=30)
     password = CharField(max_length=128, write_only=True)
-    email = EmailField(required=False)
-    first_name = CharField(max_length=30, required=False)
-    last_name = CharField(max_length=30, required=False)
+    email = EmailField(required=False, allow_blank=True)
+    first_name = CharField(max_length=30, required=False, allow_blank=True)
+    last_name = CharField(max_length=30, required=False, allow_blank=True)
 
     class Meta:
         model = models.Driver
@@ -36,7 +36,6 @@ class DriverSerializer(ModelSerializer):
             'last_name',
             'client_display',
         )
-        extra_kwargs={'password': {'write_only': True}}
         read_only_fields = ('id', 'all_docs_uploaded',)
 
     def create(self, validated_data):

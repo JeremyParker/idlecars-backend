@@ -6,7 +6,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
-from server.services import car as car_service
+from server.services import car as car_service, car_search
 from server.serializers import CarCompatibilitySerializer
 
 
@@ -22,6 +22,7 @@ class CarSerializer(serializers.ModelSerializer):
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     zipcode = serializers.SerializerMethodField()
+    searchable = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
@@ -38,6 +39,7 @@ class CarSerializer(serializers.ModelSerializer):
             'cost_bucket',
             'image_url',
             'zipcode',
+            'searchable',
         )
 
     def get_name(self, obj):
@@ -89,16 +91,11 @@ class CarSerializer(serializers.ModelSerializer):
         return details
 
     def get_cost(self, obj):
-        return unicode(self._normalized_cost(obj))
+        return unicode(obj.normalized_cost())
 
     def get_cost_bucket(self, obj):
-        norm = self._normalized_cost(obj)
-        if norm < 60:
-            return 'cheap'
-        elif norm < 80:
-            return 'medium'
-        else:
-            return 'pricey'
+        # TODO: remove method when front end no longer needs it
+        return car_search.get_cost_bucket(obj)
 
     def get_cost_time(self, obj):
         return 'a day'
@@ -111,8 +108,8 @@ class CarSerializer(serializers.ModelSerializer):
             return None
         return obj.owner.zipcode
 
-    def _normalized_cost(self, obj):
-        return int((obj.solo_cost + 6) / 7)
+    def get_searchable(self, obj):
+        return car_search.search_attrs(obj)
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():

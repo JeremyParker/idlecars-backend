@@ -70,6 +70,24 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().phone_number(), '1235551212')
 
+    def test_update_username_with_full_me(self):
+        data = {
+            'address_proof_image': "",
+            'all_docs_uploaded': False,
+            'client_display': "1112220987",
+            'defensive_cert_image': "",
+            'driver_license_image': "",
+            'email': "",
+            'fhv_license_image': "",
+            'first_name': "",
+            'id': 201,
+            'last_name': "",
+           ' phone_number': "(111) 222-3333",
+        }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self._driver_reloaded().phone_number(), '1112223333')
+
     def test_update_password_forbidden(self):
         response = self.client.patch(self.url, {'password': 'new_password'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
