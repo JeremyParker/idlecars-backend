@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
 from server.services import car as car_service, car_search
-from server.serializers import CarCompatibilitySerializer
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -115,9 +114,7 @@ class CarSerializer(serializers.ModelSerializer):
 
     def get_compatibility(self, obj):
         # TODO: use CarCompatibility model if more complicated logic is needed
-        return {
-            flavor.friendly_id: flavor.name for flavor in obj.make_model.rideshareflavor_set.all()
-        }
+        return CarCompatibility(obj)._get_compatible_flavors()
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
