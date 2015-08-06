@@ -16,9 +16,12 @@ class Booking(models.Model):
     driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
+
     check_out_time = models.DateTimeField(null=True)
     approval_time = models.DateTimeField(null=True)
     pick_up_time = models.DateTimeField(null=True)
+
+    end_time = models.DateTimeField(null=True)
     return_time = models.DateTimeField(null=True)
 
     PENDING = 1
@@ -50,7 +53,3 @@ class Booking(models.Model):
     )
     state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)
-
-    def estimate_time(self):
-        now = datetime.datetime.now() + datetime.timedelta(days=2)
-        return format(now.month) + "/" + format(now.day)

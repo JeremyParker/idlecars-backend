@@ -134,3 +134,20 @@ def cancel_booking(booking):
     ops_emails.booking_canceled(booking)
     driver_emails.booking_canceled(booking)
     return booking
+
+
+def _format_date(date):
+    return '{}/{}'.format(date.month, date.day)
+
+
+def get_start_time(booking):
+    if booking.pick_up_time:
+        time_string = _format_date(booking.pick_up_time)
+    elif booking.approval_time:
+        time_string = 'on pickup'
+    elif booking.check_out_time:
+        time_string = _format_date(booking.check_out_time + datetime.timedelta(days=2))
+    else:
+        time_string = _format_date(timezone.now() + datetime.timedelta(days=2))
+
+    return time_string if booking.approval_time else time_string + ' (estimated)'

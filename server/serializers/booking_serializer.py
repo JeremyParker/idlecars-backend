@@ -63,6 +63,7 @@ booking_state_details = {
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
     state_details = serializers.SerializerMethodField()
+    start_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -71,7 +72,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'car',
             'state',
             'state_details',
-            'estimate_time',
+            'start_time',
         )
         read_only_fields = (
             'id',
@@ -96,3 +97,6 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         deets = booking_state_details[obj.state]
         deets.update({"cancelable": obj.state in booking_service.cancelable_states})
         return deets
+
+    def get_start_time(self, obj):
+        return booking_service.get_start_time(obj)
