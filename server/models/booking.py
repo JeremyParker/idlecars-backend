@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 from django.db import models
 
 from . import Car, UserAccount, Driver
+import datetime
 
+def format(time):
+    if time < 10:
+        return '0' + str(time)
+    return str(time)
 
 class Booking(models.Model):
     user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
@@ -45,3 +50,7 @@ class Booking(models.Model):
     )
     state = models.IntegerField(choices=STATE, default=PENDING)
     notes = models.TextField(blank=True)
+
+    def estimate_time(self):
+        now = datetime.datetime.now() + datetime.timedelta(days=2)
+        return format(now.month) + "/" + format(now.day)
