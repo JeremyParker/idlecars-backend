@@ -6,10 +6,6 @@ from django.db import models
 from . import Car, UserAccount, Driver
 import datetime
 
-def format(time):
-    if time < 10:
-        return '0' + str(time)
-    return str(time)
 
 class Booking(models.Model):
     user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
