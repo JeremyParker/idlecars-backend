@@ -16,7 +16,7 @@ class BookingAdmin(admin.ModelAdmin):
                 ('driver_link', 'driver_phone', 'driver_email',),
                 ('car_link', 'car_plate', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
-                'created_time',
+                ('created_time', 'end_time',),
                 'notes',
             ),
         }),

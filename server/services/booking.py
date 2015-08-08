@@ -136,11 +136,10 @@ def cancel_booking(booking):
     return booking
 
 
-def _format_date(date):
-    return '{}/{}'.format(date.month, date.day)
+def start_time_display(booking):
+    def _format_date(date):
+        return '{}/{}'.format(date.month, date.day)
 
-
-def get_start_time(booking):
     if booking.pick_up_time:
         time_string = _format_date(booking.pick_up_time)
     elif booking.approval_time:
@@ -151,3 +150,16 @@ def get_start_time(booking):
         time_string = _format_date(timezone.now() + datetime.timedelta(days=2))
 
     return time_string if booking.approval_time else time_string + ' (estimated)'
+
+def first_valid_end_time(obj):
+    '''
+    Returns the earliest legal end time of the booking, so the user can't end the booking prematurely.
+    The return value is a list of ints representing [Year, Zero-indexed month, Day].
+    '''
+    # TODO real logic for the earliest end date available
+    return timezone.now() + datetime.timedelta(days=7)
+
+def set_end_time(booking, end_time):
+    booking.end_time = end_time
+    booking.save()
+    return booking
