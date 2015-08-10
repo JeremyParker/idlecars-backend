@@ -90,15 +90,15 @@ class ListBookingTest(APITestCase):
         self.assertEqual(len(response.data), 0)
 
     def test_cancelable_bookings(self):
-        for state in services.booking.cancelable_states():
+        for state in models.booking_state.cancelable_states():
             self.booking.state = state
             self.booking.save()
             response = self.client.get(self.url, format='json')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertTrue(response.data[0]['state_details']['cancelable'])
 
-        visible = services.booking.visible_states()
-        cancelable = services.booking.cancelable_states()
+        visible = models.booking_state.visible_states()
+        cancelable = models.booking_state.cancelable_states()
         un_cancelable = [s for s in visible if s not in cancelable]
 
         for state in un_cancelable:

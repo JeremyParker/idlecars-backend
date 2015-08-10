@@ -43,7 +43,7 @@ class BookingViewSet(
     def get_queryset(self):
         return models.Booking.objects.filter(
             driver=models.Driver.objects.get(auth_user=self.request.user),
-            state__in=services.booking.visible_states()
+            state__in=models.booking_state.visible_states()
         )
 
 
