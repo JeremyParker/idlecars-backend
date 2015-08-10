@@ -9,6 +9,7 @@ from django.utils import timezone
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
 from server.models import Booking, booking_state
+from server.services import car as car_service
 
 
 def conflicting_bookings(booking):
@@ -135,13 +136,28 @@ def start_time_display(booking):
 
     return time_string if booking.approval_time else time_string + ' (estimated)'
 
-def first_valid_end_time(obj):
+
+def min_rental_still_limiting(booking):
+    min_notice = timezone.now() + datetime.timedelta(days=7)
+    min_rental = car_service.get_min_rental_duration(booking.car)
+    if not min_rental:
+        return False
+
+    if not booking.pick_up_time or booking.pick_up_time + datetime.timedelta(min_rental) > min_notice:
+        return True
+    return False
+
+
+def first_valid_end_time(booking):
     '''
     Returns the earliest legal end time of the booking, so the user can't end the booking prematurely.
     The return value is a list of ints representing [Year, Zero-indexed month, Day].
     '''
-    # TODO real logic for the earliest end date available
+    if min_rental_still_limiting(booking):
+        min_rental_days = car_service.get_min_rental_duration(booking.car)
+        return timezone.now() + datetime.timedelta(days=min_rental_days)
     return timezone.now() + datetime.timedelta(days=7)
+
 
 def set_end_time(booking, end_time):
     booking.end_time = end_time

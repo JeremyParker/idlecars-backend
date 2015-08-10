@@ -13,9 +13,7 @@ states = {
             "content": "You must upload your documents to rent this car.",
             "color": "rgb(255,51,51)",
         },
-        'step_details': {
-            'step': 2,
-        }
+        'step': 2,
     },
     Booking.COMPLETE: {
         'visible': True,
@@ -25,9 +23,7 @@ states = {
             "content": "Your documents are being reviewed.",
             "color": "rgb(255,128,0)"
         },
-        'step_details': {
-            'step': 3,
-        }
+        'step': 3,
     },
     Booking.REQUESTED: {
         'visible': True,
@@ -37,9 +33,7 @@ states = {
             "content": "You are being added to this car's insurance.",
             "color": "rgb(255,128,0)"
         },
-        'step_details': {
-            'step': 4,
-        }
+        'step': 4,
     },
     Booking.ACCEPTED: {
         'visible': True,
@@ -49,9 +43,7 @@ states = {
             "content": "Please call us if you need assistance. 1-844-435-3227",
             "color": "rgb(255,51,51)"
         },
-        'step_details': {
-            'step': 4,
-        }
+        'step': 4,
     },
     Booking.BOOKED: {
         'visible': True,
@@ -61,9 +53,7 @@ states = {
             "content": "Happy driving!",
             "color": "rgb(0,204,0)"
         },
-        'step_details': {
-            'step': 5,
-        }
+        'step': 5,
     },
     Booking.FLAKE: {
         'visible': True,
@@ -73,9 +63,7 @@ states = {
             "content": "Please upload your driver documents.",
             "color": "rgb(255,51,51)"
         },
-        'step_details': {
-            'step': 2,
-        }
+        'step': 2,
     },
     Booking.TOO_SLOW: {
         'visible': False,
@@ -109,3 +97,8 @@ def visible_states():
 
 def cancelable_states():
     return [s for s in states.keys() if states[s]['cancelable']]
+
+def get_step(state):
+    if 'step' not in states[state]:
+        return None
+    return states[state]['step']

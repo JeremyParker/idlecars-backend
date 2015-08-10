@@ -8,6 +8,7 @@ from idlecars import fields
 from server.models import Car, Booking, Driver, booking_state
 from server.services import booking as booking_service
 from server.serializers import car_serializer
+from . import step_details
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -53,6 +54,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     end_time = fields.DateArrayField()
     step = serializers.SerializerMethodField()
     step_details = serializers.SerializerMethodField()
+    end_time_limit_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -63,9 +65,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'state_details',
             'step',
             'step_details',
-            'end_time',
             'start_time_display',
+            'end_time',
             'first_valid_end_time',
+            'end_time_limit_display',
         )
         read_only_fields = (
             'id',
@@ -75,6 +78,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step_details',
             'start_time_display',
             'first_valid_end_time',
+            'end_time_limit_display',
         )
 
     def update(self, instance, validated_data):
@@ -95,19 +99,20 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def get_state_details (self, obj):
+    def get_state_details(self, obj):
         if not booking_state.states[obj.state]['visible']:
             return None
         deets = booking_state.states[obj.state]['details']
         deets.update({"cancelable": obj.state in booking_state.cancelable_states()})
         return deets
+
     def get_step(self, obj):
-        return None
+        return booking_state.get_step(obj.state)
 
     def get_step_details(self, obj):
         if not booking_state.states[obj.state]['visible']:
             return None
-        return None
+        return step_details.get_step_details(obj)
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
@@ -115,3 +120,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     def get_first_valid_end_time(self, obj):
         first_end = booking_service.first_valid_end_time(obj)
         return fields.format_date_array(first_end)
+
+    def get_end_time_limit_display(self, obj):
+        ''' determine if we should show the min rental period, or the one week notice limit '''
+        if booking_service.min_rental_still_limiting(obj):
+            return '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.car.min_lease])
+        else:
+            return '7 days notice'
