@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from idlecars import fields
 from server.models import Car, Booking, Driver
 from server.services import booking as booking_service
 from server.serializers import car_serializer
@@ -63,6 +64,9 @@ booking_state_details = {
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
     state_details = serializers.SerializerMethodField()
+    start_time_display = serializers.SerializerMethodField()
+    first_valid_end_time = serializers.SerializerMethodField()
+    end_time = fields.DateArrayField()
 
     class Meta:
         model = Booking
@@ -71,11 +75,16 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'car',
             'state',
             'state_details',
+            'end_time',
+            'start_time_display',
+            'first_valid_end_time',
         )
         read_only_fields = (
             'id',
             'car',
             'state_details',
+            'start_time_display',
+            'first_valid_end_time',
         )
 
     def update(self, instance, validated_data):
@@ -83,15 +92,27 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         Right now we only allow the API to update a booking's status to CANCELED. The booking
         must be in a state that can be canceled.
         '''
-        if instance.state not in booking_service.cancelable_states:
-            raise ValidationError('This rental can\'t be canceled at this time.')
+        if 'state' in validated_data:
+            if validated_data['state'] == Booking.CANCELED:
+                if instance.state not in booking_service.cancelable_states:
+                    raise ValidationError('This rental can\'t be canceled at this time.')
+                return booking_service.cancel_booking(instance)
 
-        if 'state' not in validated_data or validated_data['state'] != Booking.CANCELED:
             raise ValidationError('This is not a valid state for a rental.')
 
-        return booking_service.cancel_booking(instance)
+        if 'end_time' in validated_data:
+            return booking_service.set_end_time(instance, validated_data['end_time'])
+
+        return instance
 
     def get_state_details (self, obj):
         deets = booking_state_details[obj.state]
         deets.update({"cancelable": obj.state in booking_service.cancelable_states})
         return deets
+
+    def get_start_time_display(self, obj):
+        return booking_service.start_time_display(obj)
+
+    def get_first_valid_end_time(self, obj):
+        first_end = booking_service.first_valid_end_time(obj)
+        return fields.format_date_array(first_end)
