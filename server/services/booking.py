@@ -8,24 +8,19 @@ from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
-from server.models import Booking
+from server.models import Booking, booking_state
 
 ''' These are the states where the user sees the booking in their bookings page '''
-visible_states = [
-    Booking.PENDING,
-    Booking.COMPLETE,
-    Booking.REQUESTED,
-    Booking.ACCEPTED,
-    Booking.BOOKED,
-    Booking.FLAKE,
-]
+def visible_states():
+    return [s for s in booking_state.states.keys() if booking_state.states[s]['visible']]
 
-cancelable_states = [
-    Booking.PENDING,
-    Booking.COMPLETE,
-    Booking.REQUESTED,
-    Booking.FLAKE,
-]
+def cancelable_states():
+    return [
+        Booking.PENDING,
+        Booking.COMPLETE,
+        Booking.REQUESTED,
+        Booking.FLAKE,
+    ]
 
 def conflicting_bookings(booking):
     return Booking.objects.filter(

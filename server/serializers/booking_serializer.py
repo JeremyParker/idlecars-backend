@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from idlecars import fields
-from server.models import Car, Booking, Driver
+from server.models import Car, Booking, Driver, booking_state
 from server.services import booking as booking_service
 from server.serializers import car_serializer
 
@@ -45,28 +45,14 @@ class BookingSerializer(serializers.ModelSerializer):
         return booking_service.create_booking(car, driver)
 
 
-booking_state_details = {
-    Booking.PENDING: {"status": "Waiting for documents", "content": "You must upload your documents to rent this car.", "color": "rgb(255,51,51)"},
-    Booking.COMPLETE: {"status": "Documents uploaded", "content": "Your documents are being reviewed.", "color": "rgb(255,128,0)"},
-    Booking.REQUESTED: {"status": "Insurance processing", "content": "You are being added to this car's insurance.", "color": "rgb(255,128,0)"},
-    Booking.ACCEPTED: {"status": "Ready for pickup", "content": "Please call us if you need assistance. 1-844-435-3227", "color": "rgb(255,51,51)"},
-    Booking.BOOKED: {"status": "In progress", "content": "Happy driving!", "color": "rgb(0,204,0)"},
-    Booking.FLAKE: {"status": "Waiting for documents", "content": "Please upload your driver documents.", "color": "rgb(255,51,51)"},
-    Booking.TOO_SLOW: {"status": "Booked by another driver", "content": "Sorry, someone else booked this car.", "color": "rgb(0,0,0)"},
-    Booking.OWNER_REJECTED: {"status": "Rejected by insurance", "content": "Sorry, you couldn't be added to the insurance.", "color": "rgb(0,0,0)"},
-    Booking.DRIVER_REJECTED: {"status": "Canceled", "content": "Canceled by the driver.", "color": "rgb(0,0,0)"},
-    Booking.MISSED: {"status": "Booked by another driver", "content": "Sorry, someone else booked this car.", "color": "rgb(0,0,0)"},
-    Booking.TEST_BOOKING: {"status": "Test", "content": "This was marked as a test.", "color": "rgb(0,0,0)"},
-    Booking.CANCELED: {"status": "Canceled", "content": "Canceled by the driver.", "color": "rgb(0,0,0)"},
-}
-
-
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
     state_details = serializers.SerializerMethodField()
     start_time_display = serializers.SerializerMethodField()
     first_valid_end_time = serializers.SerializerMethodField()
     end_time = fields.DateArrayField()
+    step = serializers.SerializerMethodField()
+    step_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -75,6 +61,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'car',
             'state',
             'state_details',
+            'step',
+            'step_details',
             'end_time',
             'start_time_display',
             'first_valid_end_time',
@@ -83,6 +71,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'id',
             'car',
             'state_details',
+            'step',
+            'step_details',
             'start_time_display',
             'first_valid_end_time',
         )
@@ -94,7 +84,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         '''
         if 'state' in validated_data:
             if validated_data['state'] == Booking.CANCELED:
-                if instance.state not in booking_service.cancelable_states:
+                if instance.state not in booking_service.cancelable_states():
                     raise ValidationError('This rental can\'t be canceled at this time.')
                 return booking_service.cancel_booking(instance)
 
@@ -106,9 +96,18 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return instance
 
     def get_state_details (self, obj):
-        deets = booking_state_details[obj.state]
-        deets.update({"cancelable": obj.state in booking_service.cancelable_states})
+        if not booking_state.states[obj.state]['visible']:
+            return None
+        deets = booking_state.states[obj.state]['details']
+        deets.update({"cancelable": obj.state in booking_service.cancelable_states()})
         return deets
+    def get_step(self, obj):
+        return None
+
+    def get_step_details(self, obj):
+        if not booking_state.states[obj.state]['visible']:
+            return None
+        return None
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
