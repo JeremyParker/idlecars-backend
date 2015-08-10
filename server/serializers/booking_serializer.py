@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 from idlecars import fields
 from server.models import Car, Booking, Driver, booking_state
 from server.services import booking as booking_service
+from server.services import car as car_service
 from server.serializers import car_serializer
 from . import step_details
 
@@ -50,11 +51,12 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     car = car_serializer.CarSerializer()
     state_details = serializers.SerializerMethodField()
     start_time_display = serializers.SerializerMethodField()
-    first_valid_end_time = serializers.SerializerMethodField()
+    end_time_display = serializers.SerializerMethodField()
     end_time = fields.DateArrayField()
+    first_valid_end_time = serializers.SerializerMethodField()
+    end_time_limit_display = serializers.SerializerMethodField()
     step = serializers.SerializerMethodField()
     step_details = serializers.SerializerMethodField()
-    end_time_limit_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -66,6 +68,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_details',
             'start_time_display',
+            'end_time_display',
             'end_time',
             'first_valid_end_time',
             'end_time_limit_display',
@@ -77,6 +80,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_details',
             'start_time_display',
+            'end_time_display',
             'first_valid_end_time',
             'end_time_limit_display',
         )
@@ -127,3 +131,21 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             return '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.car.min_lease])
         else:
             return '7 days notice'
+
+    def get_end_time_display(self, booking):
+        def _format_date(date):
+            return date.strftime('%b %d')
+
+        import pdb; pdb.set_trace()
+        min_duration = car_service.get_min_rental_duration(booking.car)
+
+        if booking.end_time:
+            return _format_date(booking.end_time)
+        elif booking.approval_time:
+            time_string = _format_date(booking.approval_time + datetime.timedelta(days=min_duration + 1))
+        elif booking.check_out_time:
+            time_string = _format_date(booking.check_out_time + datetime.timedelta(days=min_duration + 2))
+        else:
+            time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
+
+        return time_string if booking.approval_time else time_string + ' (estimated)'
