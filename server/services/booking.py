@@ -138,7 +138,7 @@ def cancel_booking(booking):
 
 def start_time_display(booking):
     def _format_date(date):
-        return '{}/{}'.format(date.month, date.day)
+        return date.strftime('%b %d')
 
     if booking.pick_up_time:
         time_string = _format_date(booking.pick_up_time)
