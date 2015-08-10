@@ -1,7 +1,11 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.core.urlresolvers import reverse
+from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
@@ -107,7 +111,10 @@ class ListBookingTest(APITestCase):
 
 class UpdateBookingTest(APITestCase):
     def setUp(self):
-        self.booking = factories.Booking.create()
+        self.booking = factories.Booking.create(
+            state=models.Booking.PENDING,
+            end_time=datetime.datetime(2014, 12, 15, 14, tzinfo=timezone.get_current_timezone())
+        )
 
         self.client = APIClient()
         # Include an appropriate `Authorization:` header on all requests.
@@ -133,3 +140,23 @@ class UpdateBookingTest(APITestCase):
         data = { 'state': models.Booking.BOOKED }
         response = self.client.patch(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_cancel_booked_booking(self):
+        # set the booking to "Booked"
+        self.booking.state = models.Booking.BOOKED
+        self.booking.save()
+
+        data = { 'state': models.Booking.CANCELED }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_end_time(self):
+        data = {'end_time': [2015, 0, 1]}  # happy new year
+        response = self.client.patch(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.booking = models.Booking.objects.get(id=self.booking.pk)
+        expected_end = datetime.datetime(2015, 1, 1, tzinfo=timezone.get_current_timezone())
+        self.assertEqual(
+            self.booking.end_time.astimezone(timezone.get_current_timezone()),
+            expected_end
+        )

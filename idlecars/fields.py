@@ -27,6 +27,11 @@ class PhoneNumberField(fields.CharField):
         return value
 
 
+def format_date_array(date):
+        d = date.astimezone(timezone.get_current_timezone())
+        return [d.year, d.month - 1, d.day]
+
+
 class DateArrayField(fields.ListField):
     '''
     Field for a python date object that gets serialized as an array of integers for javascript. The
@@ -37,15 +42,18 @@ class DateArrayField(fields.ListField):
         'invalid': 'Enter a valid date array.',
     }
 
+    def get_value(self, dictionary):
+        return super(DateArrayField, self).get_value(dictionary)
+
     def validate_empty_values(self, data):
+        '''
+        Override this method to interpret [] as a None value.
+        '''
         if [] == data:
             return (True, None)
-        return super(DateArrayField, self).validate_empty_values(self, data)
+        return super(DateArrayField, self).validate_empty_values(data)
 
     def to_internal_value(self, data):
-        if not data:
-            return None
-
         if not isinstance(data, list) or len(data) != 3:
             self.fail('invalid')
 
@@ -61,5 +69,4 @@ class DateArrayField(fields.ListField):
         return data
 
     def to_representation(self, value):
-        d = value.astimezone(timezone.get_current_timezone())
-        return [d.year, d.month - 1, d.day]
+        return format_date_array(value)

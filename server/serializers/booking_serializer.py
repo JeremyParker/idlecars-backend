@@ -115,8 +115,4 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_first_valid_end_time(self, obj):
         first_end = booking_service.first_valid_end_time(obj)
-        return [
-            first_end.year,
-            first_end.month - 1,
-            first_end.day,
-        ]
+        return fields.format_date_array(first_end)
