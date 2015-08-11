@@ -40,7 +40,7 @@ class Owner(models.Model):
 
     def name(self):
         if self.company_name:
-            return self.company_name            
+            return self.company_name
         names = sorted(self.user_account.all(), key=attrgetter('last_name'))
         return ', '.join([u.full_name() for u in names])
 
@@ -54,7 +54,7 @@ class Owner(models.Model):
         else:
             return 'multiple values'
 
-    def number(self):
+    def phone_number(self):
         return self.get_user_account_attr('phone_number')
 
     def email(self):

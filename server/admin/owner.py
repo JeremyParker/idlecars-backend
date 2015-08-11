@@ -50,7 +50,7 @@ class OwnerAdmin(admin.ModelAdmin):
     list_display = [
         'link_name',
         'rating',
-        'number',
+        'phone_number',
         'email',
         'cars_available',
         'total_cars',

@@ -62,7 +62,7 @@ class BookingAdmin(admin.ModelAdmin):
 
     def owner_phone(self, instance):
         if instance.car and instance.car.owner:
-            return instance.car.owner.number()
+            return instance.car.owner.phone_number()
         else:
             return None
     owner_phone.short_description = 'Phone Number'
