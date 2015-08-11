@@ -136,9 +136,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         def _format_date(date):
             return date.strftime('%b %d')
 
-        import pdb; pdb.set_trace()
         min_duration = car_service.get_min_rental_duration(booking.car)
-
         if booking.end_time:
             return _format_date(booking.end_time)
         elif booking.approval_time:
