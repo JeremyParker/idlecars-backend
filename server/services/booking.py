@@ -126,15 +126,13 @@ def start_time_display(booking):
         return date.strftime('%b %d')
 
     if booking.pick_up_time:
-        time_string = _format_date(booking.pick_up_time)
+        return _format_date(booking.pick_up_time)
     elif booking.approval_time:
-        time_string = 'on pickup'
+        return 'on pickup'
     elif booking.check_out_time:
-        time_string = _format_date(booking.check_out_time + datetime.timedelta(days=2))
+        return _format_date(booking.check_out_time + datetime.timedelta(days=2))
     else:
-        time_string = _format_date(timezone.now() + datetime.timedelta(days=2))
-
-    return time_string if booking.approval_time else time_string + ' (estimated)'
+        return _format_date(timezone.now() + datetime.timedelta(days=2))
 
 
 def min_rental_still_limiting(booking):

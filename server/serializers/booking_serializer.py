@@ -11,8 +11,7 @@ from idlecars import fields
 from server.models import Car, Booking, Driver, booking_state
 from server.services import booking as booking_service
 from server.services import car as car_service
-from server.serializers import car_serializer
-from . import step_details
+from server.serializers import car_serializer, step_details
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -51,9 +50,10 @@ class BookingSerializer(serializers.ModelSerializer):
 
 
 class BookingDetailsSerializer(serializers.ModelSerializer):
-    car = car_serializer.CarSerializer()
+    car = serializers.SerializerMethodField()
     state_details = serializers.SerializerMethodField()
     start_time_display = serializers.SerializerMethodField()
+    start_time_estimated = serializers.SerializerMethodField()
     end_time_display = serializers.SerializerMethodField()
     end_time = fields.DateArrayField()
     first_valid_end_time = serializers.SerializerMethodField()
@@ -71,6 +71,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_details',
             'start_time_display',
+            'start_time_estimated',
             'end_time_display',
             'end_time',
             'first_valid_end_time',
@@ -83,6 +84,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_details',
             'start_time_display',
+            'start_time_estimated',
             'end_time_display',
             'first_valid_end_time',
             'end_time_limit_display',
@@ -90,8 +92,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         '''
-        Right now we only allow the API to update a booking's status to CANCELED. The booking
-        must be in a state that can be canceled.
+        We can change the state to canceled, or we can change the end_time.
         '''
         if 'state' in validated_data:
             if validated_data['state'] == Booking.CANCELED:
@@ -105,6 +106,14 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             return booking_service.set_end_time(instance, validated_data['end_time'])
 
         return instance
+
+    def get_car(self, obj):
+        # if the booking is in the ACCEPTED state, use a custom serializer with contact info
+        if obj.state == Booking.ACCEPTED:
+            serializer = car_serializer.CarPickupSerializer
+        else:
+            serializer = car_serializer.CarSerializer
+        return serializer(obj.car).data
 
     def get_state_details(self, obj):
         if not booking_state.states[obj.state]['visible']:
@@ -123,6 +132,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
+
+    def get_start_time_estimated(self, obj):
+        return not obj.approval_time
 
     def get_first_valid_end_time(self, obj):
         first_end = booking_service.first_valid_end_time(obj)
@@ -149,4 +161,4 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         else:
             time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
 
-        return time_string if booking.approval_time else time_string + ' (estimated)'
+        return time_string
