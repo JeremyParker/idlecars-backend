@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
-from server.models import Booking, booking_state
+from server.models import Booking
 from server.services import car as car_service
 
 
