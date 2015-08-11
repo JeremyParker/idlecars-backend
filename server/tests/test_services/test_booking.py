@@ -236,12 +236,12 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.create_booking(self.car, self.driver)
 
         est_time = timezone.now() + datetime.timedelta(days=2)
-        time_string = est_time.strftime('%b %d') + ' (estimated)'
+        time_string = est_time.strftime('%b %d')
         self.assertEqual(booking_service.start_time_display(new_booking), time_string)
 
         # make sure the estimated time is correct after the checkout is copmlete
         new_booking.check_out_time = datetime.datetime(2015, 8, 15, 8, 15, 12, 0, timezone.get_current_timezone())
-        self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 17 (estimated)')
+        self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 17')
 
         # make sure the driver sees the rental starts 'on pickup' once they're approved
         new_booking.approval_time = datetime.datetime(2015, 8, 17, 8, 15, 12, 0, timezone.get_current_timezone())

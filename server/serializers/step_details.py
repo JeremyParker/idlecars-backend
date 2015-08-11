@@ -14,11 +14,11 @@ step_details = {
     },
     4: {
         'step_title': 'Pick up your car',
-        'step_subtitle': "Once you're on the insurance, you can pick up your car",
+        'step_subtitle': "Your insurance has been approved. Pick up your car!",
     },
     5: {
         'step_title': 'Rental in progress',
-        'step_subtitle': 'If you have any trouble with your car, please call idlecars',
+        'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
     }
 }
 
@@ -26,6 +26,6 @@ def get_step_details(booking):
     ret = step_details[booking_state.get_step(booking.state)]
     if booking.state == Booking.REQUESTED:
         ret.update({
-            'step_subtitle': 'You have been added to the insurance. You can now pick up your car',
+            'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
         })
     return ret

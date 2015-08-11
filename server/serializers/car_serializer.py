@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
 from server.services import car as car_service, car_search
+import owner_serializer
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -27,6 +28,22 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = (
+            'id',
+            'name',
+            'listing_features',
+            'booked_features',
+            'headline_features',
+            'certifications',
+            'details',
+            'cost',
+            'cost_time',
+            'cost_bucket',
+            'image_url',
+            'zipcode',
+            'searchable',
+            'compatibility',
+        )
+        read_only_fields = (
             'id',
             'name',
             'listing_features',
@@ -120,3 +137,17 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
+
+
+class CarPickupSerializer(CarSerializer):
+    owner = owner_serializer.OwnerSerializer()
+
+    class Meta(CarSerializer.Meta):
+        fields = CarSerializer.Meta.fields + (
+            'owner',
+            'plate',
+        )
+        read_only_fields = CarSerializer.Meta.read_only_fields + (
+            'owner',
+            'plate',
+        )
