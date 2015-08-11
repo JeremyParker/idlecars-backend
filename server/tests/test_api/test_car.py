@@ -64,6 +64,7 @@ class CarTest(APITestCase):
                         ['TLC Base', car.base]
                     ]
                 ),
+                ('deposit', '${}'.format(car.solo_deposit)),
                 ('cost', '{0:.0f}'.format(int((car.solo_cost) + 6) / 7)),
                 ('cost_time', 'a day'),
                 ('cost_bucket', 'cheap'),

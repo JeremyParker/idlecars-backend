@@ -16,6 +16,7 @@ class CarSerializer(serializers.ModelSerializer):
     headline_features = serializers.SerializerMethodField()
     certifications = serializers.SerializerMethodField()
     details = serializers.SerializerMethodField()
+    deposit = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
     cost_bucket = serializers.SerializerMethodField()
@@ -34,6 +35,7 @@ class CarSerializer(serializers.ModelSerializer):
             'headline_features',
             'certifications',
             'details',
+            'deposit',
             'cost',
             'cost_time',
             'cost_bucket',
@@ -90,6 +92,9 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.hybrid:
             details = [['Hybrid ☑', ''],] + details
         return details
+
+    def get_deposit(self, obj):
+        return '${}'.format(obj.solo_deposit)
 
     def get_cost(self, obj):
         return unicode(obj.normalized_cost())
