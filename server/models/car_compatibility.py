@@ -1,48 +1,37 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from server.models import RideshareFlavor
+
 class CarCompatibility(object):
     def __init__(self, car):
         self.car = car
         self._compatible_flavors = None
 
     def uber_x(self):
-        # TODO: implement proper logic
-        # if self.car.year > 2009:
-        #     return self._compatible_flavor_name('uber_x')
-        return False
+        return self._compatible_flavor_name('uber_x')
 
     def uber_xl(self):
-        return False
-
-    def uber_plus(self):
-        return False
+        return self._compatible_flavor_name('uber_xl')
 
     def uber_black(self):
-        return False
+        return self._compatible_flavor_name('uber_black')
 
     def uber_suv(self):
-        return False
-
-    def uber_lux(self):
-        return False
+        return self._compatible_flavor_name('uber_suv')
 
     def lyft_standard(self):
-        return False
+        if self.car.year >= 2010 and self.car.passenger_count < 6:
+            return RideshareFlavor.objects.get(friendly_id='lyft_standard').name
 
-    def lyft_suv(self):
-        return False
+    def lyft_plus(self):
+        if self.car.year >= 2010 and self.car.passenger_count >= 6
+            return RideshareFlavor.objects.get(friendly_id='lyft_plus').name
 
     def via_standard(self):
-        return False
-
-    def via_suv(self):
-        return False
+        return self._compatible_flavor_name('via_standard')
 
     def gett_standard(self):
-        return False
-
-    def gett_suv(self):
         return False
 
 
