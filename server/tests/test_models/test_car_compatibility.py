@@ -14,16 +14,10 @@ class TestCarCompatibility(TestCase):
         self.uber_x = RideshareFlavorFactory.create(name='uberX', friendly_id='uber_x')
         self.uber_x.compatible_models.add(self.delorean_2)
 
-    # PENDING: implementation of comaptibility logic
+    def test_compatible_model(self):
+        car = Car.create(make_model=self.delorean_2)
+        self.assertEqual(self.uber_x.name, CarCompatibility(car).uber_x())
 
-    # def test_new_car(self):
-    #     car = Car.create(year=2021, make_model=self.delorean_2)
-    #     self.assertTrue(CarCompatibility(car).uber_x())
-
-    # def test_old_car(self):
-    #     car = Car.create(year=1985, make_model=self.delorean_2)
-    #     self.assertFalse(CarCompatibility(car).uber_x())
-
-    # def test_non_compatible_model(self):
-    #     car = Car.create(year=2021, make_model=self.non_compaitble)
-    #     self.assertFalse(CarCompatibility(car).uber_x())
+    def test_non_compatible_model(self):
+        car = Car.create(make_model=self.non_compaitble)
+        self.assertFalse(CarCompatibility(car).uber_x())

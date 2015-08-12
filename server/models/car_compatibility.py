@@ -21,18 +21,19 @@ class CarCompatibility(object):
         return self._compatible_flavor_name('uber_suv')
 
     def lyft_standard(self):
-        if self.car.year >= 2010 and self.car.passenger_count < 6:
+        if self.car.make_model.passenger_count < 6:
             return RideshareFlavor.objects.get(friendly_id='lyft_standard').name
 
     def lyft_plus(self):
-        if self.car.year >= 2010 and self.car.passenger_count >= 6
+        if self.car.make_model.passenger_count >= 6:
             return RideshareFlavor.objects.get(friendly_id='lyft_plus').name
 
     def via_standard(self):
         return self._compatible_flavor_name('via_standard')
 
     def gett_standard(self):
-        return False
+        if self.car.exterior_color in (0,1) and self.car.interior_color in (0,1,2):
+            return RideshareFlavor.objects.get(friendly_id='gett_standard').name
 
 
     def _compatible_flavor_name(self, friendly_id):
