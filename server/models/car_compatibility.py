@@ -22,18 +22,18 @@ class CarCompatibility(object):
 
     def lyft_standard(self):
         if self.car.make_model.passenger_count < 6:
-            return RideshareFlavor.objects.get(friendly_id='lyft_standard').name
+            return self._flavor_name('lyft_standard')
 
     def lyft_plus(self):
         if self.car.make_model.passenger_count >= 6:
-            return RideshareFlavor.objects.get(friendly_id='lyft_plus').name
+            return self._flavor_name('lyft_plus')
 
     def via_standard(self):
         return self._compatible_flavor_name('via_standard')
 
     def gett_standard(self):
         if self.car.exterior_color in (0,1) and self.car.interior_color in (0,1,2):
-            return RideshareFlavor.objects.get(friendly_id='gett_standard').name
+            return self._flavor_name('gett_standard')
 
 
     def _compatible_flavor_name(self, friendly_id):
@@ -45,4 +45,15 @@ class CarCompatibility(object):
     def _get_compatible_flavors(self):
         return {
             flavor.friendly_id: flavor.name for flavor in self.car.make_model.rideshareflavor_set.all()
+        }
+
+    def _flavor_name(self, friendly_id):
+        if not self._compatible_flavors:
+            self._flavor_names = self._get_flavor_names()
+
+        return self._flavor_names.get(friendly_id)
+
+    def _get_flavor_names(self):
+        return {
+            flavor.friendly_id: flavor.name for flavor in RideshareFlavor.objects.all()
         }
