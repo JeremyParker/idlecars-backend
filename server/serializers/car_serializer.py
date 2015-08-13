@@ -114,7 +114,7 @@ class CarSerializer(serializers.ModelSerializer):
         return car_search.search_attrs(obj)
 
     def get_compatibility(self, obj):
-        return CarCompatibilitySerializer(CarCompatibility(obj)).data
+        return CarCompatibility(obj).all()
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():

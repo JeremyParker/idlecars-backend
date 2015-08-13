@@ -76,15 +76,7 @@ class CarTest(APITestCase):
                 ),
                 ('image_url', None),
                 ('zipcode', car.owner.zipcode),
-                ('compatibility', {
-                    'uber_black': None,
-                    'gett_standard': None,
-                    'uber_x': None,
-                    'via_standard': None,
-                    'lyft_plus': None,
-                    'lyft_standard': None,
-                    'uber_suv': None
-                }),
+                ('compatibility', []),
             ]
         )
 
