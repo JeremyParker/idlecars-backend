@@ -16,8 +16,6 @@ class BookingAdmin(admin.ModelAdmin):
                 ('driver_link', 'driver_phone', 'driver_email',),
                 ('car_link', 'car_plate', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
-                ('created_time', 'end_time',),
-                'notes',
             ),
         }),
         ('State History', {
@@ -27,9 +25,15 @@ class BookingAdmin(admin.ModelAdmin):
                 ('requested_time',),
                 ('approval_time',),
                 ('pickup_time',),
+                ('end_time',),
                 ('return_time',),
                 ('incomplete_time', 'incomplete_reason',),
                 ('refund_time',),
+            ),
+        }),
+        ('Notes', {
+            'fields': (
+                'notes',
             ),
         }),
     )
@@ -57,14 +61,15 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_phone',
         'driver_email',
         'created_time',
-        'checkout_time',
-        'requested_time',
-        'approval_time',
-        'pickup_time',
-        'return_time',
-        'incomplete_time',
-        'incomplete_reason',
-        'refund_time',
+        # 'checkout_time',
+        # 'requested_time',
+        # 'approval_time',
+        # 'pickup_time',
+        # 'end_time',
+        # 'return_time',
+        # 'incomplete_time',
+        # 'incomplete_reason',
+        # 'refund_time',
 
     ]
     search_fields = [
