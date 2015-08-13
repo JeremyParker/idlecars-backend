@@ -7,6 +7,20 @@ class CarCompatibility(object):
     def __init__(self, car):
         self.car = car
         self._compatible_flavors = None
+        self._flavor_names = None
+
+    def all(self):
+        services = (
+            self.uber_x,
+            self.uber_xl,
+            self.uber_black,
+            self.uber_suv,
+            self.lyft_standard,
+            self.lyft_plus,
+            self.via_standard,
+            self.gett_standard,
+        )
+        return [method() for method in services if method()]
 
     def uber_x(self):
         return self._compatible_flavor_name('uber_x')
@@ -48,7 +62,7 @@ class CarCompatibility(object):
         }
 
     def _flavor_name(self, friendly_id):
-        if not self._compatible_flavors:
+        if not self._flavor_names:
             self._flavor_names = self._get_flavor_names()
 
         return self._flavor_names.get(friendly_id)

@@ -16,11 +16,11 @@ class TestComaptibleMakeModel(TestCase):
 
     def test_compatible_model(self):
         car = Car.create(make_model=self.delorean_2)
-        self.assertEqual(self.uber_x.name, CarCompatibility(car).uber_x())
+        self.assertEqual([self.uber_x.name], CarCompatibility(car).all())
 
     def test_non_compatible_model(self):
         car = Car.create(make_model=self.non_compaitble)
-        self.assertFalse(CarCompatibility(car).uber_x())
+        self.assertEqual([], CarCompatibility(car).all())
 
 
 class TestLyft(TestCase):
@@ -31,12 +31,12 @@ class TestLyft(TestCase):
     def test_lil_car(self):
         mm = MakeModel.create(passenger_count=2)
         car = Car.create(make_model=mm)
-        self.assertEqual(self.lyft_standard.name, CarCompatibility(car).lyft_standard())
+        self.assertEqual([self.lyft_standard.name], CarCompatibility(car).all())
 
     def test_big_car(self):
         mm = MakeModel.create(passenger_count=22)
         car = Car.create(make_model=mm)
-        self.assertEqual(self.lyft_plus.name, CarCompatibility(car).lyft_plus())
+        self.assertEqual([self.lyft_plus.name], CarCompatibility(car).all())
 
 
 class TestGett(TestCase):
@@ -45,12 +45,12 @@ class TestGett(TestCase):
 
     def test_black_on_black(self):
         car = Car.create(exterior_color=0, interior_color=0)
-        self.assertEqual(self.gett_standard.name, CarCompatibility(car).gett_standard())
+        self.assertEqual([self.gett_standard.name], CarCompatibility(car).all())
 
     def test_black_on_blue(self):
         car = Car.create(exterior_color=0, interior_color=3)
-        self.assertFalse(CarCompatibility(car).gett_standard())
+        self.assertEqual([], CarCompatibility(car).all())
 
     def test_blue_on_black(self):
         car = Car.create(exterior_color=4, interior_color=0)
-        self.assertFalse(CarCompatibility(car).gett_standard())
+        self.assertEqual([], CarCompatibility(car).all())
