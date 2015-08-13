@@ -18,5 +18,4 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^token-auth/', auth_views.obtain_auth_token, name='token-auth'),
     url(r'^phone_numbers/(?P<pk>[0-9 ()+.\-]+)/$', views.PhoneNumberDetailView.as_view(), name='phone_numbers'),
-    # url(r'^bookings/(?P<pk>[0-9]+)/cancelations/$', views.CancelationView.as_view(), name='cancelations'),
 ]

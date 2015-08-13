@@ -92,7 +92,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         '''
-        We can change the state to canceled, or we can change the end_time.
+        We can change the end_time. Changing state is deprecated
         '''
         if 'state' in validated_data:
             if validated_data['state'] == Booking.CANCELED:
