@@ -42,8 +42,24 @@ class BookingViewSet(
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def cancelation(self, request, pk=None):
         booking = self.get_object()
-        if booking.state not in models.booking_state.cancelable_states():
-            raise ValidationError('This rental can\'t be canceled at this time.')
-        serializer = self.get_serializer(booking_service.cancel_booking(booking))
+        if not booking_service.can_cancel(booking):
+            raise ValidationError('Your rental can\'t be canceled at this time.')
+        serializer = self.get_serializer(booking_service.cancel(booking))
+        return Response(serializer.data)
+
+    @detail_route(methods=['post'], permission_classes=[OwnsBooking])
+    def checkout(self, request, pk=None):
+        booking = self.get_object()
+        if not booking_service.can_checkout(booking):
+            raise ValidationError('Your rental can\'t be created at this time.')
+        serializer = self.get_serializer(booking_service.checkout(booking))
+        return Response(serializer.data)
+
+    @detail_route(methods=['post'], permission_classes=[OwnsBooking])
+    def pickup(self, request, pk=None):
+        booking = self.get_object()
+        if not booking_service.can_pickup(booking):
+            raise ValidationError('Your rental can\'t be picked up at this time.')
+        serializer = self.get_serializer(booking_service.pickup(booking))
         return Response(serializer.data)
 

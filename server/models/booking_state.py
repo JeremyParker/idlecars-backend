@@ -4,10 +4,12 @@ from __future__ import unicode_literals
 from . import Booking
 
 
-states = {
+state = {
     Booking.PENDING: {
         'visible': True,
         'cancelable': True,
+        'checkoutable': True,
+        'pickupable': False,
         'details': {
             "status": "Waiting for documents",
             "content": "You must upload your documents to rent this car.",
@@ -15,19 +17,11 @@ states = {
         },
         'step': 2,
     },
-    Booking.COMPLETE: {
-        'visible': True,
-        'cancelable': True,
-        'details': {
-            "status": "Documents uploaded",
-            "content": "Your documents are being reviewed.",
-            "color": "rgb(255,128,0)"
-        },
-        'step': 3,
-    },
     Booking.REQUESTED: {
         'visible': True,
         'cancelable': True,
+        'checkoutable': False,
+        'pickupable': False,
         'details': {
             "status": "Insurance processing",
             "content": "You are being added to this car's insurance.",
@@ -38,6 +32,8 @@ states = {
     Booking.ACCEPTED: {
         'visible': True,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': True,
         'details': {
             "status": "Ready for pickup",
             "content": "Please call us if you need assistance. 1-844-435-3227",
@@ -48,6 +44,8 @@ states = {
     Booking.BOOKED: {
         'visible': True,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
         'details': {
             "status": "In progress",
             "content": "Happy driving!",
@@ -58,6 +56,8 @@ states = {
     Booking.FLAKE: {
         'visible': True,
         'cancelable': True,
+        'checkoutable': False,
+        'pickupable': False,
         'details': {
             "status": "Waiting for documents",
             "content": "Please upload your driver documents.",
@@ -68,37 +68,52 @@ states = {
     Booking.TOO_SLOW: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
     Booking.OWNER_REJECTED: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
     Booking.DRIVER_REJECTED: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
     Booking.MISSED: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
     Booking.TEST_BOOKING: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
     Booking.CANCELED: {
         'visible': False,
         'cancelable': False,
+        'checkoutable': False,
+        'pickupable': False,
     },
 }
 
 
+def states():
+    return [state for (state, string) in Booking.STATE]
+
 def visible_states():
-    return [s for s in states.keys() if states[s]['visible']]
+    return [s for s in states() if state[s]['visible']]
 
 def cancelable_states():
-    return [s for s in states.keys() if states[s]['cancelable']]
+    return [s for s in states() if state[s]['cancelable']]
 
-def get_step(state):
-    if 'step' not in states[state]:
+def get_step(booking_state):
+    if 'step' not in state[booking_state]:
         return None
-    return states[state]['step']
+    return state[booking_state]['step']

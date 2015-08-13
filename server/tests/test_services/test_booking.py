@@ -58,7 +58,7 @@ class BookingServiceTest(TestCase):
         self.assertIsNotNone(new_booking)
         self.assertEqual(new_booking.driver, self.driver)
         self.assertEqual(new_booking.car, self.car)
-        self.assertEqual(new_booking.state, models.Booking.COMPLETE)
+        self.assertEqual(new_booking.state, models.Booking.PENDING)
 
         # we should have sent an email to ops telling them about the new booking
         from django.core.mail import outbox
@@ -162,7 +162,7 @@ class BookingServiceTest(TestCase):
     def test_documents_approved(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = booking_service.create_booking(self.car, self.driver)
-        self.assertEqual(new_booking.state, models.Booking.COMPLETE)
+        self.assertEqual(new_booking.state, models.Booking.PENDING)
 
         new_booking.driver.documentation_approved = True
         new_booking.driver.save()
@@ -208,7 +208,7 @@ class BookingServiceTest(TestCase):
 
     def test_cancel_pending_booking(self):
         new_booking = booking_service.create_booking(self.car, self.driver)
-        booking_service.cancel_booking(new_booking)
+        booking_service.cancel(new_booking)
 
         ''' we should have sent
         - one email to ops when the booking was created,
@@ -221,7 +221,7 @@ class BookingServiceTest(TestCase):
     def test_cancel_requested_booking(self):
         approved_driver = factories.ApprovedDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
-        booking_service.cancel_booking(new_booking)
+        booking_service.cancel(new_booking)
 
         ''' we should have sent
         - message to the owner to send the insurance docs,

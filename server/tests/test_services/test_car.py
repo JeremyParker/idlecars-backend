@@ -26,9 +26,9 @@ class CarTest(TestCase):
         ''' verify that a car is not listed when it has a booking in progress '''
         booking = factories.Booking.create(car=self.car)
         for state in [
-            models.Booking.COMPLETE,
             models.Booking.REQUESTED,
             models.Booking.ACCEPTED,
+            models.Booking.BOOKED,
         ]:
             booking.state = state
             booking.save()
@@ -39,7 +39,6 @@ class CarTest(TestCase):
         models.Booking.objects.all().delete()  # make sure there are no bookings on our car
         for state in [
             models.Booking.PENDING,
-            models.Booking.BOOKED,
             models.Booking.FLAKE,
             models.Booking.TOO_SLOW,
             models.Booking.OWNER_REJECTED,

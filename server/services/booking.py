@@ -8,15 +8,35 @@ from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
-from server.models import Booking
+from server.models import Booking, booking_state
 from server.services import car as car_service
 
 
-def conflicting_bookings(booking):
+def conflicting_pending_bookings(booking):
     return Booking.objects.filter(
         car=booking.car,
-        state__in=[Booking.PENDING, Booking.FLAKE, Booking.COMPLETE],
+        state__in=[Booking.PENDING, Booking.FLAKE],
     )
+
+
+def is_visible(booking):
+    ''' Can this booking be seen in the Driver app '''
+    return booking_state.state[booking.state]['visible']
+
+
+def can_cancel(booking):
+    return booking_state.state[booking.state]['cancelable']
+
+
+def can_checkout(booking):
+    # TODO - check that the car is still available (may have been a race to book)
+    return booking.driver.all_docs_uploaded() and \
+        booking_state.state[booking.state]['checkoutable']
+
+
+def can_pickup(booking):
+    return booking.driver.documentation_approved and \
+        booking_state.state[booking.state]['pickupable']
 
 
 def send_reminders():
@@ -37,22 +57,10 @@ def send_reminders():
         booking.save()
 
 
-def on_documents_uploaded(driver):
-    # note: the driver service sends ops an email to check the docs
-    bookings = Booking.objects.filter(
-        driver=driver,
-        state__in=[Booking.PENDING, Booking.FLAKE]
-    )
-    for booking in bookings:
-        booking.state = Booking.COMPLETE
-        booking.save()
-        return booking
-
-
 def on_documents_approved(driver):
     bookings = Booking.objects.filter(
         driver=driver,
-        state=Booking.COMPLETE,
+        state=Booking.PENDING,
     )
     if not bookings:
         driver_emails.documents_approved_no_booking(driver)
@@ -65,19 +73,23 @@ def on_documents_approved(driver):
 
 def someone_else_booked(booking):
     booking.state = Booking.TOO_SLOW
+    booking.incomplete_time = timezone.now()
+    booking.incomplete_reason = Booking.REASON_ANOTHER_BOOKED
+    booking.save()
     driver_emails.someone_else_booked(booking)
     return booking
 
 
 def request_insurance(booking):
     owner_emails.new_booking_email(booking)
+    # TODO - driver_emails.new_booking_insurance_requested()
     booking.state = Booking.REQUESTED
+    booking.requested_time = timezone.now()
     booking.save()
 
     # cancel other conflicting in-progress bookings and notify those drivers
-    for conflicting_booking in conflicting_bookings(booking):
+    for conflicting_booking in conflicting_pending_bookings(booking):
         conflicting_booking = someone_else_booked(conflicting_booking)
-        conflicting_booking.save()
 
     return booking
 
@@ -89,35 +101,43 @@ def create_booking(car, driver):
     - car: an existing car object
     - driver: the driver making the booking
     '''
-    booking = Booking(
-        car=car,
-        driver=driver,
-    )
-
+    booking = Booking(car=car, driver=driver,)
     if booking.driver.documentation_approved:
-        # TODO - driver_emails.new_booking_insurance_requested()
         return request_insurance(booking)
 
-    if booking.driver.all_docs_uploaded():
-        booking.state = Booking.COMPLETE
-        # TODO - driver_emails.new_booking_complete()
-    else:
-        booking.state = Booking.PENDING
     booking.save()
-
     ops_emails.new_booking_email(booking)
     return booking
 
 
-def cancel_booking(booking):
+def cancel(booking):
     if Booking.REQUESTED == booking.state:
         owner_emails.booking_canceled(booking)
 
     booking.state = Booking.CANCELED
+    booking.incomplete_time = timezone.now()
+    booking.incomplete_reason = Booking.REASON_CANCELED
     booking.save()
 
     ops_emails.booking_canceled(booking)
     driver_emails.booking_canceled(booking)
+    return booking
+
+
+def checkout(booking):
+    # TODO - payment here
+    booking.checkout_time = timezone.now()
+    booking.save()
+    # TODO - send some kind of confirmation message
+    return booking
+
+
+def pickup(booking):
+    # TODO - payment here
+    booking.state = Booking.BOOKED
+    booking.pickup_time = timezone.now()
+    booking.save()
+    # TODO - send some kind of confirmation message
     return booking
 
 

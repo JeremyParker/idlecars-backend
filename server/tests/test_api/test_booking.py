@@ -42,7 +42,7 @@ class CreateBookingTest(APITestCase):
         """ Ensure we can't book if the driver already has an oustanding booking"""
         other_car = factories.Car.create()
         existing_booking = models.Booking.objects.create(car=other_car, driver=self.driver)
-        existing_booking.state = models.Booking.COMPLETE
+        existing_booking.state = models.Booking.PENDING
         existing_booking.save()
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

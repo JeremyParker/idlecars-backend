@@ -98,7 +98,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             if validated_data['state'] == Booking.CANCELED:
                 if instance.state not in booking_state.cancelable_states():
                     raise ValidationError('This rental can\'t be canceled at this time.')
-                return booking_service.cancel_booking(instance)
+                return booking_service.cancel(instance)
 
             raise ValidationError('This is not a valid state for a rental.')
 
@@ -116,9 +116,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return serializer(obj.car).data
 
     def get_state_details(self, obj):
-        if not booking_state.states[obj.state]['visible']:
+        if not booking_state.state[obj.state]['visible']:
             return None
-        deets = booking_state.states[obj.state]['details']
+        deets = booking_state.state[obj.state]['details']
         deets.update({"cancelable": obj.state in booking_state.cancelable_states()})
         return deets
 
@@ -126,7 +126,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return booking_state.get_step(obj.state)
 
     def get_step_details(self, obj):
-        if not booking_state.states[obj.state]['visible']:
+        if not booking_state.state[obj.state]['visible']:
             return None
         return step_details.get_step_details(obj)
 

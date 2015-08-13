@@ -57,6 +57,15 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_phone',
         'driver_email',
         'created_time',
+        'checkout_time',
+        'requested_time',
+        'approval_time',
+        'pickup_time',
+        'return_time',
+        'incomplete_time',
+        'incomplete_reason',
+        'refund_time',
+
     ]
     search_fields = [
         'driver__auth_user__username',
