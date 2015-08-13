@@ -6,9 +6,9 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
+from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from rest_framework.authtoken.models import Token
 
 from server import factories, models, services
 
