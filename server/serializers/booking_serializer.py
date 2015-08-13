@@ -156,8 +156,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             return _format_date(booking.end_time)
         elif booking.approval_time:
             time_string = _format_date(booking.approval_time + datetime.timedelta(days=min_duration + 1))
-        elif booking.check_out_time:
-            time_string = _format_date(booking.check_out_time + datetime.timedelta(days=min_duration + 2))
+        elif booking.checkout_time:
+            time_string = _format_date(booking.checkout_time + datetime.timedelta(days=min_duration + 2))
         else:
             time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
 

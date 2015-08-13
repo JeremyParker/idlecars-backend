@@ -240,7 +240,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(booking_service.start_time_display(new_booking), time_string)
 
         # make sure the estimated time is correct after the checkout is copmlete
-        new_booking.check_out_time = datetime.datetime(2015, 8, 15, 8, 15, 12, 0, timezone.get_current_timezone())
+        new_booking.checkout_time = datetime.datetime(2015, 8, 15, 8, 15, 12, 0, timezone.get_current_timezone())
         self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 17')
 
         # make sure the driver sees the rental starts 'on pickup' once they're approved
@@ -248,5 +248,5 @@ class BookingServiceTest(TestCase):
         self.assertEqual(booking_service.start_time_display(new_booking), 'on pickup')
 
         # make sure the driver sees the rental starts 'on pickup' once they're approved
-        new_booking.pick_up_time = datetime.datetime(2015, 8, 18, 8, 15, 12, 0, timezone.get_current_timezone())
+        new_booking.pickup_time = datetime.datetime(2015, 8, 18, 8, 15, 12, 0, timezone.get_current_timezone())
         self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 18')
