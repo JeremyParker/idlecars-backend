@@ -20,6 +20,18 @@ class BookingAdmin(admin.ModelAdmin):
                 'notes',
             ),
         }),
+        ('State History', {
+            'fields': (
+                ('created_time',),
+                ('checkout_time',),
+                ('requested_time',),
+                ('approval_time',),
+                ('pickup_time',),
+                ('return_time',),
+                ('incomplete_time', 'incomplete_reason',),
+                ('refund_time',),
+            ),
+        }),
     )
     list_display = [
         'state',

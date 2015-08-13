@@ -11,14 +11,35 @@ class Booking(models.Model):
     user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
     driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
-    created_time = models.DateTimeField(auto_now_add=True)
 
-    check_out_time = models.DateTimeField(null=True)
-    approval_time = models.DateTimeField(null=True)
-    pick_up_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)  # end time set by the user
 
-    end_time = models.DateTimeField(null=True)
-    return_time = models.DateTimeField(null=True)
+    #state transition times
+    created_time = models.DateTimeField(auto_now_add=True)  # PENDING
+    checkout_time = models.DateTimeField(null=True)         # still PENDING
+    requested_time = models.DateTimeField(null=True)        # REQUESTED
+    approval_time = models.DateTimeField(null=True)         # ACCEPTED
+    pickup_time = models.DateTimeField(null=True)           # BOOKED
+    return_time = models.DateTimeField(null=True)           # (new state)
+    incomplete_time = models.DateTimeField(null=True)       # CANCELED
+    refund_time = models.DateTimeField(null=True)           # (new state)
+
+    REASON_TOO_SLOW = 1
+    REASON_OWNER_REJECTED = 2
+    REASON_DRIVER_REJECTED = 3
+    REASON_MISSED = 4
+    REASON_TEST_BOOKING = 5
+    REASON_CANCELED = 6
+    REASON = (
+        (REASON_TOO_SLOW, 'Too Slow - somebody else booked your car'),
+        (REASON_OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
+        (REASON_DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
+        (REASON_MISSED, 'Missed - car rented out before we found a driver'),
+        (REASON_TEST_BOOKING, 'Test - a booking that one of us created as a test'),
+        (REASON_CANCELED, 'Canceled - driver canceled the booking thru the app'),
+    )
+    incomplete_reason = models.IntegerField(choices=REASON, null=True)
+
 
     PENDING = 1
     COMPLETE = 2
