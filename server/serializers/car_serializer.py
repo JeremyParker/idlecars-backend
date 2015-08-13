@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
+from server.serializers import CarCompatibilitySerializer
 from server.services import car as car_service, car_search
 
 
@@ -113,8 +114,7 @@ class CarSerializer(serializers.ModelSerializer):
         return car_search.search_attrs(obj)
 
     def get_compatibility(self, obj):
-        # TODO: use CarCompatibility model if more complicated logic is needed
-        return CarCompatibility(obj)._get_compatible_flavors()
+        return CarCompatibility(obj).all()
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
