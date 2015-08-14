@@ -60,7 +60,7 @@ def send_reminders():
 def on_documents_approved(driver):
     bookings = Booking.objects.filter(
         driver=driver,
-        state=Booking.PENDING,
+        state__in=[Booking.PENDING, Booking.FLAKE]
     )
     if not bookings:
         driver_emails.documents_approved_no_booking(driver)

@@ -160,3 +160,19 @@ class UpdateBookingTest(APITestCase):
             self.booking.end_time.astimezone(timezone.get_current_timezone()),
             expected_end
         )
+
+
+class BookingStepTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.driver = factories.Driver.create()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_created_new_driver(self):
+        booking = factories.Booking.create(driver=self.driver)
+        url = reverse('server:bookings-detail', args=(booking.pk,))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.data['step'], 2)
+

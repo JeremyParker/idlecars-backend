@@ -11,7 +11,7 @@ from idlecars import fields
 from server.models import Car, Booking, Driver, booking_state
 from server.services import booking as booking_service
 from server.services import car as car_service
-from server.serializers import car_serializer, step_details
+from server.serializers import car_serializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -123,12 +123,44 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return deets
 
     def get_step(self, obj):
-        return booking_state.get_step(obj.state)
+        if obj.state == Booking.PENDING or obj.state == Booking.FLAKE:
+            if obj.driver.all_docs_uploaded():
+                return 3
+            else:
+                return 2
+        elif obj.state == Booking.REQUESTED or obj.state == Booking.ACCEPTED:
+            return 4
+        elif obj.state == Booking.BOOKED:
+            return 5
+        return None
 
     def get_step_details(self, obj):
         if not booking_state.state[obj.state]['visible']:
             return None
-        return step_details.get_step_details(obj)
+        step_details = {
+            2: {
+                'step_title': 'Create your account',
+                'step_subtitle': 'You must upload your documents to rent this car',
+            },
+            3: {
+                'step_title': 'Reserve your car',
+                'step_subtitle': 'Put down the deposit to reserve your car',
+            },
+            4: {
+                'step_title': 'Pick up your car',
+                'step_subtitle': "Your insurance has been approved. Pick up your car!",
+            },
+            5: {
+                'step_title': 'Rental in progress',
+                'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
+            }
+        }
+        ret = step_details[self.get_step(obj)]
+        if obj.state == Booking.REQUESTED:
+            ret.update({
+                'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
+            })
+        return ret
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
