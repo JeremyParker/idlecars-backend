@@ -163,16 +163,108 @@ class UpdateBookingTest(APITestCase):
 
 
 class BookingStepTest(APITestCase):
-    def setUp(self):
-        self.client = APIClient()
+    '''
+    Test that the booking shows the correct steps at the correct times as it
+    transitions through all states
+    '''
+    def test_new_driver_starts(self):
         self.driver = factories.Driver.create()
-        # Include an appropriate `Authorization:` header on all requests.
         token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.booking = factories.Booking.create(driver=self.driver)
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+        self._pending_no_docs()
 
-    def test_created_new_driver(self):
-        booking = factories.Booking.create(driver=self.driver)
-        url = reverse('server:bookings-detail', args=(booking.pk,))
-        response = self.client.get(url, format='json')
+    def test_complete_driver_starts(self):
+        self.driver = factories.CompletedDriver.create()
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.booking = factories.Booking.create(driver=self.driver)
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+        self._pending_with_docs()
+
+    def test_approved_driver_starts(self):
+        self.driver = factories.ApprovedDriver.create()
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.booking = factories.Booking.create(driver=self.driver)
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+        self._pending_with_docs()
+
+
+    def _pending_no_docs(self):
+        response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['step'], 2)
+        self.assertTrue(response.data['start_time_estimated'])
 
+        # driver uploads their documents
+        self.driver.driver_license_image = 'some image'
+        self.driver.fhv_license_image = 'some image'
+        self.driver.address_proof_image = 'some image'
+        self.driver.defensive_cert_image = 'some image'
+        self.driver.save()
+
+        self._pending_with_docs()
+
+    def _pending_with_docs(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['step'], 3)
+        self.assertTrue(response.data['start_time_estimated'])
+
+        checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
+        checkout_response = self.client.post(checkout_url, data={})
+        self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+
+        self._checked_out_docs_unapproved()
+
+    def _pending_docs_approved(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['step'], 3)
+        self.assertTrue(response.data['start_time_estimated'])
+
+        checkout_url = reverse('server:bookings-cancelation')
+        checkout_response = self.client.post(checkout_url, args=(self.booking.pk,))
+        self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+        self._checked_out_docs_approved()
+
+    def _checked_out_docs_unapproved(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.data['step'], 4)
+        self.assertTrue(response.data['start_time_estimated'])
+
+        # next, the docs get approved...
+        self.driver.documentation_approved = True
+        self.driver.save()
+        self._checked_out_docs_approved()
+
+    def _checked_out_docs_approved(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.data['step'], 4)
+        self.assertTrue(response.data['start_time_estimated'])
+
+        # next, the insurance gets accepted
+        self.booking.state = models.Booking.ACCEPTED
+        self.booking.approval_time = timezone.now()
+        self.booking.save()
+        self._accepted_booking()
+
+    def _accepted_booking(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.data['step'], 4)
+        self.assertFalse(response.data['start_time_estimated'])
+
+        # next the driver picks up the car
+        pickup_url = reverse('server:bookings-pickup', args=(self.booking.pk,))
+        pickup_response = self.client.post(pickup_url, data={})
+        self.assertEqual(pickup_response.status_code, status.HTTP_200_OK)
+        self._in_progress_booking()
+
+    def _in_progress_booking(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.data['step'], 5)
+        self.assertFalse(response.data['start_time_estimated'])

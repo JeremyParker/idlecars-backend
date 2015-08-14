@@ -128,7 +128,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_step(self, obj):
         if obj.state == Booking.PENDING or obj.state == Booking.FLAKE:
-            if obj.driver.all_docs_uploaded():
+            if obj.checkout_time:
+                return 4
+            elif obj.driver.all_docs_uploaded():
                 return 3
             else:
                 return 2
@@ -162,8 +164,11 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
                 'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
             }
         }
-        ret = step_details[self.get_step(obj)]
-        if obj.state == Booking.REQUESTED:
+        step = self.get_step(obj)
+        ret = step_details[step]
+
+        # differentiate between step 4 requested, and step 4 ready for pickup
+        if 4 == step and obj.state and not obj.state == Booking.ACCEPTED:
             ret.update({
                 'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
             })
