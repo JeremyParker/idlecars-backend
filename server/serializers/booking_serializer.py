@@ -59,6 +59,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     first_valid_end_time = serializers.SerializerMethodField()
     end_time_limit_display = serializers.SerializerMethodField()
     step = serializers.SerializerMethodField()
+    step_display_count = serializers.SerializerMethodField()
+
     step_details = serializers.SerializerMethodField()
 
     class Meta:
@@ -69,6 +71,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'state',
             'state_details',
             'step',
+            'step_display_count',
             'step_details',
             'start_time_display',
             'start_time_estimated',
@@ -82,6 +85,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'car',
             'state_details',
             'step',
+            'step_display_count',
             'step_details',
             'start_time_display',
             'start_time_estimated',
@@ -133,6 +137,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         elif obj.state == Booking.BOOKED:
             return 5
         return None
+
+    def get_step_display_count(self, obj):
+        return 4
 
     def get_step_details(self, obj):
         if not booking_state.state[obj.state]['visible']:
