@@ -42,6 +42,7 @@ class Booking(models.Model):
 
 
     PENDING = 1
+    COMPLETE = 2
     REQUESTED = 3
     ACCEPTED = 4
     BOOKED = 5
@@ -55,6 +56,7 @@ class Booking(models.Model):
 
     STATE = (
         (PENDING, 'Pending - waiting for driver docs'),
+        (COMPLETE, 'Deprecated'),
         (REQUESTED, 'Requested - waiting for owner/insurance'),
         (ACCEPTED, 'Accepted - waiting for deposit, ssn, contract'),
         (BOOKED, 'Booked - car marked busy with new available_time'),
