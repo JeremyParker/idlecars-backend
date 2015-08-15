@@ -84,6 +84,8 @@ class ListBookingTest(APITestCase):
 
     def test_canceled_booking_excluded(self):
         self.booking.state = models.Booking.CANCELED
+        self.booking.incomplete_time = timezone.now()
+        self.booking.incomplete_reason = models.Booking.REASON_CANCELED
         self.booking.save()
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

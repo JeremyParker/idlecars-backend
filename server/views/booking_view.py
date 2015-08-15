@@ -36,7 +36,8 @@ class BookingViewSet(
     def get_queryset(self):
         return models.Booking.objects.filter(
             driver=models.Driver.objects.get(auth_user=self.request.user),
-            state__in=models.booking_state.visible_states()
+            return_time__isnull=True,
+            incomplete_time__isnull=True,
         )
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
