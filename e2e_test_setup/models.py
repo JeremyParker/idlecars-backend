@@ -21,6 +21,7 @@ class E2ETestSetup():
         self._truncate_tables()
         self._setup_cars()
         self._setup_renewals()
+        self._setup_user()
         self._setup_drivers()
         self._setup_booking()
 
@@ -60,14 +61,26 @@ class E2ETestSetup():
         '''
             Create a booking
         '''
-        server.factories.Booking.create(car=self.delorean, driver=self.driver)
+        server.factories.Booking.create(car=self.delorean, driver=self.driver_incomplete)
+
+    def _setup_user(self):
+        '''
+            Create 3 users(1 staff user)
+        '''
+        self.user_incomplete = server.factories.AuthUser.create(username='1234567891', email='tom@test.com', first_name='Tom', last_name='Cat')
+        self.user_approved = server.factories.AuthUser.create(username='1234567892', email='jerry@test.com', first_name='Jerry', last_name='Mouse')
+        server.factories.StaffUser.create(username='idlecars')
 
     def _setup_drivers(self):
         '''
-            Create 1 driver
+            Create 2 drivers
         '''
         driver_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-7b33baf8-4aee-4e75-b7e1-0f591017251c-image.jpg"
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
 
-        self.user = server.factories.AuthUser.create(username='1234567891', email='user@test.com', first_name='Tom', last_name='Cat')
-        self.driver = server.factories.Driver.create(auth_user=self.user, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
+        self.driver_incomplete = server.factories.Driver.create(auth_user=self.user_incomplete, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
+        server.factories.ApprovedDriver.create(auth_user=self.user_approved)
+
+
+
+
