@@ -46,7 +46,10 @@ class E2ETestSetup():
         self.delorean = server.factories.BookableCar.create(make_model=dmc, year=1985)
 
         luxy = server.factories.MakeModel.create(make='Venus', model='Xtravaganza', lux_level=1)
-        server.factories.BookableCar.create(make_model=luxy)
+        self.luxy = server.factories.BookableCar.create(make_model=luxy)
+
+        benz = server.factories.MakeModel.create(make='Benz', model='C350', lux_level=1)
+        self.benz = server.factories.BookableCar.create(make_model=benz)
 
         for i in xrange(2):
             server.factories.BookableCar.create()
@@ -59,16 +62,18 @@ class E2ETestSetup():
 
     def _setup_booking(self):
         '''
-            Create a booking
+            Create 2 bookings
         '''
-        server.factories.Booking.create(car=self.delorean, driver=self.driver_with_booking)
+        server.factories.Booking.create(car=self.delorean, driver=self.driver_step_2)
+        server.factories.Booking.create(car=self.benz, driver=self.driver_step_4, state=4)
 
     def _setup_user(self):
         '''
-            Create 3 users(1 staff user)
+            Create 4 users(1 staff user)
         '''
-        self.user_with_booking = server.factories.AuthUser.create(username='1234567891', email='tom@test.com', first_name='Tom', last_name='Cat')
-        self.user_without_booking = server.factories.AuthUser.create(username='1234567892', email='jerry@test.com', first_name='Jerry', last_name='Mouse')
+        self.user_step_1 = server.factories.AuthUser.create(username='1234567891', email='jerry@test.com', first_name='Jerry', last_name='Mouse')
+        self.user_step_2 = server.factories.AuthUser.create(username='1234567892', email='tom@test.com', first_name='Tom', last_name='Cat')
+        self.user_step_4 = server.factories.AuthUser.create(username='1234567894', email='kerry@test.com', first_name='Kerry', last_name='Goose')
         server.factories.StaffUser.create(username='idlecars')
 
     def _setup_drivers(self):
@@ -79,5 +84,6 @@ class E2ETestSetup():
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
         defensive_cert_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-e7cb3e75-f140-48ae-a16b-4550e249e62d-1439735074143-478457530.jpg"
 
-        self.driver_with_booking = server.factories.Driver.create(auth_user=self.user_with_booking)
-        server.factories.Driver.create(auth_user=self.user_without_booking, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
+        server.factories.Driver.create(auth_user=self.user_step_1, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
+        self.driver_step_2 = server.factories.Driver.create(auth_user=self.user_step_2)
+        self.driver_step_4 = server.factories.ApprovedDriver.create(auth_user=self.user_step_4, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
