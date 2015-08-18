@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import connection
 from django.conf import settings
 from django.contrib import auth
+from rest_framework.authtoken.models import Token
 
 from server import models
 import server.factories
@@ -24,6 +25,7 @@ class E2ETestSetup():
         self._setup_user()
         self._setup_drivers()
         self._setup_booking()
+        self._reset_token()
 
     def _truncate_tables(self):
         tables = (
@@ -37,6 +39,11 @@ class E2ETestSetup():
         )
         table_list = ','.join(tables)
         self.cursor.execute('TRUNCATE TABLE {} RESTART IDENTITY CASCADE;'.format(table_list))
+
+    def _reset_token(self):
+        Token.objects.filter(user=self.user_insurance_approved).update(key='insurance_approved')
+        Token.objects.filter(user=self.user_without_booking).update(key='without_booking')
+        Token.objects.filter(user=self.user_without_docs).update(key='without_docs')
 
     def _setup_cars(self):
         '''
