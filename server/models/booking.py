@@ -16,13 +16,13 @@ class Booking(models.Model):
 
     #state transition times
     created_time = models.DateTimeField(auto_now_add=True)              # PENDING
-    checkout_time = models.DateTimeField(null=True, blank=True)         # still PENDING
+    checkout_time = models.DateTimeField(null=True, blank=True)         # RESERVED
     requested_time = models.DateTimeField(null=True, blank=True)        # REQUESTED
     approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED
     pickup_time = models.DateTimeField(null=True, blank=True)           # BOOKED
-    return_time = models.DateTimeField(null=True, blank=True)           # (new state)
-    refund_time = models.DateTimeField(null=True, blank=True)           # (new state)
-    incomplete_time = models.DateTimeField(null=True, blank=True)       # CANCELED
+    return_time = models.DateTimeField(null=True, blank=True)           # RETURNED
+    refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
+    incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
 
     REASON_ANOTHER_BOOKED = 1
     REASON_OWNER_REJECTED = 2
@@ -40,7 +40,7 @@ class Booking(models.Model):
     )
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 
-
+    STATE_FROM_EVENT_TIMES = 0
     PENDING = 1
     COMPLETE = 2
     REQUESTED = 3
@@ -53,8 +53,13 @@ class Booking(models.Model):
     MISSED = 10
     TEST_BOOKING = 11
     CANCELED = 12
+    RESERVED = 13    # deposit paid, but not requested on insurance yet (waiting for doc review)
+    RETURNED = 14    # returned to owner, but not refunded the deposit yet
+    REFUNDED = 15    # returned and refunded
+    INCOMPLETE = 16  # canceled or someone else booked, ...etc. and refunded if necessary
 
-    STATE = (
+    OLD_STATES = (
+        (STATE_FROM_EVENT_TIMES, 'State comes from event times, not from this field.'),
         (PENDING, 'Pending - waiting for driver docs'),
         (COMPLETE, 'Deprecated'),
         (REQUESTED, 'Requested - waiting for owner/insurance'),
@@ -68,5 +73,34 @@ class Booking(models.Model):
         (TEST_BOOKING, 'Test - a booking that one of us created as a test'),
         (CANCELED, 'Canceled - driver canceled the booking thru the app'),
     )
-    state = models.IntegerField(choices=STATE, default=PENDING)
+    state = models.IntegerField(choices=OLD_STATES, default=STATE_FROM_EVENT_TIMES)
     notes = models.TextField(blank=True)
+
+    STATES = {
+        PENDING: 'Pending - booking has been created but not reserved yet',
+        RESERVED: 'Reserved - deposit paid, not requested (waiting for doc review)',
+        REQUESTED: 'Requested - waiting for owner/insurance',
+        ACCEPTED: 'Accepted - waiting for deposit, ssn, contract',
+        BOOKED: 'Booked - car marked busy with new available_time',
+        RETURNED: 'Returned - driver returned the car but hasn\'t got deposit back',
+        REFUNDED: 'Refunded - car was returned and driver got their deposit back',
+        INCOMPLETE: 'Incomplete - this rental didn\'t happen for some reason (see reason field)',
+    }
+
+    def get_state(self):
+        if self.incomplete_time:
+            return Booking.INCOMPLETE
+        elif self.refund_time:
+            return Booking.REFUNDED
+        elif self.return_time:
+            return Booking.RETURNED
+        elif self.pickup_time:
+            return Booking.BOOKED
+        elif self.approval_time:
+            return Booking.ACCEPTED
+        elif self.requested_time:
+            return Booking.REQUESTED
+        elif self.checkout_time:
+            return Booking.RESERVED
+        else:
+            return Booking.PENDING

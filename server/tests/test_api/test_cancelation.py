@@ -26,7 +26,8 @@ class CancelBookingTest(APITestCase):
         response = self.client.post(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.booking = Booking.objects.get(pk=self.booking.pk)
-        self.assertEqual(self.booking.state, Booking.CANCELED)
+        self.assertEqual(self.booking.get_state(), Booking.INCOMPLETE)
+        self.assertEqual(self.booking.incomplete_reason, Booking.REASON_CANCELED)
 
     def test_not_cancel_anothers_booking(self):
         another_booking = factories.Booking.create()
@@ -37,12 +38,11 @@ class CancelBookingTest(APITestCase):
 
     def test_cannot_cancel_booked_booking(self):
         # set the booking to "Booked"
-        self.booking.state = Booking.BOOKED
-        self.booking.save()
+        self.booking = factories.BookedBooking.create(driver=self.driver)
         url = reverse('server:bookings-cancelation', args=(self.booking.pk,))
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # make sure the stored booking state is the same as original booking state
         stored_booking = Booking.objects.get(pk=self.booking.pk)
-        self.assertEqual(stored_booking.state, self.booking.state)
+        self.assertEqual(stored_booking.get_state(), self.booking.get_state())

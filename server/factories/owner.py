@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 import random
 import datetime
 
-from factory import LazyAttribute
+from factory import LazyAttribute, RelatedFactory
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
-
+from . import UserAccount as UserAccountFactory
 
 class Owner(Factory):
     class Meta:
@@ -20,3 +20,5 @@ class Owner(Factory):
     state_code = LazyAttribute(lambda o: faker.state_abbr())
     zipcode = LazyAttribute(lambda o: faker.zipcode())
     rating = random.choice(owner_model.RATING)[0]
+
+    user_account = RelatedFactory(UserAccountFactory, 'owner')

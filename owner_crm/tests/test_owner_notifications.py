@@ -23,7 +23,6 @@ class TestOwnerNotifications(TestCase):
             last_status_update=update_time,
             owner=owner,
         )
-        server.factories.UserAccount.create(owner=owner)
         return car
 
     def _update_time_about_to_go_stale(self):

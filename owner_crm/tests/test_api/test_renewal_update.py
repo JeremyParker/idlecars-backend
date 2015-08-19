@@ -34,4 +34,4 @@ class RenewalUpdateTest(APITestCase):
         self.assertEqual(renewal.state, models.ConsumableToken.STATE_CONSUMED)
 
     def _listed_cars_count(self):
-        return server.services.car.listing_queryset.all().count()
+        return server.services.car.get_listing_queryset().count()

@@ -38,15 +38,33 @@ class CreateBookingTest(APITestCase):
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_create_booking_fail_when_driver_busy(self):
-        """ Ensure we can't book if the driver already has an oustanding booking"""
+    def test_fail_when_driver_has_pending_booking(self):
+        """ Ensure we can't book if the driver already has an oustanding PENDING booking"""
         other_car = factories.Car.create()
-        existing_booking = models.Booking.objects.create(car=other_car, driver=self.driver)
-        existing_booking.state = models.Booking.PENDING
-        existing_booking.save()
+        existing_booking = factories.Booking.create(car=other_car, driver=self.driver)
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['_app_notifications'], ['You have a conflicting rental.'])
+
+    def test_fail_when_driver_has_booked_booking(self):
+        other_car = factories.Car.create()
+        existing_booking = factories.BookedBooking.create(car=other_car, driver=self.driver)
+        response = self.client.post(self.url, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['_app_notifications'], ['You have a conflicting rental.'])
+
+    def test_success_when_driver_has_canceled_booking(self):
+        other_car = factories.Car.create()
+        existing_booking = factories.IncompleteBooking.create(
+            car=other_car,
+            driver=self.driver,
+            requested_time=timezone.now(),
+            checkout_time=timezone.now(),
+        )
+        response = self.client.post(self.url, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['car'], self.car.pk)
+        self.assertEqual(response.data['driver'], self.driver.pk)
 
 
 class ListBookingTest(APITestCase):
@@ -83,32 +101,12 @@ class ListBookingTest(APITestCase):
         self.assertTrue(self.booking.car.pk in ids)
 
     def test_canceled_booking_excluded(self):
-        self.booking.state = models.Booking.CANCELED
         self.booking.incomplete_time = timezone.now()
         self.booking.incomplete_reason = models.Booking.REASON_CANCELED
         self.booking.save()
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
-
-    def test_cancelable_bookings(self):
-        for state in models.booking_state.cancelable_states():
-            self.booking.state = state
-            self.booking.save()
-            response = self.client.get(self.url, format='json')
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertTrue(response.data[0]['state_details']['cancelable'])
-
-        visible = models.booking_state.visible_states()
-        cancelable = models.booking_state.cancelable_states()
-        un_cancelable = [s for s in visible if s not in cancelable]
-
-        for state in un_cancelable:
-            self.booking.state = state
-            self.booking.save()
-            response = self.client.get(self.url, format='json')
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertFalse(response.data[0]['state_details']['cancelable'])
 
 
 class UpdateBookingTest(APITestCase):
@@ -123,34 +121,6 @@ class UpdateBookingTest(APITestCase):
         token = Token.objects.get(user__username=self.booking.driver.auth_user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-
-    def test_cancel_booking_success(self):
-        data = { 'state': models.Booking.CANCELED }
-        response = self.client.patch(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.booking = models.Booking.objects.get(id=self.booking.pk)
-        self.assertEqual(self.booking.state, models.Booking.CANCELED)
-
-    def test_not_cancel_anothers_booking(self):
-        another_booking = factories.Booking.create()
-        data = { 'state': models.Booking.CANCELED }
-        url = reverse('server:bookings-detail', args=(another_booking.pk,))
-        response = self.client.patch(url, data)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_cannot_set_booking_to_non_cancel(self):
-        data = { 'state': models.Booking.BOOKED }
-        response = self.client.patch(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_cannot_cancel_booked_booking(self):
-        # set the booking to "Booked"
-        self.booking.state = models.Booking.BOOKED
-        self.booking.save()
-
-        data = { 'state': models.Booking.CANCELED }
-        response = self.client.patch(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_set_end_time(self):
         data = {'end_time': [2015, 0, 1]}  # happy new year
@@ -250,7 +220,6 @@ class BookingStepTest(APITestCase):
         self.assertTrue(response.data['start_time_estimated'])
 
         # next, the insurance gets accepted
-        self.booking.state = models.Booking.ACCEPTED
         self.booking.approval_time = timezone.now()
         self.booking.save()
         self._accepted_booking()
@@ -270,3 +239,13 @@ class BookingStepTest(APITestCase):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['step'], 5)
         self.assertFalse(response.data['start_time_estimated'])
+
+
+class CheckoutBookingTest(APITestCase):
+    # TODO
+    pass
+
+
+class PickupBookingTest(APITestCase):
+    # TODO
+    pass

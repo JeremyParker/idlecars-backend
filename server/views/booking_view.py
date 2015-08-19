@@ -34,11 +34,9 @@ class BookingViewSet(
         serializer.save(driver=driver)
 
     def get_queryset(self):
-        return models.Booking.objects.filter(
+        return booking_service.filter_visible(models.Booking.objects.filter(
             driver=models.Driver.objects.get(auth_user=self.request.user),
-            return_time__isnull=True,
-            incomplete_time__isnull=True,
-        )
+        ))
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def cancelation(self, request, pk=None):
