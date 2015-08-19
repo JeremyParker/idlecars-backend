@@ -44,6 +44,7 @@ class E2ETestSetup():
         Token.objects.filter(user=self.user_insurance_approved).update(key='insurance_approved')
         Token.objects.filter(user=self.user_without_booking).update(key='without_booking')
         Token.objects.filter(user=self.user_without_docs).update(key='without_docs')
+        Token.objects.filter(user=self.user_without_docs_approved).update(key='without_docs_approved')
 
     def _setup_cars(self):
         '''
@@ -69,23 +70,25 @@ class E2ETestSetup():
 
     def _setup_booking(self):
         '''
-            Create 2 bookings
+            Create 3 bookings
         '''
         server.factories.Booking.create(car=self.delorean, driver=self.driver_without_docs)
         server.factories.Booking.create(car=self.benz, driver=self.driver_insurance_approved, state=4)
+        server.factories.Booking.create(car=self.benz, driver=self.driver_without_docs_approved)
 
     def _setup_user(self):
         '''
-            Create 4 users(1 staff user)
+            Create 5 users(1 staff user)
         '''
         self.user_without_booking = server.factories.AuthUser.create(username='1234567891', email='jerry@test.com', first_name='Jerry', last_name='Mouse')
         self.user_without_docs = server.factories.AuthUser.create(username='1234567892', email='tom@test.com', first_name='Tom', last_name='Cat')
+        self.user_without_docs_approved = server.factories.AuthUser.create(username='1234567893', email='donald@test.com', first_name='donald', last_name='Duck')
         self.user_insurance_approved = server.factories.AuthUser.create(username='1234567894', email='kerry@test.com', first_name='Kerry', last_name='Goose')
         server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
     def _setup_drivers(self):
         '''
-            Create 3 drivers
+            Create 4 drivers
         '''
         driver_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-7b33baf8-4aee-4e75-b7e1-0f591017251c-image.jpg"
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
@@ -93,4 +96,5 @@ class E2ETestSetup():
 
         server.factories.Driver.create(auth_user=self.user_without_booking, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
         self.driver_without_docs = server.factories.Driver.create(auth_user=self.user_without_docs)
+        self.driver_without_docs_approved = server.factories.Driver.create(auth_user=self.user_without_docs_approved, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
         self.driver_insurance_approved = server.factories.ApprovedDriver.create(auth_user=self.user_insurance_approved, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
