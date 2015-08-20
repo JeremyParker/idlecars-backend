@@ -192,3 +192,10 @@ CORS_ALLOW_HEADERS = (
 
 # Heap Analytics uses the DEBUG app id in development/testing
 HEAP_APP_ID = '655181858'
+
+BRAINTREE = {
+    "environment": "Sandbox",
+    "merchant_id": "fckq6988gccrfnty",
+    "public_key": "hxbd5tx9836svxy7",
+    "private_key": "005ff099d74dfc1a098f77f176c175a8",
+}
