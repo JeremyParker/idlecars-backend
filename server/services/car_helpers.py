@@ -6,18 +6,19 @@ import datetime
 from django.utils import timezone
 from django.db.models import Q
 
-from server import models
+from server.models import Booking, Car
 
 
 next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
 staleness_threshold = timezone.now() - datetime.timedelta(days=4)
 
-q_booking_in_progress = Q(booking__state__in=[
-    models.Booking.COMPLETE,
-    models.Booking.REQUESTED,
-    models.Booking.ACCEPTED,
-])
-
+# TODO - this belongs in booking_service
+def _filter_booking_in_progress(booking_queryset):
+    return booking_queryset.filter(
+        checkout_time__isnull=False,
+        return_time__isnull=True,
+        incomplete_time__isnull=True,
+)
 
 def _filter_data_complete(queryset):
     '''
@@ -44,11 +45,14 @@ def _filter_bookable(queryset):
     return cars whose status is known, aren't busy through elsewhere, and don't have a booking
     in progress.
     '''
+    # TODO - we probably need to optimize this, or at least cache it
+    active_bookings = _filter_booking_in_progress(Booking.objects.all())
+    booked_car_ids = [b.car.id for b in active_bookings]
     return queryset.filter(
-        Q(status=models.Car.STATUS_AVAILABLE) |
-        Q(status=models.Car.STATUS_BUSY, next_available_date__lt=next_available_date_threshold)
+        Q(status=Car.STATUS_AVAILABLE) |
+        Q(status=Car.STATUS_BUSY, next_available_date__lt=next_available_date_threshold)
     ).exclude(
-        q_booking_in_progress
+        id__in=booked_car_ids
     )
 
 

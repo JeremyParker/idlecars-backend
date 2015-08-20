@@ -8,10 +8,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from idlecars import fields
-from server.models import Car, Booking, Driver, booking_state
+from server.models import Car, Booking, Driver
 from server.services import booking as booking_service
 from server.services import car as car_service
-from server.serializers import car_serializer, step_details
+from server.serializers import car_serializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class BookingSerializer(serializers.ModelSerializer):
         # TODO(JP): make this booking-check aware of end-times, so we can book after booking ends.
         if self.context['request'].method == 'POST':
             driver = Driver.objects.get(auth_user=self.context['request'].user)
-            if Booking.objects.filter(driver=driver, state__in=range(Booking.FLAKE + 1)):
+            if booking_service.filter_visible(Booking.objects.filter(driver=driver)):
                 self._errors.update({
                     '_app_notifications': ['You have a conflicting rental.'],
                 })
@@ -51,7 +51,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = serializers.SerializerMethodField()
-    state_details = serializers.SerializerMethodField()
     start_time_display = serializers.SerializerMethodField()
     start_time_estimated = serializers.SerializerMethodField()
     end_time_display = serializers.SerializerMethodField()
@@ -59,6 +58,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     first_valid_end_time = serializers.SerializerMethodField()
     end_time_limit_display = serializers.SerializerMethodField()
     step = serializers.SerializerMethodField()
+    step_display_count = serializers.SerializerMethodField()
     step_details = serializers.SerializerMethodField()
 
     class Meta:
@@ -66,9 +66,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'car',
-            'state',
-            'state_details',
             'step',
+            'step_display_count',
             'step_details',
             'start_time_display',
             'start_time_estimated',
@@ -80,8 +79,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'car',
-            'state_details',
             'step',
+            'step_display_count',
             'step_details',
             'start_time_display',
             'start_time_estimated',
@@ -92,43 +91,66 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         '''
-        We can change the end_time. Changing state is deprecated
+        We can change the end_time.
         '''
-        if 'state' in validated_data:
-            if validated_data['state'] == Booking.CANCELED:
-                if instance.state not in booking_state.cancelable_states():
-                    raise ValidationError('This rental can\'t be canceled at this time.')
-                return booking_service.cancel_booking(instance)
-
-            raise ValidationError('This is not a valid state for a rental.')
-
         if 'end_time' in validated_data:
             return booking_service.set_end_time(instance, validated_data['end_time'])
-
         return instance
 
     def get_car(self, obj):
         # if the booking is in the ACCEPTED state, use a custom serializer with contact info
-        if obj.state == Booking.ACCEPTED:
+        if obj.get_state() == Booking.ACCEPTED:
             serializer = car_serializer.CarPickupSerializer
         else:
             serializer = car_serializer.CarSerializer
         return serializer(obj.car).data
 
-    def get_state_details(self, obj):
-        if not booking_state.states[obj.state]['visible']:
-            return None
-        deets = booking_state.states[obj.state]['details']
-        deets.update({"cancelable": obj.state in booking_state.cancelable_states()})
-        return deets
-
     def get_step(self, obj):
-        return booking_state.get_step(obj.state)
+        state = obj.get_state()
+        if state == Booking.BOOKED:
+            return 5
+        elif state in [Booking.RESERVED, Booking.REQUESTED, Booking.ACCEPTED]:
+            return 4
+        elif state == Booking.PENDING:
+            if obj.driver.all_docs_uploaded():
+                return 3
+            else:
+                return 2
+        return None
+
+    def get_step_display_count(self, obj):
+        return 4
 
     def get_step_details(self, obj):
-        if not booking_state.states[obj.state]['visible']:
+        if not booking_service.is_visible(obj):
             return None
-        return step_details.get_step_details(obj)
+        step_details = {
+            2: {
+                'step_title': 'Create your account',
+                'step_subtitle': 'You must upload your documents to rent this car',
+            },
+            3: {
+                'step_title': 'Reserve your car',
+                'step_subtitle': 'Put down the deposit to reserve your car',
+            },
+            4: {
+                'step_title': 'Pick up your car',
+                'step_subtitle': "Your insurance has been approved. Pick up your car!",
+            },
+            5: {
+                'step_title': 'Rental in progress',
+                'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
+            }
+        }
+        step = self.get_step(obj)
+        ret = step_details[step]
+
+        # differentiate between step 4 requested, and step 4 ready for pickup
+        if 4 == step and not obj.get_state() == Booking.ACCEPTED:
+            ret.update({
+                'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
+            })
+        return ret
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
@@ -156,8 +178,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             return _format_date(booking.end_time)
         elif booking.approval_time:
             time_string = _format_date(booking.approval_time + datetime.timedelta(days=min_duration + 1))
-        elif booking.check_out_time:
-            time_string = _format_date(booking.check_out_time + datetime.timedelta(days=min_duration + 2))
+        elif booking.checkout_time:
+            time_string = _format_date(booking.checkout_time + datetime.timedelta(days=min_duration + 2))
         else:
             time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
 

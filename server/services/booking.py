@@ -12,11 +12,27 @@ from server.models import Booking
 from server.services import car as car_service
 
 
-def conflicting_bookings(booking):
-    return Booking.objects.filter(
-        car=booking.car,
-        state__in=[Booking.PENDING, Booking.FLAKE, Booking.COMPLETE],
+def filter_pending(booking_queryset):
+    return booking_queryset.filter(
+        checkout_time__isnull=True,
+        incomplete_time__isnull=True,
     )
+
+def filter_reserved(booking_queryset):
+    return booking_queryset.filter(
+        checkout_time__isnull=False,
+        requested_time__isnull=True,
+        incomplete_time__isnull=True,
+    )
+
+def is_visible(booking):
+    ''' Can this booking be seen in the Driver app '''
+    return not booking.return_time and not booking.incomplete_time
+
+
+def filter_visible(booking_queryset):
+    ''' Can this booking be seen in the Driver app '''
+    return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
 def send_reminders():
@@ -24,61 +40,41 @@ def send_reminders():
     docs_reminder_delay_hours = 1  # TODO(JP): get from config
 
     reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
-    remindable_bookings = Booking.objects.filter(
-        state=Booking.PENDING,
-        created_time__lte=reminder_threshold,
+    remindable_bookings = filter_pending(
+        Booking.objects.filter(created_time__lte=reminder_threshold)
     )
 
     for booking in remindable_bookings:
         if not booking.driver.email():
             continue
-        driver_emails.documents_reminder(booking)
-        booking.state = Booking.FLAKE
-        booking.save()
-
-
-def on_documents_uploaded(driver):
-    # note: the driver service sends ops an email to check the docs
-    bookings = Booking.objects.filter(
-        driver=driver,
-        state__in=[Booking.PENDING, Booking.FLAKE]
-    )
-    for booking in bookings:
-        booking.state = Booking.COMPLETE
-        booking.save()
-        return booking
+        # TODO - send email and mark email sent
+        # driver_emails.documents_reminder(booking)
+        # booking.get_state = Booking.FLAKE
+        # booking.save()
 
 
 def on_documents_approved(driver):
-    bookings = Booking.objects.filter(
-        driver=driver,
-        state=Booking.COMPLETE,
-    )
+    bookings = filter_reserved(Booking.objects.filter(driver=driver))
     if not bookings:
         driver_emails.documents_approved_no_booking(driver)
         return
 
     for booking in bookings:
-        driver_emails.documents_approved(booking)
         request_insurance(booking)
 
 
 def someone_else_booked(booking):
-    booking.state = Booking.TOO_SLOW
+    booking.incomplete_time = timezone.now()
+    booking.incomplete_reason = Booking.REASON_ANOTHER_BOOKED
+    booking.save()
     driver_emails.someone_else_booked(booking)
     return booking
 
 
 def request_insurance(booking):
     owner_emails.new_booking_email(booking)
-    booking.state = Booking.REQUESTED
+    booking.requested_time = timezone.now()
     booking.save()
-
-    # cancel other conflicting in-progress bookings and notify those drivers
-    for conflicting_booking in conflicting_bookings(booking):
-        conflicting_booking = someone_else_booked(conflicting_booking)
-        conflicting_booking.save()
-
     return booking
 
 
@@ -89,31 +85,23 @@ def create_booking(car, driver):
     - car: an existing car object
     - driver: the driver making the booking
     '''
-    booking = Booking(
-        car=car,
-        driver=driver,
-    )
-
-    if booking.driver.documentation_approved:
-        # TODO - driver_emails.new_booking_insurance_requested()
-        return request_insurance(booking)
-
-    if booking.driver.all_docs_uploaded():
-        booking.state = Booking.COMPLETE
-        # TODO - driver_emails.new_booking_complete()
-    else:
-        booking.state = Booking.PENDING
-    booking.save()
-
+    booking = Booking.objects.create(car=car, driver=driver,)
     ops_emails.new_booking_email(booking)
     return booking
 
 
-def cancel_booking(booking):
-    if Booking.REQUESTED == booking.state:
+def can_cancel(booking):
+    return not booking.approval_time
+
+
+def cancel(booking):
+    if Booking.REQUESTED == booking.get_state():
         owner_emails.booking_canceled(booking)
 
-    booking.state = Booking.CANCELED
+    # TODO - if the booking is checked out, refund the deposit
+
+    booking.incomplete_time = timezone.now()
+    booking.incomplete_reason = Booking.REASON_CANCELED
     booking.save()
 
     ops_emails.booking_canceled(booking)
@@ -121,16 +109,53 @@ def cancel_booking(booking):
     return booking
 
 
+def can_checkout(booking):
+    # TODO - check that the car is still available (may have been a race to book)
+    return booking.driver.all_docs_uploaded() and booking.get_state() == Booking.PENDING
+
+
+def checkout(booking):
+    if not can_checkout(booking):
+        raise Exception("Booking cannot be checked out in its current state")
+
+    # TODO - payment here
+    booking.checkout_time = timezone.now()
+    booking.save()
+    # TODO - send some kind of confirmation message
+
+    # cancel other conflicting in-progress bookings and notify those drivers
+    conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
+    for conflicting_booking in conflicting_pending_bookings:
+        conflicting_booking = someone_else_booked(conflicting_booking)
+
+    if booking.driver.documentation_approved:
+        return request_insurance(booking)
+
+    return booking
+
+
+def can_pickup(booking):
+    return booking.get_state() == Booking.ACCEPTED
+
+
+def pickup(booking):
+    # TODO - payment here
+    booking.pickup_time = timezone.now()
+    booking.save()
+    # TODO - send some kind of confirmation message
+    return booking
+
+
 def start_time_display(booking):
     def _format_date(date):
         return date.strftime('%b %d')
 
-    if booking.pick_up_time:
-        return _format_date(booking.pick_up_time)
+    if booking.pickup_time:
+        return _format_date(booking.pickup_time)
     elif booking.approval_time:
         return 'on pickup'
-    elif booking.check_out_time:
-        return _format_date(booking.check_out_time + datetime.timedelta(days=2))
+    elif booking.checkout_time:
+        return _format_date(booking.checkout_time + datetime.timedelta(days=2))
     else:
         return _format_date(timezone.now() + datetime.timedelta(days=2))
 
@@ -141,7 +166,7 @@ def min_rental_still_limiting(booking):
     if not min_rental:
         return False
 
-    if not booking.pick_up_time or booking.pick_up_time + datetime.timedelta(min_rental) > min_notice:
+    if not booking.pickup_time or booking.pickup_time + datetime.timedelta(min_rental) > min_notice:
         return True
     return False
 

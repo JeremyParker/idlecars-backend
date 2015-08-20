@@ -16,8 +16,25 @@ class BookingAdmin(admin.ModelAdmin):
                 ('driver_link', 'driver_phone', 'driver_email',),
                 ('car_link', 'car_plate', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
-                ('created_time', 'end_time',),
+            ),
+        }),
+        ('State History', {
+            'fields': (
+                ('created_time',),
+                ('checkout_time',),
+                ('requested_time',),
+                ('approval_time',),
+                ('pickup_time',),
+                ('end_time',),
+                ('return_time',),
+                ('incomplete_time', 'incomplete_reason',),
+                ('refund_time',),
+            ),
+        }),
+        ('Notes', {
+            'fields': (
                 'notes',
+                'deprecated_state',
             ),
         }),
     )
@@ -32,6 +49,7 @@ class BookingAdmin(admin.ModelAdmin):
         'created_time',
     ]
     readonly_fields = [
+        'state',
         'driver_docs_uploaded',
         'driver',
         'car_link',
@@ -45,6 +63,16 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_phone',
         'driver_email',
         'created_time',
+        # 'checkout_time',
+        # 'requested_time',
+        # 'approval_time',
+        # 'pickup_time',
+        # 'end_time',
+        # 'return_time',
+        # 'incomplete_time',
+        # 'incomplete_reason',
+        # 'refund_time',
+        'deprecated_state',
     ]
     search_fields = [
         'driver__auth_user__username',
@@ -52,6 +80,9 @@ class BookingAdmin(admin.ModelAdmin):
         'driver__auth_user__first_name',
         'driver__auth_user__last_name',
     ]
+
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
 
     def owner_link(self, instance):
         if instance.car and instance.car.owner:
@@ -126,11 +157,20 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
 
-
-class BookingForCarInline(admin.TabularInline):
+class BookingInlineBase(admin.TabularInline):
     model = models.Booking
     verbose_name = "Booking"
     extra = 0
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
+    def detail_link(self, instance):
+        return link(instance, 'details')
+    can_delete = False
+    def has_add_permission(self, request):
+        return False
+
+
+class BookingForCarInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
@@ -139,20 +179,13 @@ class BookingForCarInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
+        'state',
         'driver',
         'created_time',
     ]
-    def detail_link(self, instance):
-        return link(instance, 'details')
-    can_delete = False
-    def has_add_permission(self, request):
-        return False
 
 
-class BookingForDriverInline(admin.TabularInline):
-    model = models.Booking
-    verbose_name = "Booking"
-    extra = 0
+class BookingForDriverInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
@@ -161,11 +194,7 @@ class BookingForDriverInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
+        'state',
         'car',
         'created_time',
     ]
-    def detail_link(self, instance):
-        return link(instance, 'details')
-    can_delete = False
-    def has_add_permission(self, request):
-        return False
