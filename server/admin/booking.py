@@ -48,6 +48,7 @@ class BookingAdmin(admin.ModelAdmin):
         'created_time',
     ]
     readonly_fields = [
+        'state',
         'driver_docs_uploaded',
         'driver',
         'car_link',
@@ -78,6 +79,9 @@ class BookingAdmin(admin.ModelAdmin):
         'driver__auth_user__first_name',
         'driver__auth_user__last_name',
     ]
+
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
 
     def owner_link(self, instance):
         if instance.car and instance.car.owner:
@@ -165,9 +169,12 @@ class BookingForCarInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
+        'state',
         'driver',
         'created_time',
     ]
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
     def detail_link(self, instance):
         return link(instance, 'details')
     can_delete = False
@@ -187,9 +194,12 @@ class BookingForDriverInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
+        'state',
         'car',
         'created_time',
     ]
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
     def detail_link(self, instance):
         return link(instance, 'details')
     can_delete = False

@@ -40,40 +40,15 @@ class Booking(models.Model):
     )
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 
-    STATE_FROM_EVENT_TIMES = 0
     PENDING = 1
-    COMPLETE = 2
+    RESERVED = 2
     REQUESTED = 3
     ACCEPTED = 4
     BOOKED = 5
-    FLAKE = 6
-    TOO_SLOW = 7
-    OWNER_REJECTED = 8
-    DRIVER_REJECTED = 9
-    MISSED = 10
-    TEST_BOOKING = 11
-    CANCELED = 12
-    RESERVED = 13    # deposit paid, but not requested on insurance yet (waiting for doc review)
-    RETURNED = 14    # returned to owner, but not refunded the deposit yet
-    REFUNDED = 15    # returned and refunded
-    INCOMPLETE = 16  # canceled or someone else booked, ...etc. and refunded if necessary
+    RETURNED = 6
+    REFUNDED = 7
+    INCOMPLETE = 8
 
-    OLD_STATES = (
-        (STATE_FROM_EVENT_TIMES, 'State comes from event times, not from this field.'),
-        (PENDING, 'Pending - waiting for driver docs'),
-        (COMPLETE, 'Deprecated'),
-        (REQUESTED, 'Requested - waiting for owner/insurance'),
-        (ACCEPTED, 'Accepted - waiting for deposit, ssn, contract'),
-        (BOOKED, 'Booked - car marked busy with new available_time'),
-        (FLAKE, 'Flake - Didn\'t Submit Docs in 24 hours'),
-        (TOO_SLOW, 'Too Slow - somebody else booked your car'),
-        (OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
-        (DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
-        (MISSED, 'Missed - car rented out before we found a driver'),
-        (TEST_BOOKING, 'Test - a booking that one of us created as a test'),
-        (CANCELED, 'Canceled - driver canceled the booking thru the app'),
-    )
-    state = models.IntegerField(choices=OLD_STATES, default=STATE_FROM_EVENT_TIMES)
     notes = models.TextField(blank=True)
 
     STATES = {
@@ -104,3 +79,20 @@ class Booking(models.Model):
             return Booking.RESERVED
         else:
             return Booking.PENDING
+
+    OLD_STATES = (
+        (0, 'State comes from event times, not from this field.'),
+        (1, 'Pending - waiting for driver docs'),
+        (2, 'Deprecated'),
+        (3, 'Requested - waiting for owner/insurance'),
+        (4, 'Accepted - waiting for deposit, ssn, contract'),
+        (5, 'Booked - car marked busy with new available_time'),
+        (6, 'Flake - Didn\'t Submit Docs in 24 hours'),
+        (7, 'Too Slow - somebody else booked your car'),
+        (8, 'Owner Rejected - driver wasn\t approved'),
+        (9, 'Driver Rejected - driver changed their mind'),
+        (10, 'Missed - car rented out before we found a driver'),
+        (11, 'Test - a booking that one of us created as a test'),
+        (12, 'Canceled - driver canceled the booking thru the app'),
+    )
+    deprecated_state = models.IntegerField(choices=OLD_STATES, default=0, db_column='state')

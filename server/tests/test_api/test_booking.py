@@ -90,9 +90,7 @@ class ListBookingTest(APITestCase):
             self.assertEqual(booking_data['car']['id'], self.booking.car.pk)
 
     def test_get_booking_list_one_pending_one_booked(self):
-        self.booking.status = models.Booking.BOOKED
-        booking2 = factories.Booking.create(driver=self.driver, state=models.Booking.PENDING)
-
+        booking2 = factories.BookedBooking.create(driver=self.driver)
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
@@ -112,7 +110,6 @@ class ListBookingTest(APITestCase):
 class UpdateBookingTest(APITestCase):
     def setUp(self):
         self.booking = factories.Booking.create(
-            state=models.Booking.PENDING,
             end_time=datetime.datetime(2014, 12, 15, 14, tzinfo=timezone.get_current_timezone())
         )
 
