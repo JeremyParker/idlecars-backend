@@ -80,10 +80,29 @@ class E2ETestSetup():
         '''
             Create 5 users(1 staff user)
         '''
-        self.user_without_booking = server.factories.AuthUser.create(username='1234567891', email='jerry@test.com', first_name='Jerry', last_name='Mouse')
-        self.user_without_docs = server.factories.AuthUser.create(username='1234567892', email='tom@test.com', first_name='Tom', last_name='Cat')
-        self.user_without_docs_approved = server.factories.AuthUser.create(username='1234567893', email='donald@test.com', first_name='donald', last_name='Duck')
-        self.user_insurance_approved = server.factories.AuthUser.create(username='1234567894', email='kerry@test.com', first_name='Kerry', last_name='Goose')
+        self.user_without_booking = server.factories.AuthUser.create(
+            username='1234567891',
+            email='jerry@test.com',
+            first_name='Jerry',
+            last_name='Mouse'
+        )
+        self.user_without_docs = server.factories.AuthUser.create(
+            username='1234567892',
+            email='tom@test.com',
+            first_name='Tom',
+            last_name='Cat'
+        )
+        self.user_without_docs_approved = server.factories.AuthUser.create(
+            username='1234567893',
+            email='donald@test.com',
+            first_name='donald',
+            last_name='Duck'
+        )
+        self.user_insurance_approved = server.factories.AuthUser.create(
+            username='1234567894',
+            email='kerry@test.com',
+            first_name='Kerry',
+            last_name='Goose')
         server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
     def _setup_drivers(self):
@@ -94,7 +113,25 @@ class E2ETestSetup():
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
         defensive_cert_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-e7cb3e75-f140-48ae-a16b-4550e249e62d-1439735074143-478457530.jpg"
 
-        server.factories.Driver.create(auth_user=self.user_without_booking, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
+        server.factories.Driver.create(
+            auth_user=self.user_without_booking,
+            driver_license_image=driver_license_image,
+            fhv_license_image=fhv_license_image,
+            defensive_cert_image=defensive_cert_image,
+            address_proof_image=driver_license_image
+        )
         self.driver_without_docs = server.factories.Driver.create(auth_user=self.user_without_docs)
-        self.driver_without_docs_approved = server.factories.Driver.create(auth_user=self.user_without_docs_approved, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
-        self.driver_insurance_approved = server.factories.ApprovedDriver.create(auth_user=self.user_insurance_approved, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image, defensive_cert_image=defensive_cert_image, address_proof_image=driver_license_image)
+        self.driver_without_docs_approved = server.factories.Driver.create(
+            auth_user=self.user_without_docs_approved,
+            driver_license_image=driver_license_image,
+            fhv_license_image=fhv_license_image,
+            defensive_cert_image=defensive_cert_image,
+            address_proof_image=driver_license_image
+        )
+        self.driver_insurance_approved = server.factories.ApprovedDriver.create(
+            auth_user=self.user_insurance_approved,
+            driver_license_image=driver_license_image,
+            fhv_license_image=fhv_license_image,
+            defensive_cert_image=defensive_cert_image,
+            address_proof_image=driver_license_image
+        )
