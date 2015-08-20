@@ -34,6 +34,7 @@ class BookingAdmin(admin.ModelAdmin):
         ('Notes', {
             'fields': (
                 'notes',
+                'deprecated_state',
             ),
         }),
     )
@@ -71,7 +72,7 @@ class BookingAdmin(admin.ModelAdmin):
         # 'incomplete_time',
         # 'incomplete_reason',
         # 'refund_time',
-
+        'deprecated_state',
     ]
     search_fields = [
         'driver__auth_user__username',
@@ -156,11 +157,20 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
 
-
-class BookingForCarInline(admin.TabularInline):
+class BookingInlineBase(admin.TabularInline):
     model = models.Booking
     verbose_name = "Booking"
     extra = 0
+    def state(self, instance):
+        return models.Booking.STATES[instance.get_state()]
+    def detail_link(self, instance):
+        return link(instance, 'details')
+    can_delete = False
+    def has_add_permission(self, request):
+        return False
+
+
+class BookingForCarInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
@@ -173,19 +183,9 @@ class BookingForCarInline(admin.TabularInline):
         'driver',
         'created_time',
     ]
-    def state(self, instance):
-        return models.Booking.STATES[instance.get_state()]
-    def detail_link(self, instance):
-        return link(instance, 'details')
-    can_delete = False
-    def has_add_permission(self, request):
-        return False
 
 
-class BookingForDriverInline(admin.TabularInline):
-    model = models.Booking
-    verbose_name = "Booking"
-    extra = 0
+class BookingForDriverInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
@@ -198,10 +198,3 @@ class BookingForDriverInline(admin.TabularInline):
         'car',
         'created_time',
     ]
-    def state(self, instance):
-        return models.Booking.STATES[instance.get_state()]
-    def detail_link(self, instance):
-        return link(instance, 'details')
-    can_delete = False
-    def has_add_permission(self, request):
-        return False

@@ -83,7 +83,7 @@ class Booking(models.Model):
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),
         (1, 'Pending - waiting for driver docs'),
-        (2, 'Deprecated'),
+        (2, 'Complete - driver uploaded all docs'),
         (3, 'Requested - waiting for owner/insurance'),
         (4, 'Accepted - waiting for deposit, ssn, contract'),
         (5, 'Booked - car marked busy with new available_time'),
@@ -95,4 +95,4 @@ class Booking(models.Model):
         (11, 'Test - a booking that one of us created as a test'),
         (12, 'Canceled - driver canceled the booking thru the app'),
     )
-    deprecated_state = models.IntegerField(choices=OLD_STATES, default=0, db_column='state')
+    deprecated_state = models.IntegerField(choices=OLD_STATES, default=0)
