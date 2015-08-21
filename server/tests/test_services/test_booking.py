@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from braintree.test.nonces import Nonces
 
 from django.utils import timezone
 from django.test import TestCase
@@ -77,28 +78,45 @@ class BookingServiceTest(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_all_docs_uploaded(self):
-        pass
+        driver = factories.CompletedDriver.create()
+        new_booking = factories.Booking.create(self.car, driver)
+
+        # checkout with a payment nonce
+        new_booking = booking_service.checkout(new_booking, Nonce.Transactable)
+        self.assertEqual(new_booking.get_state(), Booking.RESERVED)
+        # TODO we should send an email to the driver and owner telling them what happened
+
+    def _checkout_approved_driver(self):
+        driver = factories.ApprovedDriver.create()
+        new_booking = factories.Booking.create(self.car, driver)
+
+        new_booking = booking_service.checkout(new_booking, Nonce.Transactable)
+        self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
 
     def test_checkout_docs_approved(self):
-        pass
+        self._checkout_approved_driver()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+
+        # an email to the owner to get the driver on insurance
+        self.assertEqual(outbox[3].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(
+            outbox[3].subject,
+            'A driver has booked your {}.'.format(new_booking.car.__unicode__())
+        )
+        # TODO we should send an email to the driver and owner telling them what happened
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_with_others_too_slow(self):
         # set up the other driver, and create a booking for them
         other_driver = factories.Driver.create()
-        booking_service.create_booking(self.car, other_driver)
+        factories.Booking.create(car=self.car, driver=other_driver)
 
-        driver = factories.ApprovedDriver.create()
-        new_booking = booking_service.create_booking(self.car, driver)
-        new_booking = booking_service.checkout(new_booking)
-        self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
+        self._checkout_approved_driver()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 4)
-
-        # two emails to support that there are new bookings
-        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
-        self.assertEqual(outbox[0].subject, 'New Booking from {}'.format(other_driver.phone_number()))
-        self.assertEqual(outbox[1].subject, 'New Booking from {}'.format(driver.phone_number()))
+        self.assertEqual(len(outbox), 2)
 
         # an email to the other driver to know their car is no longer available
         self.assertEqual(outbox[2].merge_vars.keys()[0], other_driver.email())
@@ -132,7 +150,7 @@ class BookingServiceTest(TestCase):
     def test_cancel_requested_booking(self):
         approved_driver = factories.ApprovedDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
-        new_booking = booking_service.checkout(new_booking)
+        new_booking = booking_service.checkout(new_booking, Nonces.Transactable)
         booking_service.cancel(new_booking)
 
         ''' we should have sent

@@ -12,9 +12,17 @@ def configure_braintree():
     braintree.Configuration.configure(**config)
 
 
-def initialize_gateway(customer):
+def initialize_gateway(driver):
     configure_braintree()
+    return {'client_token': braintree.ClientToken.generate(),}
 
-    return {
-        'client_token': braintree.ClientToken.generate(),
+
+def make_payment(amount, nonce):
+    configure_braintree()
+    request = {
+        'amount': str(amount),
+        'payment_method_nonce': nonce,
     }
+    response = braintree.Transaction.sale(request)
+    success = getattr(response, "is_success", False)
+    return success

@@ -10,6 +10,7 @@ from owner_crm.services import ops_emails, driver_emails, owner_emails
 
 from server.models import Booking
 from server.services import car as car_service
+from server.services import braintree_payments
 
 
 def filter_pending(booking_queryset):
@@ -114,22 +115,23 @@ def can_checkout(booking):
     return booking.driver.all_docs_uploaded() and booking.get_state() == Booking.PENDING
 
 
-def checkout(booking):
+def checkout(booking, nonce):
     if not can_checkout(booking):
         raise Exception("Booking cannot be checked out in its current state")
 
-    # TODO - payment here
-    booking.checkout_time = timezone.now()
-    booking.save()
-    # TODO - send some kind of confirmation message
+    success = braintree_payments.make_payment(booking.car.solo_deposit, nonce)
+    if success:
+        booking.checkout_time = timezone.now()
+        booking.save()
+        # TODO - send some kind of confirmation message
 
-    # cancel other conflicting in-progress bookings and notify those drivers
-    conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
-    for conflicting_booking in conflicting_pending_bookings:
-        conflicting_booking = someone_else_booked(conflicting_booking)
+        # cancel other conflicting in-progress bookings and notify those drivers
+        conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
+        for conflicting_booking in conflicting_pending_bookings:
+            conflicting_booking = someone_else_booked(conflicting_booking)
 
-    if booking.driver.documentation_approved:
-        return request_insurance(booking)
+        if booking.driver.documentation_approved:
+            return request_insurance(booking)
 
     return booking
 

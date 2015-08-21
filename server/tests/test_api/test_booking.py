@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from braintree.test.nonces import Nonces
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -161,8 +162,7 @@ class BookingStepTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.booking = factories.Booking.create(driver=self.driver)
         self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-        self._pending_with_docs()
-
+        self._pending_docs_approved()
 
     def _pending_no_docs(self):
         response = self.client.get(self.url, format='json')
@@ -185,7 +185,7 @@ class BookingStepTest(APITestCase):
         self.assertTrue(response.data['start_time_estimated'])
 
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
-        checkout_response = self.client.post(checkout_url, data={})
+        checkout_response = self.client.post(checkout_url, data={'nonce': Nonces.Transactable})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
 
         self._checked_out_docs_unapproved()
@@ -196,8 +196,8 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
 
-        checkout_url = reverse('server:bookings-cancelation')
-        checkout_response = self.client.post(checkout_url, args=(self.booking.pk,))
+        checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
+        checkout_response = self.client.post(checkout_url, data={'nonce': Nonces.Transactable})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
         self._checked_out_docs_approved()
 
