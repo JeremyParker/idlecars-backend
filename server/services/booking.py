@@ -9,8 +9,9 @@ from django.utils import timezone
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
 from server.models import Booking
+from . import payment as payment_service
 from server.services import car as car_service
-from server.services import braintree_payments
+from server.payment_gateways import braintree_payments
 
 
 def filter_pending(booking_queryset):
@@ -115,12 +116,17 @@ def can_checkout(booking):
     return booking.driver.all_docs_uploaded() and booking.get_state() == Booking.PENDING
 
 
-def checkout(booking, nonce):
+def checkout(booking, credit_card=None, nonce=None):
     if not can_checkout(booking):
         raise Exception("Booking cannot be checked out in its current state")
 
-    success = braintree_payments.make_payment(booking.car.solo_deposit, nonce)
-    if success:
+    payment = payment_service.create_payment(
+        booking,
+        booking.car.solo_deposit,
+        credit_card=credit_card,
+        nonce=nonce,
+    )
+    if payment.is_paid():
         booking.checkout_time = timezone.now()
         booking.save()
         # TODO - send some kind of confirmation message

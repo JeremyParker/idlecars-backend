@@ -193,6 +193,8 @@ CORS_ALLOW_HEADERS = (
 # Heap Analytics uses the DEBUG app id in development/testing
 HEAP_APP_ID = '655181858'
 
+PAYMENT_GATEWAY_NAME = 'fake'
+
 BRAINTREE = {
     "environment": "Sandbox",
     "merchant_id": "fckq6988gccrfnty",

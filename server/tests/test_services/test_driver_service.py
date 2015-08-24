@@ -1,6 +1,8 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from braintree.test.nonces import Nonces
+
 from django.utils import timezone
 from django.test import TestCase
 from django.conf import settings
@@ -116,8 +118,8 @@ class DriverServiceTest(TestCase):
         new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertEqual(new_booking.get_state(), Booking.PENDING)
 
-        # booking is reserved with the credit card
-        booking_service.checkout(new_booking)
+        # booking is reserved with the deposit paid
+        booking_service.checkout(new_booking, nonce=Nonces.Transactable)
         self.assertEqual(new_booking.get_state(), Booking.RESERVED)
 
         # THEN the documents are approved

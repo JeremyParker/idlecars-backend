@@ -56,7 +56,7 @@ class BookingViewSet(
             raise ValidationError('Your rental can\'t be created at this time.')
 
         nonce = serializer.validated_data['nonce']
-        result_booking = booking_service.checkout(booking, nonce)
+        result_booking = booking_service.checkout(booking, nonce=nonce)
         result_serializer = self.get_serializer(result_booking)
         return Response(result_serializer.data)
 

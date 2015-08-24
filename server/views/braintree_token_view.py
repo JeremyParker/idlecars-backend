@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from server.services import braintree_payments
+from server.payment_gateways import braintree_payments
 from server.models import Driver
 
 

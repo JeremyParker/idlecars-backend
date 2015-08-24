@@ -14,6 +14,7 @@ from car import Car
 from car_compatibility import CarCompatibility
 from driver import Driver
 from booking import Booking
+from payment import Payment
 from rideshare_flavor import RideshareFlavor
 
 
