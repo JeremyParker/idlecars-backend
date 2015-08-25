@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from braintree.test.nonces import Nonces
+
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 
@@ -157,3 +159,15 @@ class DriverCreateTest(APITestCase):
         data = {'password': 'test'}
         response = APIClient().post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class AddPaymentMethodTest(AuthenticatedDriverTest):
+    def setUp(self):
+        super(AddPaymentMethodTest, self).setUp()
+        self.url = reverse('server:drivers-payment-method', args=(self.driver.pk,))
+
+    def test_add_payment_method(self):
+        response = self.client.post(self.url, data={'nonce': Nonces.Transactable})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # TODO - check for new payment method info in returned Driver object

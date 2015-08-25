@@ -21,7 +21,7 @@ class Driver(models.Model):
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
 
-    # braintree_token = models.CharField(max_length=32)
+    braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
 
     def admin_display(self):

@@ -7,41 +7,36 @@ from server import models
 
 
 next_payment_response = None
-add_card_log = []
 make_payment_log = []
 
-def add_card(desc, customer, device):
-    global next_card_response
-    add_card_log.append((
-        customer,
-        desc.number,
-        desc.expiry_date,
-        desc.cvv,
-        desc.cardholder,
-        desc.postcode,
-        desc.country_code,
-        device,
-    ))
+next_payment_method_response = None
+add_payment_method_log = []
 
-    if next_card_response is None:
-        res = True, ("fake-token", "1234", "Visa", None, datetime.date(2012, 6, 1), "")
+
+def add_payment_method(driver, nonce):
+    global next_payment_method_response
+    add_payment_method_log.append((driver, nonce,))
+
+    if next_payment_method_response is None:
+        result = True, ("some-token", "1234", "Visa", None, datetime.date(2015, 8, 30), "")
     else:
-        res = next_card_response
-        next_card_response = None
-    return res
+        result = next_payment_method_response
+    next_payment_method_response = None
+    return result
+
 
 def make_payment(payment, nonce=None):
     global next_payment_response
     make_payment_log.append(payment)
 
     if next_payment_response:
-        res = next_payment_response
+        result = next_payment_response
     elif nonce:
-        res = (models.Payment.APPROVED, "test", "", datetime.date(2015, 8, 30))
+        result = (models.Payment.APPROVED, "test", "", datetime.date(2015, 8, 30))
     else:
-        res = (models.Payment.DECLINED, "test", "No funds available", datetime.date(2015, 8, 30))
+        result = (models.Payment.DECLINED, "test", "No funds available", datetime.date(2015, 8, 30))
     next_payment_response = None
-    return res
+    return result
 
 
 def reset():

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from checkout_serializer import CheckoutSerializer
+from nonce_serializer import NonceSerializer
 from car_compatibility_serializer import CarCompatibilitySerializer
 from owner_serializer import OwnerSerializer
 from car_serializer import CarSerializer, CarPickupSerializer
