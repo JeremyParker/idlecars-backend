@@ -5,9 +5,9 @@ extends ./base.jade
     div
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
     .links
-      .link #[a] How it works
-      .link #[a] Join/Login
-      .link #[a] List your car
+      .link #[a How it works]
+      .link #[a Join/Login]
+      .link #[a List your car]
 
   section.headline
     .phone-background
@@ -27,22 +27,10 @@ extends ./base.jade
   section.select
     .container
       .content
-        h2 Ready to drive
-        p Every idlecar is inspected and is already registered with the TLC.
-        p Find a car and start driving the next day. No leases, loans or long-term commitments.
+        h2 Choose your car, get insured #[br] and start driving within #[br] #[span 24 hours.]
+        h1 It's that easy
 
-  section.get-more
-    .container
-      h2 It’s your choice
-      p Our cars allow you to drive for any base.
-      img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
-      img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
-
-  section.get-more.convenient
-    .container
-      h2 Convenient for you
-      p We take care of all the paperwork, insurance, and maintenance.
-      p The listed price is all you pay.
+  section.manhattan
 
   #lets-talk
   - if show_thanks

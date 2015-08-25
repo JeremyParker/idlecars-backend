@@ -15,7 +15,7 @@ h1, h2, h3, p {
 }
 
 h1, h2, h3 {
-  line-height: 1em;
+  line-height: 1.5em;
 }
 
 h1 {
@@ -134,11 +134,11 @@ section {
 }
 
 .headline h1 {
+  line-height: 1em;
   margin-bottom: 1.5rem;
 }
 
 .headline h3 {
-  line-height: 1.5rem;
   margin-bottom: 0.75rem;
 }
 
@@ -165,8 +165,21 @@ section {
   background-position: calc(50% + 336px) center;
 }
 
+.select h1 {
+  margin-top: 3rem;
+}
+
+.select h2 {
+  font-weight: 100;
+}
+
+.select span {
+  font-weight: 500;
+}
+
 .select .container {
-  height: 522px
+  height: 522px;
+  text-align: center;
 }
 
 .select p {
@@ -191,18 +204,14 @@ section {
   max-width: 33rem;
 }
 
+.manhattan {
+  background: url(img/manhattan.png) no-repeat black;
+  height: 507px;
+}
+
 p.strong {
   font-weight: 500;
   margin: 0;
-}
-
-.convenient {
-  background: black;
-}
-
-.convenient .container {
-  color: white;
-  min-height: 500px;
 }
 
 .form {
