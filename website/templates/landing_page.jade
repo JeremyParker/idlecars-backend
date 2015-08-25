@@ -1,13 +1,23 @@
 extends ./base.jade
 
 - block content
-  section.headline
-    .container
+  section.navbar
+    div
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
-      .content
-        h1 Start renting #[br] Start earning
-        a.button(href="#{ settings.WEBAPP_URL }") Find your car
-        a.login(href="#{ login_url }") Have an account? #[span Log in]
+    .links
+      .link #[a] How it works
+      .link #[a] Join/Login
+      .link #[a] List your car
+
+  section.headline
+    .phone-background
+      .container
+        .content
+          h1 Keep More of What You Earn
+          h3 NYC's widest selection of TLC registered #[br] for-hire rentals at the best price
+          h3 No leases, loans or long-term commitments. #[br] insurance and maintenance included.
+          a.button(href="#{ settings.WEBAPP_URL }") Find your car
+          a.login(href="#{ login_url }") Have an account? #[span Log in]
 
   section.get-more
     .container
