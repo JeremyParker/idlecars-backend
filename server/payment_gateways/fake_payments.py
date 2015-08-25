@@ -18,7 +18,14 @@ def add_payment_method(driver, nonce):
     add_payment_method_log.append((driver, nonce,))
 
     if next_payment_method_response is None:
-        result = True, ("some-token", "1234", "Visa", None, datetime.date(2015, 8, 30), "")
+        result = True, (
+            'some-token',
+            '1234',
+            'Visa',
+            'https://assets.braintreegateway.com/payment_method_logo/visa.png?environment=sandbox',
+            datetime.date(2016, 8, 30),
+            '',
+        )
     else:
         result = next_payment_method_response
     next_payment_method_response = None
@@ -32,9 +39,9 @@ def make_payment(payment, nonce=None):
     if next_payment_response:
         result = next_payment_response
     elif nonce:
-        result = (models.Payment.APPROVED, "test", "", datetime.date(2015, 8, 30))
+        result = (models.Payment.APPROVED, 'test', '', datetime.date(2015, 8, 30))
     else:
-        result = (models.Payment.DECLINED, "test", "No funds available", datetime.date(2015, 8, 30))
+        result = (models.Payment.DECLINED, 'test', 'No funds available', datetime.date(2015, 8, 30))
     next_payment_response = None
     return result
 

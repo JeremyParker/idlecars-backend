@@ -35,7 +35,7 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
             }
         }
         response = braintree.Customer.create(request)
-        success = True
+        success = response.is_success
         # record_in_history(models.PaymentGatewayHistory.OPERATION.NEW_CUSTOMER, customer, None, None, request, response, success)
         customer_id = response.customer.id
         driver.braintree_customer_id = customer_id
@@ -73,10 +73,11 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
 
             card_suffix = payment_method.last_4
             card_type = payment_method.card_type
+            card_logo = payment_method.image_url
             exp = datetime.date(int(payment_method.expiration_year), int(payment_method.expiration_month), 1)
             unique_number_identifier = payment_method.unique_number_identifier
 
-        return True, (card_token, card_suffix, card_type, exp, unique_number_identifier)
+        return True, (card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier)
     else:
         error_message, error_fields, suspicious_activity = parse_card_error(response)
         error = error_message, error_fields
