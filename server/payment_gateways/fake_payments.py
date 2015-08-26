@@ -39,9 +39,9 @@ def make_payment(payment, escrow=False, nonce=None, token=None):
     if next_payment_response:
         result = next_payment_response
     elif nonce or token:
-        result = (models.Payment.APPROVED, 'test_transaction_id', '', datetime.date(2015, 8, 30))
+        result = (models.Payment.APPROVED, 'test_transaction_id', '',)
     else:
-        result = (models.Payment.DECLINED, 'test_transaction_id', 'No funds available', datetime.date(2015, 8, 30))
+        result = (models.Payment.DECLINED, 'test_transaction_id', 'No funds available',)
     next_payment_response = None
     return result
 

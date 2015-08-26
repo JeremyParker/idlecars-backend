@@ -26,7 +26,6 @@ def _add_customer(driver):
         }
         response = braintree.Customer.create(request)
         success = getattr(response, 'is_success', False)
-        # record_in_history(models.PaymentGatewayHistory.OPERATION.NEW_CUSTOMER, customer, None, None, request, response, success)
 
         customer_id = response.customer.id
         driver.braintree_customer_id = customer_id
@@ -59,17 +58,6 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
     response = braintree.PaymentMethod.create(request)
     success = getattr(response, "is_success", False)
 
-    # record = record_in_history(
-    #     models.PaymentGatewayHistory.OPERATION.NEW_CARD,
-    #     customer,
-    #     None,  # card is filled in later
-    #     None,
-    #     device,
-    #     request,
-    #     response,
-    #     success,
-    # )
-
     if success:
         payment_method = response.payment_method
         card_token = payment_method.token
@@ -88,11 +76,6 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
     else:
         error_message, error_fields, suspicious_activity = parse_card_error(response)
         error = error_message, error_fields
-        # record.error = str(error)
-        # record.save()
-
-        # if suspicious_activity:
-        #     send_suspicious_activity_email(customer, device, None, record)
         return False, error
 
 
@@ -117,18 +100,6 @@ def make_payment(payment, escrow=False, nonce=None, token=None):
     response = braintree.Transaction.sale(request)
     success = getattr(response, 'is_success', False)
 
-    # record = record_in_history(
-    #     models.PaymentGatewayHistory.OPERATION.PAYMENT,
-    #     payment.booking.customer,
-    #     payment.credit_card,
-    #     payment,
-    #     payment.booking.device,
-    #     request,
-    #     response,
-    #     success,
-    # )
-
-    expiration_date = None
     transaction_id = None
     if hasattr(response, "transaction"):
         transaction_id = response.transaction.id
@@ -138,8 +109,5 @@ def make_payment(payment, escrow=False, nonce=None, token=None):
         error_message = ""
     else:
         result, error_message, suspicious_activity = parse_payment_error(response)
-        # record.error = error_message
-        # record.save()
-        # TODO: if suspicious_activity: send an email
 
-    return result, transaction_id, error_message, expiration_date
+    return result, transaction_id, error_message
