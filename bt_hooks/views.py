@@ -9,7 +9,8 @@ import braintree
 from idlecars import email
 
 
-def _register_bt_endpoint(request):
+def _confirm_bt_endpoint(request):
+    # TODO: @jeremeyparker will update this when config is moved to a general place
     braintree.Configuration.configure(
         braintree.Environment.Sandbox,
         'cg5tqqwr6fn5xycb',
@@ -19,19 +20,19 @@ def _register_bt_endpoint(request):
     reply = braintree.WebhookNotification.verify(request.GET['bt_challenge'])
     return HttpResponse(reply, content_type='text/plain')
 
-def _send_email_to_admin(request):
+def _send_email_to_admin(request, subject):
     merge_vars = {
-        'jeff@idlecars.com': {
-            'FNAME': 'Admin',
-            'HEADLINE': 'Owner Bank Link Update',
-            'TEXT': str(request.POST),
-            'CTA_LABEL': 'Dont click me',
+        'support@idlecars.com': {
+            'FNAME': 'Dearest Admin',
+            'HEADLINE': subject,
+            'TEXT': 'detail from braintree (if any):\n' + str(request.POST),
+            'CTA_LABEL': 'button',
             'CTA_URL': 'https://idlecars.com',
         }
     }
     email.send_sync(
         template_name='one_button_no_image',
-        subject='Owner Bank Link Update',
+        subject=subject,
         merge_vars=merge_vars,
     )
 
@@ -39,15 +40,15 @@ def _send_email_to_admin(request):
 @csrf_exempt
 def submerchant_create_success(request):
     if request.method == 'GET':
-        return _register_bt_endpoint(request)
+        return _confirm_bt_endpoint(request)
     elif request.method == 'POST':
-        _send_email_to_admin(request)
+        _send_email_to_admin(request, 'Owner Bank Account Added')
         return HttpResponse('')
 
 @csrf_exempt
 def submerchant_create_failure(request):
     if request.method == 'GET':
-        return _register_bt_endpoint(request)
+        return _confirm_bt_endpoint(request)
     elif request.method == 'POST':
-        _send_email_to_admin(request)
+        _send_email_to_admin(request, 'Owner Bank Account Rejected')
         return HttpResponse('')
