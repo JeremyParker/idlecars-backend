@@ -2,8 +2,12 @@
 from __future__ import unicode_literals
 
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import braintree
+
+from idlecars import email
+
 
 def _register_bt_endpoint(request):
     braintree.Configuration.configure(
@@ -20,7 +24,7 @@ def _send_email_to_admin(request):
         'jeff@idlecars.com': {
             'FNAME': 'Admin',
             'HEADLINE': 'Owner Bank Link Update',
-            'TEXT': request.POST.__unicode__(),
+            'TEXT': str(request.POST),
             'CTA_LABEL': 'Dont click me',
             'CTA_URL': 'https://idlecars.com',
         }
@@ -32,6 +36,7 @@ def _send_email_to_admin(request):
     )
 
 
+@csrf_exempt
 def submerchant_create_success(request):
     if request.method == 'GET':
         return _register_bt_endpoint(request)
@@ -39,6 +44,7 @@ def submerchant_create_success(request):
         _send_email_to_admin(request)
         return HttpResponse('')
 
+@csrf_exempt
 def submerchant_create_failure(request):
     if request.method == 'GET':
         return _register_bt_endpoint(request)
