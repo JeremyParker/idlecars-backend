@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import datetime
-
 import braintree
 
 from django.conf import settings
@@ -10,23 +9,14 @@ from django.conf import settings
 from server import models
 
 
-def configure_braintree():
+def _configure_braintree():
     config = settings.BRAINTREE
     if isinstance(config["environment"], unicode):
         config["environment"] = getattr(braintree.Environment, config["environment"])
     braintree.Configuration.configure(**config)
 
 
-def initialize_gateway(driver):
-    configure_braintree()
-    return {'client_token': braintree.ClientToken.generate(),}
-
-
-def add_payment_method(driver, nonce):  # TODO: I don't think driver should be passed in. The ID should passed out.
-    configure_braintree()
-
-    customer_id = driver.braintree_customer_id
-    if not customer_id:
+def _add_customer(driver):
         request = {
             'first_name': driver.first_name(),
             'last_name': driver.last_name(),
@@ -35,14 +25,31 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
             }
         }
         response = braintree.Customer.create(request)
-        success = response.is_success
+        success = getattr(response, 'is_success', False)
         # record_in_history(models.PaymentGatewayHistory.OPERATION.NEW_CUSTOMER, customer, None, None, request, response, success)
+
         customer_id = response.customer.id
         driver.braintree_customer_id = customer_id
         driver.save()
 
+        return driver
+
+
+def initialize_gateway(driver):
+    _configure_braintree()
+    return {'client_token': braintree.ClientToken.generate(),}
+
+
+def add_payment_method(driver, nonce):  # TODO: I don't think driver should be passed in. The ID should passed out.
+    _configure_braintree()
+
+    if not driver.braintree_customer_id:
+        driver = _add_customer(driver)
+        if not driver.braintree_customer_id:
+            raise Exception('Unable to add a customer to Braintree.')
+
     request = {
-        "customer_id": customer_id,
+        "customer_id": driver.braintree_customer_id,
         "payment_method_nonce": nonce,
         "options": {
             "make_default": True,
@@ -89,23 +96,26 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
         return False, error
 
 
-def make_payment(payment, nonce):
-    configure_braintree()
+def make_payment(payment, escrow=False, nonce=None, token=None):
+    assert nonce or token
+    _configure_braintree()
 
     request = {
-        "amount": str(payment.amount),
-        # "merchant_account_id": settings.BRAINTREE["merchant_id"],
-        # "customer_id": payment.booking.driver.braintree_customer_id,
-        "options": {
-            "submit_for_settlement": True,
+        'amount': str(payment.amount),
+        'customer_id': payment.booking.driver.braintree_customer_id,
+        'options': {
+            'submit_for_settlement': True,
+            # 'hold_in_escrow': escrow,
         },
     }
 
     if nonce:
         request['payment_method_nonce'] = nonce
+    elif token:
+        request['payment_method_token'] = token
 
     response = braintree.Transaction.sale(request)
-    success = getattr(response, "is_success", False)
+    success = getattr(response, 'is_success', False)
 
     # record = record_in_history(
     #     models.PaymentGatewayHistory.OPERATION.PAYMENT,
@@ -119,12 +129,9 @@ def make_payment(payment, nonce):
     # )
 
     expiration_date = None
-    transaction_token = None
+    transaction_id = None
     if hasattr(response, "transaction"):
-        transaction_token = response.transaction.id
-        if hasattr(response.transaction, "credit_card"):
-            card = response.transaction.credit_card
-            expiration_date = datetime.date(int(card["expiration_year"]), int(card["expiration_month"]), 1)
+        transaction_id = response.transaction.id
 
     if success:
         result = models.Payment.APPROVED
@@ -135,4 +142,4 @@ def make_payment(payment, nonce):
         # record.save()
         # TODO: if suspicious_activity: send an email
 
-    return result, transaction_token, error_message, expiration_date
+    return result, transaction_id, error_message, expiration_date

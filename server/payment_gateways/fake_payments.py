@@ -32,16 +32,16 @@ def add_payment_method(driver, nonce):
     return result
 
 
-def make_payment(payment, nonce=None):
+def make_payment(payment, escrow=False, nonce=None, token=None):
     global next_payment_response
     make_payment_log.append(payment)
 
     if next_payment_response:
         result = next_payment_response
-    elif nonce:
-        result = (models.Payment.APPROVED, 'test', '', datetime.date(2015, 8, 30))
+    elif nonce or token:
+        result = (models.Payment.APPROVED, 'test_transaction_id', '', datetime.date(2015, 8, 30))
     else:
-        result = (models.Payment.DECLINED, 'test', 'No funds available', datetime.date(2015, 8, 30))
+        result = (models.Payment.DECLINED, 'test_transaction_id', 'No funds available', datetime.date(2015, 8, 30))
     next_payment_response = None
     return result
 

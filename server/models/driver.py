@@ -24,6 +24,9 @@ class Driver(models.Model):
     braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
 
+    def __unicode__(self):
+        return self.full_name()
+
     def admin_display(self):
         return self.auth_user.get_full_name() or fields.format_phone_number(self.phone_number())
 

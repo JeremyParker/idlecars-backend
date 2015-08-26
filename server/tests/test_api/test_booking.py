@@ -137,6 +137,12 @@ class BookingStepTest(APITestCase):
     Test that the booking shows the correct steps at the correct times as it
     transitions through all states
     '''
+    def _driver_adds_payment_method(self):
+        # client adds a payment_method. Don't do this here 'cause we're not testing driver API
+        self.driver.braintree_customer_id = 'fake_customer_id'
+        self.driver.save()
+        factories.PaymentMethod.create(driver=self.driver)
+
     def test_new_driver_starts(self):
         self.driver = factories.Driver.create()
         token = Token.objects.get(user__username=self.driver.auth_user.username)
@@ -184,8 +190,10 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
 
+        self._driver_adds_payment_method()
+
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
-        checkout_response = self.client.post(checkout_url, data={'nonce': Nonces.Transactable})
+        checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
 
         self._checked_out_docs_unapproved()
@@ -196,8 +204,10 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
 
+        self._driver_adds_payment_method()
+
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
-        checkout_response = self.client.post(checkout_url, data={'nonce': Nonces.Transactable})
+        checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
         self._checked_out_docs_approved()
 

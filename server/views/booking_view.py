@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 from server import models
 from server.services import booking as booking_service
-from server.serializers import BookingSerializer, BookingDetailsSerializer, CheckoutSerializer
+from server.serializers import BookingSerializer, BookingDetailsSerializer
 from server.permissions import OwnsBooking
 
 
@@ -22,7 +22,8 @@ class BookingViewSet(
     ):
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve', 'partial_update']:
+        detail_actions = ['list', 'retrieve', 'partial_update', 'checkout', 'cancelation', 'pickup']
+        if self.action in detail_actions:
             return BookingDetailsSerializer
         return BookingSerializer
 
@@ -48,15 +49,10 @@ class BookingViewSet(
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def checkout(self, request, pk=None):
-        serializer = CheckoutSerializer(data=request.DATA)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         booking = self.get_object()
         if not booking_service.can_checkout(booking):
-            raise ValidationError('Your rental can\'t be created at this time.')
-
-        nonce = serializer.validated_data['nonce']
-        result_booking = booking_service.checkout(booking, nonce=nonce)
+            raise ValidationError('Your rental can\'t be reserved at this time.')
+        result_booking = booking_service.checkout(booking)
         result_serializer = self.get_serializer(result_booking)
         return Response(result_serializer.data)
 

@@ -114,27 +114,22 @@ class DriverServiceTest(TestCase):
         )
 
     def test_documents_approved_reserved_booking(self):
-        self.driver = factories.CompletedDriver.create()
-        new_booking = booking_service.create_booking(self.car, self.driver)
-        self.assertEqual(new_booking.get_state(), Booking.PENDING)
-
-        # booking is reserved with the deposit paid
-        booking_service.checkout(new_booking, nonce=Nonces.Transactable)
+        self.driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.ReservedBooking.create(driver=self.driver)
         self.assertEqual(new_booking.get_state(), Booking.RESERVED)
+        self.assertFalse(self.driver.documentation_approved)
 
         # THEN the documents are approved
         new_booking.driver.documentation_approved = True
         new_booking.driver.save()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
-
-        self._validate_new_booking_email(outbox[0], new_booking)
+        self.assertEqual(len(outbox), 1)
 
         # we should have sent an email to the owner asking them to add the driver to the insurance
-        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(outbox[0].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
-            outbox[1].subject,
+            outbox[0].subject,
             'A driver has booked your {}.'.format(new_booking.car.__unicode__())
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))

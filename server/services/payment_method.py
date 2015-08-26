@@ -17,7 +17,7 @@ def add_payment_method(driver, nonce):
         payment_method = models.PaymentMethod.objects.create(
             driver=driver,
             gateway_name=settings.PAYMENT_GATEWAY_NAME,
-            gateway_token=nonce,
+            gateway_token=token,
             suffix=suffix,
             card_type=card_type,
             card_logo=card_logo,

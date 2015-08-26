@@ -113,18 +113,25 @@ def cancel(booking):
 
 def can_checkout(booking):
     # TODO - check that the car is still available (may have been a race to book)
-    return booking.driver.all_docs_uploaded() and booking.get_state() == Booking.PENDING
+    if not booking.driver.all_docs_uploaded():
+        return False
+    if booking.get_state() != Booking.PENDING:
+        return False
+    if not booking.driver.braintree_customer_id:
+        return False
+    if not booking.driver.paymentmethod_set.exists():
+        return False
+    return True
 
-
-def checkout(booking, credit_card=None, nonce=None):
+def checkout(booking):
     if not can_checkout(booking):
         raise Exception("Booking cannot be checked out in its current state")
 
+    payment_method = booking.driver.paymentmethod_set.last() # TODO - store 'em all and make latest the default
     payment = payment_service.create_payment(
         booking,
         booking.car.solo_deposit,
-        credit_card=credit_card,
-        nonce=nonce,
+        payment_method=payment_method,
     )
     if payment.is_paid():
         booking.checkout_time = timezone.now()

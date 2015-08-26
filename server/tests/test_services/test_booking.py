@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import datetime
-from braintree.test.nonces import Nonces
 
 from django.utils import timezone
 from django.test import TestCase
@@ -78,18 +77,18 @@ class BookingServiceTest(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_all_docs_uploaded(self):
-        driver = factories.CompletedDriver.create()
+        driver = factories.PaymentMethodDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=driver)
 
-        # checkout with a payment nonce
-        new_booking = booking_service.checkout(new_booking, nonce=Nonces.Transactable)
+        # checkout
+        new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.RESERVED)
         # TODO we should send an email to the driver and owner telling them what happened
 
     def _checkout_approved_driver(self):
         driver = factories.ApprovedDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=driver)
-        new_booking = booking_service.checkout(new_booking, nonce=Nonces.Transactable)
+        new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
         return new_booking
 
@@ -150,7 +149,7 @@ class BookingServiceTest(TestCase):
     def test_cancel_requested_booking(self):
         approved_driver = factories.ApprovedDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
-        new_booking = booking_service.checkout(new_booking, nonce=Nonces.Transactable)
+        new_booking = booking_service.checkout(new_booking)
         booking_service.cancel(new_booking)
 
         ''' we should have sent

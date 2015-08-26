@@ -7,7 +7,8 @@ from owner import Owner
 from make_model import MakeModel, MakeModelWithImage, MakeModelWithImages
 from car import Car, BookableCar, CarExpiredListing, CompleteCar
 from user import AuthUser, StaffUser
-from driver import Driver, CompletedDriver, ApprovedDriver
+from driver import Driver, CompletedDriver, PaymentMethodDriver, ApprovedDriver
 from booking import Booking, ReservedBooking, RequestedBooking, AcceptedBooking, BookedBooking
 from booking import ReturnedBooking, RefundedBooking, IncompleteBooking
 from rideshare_flavor_factory import RideshareFlavorFactory
+from payment_method import PaymentMethod

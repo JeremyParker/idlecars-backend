@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from . import Booking #, CreditCard
+from server.models import Booking, PaymentMethod
 
 class Payment(models.Model):
     PENDING = 0
@@ -18,10 +18,10 @@ class Payment(models.Model):
     )
     booking = models.ForeignKey(Booking)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    # credit_card = models.ForeignKey(CreditCard, null=True, blank=True)
+    payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True)
     status = models.IntegerField(choices=STATUS, default=PENDING)
     error_message = models.CharField(max_length=256)
-    gateway_token = models.CharField(max_length=32)
+    transaction_id = models.CharField(max_length=32)
 
     def __unicode__(self):
         return '{} from {}'.format(self.amount, self.booking.driver) # self.credit_card)
