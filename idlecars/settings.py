@@ -193,11 +193,11 @@ CORS_ALLOW_HEADERS = (
 # Heap Analytics uses the DEBUG app id in development/testing
 HEAP_APP_ID = '655181858'
 
-PAYMENT_GATEWAY_NAME = 'fake'
+PAYMENT_GATEWAY_NAME = 'braintree'
 
 BRAINTREE = {
-    "environment": "Sandbox",
-    "merchant_id": "fckq6988gccrfnty",
-    "public_key": "hxbd5tx9836svxy7",
-    "private_key": "005ff099d74dfc1a098f77f176c175a8",
+    'environment': os.getenv('BRAINTREE_ENVIRONMENT', 'Sandbox'),
+    'merchant_id': os.getenv('BRAINTREE_MERCHANT_ID', 'fckq6988gccrfnty'),
+    'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
+    'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
