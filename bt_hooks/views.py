@@ -37,6 +37,7 @@ def _send_email_to_admin(request, subject):
     )
 
 
+# TODO: confirm the request actually came from braintree
 @csrf_exempt
 def submerchant_create_success(request):
     if request.method == 'GET':
@@ -45,6 +46,7 @@ def submerchant_create_success(request):
         _send_email_to_admin(request, 'Owner Bank Account Added')
         return HttpResponse('')
 
+# TODO: confirm the request actually came from braintree
 @csrf_exempt
 def submerchant_create_failure(request):
     if request.method == 'GET':
