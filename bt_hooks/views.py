@@ -25,7 +25,7 @@ def _send_email_to_admin(request):
             'CTA_URL': 'https://idlecars.com',
         }
     }
-    email.send_async(
+    email.send_sync(
         template_name='one_button_no_image',
         subject='Owner Bank Link Update',
         merge_vars=merge_vars,
