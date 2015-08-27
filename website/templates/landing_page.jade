@@ -100,10 +100,18 @@ extends ./base.jade
 
 
 
+  section.ask
+    h3 Your Car is Ready, Are You?
+    a(href='mailto:support@idlecars.com') ASK US ANYTHING
+    h3 Follow Us Too
+    .social
+      .app
+        img(src="#{ settings.STATIC_URL }img/twitter.png")
+      .app
+        img(src="#{ settings.STATIC_URL }img/facebook.png")
+      .app
+        img(src="#{ settings.STATIC_URL }img/linkedin.png")
+
   footer
-    .container
-      p.ask
-        a(href='mailto:support@idlecars.com') ASK US ANYTHING
-        div.last_content
-          | <p class='tm'>© {% now 'Y' %} idlecars</p>
-          p.tm All trademarks and images are copyright of their respective owners.
+    p.tm © {% now 'Y' %} idlecars
+    p.tm All trademarks and images are copyright of their respective owners.
