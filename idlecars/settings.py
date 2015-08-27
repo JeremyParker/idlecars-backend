@@ -192,3 +192,6 @@ CORS_ALLOW_HEADERS = (
 
 # Heap Analytics uses the DEBUG app id in development/testing
 HEAP_APP_ID = '655181858'
+
+# TODO: add production account_id for braintree
+MASTER_MERCHANT_ACCOUNT_ID = 'sandyMerch'
