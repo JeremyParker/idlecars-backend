@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib import auth
 
-from owner_crm import models
+from owner_crm import models, services
 
 
 def create(phone_number):
@@ -16,3 +16,9 @@ def create(phone_number):
     except auth.models.User.DoesNotExist:
         pass
     return None
+
+
+def invite_owner(auth_user):
+    password_reset = create(auth_user.username)
+    if password_reset:
+        services.owner_emails.account_created(password_reset)

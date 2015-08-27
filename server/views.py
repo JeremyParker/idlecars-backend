@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.http import Http404
+from django.contrib.auth.models import User
 
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
@@ -9,8 +10,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from idlecars import fields
+from owner_crm.services import password_reset_service
 
 import models, services
+from services import auth_user as auth_user_service
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
 from serializers import DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
@@ -65,17 +68,37 @@ class DriverViewSet(
         ''' override to map 'me' to the current user's driver object '''
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
-            self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
+            try:
+                self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
+            except models.Driver.DoesNotExist:
+                raise Http404
         return super(DriverViewSet, self).get_object()
 
 
 class PhoneNumberDetailView(APIView):
     def get(self, request, pk, format=None):
+        phone_number = fields.parse_phone_number(pk)
         try:
-            driver = models.Driver.objects.get(auth_user__username=fields.parse_phone_number(pk))
-        except models.Driver.DoesNotExist:
-            # TODO(JP) create a new Driver, call start_set_password(auth_user).
-            raise Http404
+            auth_user = User.objects.get(username=phone_number)
+            serializer = PhoneNumberSerializer(auth_user)
+            return Response(serializer.data)
 
-        serializer = PhoneNumberSerializer(driver.auth_user, many=False)
-        return Response(serializer.data)
+        except User.DoesNotExist:
+            # If an old-skool UserAccount exists, and an Owner exists then it's an owner signing up.
+            user_accounts = models.UserAccount.objects.filter(phone_number=phone_number)
+            if not [u.owner for u in user_accounts if u.owner]:
+                raise Http404
+
+            # we can only have one auth.User per phone. Use the first.
+            auth_user = auth_user_service.create_auth_user(user_accounts[0])
+            user_accounts[0].owner.auth_user.add(auth_user)
+            password_reset_service.invite_owner(auth_user)
+
+            content = PhoneNumberSerializer(auth_user).data
+            content.update({'_app_notifications': [
+                '''
+                Great, you're in our system already! An email has been sent to your address
+                with instructions for setting your password.
+                '''
+            ],})
+            return Response(content)

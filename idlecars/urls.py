@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/', include('server.urls', namespace='server')),
     url(r'^api/', include('owner_crm.urls', namespace='owner_crm')),
-    url(r'^api/owner_portal/', include('owner_portal.urls', namespace='owner_portal')),
     url(r'^bt_hooks/', include('bt_hooks.urls', namespace='bt_hooks')),
 
     url(r'^admin/', include('unsubscribes.urls', namespace='unsubscribes')),
