@@ -94,6 +94,10 @@ section {
   padding: 2rem 2rem;
 }
 
+.thanks .content {
+  margin: 0 auto;
+}
+
 .navbar {
   background: black;
   display: flex;
