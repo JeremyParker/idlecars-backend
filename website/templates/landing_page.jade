@@ -13,31 +13,56 @@ extends ./base.jade
     .phone-background
       .container
         .content
-          h1 Keep More of What You Earn
-          h3 NYC's widest selection of TLC registered #[br] for-hire rentals at the best price
-          h3 No leases, loans or long-term commitments. #[br] insurance and maintenance included.
+          h2 Keep More of #[br] What You Earn
+          p NYC's widest selection of TLC registered #[br] for-hire rentals at the best price
+          p No leases, loans or long-term commitments. #[br] insurance and maintenance included.
           a.button(href="#{ settings.WEBAPP_URL }") Find your car
           a.login(href="#{ login_url }") Have an account? #[span Log in]
 
   section.get-more
     .container
-      h2 Registered Today. Drive Tomorrow.
+      h3 Register Today. Drive Tomorrow.
       p we handle the paperwork so you can focus on your fares.
 
   section.select
     .container
       .content
-        h2 Choose your car, get insured #[br] and start driving within #[br] #[span 24 hours.]
+        h3 Choose your car, get insured #[br] and start driving within #[br] #[strong 24 hours.]
         h1 It's that easy
 
   section.manhattan
+
+  section.tutorial
+    h2 How it works
+    .segments
+      .segment
+        .pane
+          img(src="#{ settings.STATIC_URL }img/white_car.png")
+          strong Pick A Car. Any Car.
+          p Find the car that fits your style and budget.
+      .segment
+        .pane
+          img(src="#{ settings.STATIC_URL }img/white_car.png")
+          strong Start Your Account.
+          p Use your smartphone to upload your driving documents.
+      .segment
+        .pane
+          img(src="#{ settings.STATIC_URL }img/white_car.png")
+          strong Reserve Your Car.
+          p Use your credit card or bank account to reserve your car.
+      .segment
+        .pane
+          img(src="#{ settings.STATIC_URL }img/white_car.png")
+          strong DRIVE
+          p Once you’re added to the insurance you’re ready to go. Go pick up your car!
+
 
   #lets-talk
   - if show_thanks
     section.thanks
       .container
         .content
-          h2 Thanks!
+          h3 Thanks!
           p Expect an email from us shortly.
           p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
 

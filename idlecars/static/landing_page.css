@@ -9,27 +9,24 @@ body {
 }
 
 h1, h2, h3, p {
-  font-weight: 200;
+  font-weight: 300;
   margin-top: 0;
   margin-bottom: 0.5rem;
-}
-
-h1, h2, h3 {
   line-height: 1.5em;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 500;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 p {
@@ -133,13 +130,13 @@ section {
   position: relative;
 }
 
-.headline h1 {
-  line-height: 1em;
-  margin-bottom: 1.5rem;
+.headline h2 {
+  line-height: 1.25em;
+  margin-bottom: 2rem;
 }
 
-.headline h3 {
-  margin-bottom: 0.75rem;
+.headline p {
+  margin-bottom: 1rem;
 }
 
 .headline .button {
@@ -169,12 +166,8 @@ section {
   margin-top: 3rem;
 }
 
-.select h2 {
-  font-weight: 100;
-}
-
-.select span {
-  font-weight: 500;
+.select h3 {
+  font-weight: 300;
 }
 
 .select .container {
@@ -182,14 +175,14 @@ section {
   text-align: center;
 }
 
-.select p {
-  width: 360px;
-}
-
 .get-more {
   background: white;
   color: black;
   text-align: center;
+}
+
+.get-more h3 {
+  font-weight: 500;
 }
 
 .get-more .container {
@@ -205,13 +198,52 @@ section {
 }
 
 .manhattan {
-  background: url(img/manhattan.png) no-repeat black;
+  background: url(img/manhattan.png) no-repeat white;
+  background-size: cover;
+  background-position: center;
   height: 507px;
 }
 
-p.strong {
+.tutorial {
+  height: 400px;
+  background-color: #008aff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.tutorial h2 {
+  margin: 3rem 0;
+}
+
+.tutorial p {
+  font-size: 0.85rem;
+}
+
+.tutorial strong {
+  font-size: 1rem;
   font-weight: 500;
-  margin: 0;
+  display: block;
+  margin: 1.25rem 0;
+}
+
+.tutorial .segments {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.tutorial .segment {
+  flex: 1;
+}
+
+.tutorial img {
+  height: 5rem;
+}
+
+.tutorial .pane {
+  max-width: 13rem;
+  margin: 0 auto;
 }
 
 .form {
