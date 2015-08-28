@@ -13,3 +13,8 @@ class OwnsBooking(permissions.BasePermission):
     """a user can edit or get only their own bookings"""
     def has_object_permission(self, request, view, obj):
         return request.user == obj.driver.auth_user
+
+class OwnsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # TODO: implement when owner has auth users associated to it
+        return True

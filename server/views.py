@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import detail_route
+from rest_framework import status
 
 from idlecars import fields
 from owner_crm.services import password_reset_service
@@ -17,6 +19,9 @@ from services import auth_user as auth_user_service
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
 from serializers import DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
+from server.models import Owner
+from server.services import owner_bank_link_service
+from server.permissions import OwnsOwner
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
@@ -73,6 +78,23 @@ class DriverViewSet(
             except models.Driver.DoesNotExist:
                 raise Http404
         return super(DriverViewSet, self).get_object()
+
+
+class OwnerViewSet(
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet
+    ):
+    queryset = Owner.objects.all()
+
+    @detail_route(methods=['post'], permission_classes=[OwnsOwner])
+    def bank_link(self, request, pk=None):
+        owner = self.get_object()
+        result = owner_bank_link_service.link(owner, request.data)
+
+        if not result.get('error'):
+            return Response(result, status=status.HTTP_201_CREATED)
+        else:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PhoneNumberDetailView(APIView):
