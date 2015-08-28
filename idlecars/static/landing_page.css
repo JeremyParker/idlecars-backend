@@ -29,7 +29,7 @@ h3 {
   font-size: 1.5rem;
 }
 
-p, strong {
+p {
   font-size: 1rem;
   line-height: 1.35em;
 }
@@ -37,6 +37,10 @@ p, strong {
 a {
   color: white;
   text-decoration: none;
+}
+
+strong {
+  font-weight: 500;
 }
 
 input {
@@ -227,7 +231,6 @@ section {
 }
 
 .tutorial strong {
-  font-weight: 500;
   display: block;
   margin: 1.25rem 0;
 }
@@ -459,7 +462,7 @@ footer {
     font-size: 1.25rem;
   }
 
-  p, strong{
+  p {
     font-size: 0.75rem;
   }
 
