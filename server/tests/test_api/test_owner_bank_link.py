@@ -23,10 +23,10 @@ class BankLinkTest(APITestCase):
     # def test_merchant_id_added_to_owner(self):
     #     self.assertFalse(self.owner.merchant_id)
     #     response = self.client.post(self.url, self._fake_params(), format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     #     reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
-    #     self.assertTrue(reloaded_owner)
+    #     self.assertTrue(reloaded_owner.merchant_id)
 
     def _fake_params(self):
         return {
