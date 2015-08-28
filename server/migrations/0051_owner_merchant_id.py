@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0053_auto_20150819_2256'),
+        ('server', '0050_makemodel_passenger_count'),
     ]
 
     operations = [
