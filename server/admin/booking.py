@@ -89,7 +89,7 @@ class BookingAdmin(admin.ModelAdmin):
 
     def car_link(self, instance):
         if instance.car:
-            return link(instance.car, instance.car.__unicode__())
+            return link(instance.car, instance.car.display_name())
         else:
             return None
     car_link.short_description = 'Car'
@@ -161,7 +161,6 @@ class BookingForDriverInline(admin.TabularInline):
     ]
     readonly_fields = [
         'detail_link',
-        'car',
         'created_time',
     ]
     def detail_link(self, instance):
