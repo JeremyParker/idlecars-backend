@@ -13,6 +13,7 @@ class Owner(models.Model):
     address1 = models.CharField(blank=True, max_length=200)
     address2 = models.CharField(blank=True, max_length=200)
     city = models.CharField(blank=True, max_length=200)
+    merchant_id = models.CharField(blank=True, max_length=200)
     state_code = models.CharField(blank=True, max_length=2)
     zipcode = models.CharField(blank=True, max_length=5, verbose_name='Zip Code',
         validators=[

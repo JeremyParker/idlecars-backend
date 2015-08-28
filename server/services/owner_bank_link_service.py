@@ -25,4 +25,4 @@ def link(owner, braintree_params):
         add_merchant_id_to_owner(result.merchant_account.id, owner)
         return {}
     else:
-        return {'errors': result.message}
+        return {'_app_notifications': [result.message]}

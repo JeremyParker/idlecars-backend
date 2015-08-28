@@ -13,14 +13,14 @@ from server import factories
 class BankLinkTest(APITestCase):
     def setUp(self):
         self.owner = factories.Owner.create()
-        # token = Token.objects.get(user__username=self.driver.auth_user.username)
         self.client = APIClient()
-        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:owners-bank-link', args=(self.owner.pk,))
 
-    def test_request(self):
+    def test_merchant_id_added_to_owner(self):
+        self.assertFalse(self.owner.merchant_id)
         response = self.client.post(self.url, self._fake_params(), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.owner.merchant_id)
 
     def _fake_params(self):
         return {
