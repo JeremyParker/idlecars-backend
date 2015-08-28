@@ -2,16 +2,23 @@ extends ./base.jade
 
 - block content
   section.navbar
-    div
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
+    .logo
+      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
     .links
-      .link #[a How it works]
-      .link #[a Join/Login]
-      .link #[a List your car]
+      a How it works
+      a Join/Login
+      a List your car
+    .menu-button(ng-click='showMenu = !showMenu')
+      .burger-button
+    .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+      a How it works
+      a Join/Login
+      a List your car
 
   section.headline
     .phone-background
       .container
+        img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
         .content
           h2 Keep More of #[br] What You Earn
           p NYC's widest selection of TLC registered #[br] for-hire rentals at the best price
@@ -65,9 +72,9 @@ extends ./base.jade
           p Expect an email from us shortly.
           p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
 
-  section.form
+  section.form(ng-controller="formCtrl")
     .container
-      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
+      form(action="#{ action }", method="post", novalidate='', name="myForm")
         - csrf_token
 
         ul.role(ng-init="role = 'driver'")

@@ -103,16 +103,21 @@ section {
   display: flex;
 }
 
-.navbar div {
+.navbar .logo, .navbar .links {
   display: flex;
   flex: 1;
   padding: 0.5rem 0;
+  align-items: center;
 }
 
-.navbar .link {
+.navbar a {
   flex: 1;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+}
+
+.navbar .menu-button {
+  display: none;
+  cursor: pointer;
 }
 
 .navbar img {
@@ -132,6 +137,10 @@ section {
 .headline .container {
   height: 695px;
   position: relative;
+}
+
+.headline img {
+  display: none;
 }
 
 .headline h2 {
@@ -279,10 +288,6 @@ li {
   flex: 1;
 }
 
-.red {
-  color: red;
-}
-
 .role {
   padding: 0 0 4rem;
 }
@@ -394,9 +399,58 @@ footer {
   max-width: 100%;
 }
 
+.burger-button, .burger-button:before, .burger-button:after {
+  border-radius: 1px;
+  height: 3px;
+  width: 20px;
+  background: white;
+  display: block;
+  content: '';
+  position: absolute;
+}
+
+.burger-button {
+  top: 23px;
+  right: 14px;
+}
+
+.burger-button:before {
+  top: -6px;
+}
+
+.burger-button:after {
+  bottom: -6px;
+}
+
+.menu-container {
+  position: absolute;
+  background-color: black;
+  width: 100%;
+  top: 3rem;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem 0.5rem;
+}
+
+.menu-container a {
+  text-align: right;
+  margin-bottom: 0.5rem;
+  font-weight: 300;
+}
+
 @media (max-width: 700px) {
-  .navbar .links {
+  .navbar .links, .navbar .logo {
     display: none;
+  }
+
+  .navbar .menu-button {
+    display: block;
+    position: relative;
+    left: calc(100% - 3rem);
+    width: 3rem;
+    height: 3rem;
   }
 }
 
