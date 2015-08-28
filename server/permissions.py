@@ -16,5 +16,4 @@ class OwnsBooking(permissions.BasePermission):
 
 class OwnsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        # TODO: implement when owner has auth users associated to it
-        return True
+        return request.user == obj.auth_user
