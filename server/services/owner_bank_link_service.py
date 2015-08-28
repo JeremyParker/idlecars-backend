@@ -6,7 +6,8 @@ from django.conf import settings
 import braintree
 
 def add_merchant_id_to_owner(merchant_id, owner):
-    return True
+    owner.merchant_id = merchant_id
+    return owner.save()
 
 def link(owner, braintree_params):
     # TODO: @jeremyparker will move this when needed
