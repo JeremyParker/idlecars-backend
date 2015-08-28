@@ -43,7 +43,7 @@ def _missing_documents_text(driver):
 def _render_reminder_body(booking):
     docs = _missing_documents_text(booking.driver)
     template_data = {
-        'CAR_NAME': booking.car.__unicode__(),
+        'CAR_NAME': booking.car.display_name(),
         'DOCS_LIST': docs,
     }
     context = Context(autoescape=False)
@@ -62,13 +62,13 @@ def documents_reminder(booking):
             'TEXT': body,
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': cta_url,
-            'HEADLINE': 'Your {} is waiting'.format(booking.car.__unicode__()),
+            'HEADLINE': 'Your {} is waiting'.format(booking.car.display_name()),
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
         }
     }
     email.send_async(
         template_name='one_button_one_image',
-        subject='Your {} is waiting on your driving documents'.format(booking.car.__unicode__()),
+        subject='Your {} is waiting on your driving documents'.format(booking.car.display_name()),
         merge_vars=merge_vars,
     )
 
@@ -77,7 +77,7 @@ def documents_approved(booking):
     if not booking.driver.email():
         return
     template_data = {
-        'CAR_NAME': booking.car.__unicode__(),
+        'CAR_NAME': booking.car.display_name(),
     }
     context = Context(autoescape=False)
     body = render_to_string("driver_docs_approved.jade", template_data, context)
@@ -108,14 +108,14 @@ def someone_else_booked(booking):
             'HEADLINE': 'Someone else rented your car!',
             'TEXT': '''While we were waiting for you to finish uploading your documents,
                 another driver rented your car. But don't worry,
-                there are plenty more cars available.'''.format(booking.car.__unicode__()),
+                there are plenty more cars available.'''.format(booking.car.display_name()),
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Someone else rented your {}.'.format(booking.car.__unicode__()),
+        subject='Someone else rented your {}.'.format(booking.car.display_name()),
         merge_vars=merge_vars,
     )
 
@@ -129,7 +129,7 @@ def booking_canceled(booking):
     merge_vars = {
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
-            'TEXT': body.format(booking.car.__unicode__()),
+            'TEXT': body.format(booking.car.display_name()),
             'CTA_LABEL': 'Find another car',
             'CTA_URL': client_side_routes.car_listing_url(),
             'HEADLINE': 'Your rental has been canceled',
