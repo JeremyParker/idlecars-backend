@@ -55,12 +55,10 @@ section {
   padding: 8rem 2rem;
   display: -webkit-flex;
   display: flex;
-  -webkit-align-items: center;
-  align-items: center;
-}
-
-.content {
-  width: 25rem;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  -webkit-justify-content: center;
+  justify-content: center;
 }
 
 .button {
@@ -118,6 +116,10 @@ section {
 .navbar .menu-button {
   display: none;
   cursor: pointer;
+  position: relative;
+  left: calc(100% - 3rem);
+  width: 3rem;
+  height: 3rem;
 }
 
 .navbar img {
@@ -188,6 +190,10 @@ section {
   text-align: center;
 }
 
+.select .content {
+  max-width: 25rem;
+}
+
 .get-more {
   background: white;
   color: black;
@@ -196,18 +202,6 @@ section {
 
 .get-more h3 {
   font-weight: 500;
-}
-
-.get-more .container {
-  -webkit-flex-direction: column;
-  flex-direction: column;
-  -webkit-justify-content: center;
-  justify-content: center;
-  padding: 5rem 1rem
-}
-
-.get-more p {
-  max-width: 33rem;
 }
 
 .manhattan {
@@ -447,80 +441,73 @@ footer {
 
   .navbar .menu-button {
     display: block;
-    position: relative;
-    left: calc(100% - 3rem);
-    width: 3rem;
-    height: 3rem;
   }
 }
 
 @media (max-width: 415px) {
-  h1, h2 {
-    font-size: 1.8rem;
+  h1, h2, h3, p {
     line-height: 1.25em;
-    margin-bottom: 15px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
   }
 
   h3 {
-    line-height: 1rem;
-    font-size: 8px;
+    font-size: 1.25rem;
   }
 
   p {
-    font-size: 0.7rem;
-    width: 19em;
+    font-size: 0.75rem;
   }
 
-  .logo {
-    height: 2.7em;
-    margin-top: 0.8em;
-  }
-
-  .container {
+  .headline .container{
+    height: 500px;
     padding: 3rem 1.75rem;
   }
 
   .headline img {
-    top: 1rem;
-    left: 2rem;
-    max-width: 40%;
+    display: block;
+    height: 3rem;
+    margin-bottom: 2.5rem;
   }
-
-  .headline h1 {
-    width: 15rem;
+  .headline h2 {
+    margin-bottom: 1rem;
   }
 
   .headline .button {
-    text-shadow: none
-  }
-
-  .headline, .select, .keep-more {
-    background-size: auto 350px;
-    background-position: calc(50% + 150px) center;
+    text-shadow: none;
+    margin: 1.5rem 0;
   }
 
   .select {
     background-position: calc(50% + 205px) center;
   }
 
-  .select p {
-    width: 22em;
+  .select .container {
+    height: 400px;
+    padding: 3rem 3.5rem;
   }
 
   .convenient .container {
     min-height: initial;
   }
 
-  .headline .container, .select .container, .keep-more .container {
+  .headline .container, .select .container {
     background: rgba(0,0,0,0.5);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-    height: 350px;
+  }
+
+  .get-more .container {
+    padding: 2rem 3rem;
   }
 
   .get-more p {
-    text-align: center;
     margin-bottom: 0em;
-    width: 23em;
   }
 
   .service-logos-big {
