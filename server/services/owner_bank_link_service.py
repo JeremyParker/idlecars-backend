@@ -21,12 +21,13 @@ def link(owner, braintree_params):
     braintree_params['funding']['destination'] = braintree.MerchantAccount.FundingDestination.Bank
     braintree_params['master_merchant_account_id'] = settings.MASTER_MERCHANT_ACCOUNT_ID
 
-    result = braintree.MerchantAccount.create(braintree_params)
-    if type(result) is braintree.successful_result.SuccessfulResult:
-        add_merchant_id_to_owner(result.merchant_account.id, owner)
+    response = braintree.MerchantAccount.create(braintree_params)
+    success = getattr(response, "is_success", False)
+    if success:
+        add_merchant_id_to_owner(response.merchant_account.id, owner)
         return {}
     else:
         return {
-            'error': result.message,
-            '_app_notifications': [result.message]
+            'error': response.message,
+            '_app_notifications': [response.message]
         }

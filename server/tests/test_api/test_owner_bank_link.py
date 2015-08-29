@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-# from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.models import Token
 
 from server import factories
 from server import models
@@ -13,20 +13,25 @@ from server import models
 
 class BankLinkTest(APITestCase):
     def setUp(self):
-        self.owner = factories.Owner.create()
         self.client = APIClient()
+
+        self.owner = factories.AuthOwner.create()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.owner.auth_users.last().username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
         self.url = reverse('server:owners-bank-link', args=(self.owner.pk,))
 
     # NOTE: as of writing, this test passes, but accesses Braintree
     # To reduce external dependencies, this test is not part of the normal run
 
-    # def test_merchant_id_added_to_owner(self):
-    #     self.assertFalse(self.owner.merchant_id)
-    #     response = self.client.post(self.url, self._fake_params(), format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    def test_merchant_id_added_to_owner(self):
+        self.assertFalse(self.owner.merchant_id)
+        response = self.client.post(self.url, self._fake_params(), format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    #     reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
-    #     self.assertTrue(reloaded_owner.merchant_id)
+        reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
+        self.assertTrue(reloaded_owner.merchant_id)
 
     def _fake_params(self):
         return {

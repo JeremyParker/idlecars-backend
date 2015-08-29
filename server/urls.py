@@ -13,6 +13,7 @@ router = idlecars.routers.OptionalApiRootDefaultRouter()
 router.register(r'cars', views.CarViewSet, base_name='cars')
 router.register(r'bookings', views.BookingViewSet, base_name='bookings')
 router.register(r'drivers', views.DriverViewSet, base_name='drivers')
+router.register(r'owners', views.OwnerViewSet, base_name='owners')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

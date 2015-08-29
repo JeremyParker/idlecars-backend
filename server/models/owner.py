@@ -10,7 +10,7 @@ from django.contrib.auth.models import User as AuthUser
 
 
 class Owner(models.Model):
-    auth_user = models.ManyToManyField(AuthUser)
+    auth_users = models.ManyToManyField(AuthUser)
     company_name = models.CharField(max_length=256, blank=True)
     address1 = models.CharField(blank=True, max_length=200)
     address2 = models.CharField(blank=True, max_length=200)

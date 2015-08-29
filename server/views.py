@@ -113,7 +113,7 @@ class PhoneNumberDetailView(APIView):
 
             # we can only have one auth.User per phone. Use the first.
             auth_user = auth_user_service.create_auth_user(user_accounts[0])
-            user_accounts[0].owner.auth_user.add(auth_user)
+            user_accounts[0].owner.auth_users.add(auth_user)
             password_reset_service.invite_owner(auth_user)
 
             content = PhoneNumberSerializer(auth_user).data
