@@ -15,13 +15,12 @@ from idlecars import fields
 from owner_crm.services import password_reset_service
 
 import models, services
-from services import auth_user as auth_user_service
+from services import owner_service
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
 from serializers import DriverSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
-from server.models import Owner
-from server.services import owner_bank_link_service
-from server.permissions import OwnsOwner
+from models import Owner
+from permissions import OwnsOwner
 
 
 class CarViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,7 +88,7 @@ class OwnerViewSet(
     @detail_route(methods=['post'], permission_classes=[OwnsOwner])
     def bank_link(self, request, pk=None):
         owner = self.get_object()
-        result = owner_bank_link_service.link(owner, request.data)
+        result = owner_service.link_bank_account(owner, request.data)
 
         if not result.get('error'):
             return Response(result, status=status.HTTP_201_CREATED)
@@ -99,22 +98,33 @@ class OwnerViewSet(
 
 class PhoneNumberDetailView(APIView):
     def get(self, request, pk, format=None):
+        try:
+            driver = models.Driver.objects.get(auth_user__username=fields.parse_phone_number(pk))
+        except models.Driver.DoesNotExist:
+            # TODO(JP) create a new Driver, call start_set_password(auth_user).
+            raise Http404
+
+        serializer = PhoneNumberSerializer(driver.auth_user, many=False)
+        return Response(serializer.data)
+
+
+class OwnerPhoneNumberDetailView(APIView):
+    # TODO - test this before hooking it up to anything!
+    def get(self, request, pk, format=None):
         phone_number = fields.parse_phone_number(pk)
         try:
+            # if Owner exists with this phone number, return success, so we get redirected to login
             auth_user = User.objects.get(username=phone_number)
+            if not Owner.objects.filter(auth_users=auth_user):
+                raise Owner.DoesNotExist
             serializer = PhoneNumberSerializer(auth_user)
             return Response(serializer.data)
 
-        except User.DoesNotExist:
-            # If an old-skool UserAccount exists, and an Owner exists then it's an owner signing up.
-            user_accounts = models.UserAccount.objects.filter(phone_number=phone_number)
-            if not [u.owner for u in user_accounts if u.owner]:
-                raise Http404
-
-            # we can only have one auth.User per phone. Use the first.
-            auth_user = auth_user_service.create_auth_user(user_accounts[0])
-            user_accounts[0].owner.auth_users.add(auth_user)
-            password_reset_service.invite_owner(auth_user)
+        except User.DoesNotExist, Owner.DoesNotExist:
+            try:
+                auth_user = owner_service.invite_legacy_owner(phone_number)
+            except Owner.DoesNotExist:
+                raise Http404  # there never was an Owner for this number. They are forbidden.
 
             content = PhoneNumberSerializer(auth_user).data
             content.update({'_app_notifications': [
