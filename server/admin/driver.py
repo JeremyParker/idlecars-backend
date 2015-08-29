@@ -8,7 +8,6 @@ from idlecars.reverse_admin import ReverseInlineModelAdmin, ReverseModelAdmin
 from server import models
 from server.admin.booking import BookingForDriverInline
 from server.admin.user_account import UserAccountForDriverInline
-from idlecars.admin_helpers import link
 
 
 class DriverAdmin(ReverseModelAdmin):
