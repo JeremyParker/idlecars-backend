@@ -44,21 +44,31 @@ class Owner(models.Model):
     def name(self):
         if self.company_name:
             return self.company_name
+        # TODO - free ourselves from the user_account alltogether
         names = sorted(self.user_account.all(), key=attrgetter('last_name'))
         return ', '.join([u.full_name() for u in names])
 
-    # get a value from the associated UserAccount, or return null, or 'multiple values'
     def get_user_account_attr(self, attrib):
-        users = self.user_account.all()
-        if not users:
-            return ''
-        elif users.count() == 1:
-            return getattr(self.user_account.get(), attrib)
-        else:
+        # get a value from the associated User, or return '', or 'multiple values'
+        users = self.auth_users.all()
+        if users.count() == 1:
+            return getattr(users.first(), attrib)
+        elif users.count() > 1:
             return 'multiple values'
 
-    def number(self):
-        return self.get_user_account_attr('phone_number')
+        # TODO - free ourselves from the user_account alltogether
+        users = self.user_account.all()
+        if users.count() == 1:
+            if attrib == 'username':
+                attrib = 'phone_number'
+            return getattr(self.user_account.get(), attrib)
+        elif users.count() > 1:
+            return 'multiple values'
+
+        return ''
+
+    def phone_number(self):
+        return self.get_user_account_attr('username')
 
     def email(self):
         return self.get_user_account_attr('email')
