@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib import auth
 
-from idlecars.reverse_admin import ReverseInlineModelAdmin, ReverseModelAdmin
+from idlecars.reverse_admin import ReverseModelAdmin
 from server import models
 from server.admin.booking import BookingForDriverInline
 from server.admin.user_account import UserAccountForDriverInline

@@ -30,8 +30,38 @@ class CarInline(admin.TabularInline):
         return link(instance, 'details')
 
 
+class AuthUserInline(admin.TabularInline):
+    model = models.Owner.auth_users.through
+    verbose_name = "Users"
+    extra = 0
+    fields = [
+        'first_name',
+        'last_name',
+        'phone_number',
+        'email',
+    ]
+    readonly_fields = [
+        'first_name',
+        'last_name',
+        'phone_number',
+        'email',
+    ]
+    def first_name(self, instance):
+        return instance.user.first_name
+
+    def last_name(self, instance):
+        return instance.user.last_name
+
+    def phone_number(self, instance):
+        return instance.user.username
+
+    def email(self, instance):
+        return instance.user.email
+
+
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
+        AuthUserInline,
         UserAccountForOwnerInline,
         CarInline,
     ]
