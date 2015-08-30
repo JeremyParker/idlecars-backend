@@ -11,7 +11,6 @@ from server.models import Owner, UserAccount
 from server.services import auth_user as auth_user_service
 
 
-
 def add_merchant_id_to_owner(merchant_id, owner):
     owner.merchant_id = merchant_id
     return owner.save()
@@ -56,8 +55,9 @@ def invite_legacy_owner(phone_number):
     # we can only have one auth.User per phone. Use the most recent.
     user_account = user_accounts.latest('created_time')
 
-    auth_user = auth_user_service.create_auth_user(user_account)
-    user_account.owner.auth_users.add(auth_user)
+    auth_user = auth_user_service.get_or_create_auth_user(user_account)
+    if not auth_user in user_account.owner.auth_users.all():
+        user_account.owner.auth_users.add(auth_user)
 
     password_reset_service.invite_owner(auth_user)
     return auth_user

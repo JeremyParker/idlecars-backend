@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.core.management.base import BaseCommand
 
 from server.services import owner_service
+from server.models import Owner
 
 class Command(BaseCommand):
     help = '''
