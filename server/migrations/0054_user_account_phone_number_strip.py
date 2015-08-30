@@ -7,7 +7,6 @@ from idlecars.fields import parse_phone_number
 from server.models import UserAccount
 
 def parse_user_account_phone(apps, schema_editor):
-    import pdb; pdb.set_trace()
     for user_account in UserAccount.objects.all():
         user_account.phone_number = parse_phone_number(user_account.phone_number)
         user_account.save()
