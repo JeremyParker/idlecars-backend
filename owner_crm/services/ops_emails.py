@@ -70,3 +70,20 @@ def booking_canceled(booking):
         subject='A booking got canceled.',
         merge_vars=merge_vars,
     )
+
+
+def owner_account_result(details, subject):
+    merge_vars = {
+        settings.OPS_EMAIL: {
+            'FNAME': 'Dearest Admin',
+            'HEADLINE': subject,
+            'TEXT': 'detail from braintree (if any):\n' + details,
+            'CTA_LABEL': 'home',
+            'CTA_URL': 'https://idlecars.com',  # TODO - link to the owner's change page
+        }
+    }
+    email.send_sync(
+        template_name='one_button_no_image',
+        subject=subject,
+        merge_vars=merge_vars,
+    )

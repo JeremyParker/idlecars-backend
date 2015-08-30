@@ -9,29 +9,18 @@ from owner_crm.services import password_reset_service
 
 from server.models import Owner, UserAccount
 from server.services import auth_user as auth_user_service
-
+from server import payment_gateways
 
 def add_merchant_id_to_owner(merchant_id, owner):
     owner.merchant_id = merchant_id
     return owner.save()
 
 
-def link_bank_account(owner, braintree_params):
-    # TODO: @jeremyparker will move this when needed
-    braintree.Configuration.configure(
-        braintree.Environment.Sandbox,
-        'cg5tqqwr6fn5xycb',
-        '7vyzyb772bwnhj3x',
-        '951f45c0a8bf94e474b8eb5e956402fd'
-    )
-
-    braintree_params['funding']['destination'] = braintree.MerchantAccount.FundingDestination.Bank
-    braintree_params['master_merchant_account_id'] = settings.MASTER_MERCHANT_ACCOUNT_ID
-
-    response = braintree.MerchantAccount.create(braintree_params)
-    success = getattr(response, "is_success", False)
+def link_bank_account(owner, params):
+    gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
+    success, merchant_account_id = gateway.link_bank_account(params)
     if success:
-        add_merchant_id_to_owner(response.merchant_account.id, owner)
+        add_merchant_id_to_owner(merchant_account_id, owner)
         return {}
     else:
         return {
