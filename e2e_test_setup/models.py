@@ -10,6 +10,9 @@ import server.factories
 
 import owner_crm.factories
 
+from rest_framework.authtoken.models import Token
+
+
 class E2ETestSetup():
     def __init__(self):
         if settings.WARNING__ENABLE_TEST_SETUP_ENDPOINT__TEST_MODE_ONLY:
@@ -21,8 +24,11 @@ class E2ETestSetup():
         self._truncate_tables()
         self._setup_cars()
         self._setup_renewals()
+        self._setup_user()
         self._setup_drivers()
         self._setup_booking()
+        self._setup_owner()
+        self._reset_token()
 
     def _truncate_tables(self):
         tables = (
@@ -56,6 +62,34 @@ class E2ETestSetup():
         '''
         owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
 
+    def _setup_user(self):
+        '''
+            Create 5 users(1 staff user)
+        '''
+        self.user_owner = server.factories.AuthUser.create(
+            username='9876543210',
+            email='craig@test.com',
+            first_name='Craig',
+            last_name='List'
+        )
+        self.user_driver = server.factories.AuthUser.create(
+            username='1234567891',
+            email='user@test.com',
+            first_name='Tom',
+            last_name='Cat'
+        )
+        server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
+
+    def _reset_token(self):
+        Token.objects.filter(user=self.user_owner).update(key='owner')
+
+    def _setup_owner(self):
+        '''
+            Create an owner
+        '''
+        owner = server.factories.AuthOwner.create()
+        owner.auth_users.add(self.user_owner)
+
     def _setup_booking(self):
         '''
             Create a booking
@@ -69,5 +103,4 @@ class E2ETestSetup():
         driver_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-7b33baf8-4aee-4e75-b7e1-0f591017251c-image.jpg"
         fhv_license_image = "https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-8e275adb-3202-444c-be99-7f9eac5dcdb0-image.jpg"
 
-        self.user = server.factories.AuthUser.create(username='1234567891', email='user@test.com', first_name='Tom', last_name='Cat')
-        self.driver = server.factories.Driver.create(auth_user=self.user, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
+        self.driver = server.factories.Driver.create(auth_user=self.user_driver, driver_license_image=driver_license_image, fhv_license_image=fhv_license_image)
