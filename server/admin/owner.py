@@ -35,17 +35,22 @@ class AuthUserInline(admin.TabularInline):
     verbose_name = "Users"
     extra = 0
     fields = [
+        'detail_link',
         'first_name',
         'last_name',
         'phone_number',
         'email',
     ]
     readonly_fields = [
+        'detail_link',
         'first_name',
         'last_name',
         'phone_number',
         'email',
     ]
+    def detail_link(self, instance):
+        return link(instance.user, 'details', app='auth')
+
     def first_name(self, instance):
         return instance.user.first_name
 
