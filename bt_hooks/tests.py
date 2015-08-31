@@ -30,40 +30,43 @@ class WebhookTest(TestCase):
 
 
     def test_webhook_success(self):
-        sample_notification = braintree.WebhookTesting.sample_notification(
-            braintree.WebhookNotification.Kind.SubMerchantAccountApproved,
-            self.owner.merchant_id,
-        )
-        url = reverse('bt_hooks:submerchant_create_success')
-        response = self.client.post(url, data=sample_notification)
-        self.assertEquals(200, response.status_code)
-        self.owner.refresh_from_db()
-        self.assertEquals(
-            self.owner.merchant_account_state,
-            Owner.BANK_ACCOUNT_APPROVED,
-        )
+        with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
+            sample_notification = braintree.WebhookTesting.sample_notification(
+                braintree.WebhookNotification.Kind.SubMerchantAccountApproved,
+                self.owner.merchant_id,
+            )
+            url = reverse('bt_hooks:submerchant_create_success')
+            response = self.client.post(url, data=sample_notification)
+            self.assertEquals(200, response.status_code)
+            self.owner.refresh_from_db()
+            self.assertEquals(
+                self.owner.merchant_account_state,
+                Owner.BANK_ACCOUNT_APPROVED,
+            )
 
 
     def test_webhook_declined(self):
-        sample_notification = braintree.WebhookTesting.sample_notification(
-            braintree.WebhookNotification.Kind.SubMerchantAccountDeclined,
-            self.owner.merchant_id,
-        )
-        url = reverse('bt_hooks:submerchant_create_failure')
-        response = self.client.post(url, data=sample_notification)
-        self.assertEquals(200, response.status_code)
-        self.owner.refresh_from_db()
-        self.assertEquals(
-            self.owner.merchant_account_state,
-            Owner.BANK_ACCOUNT_DECLINED,
-        )
+        with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
+            sample_notification = braintree.WebhookTesting.sample_notification(
+                braintree.WebhookNotification.Kind.SubMerchantAccountDeclined,
+                self.owner.merchant_id,
+            )
+            url = reverse('bt_hooks:submerchant_create_failure')
+            response = self.client.post(url, data=sample_notification)
+            self.assertEquals(200, response.status_code)
+            self.owner.refresh_from_db()
+            self.assertEquals(
+                self.owner.merchant_account_state,
+                Owner.BANK_ACCOUNT_DECLINED,
+            )
 
 
     def test_webhook_no_owner(self):
-        sample_notification = braintree.WebhookTesting.sample_notification(
-            braintree.WebhookNotification.Kind.SubMerchantAccountApproved,
-            'some_wrong_id',
-        )
-        url = reverse('bt_hooks:submerchant_create_success')
-        response = self.client.post(url, data=sample_notification)
-        self.assertEquals(404, response.status_code)
+        with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
+            sample_notification = braintree.WebhookTesting.sample_notification(
+                braintree.WebhookNotification.Kind.SubMerchantAccountApproved,
+                'some_wrong_id',
+            )
+            url = reverse('bt_hooks:submerchant_create_success')
+            response = self.client.post(url, data=sample_notification)
+            self.assertEquals(404, response.status_code)
