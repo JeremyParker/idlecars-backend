@@ -21,12 +21,18 @@ BAD_PARAMS = 'bad params'
 
 def confirm_endpoint(challenge):
     # TODO - for testing, respond to success/failure input
-    return {'success': 'Success'}
+    return {'success': True}
 
 
 def link_bank_account(braintree_params):
-    # TODO - for testing, respond to success/failure input
-    return True, 'test_submerchant_account_id'
+    if not braintree_params['tos_accepted']:
+        return (
+            False,
+            '',  # merchant_account_id
+            ['tos_accepted'],
+            ['Terms Of Service needs to be accepted. Applicant tos_accepted required.'],
+        )
+    return True, 'test_submerchant_account_id', [], []
 
 
 def add_payment_method(driver, nonce):

@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'website',
     'owner_crm',
     'unsubscribes',
+    'bt_hooks',
     'django_nose',
     'djrill',
     'django_extensions',

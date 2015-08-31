@@ -26,15 +26,12 @@ def update_account_state(merchant_account_id, state):
 
 def link_bank_account(owner, params):
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
-    success, merchant_account_id = gateway.link_bank_account(params)
+    success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(params)
     if success:
         add_merchant_id_to_owner(merchant_account_id, owner)
-        return {}
+        return [], []
     else:
-        return {
-            'error': response.message,
-            '_app_notifications': [response.message]
-        }
+        return error_fields, error_msg
 
 
 def invite_legacy_owner(phone_number):

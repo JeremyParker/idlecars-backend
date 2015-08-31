@@ -45,6 +45,9 @@ def confirm_endpoint(challenge):
 
 
 def link_bank_account(braintree_params):
+    '''
+    Returns success (bool), 'account_id', [error_fields], [error_messages]
+    '''
     _configure_braintree()
 
     braintree_params['funding']['destination'] = braintree.MerchantAccount.FundingDestination.Bank
@@ -52,9 +55,16 @@ def link_bank_account(braintree_params):
 
     response = braintree.MerchantAccount.create(braintree_params)
     success = getattr(response, "is_success", False)
-    account = response.merchant_account.id if response.merchant_account else ''
-    return success, account
-
+    if success:
+        account = response.merchant_account.id if response.merchant_account else ''
+        return success, account, [], []
+    else:
+        return (
+            success,
+            '',  # merchant_account_id
+            [e.attribute for e in response.errors.deep_errors],
+            [e.message for e in response.errors.deep_errors],
+        )
 
 def add_payment_method(driver, nonce):  # TODO: I don't think driver should be passed in. The ID should passed out.
     _configure_braintree()

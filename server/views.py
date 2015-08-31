@@ -88,12 +88,16 @@ class OwnerViewSet(
     @detail_route(methods=['post'], permission_classes=[OwnsOwner])
     def bank_link(self, request, pk=None):
         owner = self.get_object()
-        result = owner_service.link_bank_account(owner, request.data)
+        error_fields, error_msg = owner_service.link_bank_account(owner, request.data)
 
-        if not result.get('error'):
-            return Response(result, status=status.HTTP_201_CREATED)
+        if not error_msg:
+            return Response({}, status=status.HTTP_201_CREATED)
         else:
-            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                'error_fields': error_fields,
+                '_app_notifications': error_msg
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PhoneNumberDetailView(APIView):

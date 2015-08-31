@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import copy
+
 from django.core.urlresolvers import reverse
 
 from rest_framework import status
@@ -22,19 +24,7 @@ class BankLinkTest(APITestCase):
 
         self.url = reverse('server:owners-bank-link', args=(self.owner.pk,))
 
-    # NOTE: as of writing, this test passes, but accesses Braintree
-    # To reduce external dependencies, this test is not part of the normal run
-
-    def test_merchant_id_added_to_owner(self):
-        self.assertFalse(self.owner.merchant_id)
-        response = self.client.post(self.url, self._fake_params(), format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
-        self.assertTrue(reloaded_owner.merchant_id)
-
-    def _fake_params(self):
-        return {
+    _fake_params = {
             'individual': {
                 'first_name': "Jane",
                 'last_name': "Doe",
@@ -70,3 +60,30 @@ class BankLinkTest(APITestCase):
             "tos_accepted": True,
         }
 
+    def test_merchant_id_added_to_owner(self):
+        self.assertFalse(self.owner.merchant_id)
+        response = self.client.post(self.url, self._fake_params, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
+        self.assertTrue(reloaded_owner.merchant_id)
+
+    def test_fail_add_account_to_another(self):
+        other_owner = factories.AuthOwner.create()
+        self.assertFalse(other_owner.merchant_id)
+        other_url = reverse('server:owners-bank-link', args=(other_owner.pk,))
+
+        response = self.client.post(other_url, self._fake_params, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_bad_params(self):
+        # for testing, make tos_accepted = False
+        params = copy.deepcopy(self._fake_params)
+        params.update({ 'tos_accepted': False })
+
+        response = self.client.post(self.url, params, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        expected = {
+            "error_fields": ["tos_accepted"],
+            "_app_notifications": ["Terms Of Service needs to be accepted. Applicant tos_accepted required."],
+        }
+        self.assertEqual(response.data, expected)
