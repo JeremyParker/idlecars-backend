@@ -113,28 +113,33 @@ class PhoneNumberDetailView(APIView):
 
 
 class OwnerPhoneNumberDetailView(APIView):
-    # TODO - test this before hooking it up to anything!
     def get(self, request, pk, format=None):
         phone_number = fields.parse_phone_number(pk)
         try:
-            # if Owner exists with this phone number, return success, so we get redirected to login
-            auth_user = User.objects.get(username=phone_number)
-            if not Owner.objects.filter(auth_users=auth_user):
-                raise Owner.DoesNotExist
-            serializer = PhoneNumberSerializer(auth_user)
-            return Response(serializer.data)
-
-        except User.DoesNotExist, Owner.DoesNotExist:
             try:
-                auth_user = owner_service.invite_legacy_owner(phone_number)
-            except Owner.DoesNotExist:
-                raise Http404  # there never was an Owner for this number. They are forbidden.
+                # if Owner exists with this phone number, return success, so we get redirected to login
+                auth_user = User.objects.get(username=phone_number)
+                if not Owner.objects.filter(auth_users=auth_user):
+                    raise Owner.DoesNotExist
+                serializer = PhoneNumberSerializer(auth_user)
+                return Response(serializer.data)
 
-            content = PhoneNumberSerializer(auth_user).data
-            content.update({'_app_notifications': [
+            except User.DoesNotExist:
+                auth_user = owner_service.invite_legacy_owner(phone_number)
+                content = PhoneNumberSerializer(auth_user).data
+                content.update({'_app_notifications': [
+                    '''
+                    Great, you're in our system already! An email has been sent to your address
+                    with instructions for setting your password.
+                    '''
+                ],})
+                return Response(content, status.HTTP_404_NOT_FOUND)
+
+        except (models.Owner.DoesNotExist, models.UserAccount.DoesNotExist):
+            content = {'_app_notifications': [
                 '''
-                Great, you're in our system already! An email has been sent to your address
-                with instructions for setting your password.
+                Sorry, something went wrong. We couldn't find a record of you as a car-owner
+                in our system. Please contact idlecars, to set up your owner account.
                 '''
-            ],})
-            return Response(content)
+            ],}
+            return Response(content, status.HTTP_404_NOT_FOUND)
