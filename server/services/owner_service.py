@@ -11,9 +11,17 @@ from server.models import Owner, UserAccount
 from server.services import auth_user as auth_user_service
 from server import payment_gateways
 
-def add_merchant_id_to_owner(merchant_id, owner):
-    owner.merchant_id = merchant_id
+
+def add_merchant_id_to_owner(merchant_account_id, owner):
+    owner.merchant_id = merchant_account_id
+    owner.merchant_account_state = Owner.BANK_ACCOUNT_PENDING
     return owner.save()
+
+
+def update_account_state(merchant_account_id, state):
+    owner = Owner.objects.get(merchant_id=merchant_account_id)
+    owner.merchant_account_state = state
+    owner.save()
 
 
 def link_bank_account(owner, params):

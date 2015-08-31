@@ -69,6 +69,7 @@ class OwnerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('split_shift', 'rating'),
+                ('merchant_id', 'merchant_account_state',),
                 'notes',
                 'company_name',
                 'address1',
@@ -77,6 +78,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
         }),
     )
+    readonly_fields = ['merchant_id', 'merchant_account_state']
     list_display = [
         'link_name',
         'rating',
@@ -84,6 +86,7 @@ class OwnerAdmin(admin.ModelAdmin):
         'email',
         'cars_available',
         'total_cars',
+        'merchant_account_state',
     ]
     search_fields = [
         # TDOO - free ourselves from user_account alltogether
