@@ -8,6 +8,8 @@ from django.contrib import auth
 from server import models
 import server.factories
 
+from owner_crm.services import password_reset_service
+from owner_crm.models import PasswordReset
 import owner_crm.factories
 
 from rest_framework.authtoken.models import Token
@@ -82,13 +84,14 @@ class E2ETestSetup():
 
     def _reset_token(self):
         Token.objects.filter(user=self.user_owner).update(key='owner')
+        PasswordReset.objects.filter(auth_user=self.user_owner).update(token='test')
 
     def _setup_owner(self):
         '''
             Create an owner
         '''
         owner = server.factories.AuthOwner.create()
-        owner.auth_users.add(self.user_owner)
+        password_reset_service.invite_owner(self.user_owner)
 
     def _setup_booking(self):
         '''
