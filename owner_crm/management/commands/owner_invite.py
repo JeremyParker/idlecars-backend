@@ -21,7 +21,10 @@ class Command(BaseCommand):
         phone_numbers = options['phone_numbers']
         for phone_number in phone_numbers:
             try:
-                auth_user = owner_service.invite_legacy_owner(phone_number)
-                self.stdout.write('Auth user created, and invite sent for {}'.format(phone_number))
+                created, auth_user = owner_service.invite_legacy_owner(phone_number)
+                if created:
+                    self.stdout.write('Auth user created, and invite sent for {}.\n'.format(phone_number))
+                else:
+                    self.stdout.write('Owner {} was already signed up. Invite sent anyway.\n'.format(phone_number))
             except Owner.DoesNotExist:
-                self.stdout.write('ERROR inviting {}'.format(phone_number))
+                self.stdout.write('ERROR inviting {}. Owner or UserAccount didn\'t exist.\n'.format(phone_number))

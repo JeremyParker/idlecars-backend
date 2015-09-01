@@ -44,13 +44,22 @@ class OwnerPhoneNumberTest(APITestCase):
         )
         self.assertIn('Great, you\'re in our system already!', response.data['_app_notifications'][0])
 
-    # not an owner
-    def test_no_owner(self):
-        driver_user_account = factories.UserAccount.create()
+    # owner who mistakenly signed up as driver too
+    def test_driver_and_owner(self):
+        driver = factories.Driver.create()
+        driver_user_account = factories.UserAccount.create(
+            driver=driver,
+            owner=self.owner,
+            phone_number=driver.auth_user.username,
+        )
         url = reverse('server:owner_phone_numbers', args=(driver_user_account.phone_number,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('Sorry, something went wrong', response.data['_app_notifications'][0])
+        self.assertEqual(
+            response.data['phone_number'],
+            fields.format_phone_number(self.owner.phone_number())
+        )
+        self.assertIn('Great, you\'re in our system already!', response.data['_app_notifications'][0])
 
     # not an owner
     def test_no_owner_or_authuser(self):

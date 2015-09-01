@@ -116,26 +116,8 @@ class OwnerPhoneNumberDetailView(APIView):
     def get(self, request, pk, format=None):
         phone_number = fields.parse_phone_number(pk)
         try:
-            try:
-                # if Owner exists with this phone number, return success, so we get redirected to login
-                auth_user = User.objects.get(username=phone_number)
-                if not Owner.objects.filter(auth_users=auth_user):
-                    raise Owner.DoesNotExist
-                serializer = PhoneNumberSerializer(auth_user)
-                return Response(serializer.data)
-
-            except User.DoesNotExist:
-                auth_user = owner_service.invite_legacy_owner(phone_number)
-                content = PhoneNumberSerializer(auth_user).data
-                content.update({'_app_notifications': [
-                    '''
-                    Great, you're in our system already! An email has been sent to your address
-                    with instructions for setting your password.
-                    '''
-                ],})
-                return Response(content, status.HTTP_404_NOT_FOUND)
-
-        except (models.Owner.DoesNotExist, models.UserAccount.DoesNotExist):
+            created, auth_user = owner_service.invite_legacy_owner(phone_number)
+        except Owner.DoesNotExist:
             content = {'_app_notifications': [
                 '''
                 Sorry, something went wrong. We couldn't find a record of you as a car-owner
@@ -143,3 +125,16 @@ class OwnerPhoneNumberDetailView(APIView):
                 '''
             ],}
             return Response(content, status.HTTP_404_NOT_FOUND)
+
+        if created:
+            content = PhoneNumberSerializer(auth_user).data
+            content.update({'_app_notifications': [
+                '''
+                Great, you're in our system already! An email has been sent to your address
+                with instructions for setting your password.
+                '''
+            ],})
+            return Response(content, status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = PhoneNumberSerializer(auth_user)
+            return Response(serializer.data, status.HTTP_200_OK)
