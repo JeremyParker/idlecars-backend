@@ -17,7 +17,7 @@ from owner_crm.services import password_reset_service
 import models, services
 from services import owner_service
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
-from serializers import DriverSerializer, PhoneNumberSerializer
+from serializers import DriverSerializer, OwnerSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
 from models import Owner
 from permissions import OwnsOwner
@@ -83,17 +83,33 @@ class OwnerViewSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet
     ):
+    model = models.Owner
     queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+
+    def get_object(self):
+        ''' override to map 'me' to the current user's driver object '''
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
+            try:
+                self.kwargs[lookup_url_kwarg] = models.Owner.objects.get(auth_users=self.request.user).pk
+            except models.Owner.DoesNotExist:
+                raise Http404
+        return super(OwnerViewSet, self).get_object()
 
     @detail_route(methods=['post'], permission_classes=[OwnsOwner])
     def bank_link(self, request, pk=None):
         owner = self.get_object()
-        result = owner_service.link_bank_account(owner, request.data)
+        error_fields, error_msg = owner_service.link_bank_account(owner, request.data)
 
-        if not result.get('error'):
-            return Response(result, status=status.HTTP_201_CREATED)
+        if not error_msg:
+            return Response({}, status=status.HTTP_201_CREATED)
         else:
-            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                'error_fields': error_fields,
+                '_app_notifications': error_msg
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PhoneNumberDetailView(APIView):
@@ -109,23 +125,20 @@ class PhoneNumberDetailView(APIView):
 
 
 class OwnerPhoneNumberDetailView(APIView):
-    # TODO - test this before hooking it up to anything!
     def get(self, request, pk, format=None):
         phone_number = fields.parse_phone_number(pk)
         try:
-            # if Owner exists with this phone number, return success, so we get redirected to login
-            auth_user = User.objects.get(username=phone_number)
-            if not Owner.objects.filter(auth_users=auth_user):
-                raise Owner.DoesNotExist
-            serializer = PhoneNumberSerializer(auth_user)
-            return Response(serializer.data)
+            created, auth_user = owner_service.invite_legacy_owner(phone_number)
+        except Owner.DoesNotExist:
+            content = {'_app_notifications': [
+                '''
+                Sorry, something went wrong. We couldn't find a record of you as a car-owner
+                in our system. Please contact idlecars, to set up your owner account.
+                '''
+            ],}
+            return Response(content, status.HTTP_404_NOT_FOUND)
 
-        except User.DoesNotExist, Owner.DoesNotExist:
-            try:
-                auth_user = owner_service.invite_legacy_owner(phone_number)
-            except Owner.DoesNotExist:
-                raise Http404  # there never was an Owner for this number. They are forbidden.
-
+        if created:
             content = PhoneNumberSerializer(auth_user).data
             content.update({'_app_notifications': [
                 '''
@@ -133,4 +146,7 @@ class OwnerPhoneNumberDetailView(APIView):
                 with instructions for setting your password.
                 '''
             ],})
-            return Response(content)
+            return Response(content, status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = PhoneNumberSerializer(auth_user)
+            return Response(serializer.data, status.HTTP_200_OK)

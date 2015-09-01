@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'website',
     'owner_crm',
     'unsubscribes',
+    'bt_hooks',
     'django_nose',
     'djrill',
     'django_extensions',
@@ -193,7 +194,7 @@ CORS_ALLOW_HEADERS = (
 # Heap Analytics uses the DEBUG app id in development/testing
 HEAP_APP_ID = '655181858'
 
-PAYMENT_GATEWAY_NAME = 'braintree'
+PAYMENT_GATEWAY_NAME = 'fake'
 
 MASTER_MERCHANT_ACCOUNT_ID = os.getenv('MASTER_MERCHANT_ACCOUNT_ID', 'idlecarsllc')
 BRAINTREE = {

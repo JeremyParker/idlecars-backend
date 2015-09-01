@@ -35,17 +35,22 @@ class AuthUserInline(admin.TabularInline):
     verbose_name = "Users"
     extra = 0
     fields = [
+        'detail_link',
         'first_name',
         'last_name',
         'phone_number',
         'email',
     ]
     readonly_fields = [
+        'detail_link',
         'first_name',
         'last_name',
         'phone_number',
         'email',
     ]
+    def detail_link(self, instance):
+        return link(instance.user, 'details', app='auth')
+
     def first_name(self, instance):
         return instance.user.first_name
 
@@ -69,6 +74,7 @@ class OwnerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('split_shift', 'rating'),
+                ('merchant_id', 'merchant_account_state',),
                 'notes',
                 'company_name',
                 'address1',
@@ -77,6 +83,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
         }),
     )
+    readonly_fields = ['merchant_id', 'merchant_account_state']
     list_display = [
         'link_name',
         'rating',
@@ -84,6 +91,7 @@ class OwnerAdmin(admin.ModelAdmin):
         'email',
         'cars_available',
         'total_cars',
+        'merchant_account_state',
     ]
     search_fields = [
         # TDOO - free ourselves from user_account alltogether

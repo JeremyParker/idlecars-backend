@@ -15,7 +15,6 @@ class Owner(models.Model):
     address1 = models.CharField(blank=True, max_length=200)
     address2 = models.CharField(blank=True, max_length=200)
     city = models.CharField(blank=True, max_length=200)
-    merchant_id = models.CharField(blank=True, max_length=200)
     state_code = models.CharField(blank=True, max_length=2)
     zipcode = models.CharField(blank=True, max_length=5, verbose_name='Zip Code',
         validators=[
@@ -24,6 +23,18 @@ class Owner(models.Model):
             MaxLengthValidator(5),
         ],
     )
+
+    BANK_ACCOUNT_PENDING = 1
+    BANK_ACCOUNT_APPROVED = 2
+    BANK_ACCOUNT_DECLINED = 3
+    MERCHANT_ACCOUNT_STATE = [
+        (BANK_ACCOUNT_PENDING, 'Pending'),
+        (BANK_ACCOUNT_APPROVED, 'Approved'),
+        (BANK_ACCOUNT_DECLINED, 'Declined'),
+    ]
+    merchant_account_state = models.IntegerField(choices=MERCHANT_ACCOUNT_STATE, null=True)
+    merchant_id = models.CharField(blank=True, max_length=200)
+
     split_shift = models.NullBooleanField(verbose_name="Accepts Split Shifts", blank=True)
     RATING = [
         (0, 'Terrible'),
