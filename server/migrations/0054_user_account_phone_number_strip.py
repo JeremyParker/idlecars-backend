@@ -19,5 +19,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(parse_user_account_phone),
+        migrations.RunPython(
+            parse_user_account_phone,
+            reverse_code=migrations.RunPython.noop
+        ),
     ]
