@@ -25,7 +25,7 @@ def confirm_endpoint(challenge):
 
 
 def link_bank_account(braintree_params):
-    if not braintree_params['tos_accepted']:
+    if not 'tos_accepted' in braintree_params.keys() or not braintree_params['tos_accepted']:
         return (
             False,
             '',  # merchant_account_id

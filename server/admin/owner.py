@@ -34,6 +34,7 @@ class AuthUserInline(admin.TabularInline):
     model = models.Owner.auth_users.through
     verbose_name = "Users"
     extra = 0
+    can_delete = False
     fields = [
         'detail_link',
         'first_name',
@@ -49,7 +50,7 @@ class AuthUserInline(admin.TabularInline):
         'email',
     ]
     def detail_link(self, instance):
-        return link(instance.user, 'details', app='auth')
+        return link(instance.user, 'details')
 
     def first_name(self, instance):
         return instance.user.first_name
