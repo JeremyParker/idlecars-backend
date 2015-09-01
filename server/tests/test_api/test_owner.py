@@ -9,8 +9,37 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
+from idlecars import fields
 from server import factories
 from server import models
+
+
+class GetOwnerTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.owner = factories.AuthOwner.create()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.owner.auth_users.last().username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:owners-detail', args=(self.owner.pk,))
+
+    def test_get_self(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['id'], self.owner.pk)
+        self.assertEqual(
+            response.data['auth_users'][0]['phone_number'],
+            fields.format_phone_number(self.owner.auth_users.all()[0].username)
+        )
+
+    def test_get_me(self):
+        self.url = reverse('server:owners-detail', args=('me',))
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['id'], self.owner.pk)
+        self.assertEqual(
+            response.data['auth_users'][0]['phone_number'],
+            fields.format_phone_number(self.owner.auth_users.all()[0].username)
+        )
 
 
 class BankLinkTest(APITestCase):

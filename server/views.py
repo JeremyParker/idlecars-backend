@@ -17,7 +17,7 @@ from owner_crm.services import password_reset_service
 import models, services
 from services import owner_service
 from serializers import CarSerializer, BookingSerializer, BookingDetailsSerializer
-from serializers import DriverSerializer, PhoneNumberSerializer
+from serializers import DriverSerializer, OwnerSerializer, PhoneNumberSerializer
 from permissions import OwnsDriver, OwnsBooking
 from models import Owner
 from permissions import OwnsOwner
@@ -83,7 +83,19 @@ class OwnerViewSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet
     ):
+    model = models.Owner
     queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+
+    def get_object(self):
+        ''' override to map 'me' to the current user's driver object '''
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
+            try:
+                self.kwargs[lookup_url_kwarg] = models.Owner.objects.get(auth_users=self.request.user).pk
+            except models.Owner.DoesNotExist:
+                raise Http404
+        return super(OwnerViewSet, self).get_object()
 
     @detail_route(methods=['post'], permission_classes=[OwnsOwner])
     def bank_link(self, request, pk=None):
