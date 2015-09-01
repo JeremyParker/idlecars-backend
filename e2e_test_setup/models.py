@@ -7,8 +7,8 @@ from django.contrib import auth
 
 from server import models
 import server.factories
+from server.services import owner_service
 
-from owner_crm.services import password_reset_service
 from owner_crm.models import PasswordReset
 import owner_crm.factories
 
@@ -66,10 +66,10 @@ class E2ETestSetup():
 
     def _setup_user(self):
         '''
-            Create 5 users(1 staff user)
+            Create 3 users(1 staff user)
         '''
-        self.user_owner = server.factories.AuthUser.create(
-            username='9876543210',
+        self.user_owner = server.factories.UserAccount.create(
+            phone_number='9876543210',
             email='craig@test.com',
             first_name='Craig',
             last_name='List'
@@ -83,15 +83,17 @@ class E2ETestSetup():
         server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
     def _reset_token(self):
-        Token.objects.filter(user=self.user_owner).update(key='owner')
-        PasswordReset.objects.filter(auth_user=self.user_owner).update(token='test')
+        Token.objects.filter(user=self.owner_auth_user).update(key='owner')
+        PasswordReset.objects.filter(auth_user=self.owner_auth_user).update(token='test')
 
     def _setup_owner(self):
         '''
             Create an owner
         '''
-        owner = server.factories.AuthOwner.create()
-        password_reset_service.invite_owner(self.user_owner)
+        owner = server.factories.Owner.create()
+        self.user_owner.owner = owner
+        self.user_owner.save()
+        _, self.owner_auth_user = owner_service.invite_legacy_owner(self.user_owner.phone_number)
 
     def _setup_booking(self):
         '''
