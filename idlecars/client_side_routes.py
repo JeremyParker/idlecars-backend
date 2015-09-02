@@ -31,3 +31,7 @@ def driver_account():
 def owner_password_reset(password_reset):
     parts = (settings.WEBAPP_URL, '#', 'owner_reset_password', password_reset.token)
     return '/'.join(parts)
+
+def terms_of_service():
+    parts = (settings.WEBAPP_URL, '#', 'terms_of_service')
+    return '/'.join(parts)

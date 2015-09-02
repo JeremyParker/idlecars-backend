@@ -15,7 +15,7 @@ def new_booking_email(booking):
             'TEXT': 'Driver {} booked {}\'s {}.'.format(
                 booking.driver.phone_number(),
                 booking.car.owner.name(),
-                booking.car.__unicode__()),
+                booking.car.display_name()),
             'CTA_LABEL': 'Check it out',
             'CTA_URL': 'https://www.idlecars.com{}'.format(
                 reverse('admin:server_booking_change', args=(booking.pk,))
@@ -57,7 +57,7 @@ def booking_canceled(booking):
             'TEXT': 'the driver with phone {} decided not to rent {}\'s {}'.format(
                 booking.driver.phone_number(),
                 booking.car.owner.__unicode__(),
-                booking.car.__unicode__(),
+                booking.car.display_name(),
             ),
             'CTA_LABEL': 'Booking details',
             'CTA_URL': 'https://www.idlecars.com{}'.format(

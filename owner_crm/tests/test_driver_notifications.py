@@ -32,7 +32,7 @@ class TestDriverNotifications(TestCase):
 
         self.assertEqual(
             outbox[0].subject,
-            'Your {} is waiting on your driving documents'.format(self.booking.car.__unicode__())
+            'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
         )
 
 
