@@ -55,6 +55,13 @@ class Command(BaseCommand):
         "tos_accepted": True,
     }
 
+    def _run_test(self, test_name, gateway):
+        try:
+            getattr(self, test_name)(gateway)
+            print '.'
+        except Exception as e:
+            print "{} failed for {} with exception {}".format(test_name, gateway, e)
+
     def handle(self, *args, **options):
         # make sure braintree is set to use the sandbox!
         config = settings.BRAINTREE
@@ -66,27 +73,58 @@ class Command(BaseCommand):
             payment_gateways.get_gateway('fake')
         ]
         for g in gateways:
-            self.test_add_bank_account_individual(g)
-            self.test_add_bank_account_failure(g)
-            self.test_add_payment_method_and_pay(g)
+            self.owner = factories.Owner.create()
+            self.driver = factories.Driver.create()
 
-    def test_add_bank_account_individual(self, gateway):
-        success, acct, error_fields, error_msgs = gateway.link_bank_account(self.bank_account_params)
-        if not success or not acct:
-            print 'test_add_bank_account_individual failed for gateway {}'.format(gateway)
-            print error_msgs
+            self._run_test('test_add_bank_account_failure', g)
+            self._run_test('test_add_bank_account_individual', g)
+            self._run_test('test_add_payment_method', g)
+            self._run_test('test_pay', g)
+
+            self.owner.delete()
+            self.driver.delete()
 
     def test_add_bank_account_failure(self, gateway):
         success, acct, error_fields, error_msgs = gateway.link_bank_account({'funding':{}})
         if not error_fields or not error_msgs:
             print 'test_add_bank_account_failure failed for gateway {}'.format(gateway)
 
-    # def test_add_payment_method_and_pay(self, gateway):
-    #     import pdb; pdb.set_trace()
-    #     driver = factories.Driver.create()
-    #     success, card_info = gateway.add_payment_method(driver, VALID_VISA_NONCE)
-    #     if success:
-    #         card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
-    #     else:
-    #         print 'test_add_payment_method_and_pay failed for gateway {}'.format(gateway)
+    def test_add_bank_account_individual(self, gateway):
+        success, acct, error_fields, error_msgs = gateway.link_bank_account(self.bank_account_params)
+        if not success or not acct:
+            print 'test_add_bank_account_individual failed for gateway {}'.format(gateway)
+            print error_msgs
+        self.owner.merchant_id = acct
+        self.owner.save()
 
+    def test_add_payment_method(self, gateway):
+        success, card_info = gateway.add_payment_method(self.driver, VALID_VISA_NONCE)
+        if not success:
+            print 'test_add_payment_method_and_pay failed to add payment_method for gateway {}'.format(gateway)
+            return
+
+        card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
+
+    def test_pay(self, gateway):
+        if gateway == payment_gateways.get_gateway('fake'): # not integrated yet
+            return
+
+        # TODO - hook this up to the braintree_payemnts module
+        # for now just manually make a payment just to proove that we've got all the bits in place
+        request = {
+            "merchant_account_id": self.owner.merchant_id,
+            'amount': '10.50',
+            "service_fee_amount": "1.00",
+            'customer_id': self.driver.braintree_customer_id,
+            'options': {
+                'submit_for_settlement': True,
+                # 'hold_in_escrow': escrow,
+            },
+        }
+
+        import braintree
+        response = braintree.Transaction.sale(request)
+        success = getattr(response, 'is_success', False)
+        if not success:
+            print 'test_pay failed to pay for gateway {}'.format(gateway)
+            return
