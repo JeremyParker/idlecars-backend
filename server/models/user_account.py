@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.core.validators import EmailValidator
 
-from idlecars import model_helpers
+from idlecars import model_helpers, fields
+
 from .owner import Owner
 from .driver import Driver
 
@@ -35,6 +36,7 @@ class UserAccount(models.Model):
 
     def clean(self, *args, **kwargs):
         self.email = self.email.lower().strip() or None
+        self.phone_number = fields.parse_phone_number(self.phone_number)
         super(UserAccount, self).clean(*args, **kwargs)
 
     def full_name(self):

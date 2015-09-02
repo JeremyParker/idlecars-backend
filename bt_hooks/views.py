@@ -1,56 +1,60 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-
 import braintree
 
+from django.conf import settings
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import Http404
+
 from idlecars import email
+from server import payment_gateways
+from server.models import Owner
+from server.services import owner_service
+from owner_crm.services import ops_emails
 
 
 def _confirm_bt_endpoint(request):
-    # TODO: @jeremeyparker will update this when config is moved to a general place
-    braintree.Configuration.configure(
-        braintree.Environment.Sandbox,
-        'cg5tqqwr6fn5xycb',
-        '7vyzyb772bwnhj3x',
-        '951f45c0a8bf94e474b8eb5e956402fd'
-    )
-    reply = braintree.WebhookNotification.verify(request.GET['bt_challenge'])
+    gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
+    reply = gateway.confirm_endpoint(request.GET['bt_challenge'])
     return HttpResponse(reply, content_type='text/plain')
 
-def _send_email_to_admin(request, subject):
-    merge_vars = {
-        'support@idlecars.com': {
-            'FNAME': 'Dearest Admin',
-            'HEADLINE': subject,
-            'TEXT': 'detail from braintree (if any):\n' + str(request.POST),
-            'CTA_LABEL': 'button',
-            'CTA_URL': 'https://idlecars.com',
-        }
-    }
-    email.send_sync(
-        template_name='one_button_no_image',
-        subject=subject,
-        merge_vars=merge_vars,
-    )
+
+def _get_webhook_notification(request):
+    bt_signature = request.POST['bt_signature']
+    bt_payload = request.POST['bt_payload']
+    return braintree.WebhookNotification.parse(bt_signature, bt_payload)
 
 
-# TODO: confirm the request actually came from braintree
+def _handle_post(request, new_state):
+    try:
+        webhook_notification = _get_webhook_notification(request)
+        owner_service.update_account_state(
+            webhook_notification.merchant_account.id,
+            new_state,
+        )
+        ops_emails.owner_account_result(str(request.POST), 'Owner Bank Account Processed')
+        return HttpResponse('')
+    except braintree.exceptions.InvalidSignatureError:
+        # hide the error - somebody's trying to hack us?
+        return HttpResponse('')
+    except Owner.DoesNotExist:
+        # TODO - some kind of email, or record of the failure.
+        raise Http404
+
+
 @csrf_exempt
 def submerchant_create_success(request):
     if request.method == 'GET':
         return _confirm_bt_endpoint(request)
     elif request.method == 'POST':
-        _send_email_to_admin(request, 'Owner Bank Account Added')
-        return HttpResponse('')
+        return _handle_post(request, Owner.BANK_ACCOUNT_APPROVED)
 
-# TODO: confirm the request actually came from braintree
+
 @csrf_exempt
 def submerchant_create_failure(request):
     if request.method == 'GET':
         return _confirm_bt_endpoint(request)
     elif request.method == 'POST':
-        _send_email_to_admin(request, 'Owner Bank Account Rejected')
-        return HttpResponse('')
+        return _handle_post(request, Owner.BANK_ACCOUNT_DECLINED)
