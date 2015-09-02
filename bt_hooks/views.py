@@ -28,20 +28,20 @@ def _get_webhook_notification(request):
 
 
 def _handle_post(request, new_state):
-        try:
-            webhook_notification = _get_webhook_notification(request)
-            owner_service.update_account_state(
-                webhook_notification.merchant_account.id,
-                new_state,
-            )
-            ops_emails.owner_account_result(str(request.POST), 'Owner Bank Account Processed')
-            return HttpResponse('')
-        except braintree.exceptions.InvalidSignatureError:
-            # hide the error - somebody's trying to hack us?
-            return HttpResponse('')
-        except Owner.DoesNotExist:
-            # TODO - some kind of email, or record of the failure.
-            raise Http404
+    try:
+        webhook_notification = _get_webhook_notification(request)
+        owner_service.update_account_state(
+            webhook_notification.merchant_account.id,
+            new_state,
+        )
+        ops_emails.owner_account_result(str(request.POST), 'Owner Bank Account Processed')
+        return HttpResponse('')
+    except braintree.exceptions.InvalidSignatureError:
+        # hide the error - somebody's trying to hack us?
+        return HttpResponse('')
+    except Owner.DoesNotExist:
+        # TODO - some kind of email, or record of the failure.
+        raise Http404
 
 
 @csrf_exempt
