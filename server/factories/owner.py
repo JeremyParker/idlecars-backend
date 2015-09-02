@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import random
 import datetime
 
-from factory import LazyAttribute, SubFactory, post_generation
+from factory import LazyAttribute, post_generation
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model

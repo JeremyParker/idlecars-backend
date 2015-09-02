@@ -41,6 +41,12 @@ class GetOwnerTest(APITestCase):
             fields.format_phone_number(self.owner.auth_users.all()[0].username)
         )
 
+    def test_get_another_owner(self):
+        other_owner = factories.AuthOwner.create()
+        self.url = reverse('server:owners-detail', args=(other_owner.pk,))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class BankLinkTest(APITestCase):
     def setUp(self):

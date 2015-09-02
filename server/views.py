@@ -86,6 +86,7 @@ class OwnerViewSet(
     model = models.Owner
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
+    permission_classes = (OwnsOwner,)
 
     def get_object(self):
         ''' override to map 'me' to the current user's driver object '''
