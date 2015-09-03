@@ -5,13 +5,13 @@ extends ./base.jade
     .logo
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
     .links
-      a How it works
+      a(href="#tutorial") How it works
       a Join/Login
       a List your car
     .menu-button(ng-click='showMenu = !showMenu')
       .burger-button
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-      a How it works
+      a(href="#tutorial") How it works
       a Join/Login
       a List your car
 
@@ -44,7 +44,7 @@ extends ./base.jade
       p Idlecars work with all services including Uber, Lyft and More
       img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
-  section.tutorial
+  section.tutorial(id="tutorial")
     h2 How it works
     .segments
       .segment

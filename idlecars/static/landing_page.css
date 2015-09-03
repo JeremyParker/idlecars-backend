@@ -469,9 +469,3 @@ footer {
     max-width: 14rem;
   }
 }
-
-@media (min-width: 1000px) {
-  .headline img {
-    left: -40px;
-  }
-}

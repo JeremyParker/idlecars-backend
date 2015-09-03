@@ -20,37 +20,7 @@ actions are both handled through this view.
 '''
 def index(request):
 
-    def _show_thanks():
-        return 'thanks' in request.GET
-
-    if request.method == 'POST':
-        contact_form = forms.ContactForm(request.POST)
-        if contact_form.is_valid():
-            try:
-                new_contact = models.Contact.objects.get(email=contact_form.cleaned_data['email'])
-                for attr in contact_form.cleaned_data:
-                    setattr(new_contact, attr, contact_form.cleaned_data[attr])
-            except models.Contact.DoesNotExist:
-                new_contact = contact_form.save()
-
-            jobs.queue_owner_welcome_email(new_contact.email)
-
-            # NOTE(jefk): survey is not ready yet, so now redirect to home
-            url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
-            return HttpResponseRedirect(url)
-            # if new_contact.role == "driver":
-            #     return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
-            # else:
-            #     return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
-    else:
-        contact_form = forms.ContactForm()
-
-
-    # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('website:index') + '#lets-talk',
-        'contact_form': contact_form,
-        'show_thanks': _show_thanks(),
         'login_url': client_side_routes.driver_account()
     }
     return render(request, 'landing_page.jade', context)
