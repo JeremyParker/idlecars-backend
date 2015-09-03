@@ -100,10 +100,6 @@ class OwnerAdmin(admin.ModelAdmin):
         'user_account__first_name',
         'user_account__phone_number',
         'user_account__email',
-        'auth_users__last_name',
-        'auth_users__first_name',
-        'auth_users__phone_number',
-        'auth_users__email',
         'company_name',
     ]
     change_form_template = "change_form_inlines_at_top.html"
