@@ -68,47 +68,6 @@ extends ./base.jade
           p #[strong DRIVE]
           p Once you’re added to the insurance you’re ready to go. Go pick up your car!
 
-  #lets-talk
-  - if show_thanks
-    section.thanks
-      .container
-        .content
-          h3 Thanks!
-          p Expect an email from us shortly.
-          p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
-
-  section.form(ng-controller="formCtrl")
-    .container
-      form(action="#{ action }", method="post", novalidate='', name="myForm")
-        - csrf_token
-
-        ul.role(ng-init="role = 'driver'")
-          li
-            input#id_role_0(name='role', type='radio', value='driver', checked, ng-model='role')
-            div
-              label(for='id_role_0') I’m a driver.
-              p Show me the available cars.
-          li
-            input#id_role_1(name='role', type='radio', value='owner', ng-model='role')
-            div
-              label(for='id_role_1') I own a car.
-              p I want my car to make me money.
-
-        ul.contact(ng-show="role == 'owner'")
-          li
-            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
-
-            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
-
-          li
-            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
-
-            input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
-
-        input.button(ng-show="role == 'owner'", type="submit", value="Let's Talk", ng-click='validation($event)')
-
-        a.button(ng-show="role == 'driver'", href="#{ settings.WEBAPP_URL }") Find your car
-
   section.ask
     h3 Your Car is Ready, Are You?
       a(href='mailto:support@idlecars.com') ASK US ANYTHING

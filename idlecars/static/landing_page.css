@@ -87,19 +87,6 @@ section {
   opacity: 0.9;
 }
 
-.thanks {
-  background: #008aff;
-  color: white;
-}
-
-.thanks .container {
-  padding: 2rem 2rem;
-}
-
-.thanks .content {
-  margin: 0 auto;
-}
-
 .navbar {
   background: black;
   display: flex;
@@ -276,91 +263,6 @@ section {
 .tutorial .pane {
   max-width: 13rem;
   margin: 0 auto 4rem auto;
-}
-
-.form {
-  background: #dde1e5;
-  color: black;
-}
-
-form {
-  width: 100%;
-  margin: 0;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: stretch;
-  align-items: stretch;
-}
-
-ul {
-  display: -webkit-flex;
-  display: flex;
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-li {
-  -webkit-flex: 1;
-  flex: 1;
-}
-
-.role {
-  padding: 0 0 4rem;
-}
-
-.role li {
-  padding-left: 3rem;
-  display: flex;
-}
-
-.role li label {
-  font-weight: 500;
-}
-
-li input {
-  margin-right: 1rem;
-}
-
-.error {
-  color: red;
-}
-
-.error input {
-  background-color : #ffd1d1;
-}
-
-.contact label {
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.contact input {
-  width: 100%
-}
-
-ul.contact {
-  padding: 2rem 0 3rem;
-  border-top: 1px solid #666;
-}
-
-.contact li {
-  margin: 0 1rem;
-}
-
-.contact li:first-child {
-  margin-left: 0;
-}
-
-.contact li:last-child {
-  margin-right: 0;
-}
-
-form .button {
-  -webkit-align-self: center;
-  align-self: center;
 }
 
 .ask {
@@ -565,44 +467,6 @@ footer {
   .ask h3 {
     font-weight: 500;
     max-width: 14rem;
-  }
-
-  .service-logos-big {
-    display: none;
-  }
-
-  .service-logos-small {
-    display: inline;
-    height: 13em;
-    margin-top: 1em;
-  }
-
-  .role {
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    padding-bottom: 2rem;
-  }
-
-  .role p {
-    font-size: 0.8rem;
-  }
-
-  .role li {
-    padding: 0;
-    margin-bottom: 1rem;
-  }
-
-  .contact {
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-
-  .contact li {
-    margin: 1rem 0 0;
-  }
-
-  .form .button {
-    width: 100%;
   }
 }
 
