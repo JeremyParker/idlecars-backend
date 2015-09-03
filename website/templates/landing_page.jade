@@ -39,6 +39,10 @@ extends ./base.jade
         h1 It's that easy
 
   section.manhattan
+    .container
+      h3 Your Car, Your Service. When you need it.
+      p Idlecars work with all services including Uber, Lyft and More
+      img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
   section.tutorial
     h2 How it works
@@ -107,7 +111,7 @@ extends ./base.jade
 
   section.ask
     h3 Your Car is Ready, Are You?
-    a(href='mailto:support@idlecars.com') ASK US ANYTHING
+      a(href='mailto:support@idlecars.com') ASK US ANYTHING
     h3 Follow Us Too
     .social
       .app
