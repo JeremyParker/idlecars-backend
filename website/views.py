@@ -19,7 +19,6 @@ There are two forms on the page, each of which has a different 'action' url. The
 actions are both handled through this view.
 '''
 def index(request):
-
     context = {
         'login_url': client_side_routes.driver_account()
     }

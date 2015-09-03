@@ -6,14 +6,14 @@ extends ./base.jade
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
     .links
       a(href="#tutorial") How it works
-      a Join/Login
-      a List your car
+      a(href="#{ login_url }") Join/Login
+      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
     .menu-button(ng-click='showMenu = !showMenu')
       .burger-button
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
       a(href="#tutorial") How it works
-      a Join/Login
-      a List your car
+      a(href="#{ login_url }") Join/Login
+      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
 
   section.headline
     .phone-background
