@@ -130,6 +130,8 @@ def insurance_follow_up_email(booking):
 
 
 def account_created(password_reset):
+    if not password_reset.auth_user.email:
+        return  # TODO - send some sort of error email, or at least log the error.
     merge_vars = {
         password_reset.auth_user.email: {
             'FNAME': password_reset.auth_user.first_name or None,

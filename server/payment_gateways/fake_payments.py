@@ -5,6 +5,7 @@ import datetime
 
 from server import models
 
+most_recent_request_data = None
 
 next_payment_response = None
 make_payment_log = []
@@ -15,9 +16,6 @@ add_payment_method_log = []
 SUCCESS_CHALLENGE = 'success_challenge'
 FAILURE_CHALLENGE = 'failure_challenge'
 
-GOOD_PARAMS = 'good params'
-BAD_PARAMS = 'bad params'
-
 
 def confirm_endpoint(challenge):
     # TODO - for testing, respond to success/failure input
@@ -25,6 +23,8 @@ def confirm_endpoint(challenge):
 
 
 def link_bank_account(braintree_params):
+    global most_recent_request_data
+    most_recent_request_data = braintree_params
     if not 'tos_accepted' in braintree_params.keys() or not braintree_params['tos_accepted']:
         return (
             False,

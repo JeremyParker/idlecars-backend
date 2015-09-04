@@ -28,6 +28,13 @@ def update_account_state(merchant_account_id, state):
 
 
 def link_bank_account(owner, params):
+    #translate client params into the format Braintree expects.
+    try:
+        params['individual']['phone'] = params['individual']['phone_number']
+        params['individual'].pop("phone_number", None)
+    except KeyError:
+        return [], ['Sorry, something went wrong there. Please try again.']
+
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
     success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(params)
     if success:
