@@ -40,12 +40,6 @@ business_data = {
         'business': {
             'legal_name': 'Craig\'s Awesome Business',
             'tax_id': '121234567',
-            # 'address': {
-            #     'street_address': "111 Main St",
-            #     'locality': "Chicago",
-            #     'region': "IL",
-            #     'postal_code': "60622"
-            # }
         },
         'funding': {
             'account_number': '1234567890',
@@ -112,43 +106,3 @@ individual_data = {
         "tos_accepted": True,
     }
 }
-
-
-# '''
-# These are the (superset of) parameters that Braintree expects.
-# '''
-# expected_params  = {
-#     'individual': {
-#         'first_name': "Jane",
-#         'last_name': "Doe",
-#         'email': "jane@14ladders.com",
-#         'phone': "5553334444",
-#         'date_of_birth': "1981-11-19",
-#         'ssn': "456-45-4567",
-#         'address': {
-#             'street_address': "111 Main St",
-#             'locality': "Chicago",
-#             'region': "IL",
-#             'postal_code': "60622"
-#         }
-#     },
-#     'business': {
-#         'legal_name': "Jane's Ladders",
-#         'dba_name': "Jane's Ladders",
-#         'tax_id': "98-7654321",
-#         'address': {
-#             'street_address': "111 Main St",
-#             'locality': "Chicago",
-#             'region': "IL",
-#             'postal_code': "60622"
-#         }
-#     },
-#     'funding': {
-#         'descriptor': "Blue Ladders",
-#         'email': "funding@blueladders.com",
-#         'mobile_phone': "5555555555",
-#         'account_number': "1123581321",
-#         'routing_number': "071101307",
-#     },
-#     "tos_accepted": True,
-# }
