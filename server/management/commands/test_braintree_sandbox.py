@@ -15,45 +15,9 @@ VALID_VISA_NONCE = Nonces.TransactableVisa
 class Command(BaseCommand):
     help = '''
     This command will test the functionality of the braintree_payments library against the
-    Braintree Sandbox environment. Also, we'll confirm that the fake_payments gateway acts
-    the same.
+    Braintree Sandbox environment. The data we send to Braintree here is the data the unit
+    tests validate against.
     '''
-
-    bank_account_params =  {
-        'individual': {
-            'first_name': "Jane",
-            'last_name': "Doe",
-            'email': "jane@14ladders.com",
-            'phone': "5553334444",
-            'date_of_birth': "1981-11-19",
-            'ssn': "456-45-4567",
-            'address': {
-                'street_address': "111 Main St",
-                'locality': "Chicago",
-                'region': "IL",
-                'postal_code': "60622"
-            }
-        },
-        'business': {
-            'legal_name': "Jane's Ladders",
-            'dba_name': "Jane's Ladders",
-            'tax_id': "98-7654321",
-            'address': {
-                'street_address': "111 Main St",
-                'locality': "Chicago",
-                'region': "IL",
-                'postal_code': "60622"
-            }
-        },
-        'funding': {
-            'descriptor': "Blue Ladders",
-            'email': "funding@blueladders.com",
-            'mobile_phone': "5555555555",
-            'account_number': "1123581321",
-            'routing_number': VALID_ROUTING_NUMBER,
-        },
-        "tos_accepted": True,
-    }
 
     def _run_test(self, test_name, gateway):
         try:
@@ -78,6 +42,7 @@ class Command(BaseCommand):
 
             self._run_test('test_add_bank_account_failure', g)
             self._run_test('test_add_bank_account_individual', g)
+            self._run_test('test_add_bank_account_business', g)
             self._run_test('test_add_payment_method', g)
             self._run_test('test_pay', g)
 
@@ -90,9 +55,19 @@ class Command(BaseCommand):
             print 'test_add_bank_account_failure failed for gateway {}'.format(gateway)
 
     def test_add_bank_account_individual(self, gateway):
-        success, acct, error_fields, error_msgs = gateway.link_bank_account(self.bank_account_params)
+        params = payment_gateways.test_braintree_params.individual_data['to_braintree']
+        success, acct, error_fields, error_msgs = gateway.link_bank_account(params)
         if not success or not acct:
             print 'test_add_bank_account_individual failed for gateway {}'.format(gateway)
+            print error_msgs
+        self.owner.merchant_id = acct
+        self.owner.save()
+
+    def test_add_bank_account_business(self, gateway):
+        params = payment_gateways.test_braintree_params.business_data['to_braintree']
+        success, acct, error_fields, error_msgs = gateway.link_bank_account(params)
+        if not success or not acct:
+            print 'test_add_bank_account_business failed for gateway {}'.format(gateway)
             print error_msgs
         self.owner.merchant_id = acct
         self.owner.save()

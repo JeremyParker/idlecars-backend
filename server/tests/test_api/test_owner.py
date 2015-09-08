@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 from idlecars import fields
 from server import factories
 from server import models
+from server import payment_gateways
 
 
 class GetOwnerTest(APITestCase):
@@ -59,66 +60,66 @@ class BankLinkTest(APITestCase):
 
         self.url = reverse('server:owners-bank-link', args=(self.owner.pk,))
 
-    _fake_params = {
-            'individual': {
-                'first_name': "Jane",
-                'last_name': "Doe",
-                'email': "jane@14ladders.com",
-                'phone': "5553334444",
-                'date_of_birth': "1981-11-19",
-                'ssn': "456-45-4567",
-                'address': {
-                    'street_address': "111 Main St",
-                    'locality': "Chicago",
-                    'region': "IL",
-                    'postal_code': "60622"
-                }
-            },
-            'business': {
-                'legal_name': "Jane's Ladders",
-                'dba_name': "Jane's Ladders",
-                'tax_id': "98-7654321",
-                'address': {
-                    'street_address': "111 Main St",
-                    'locality': "Chicago",
-                    'region': "IL",
-                    'postal_code': "60622"
-                }
-            },
-            'funding': {
-                'descriptor': "Blue Ladders",
-                'email': "funding@blueladders.com",
-                'mobile_phone': "5555555555",
-                'account_number': "1123581321",
-                'routing_number': "071101307",
-            },
-            "tos_accepted": True,
-        }
-
-    def test_merchant_id_added_to_owner(self):
+    def test_merchant_id_added_to_individual_owner(self):
         self.assertFalse(self.owner.merchant_id)
-        response = self.client.post(self.url, self._fake_params, format='json')
+        response = self.client.post(
+            self.url,
+            payment_gateways.test_braintree_params.individual_data['from_client'],
+            format='json'
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
         self.assertTrue(reloaded_owner.merchant_id)
+        try:
+            self.assertDictEqual(
+                payment_gateways.get_gateway('fake').most_recent_request_data,
+                payment_gateways.test_braintree_params.individual_data['to_braintree']
+            )
+        except AssertionError as e:
+            print 'Maybe you\'re running this test with settings set to use braintree gateway?'
+            raise e
+
+    def test_merchant_id_added_to_business_owner(self):
+        self.assertFalse(self.owner.merchant_id)
+        response = self.client.post(
+            self.url,
+            payment_gateways.test_braintree_params.business_data['from_client'],
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        reloaded_owner = models.Owner.objects.get(pk=self.owner.id)
+        self.assertTrue(reloaded_owner.merchant_id)
+        try:
+            self.assertDictEqual(
+                payment_gateways.get_gateway('fake').most_recent_request_data,
+                payment_gateways.test_braintree_params.business_data['to_braintree']
+            )
+        except AssertionError as e:
+            print 'Maybe you\'re running this test with settings set to use braintree gateway?'
+            raise e
 
     def test_fail_add_account_to_another(self):
         other_owner = factories.AuthOwner.create()
         self.assertFalse(other_owner.merchant_id)
         other_url = reverse('server:owners-bank-link', args=(other_owner.pk,))
-
-        response = self.client.post(other_url, self._fake_params, format='json')
+        response = self.client.post(
+            other_url,
+            payment_gateways.test_braintree_params.individual_data['from_client'],
+            format='json',
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_bad_params(self):
         # for testing, make tos_accepted = False
-        params = copy.deepcopy(self._fake_params)
+        params = copy.deepcopy(payment_gateways.test_braintree_params.individual_data['from_client'])
         params.update({ 'tos_accepted': False })
 
         response = self.client.post(self.url, params, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         expected = {
             "error_fields": ["tos_accepted"],
-            "_app_notifications": ["Terms Of Service needs to be accepted. Applicant tos_accepted required."],
+            "_app_notifications": [
+                "Terms Of Service needs to be accepted. Applicant tos_accepted required.",
+            ],
         }
         self.assertEqual(response.data, expected)
