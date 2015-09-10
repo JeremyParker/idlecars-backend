@@ -57,12 +57,15 @@ section {
   max-width: 54rem;
   margin: 0 auto;
   padding: 8rem 2rem;
-  display: -webkit-flex;
+
   display: flex;
+  display: -webkit-flex;
+
   flex-direction: column;
   -webkit-flex-direction: column;
-  -webkit-justify-content: center;
+
   justify-content: center;
+  -webkit-justify-content: center;
 }
 
 .button {
@@ -90,17 +93,28 @@ section {
 .navbar {
   background: black;
   display: flex;
+  display: -webkit-flex;
 }
 
 .navbar .logo, .navbar .links {
   display: flex;
+  display: -webkit-flex;
+
   flex: 1;
-  padding: 0.5rem 0;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+
   align-items: center;
+  -webkit-align-items: center;
+
+  padding: 0.5rem 0;
 }
 
 .navbar a {
   flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+
   text-align: center;
 }
 
@@ -207,6 +221,7 @@ section {
 .manhattan .container {
   height: 100%;
   padding: 0 2rem;
+
   align-items: center;
   -webkit-align-items: center;
 }
@@ -229,8 +244,12 @@ section {
 .tutorial {
   background-color: #008aff;
   text-align: center;
+
   display: flex;
+  display: -webkit-flex;
+
   flex-direction: column;
+  -webkit-flex-direction: column;
 }
 
 .tutorial h2 {
@@ -248,12 +267,20 @@ section {
 
 .tutorial .segments {
   flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+
   display: flex;
+  display: -webkit-flex;
+
   justify-content: center;
+  -webkit-justify-content: center;
 }
 
 .tutorial .segment {
   flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
 }
 
 .tutorial .image {
@@ -302,11 +329,18 @@ section {
 
 .ask .social {
   display: flex;
+  display: -webkit-flex;
+
   justify-content: center;
+  -webkit-justify-content: center;
+
 }
 
 .ask .app {
   flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
+
   max-width: 5rem;
 }
 
@@ -368,9 +402,13 @@ footer a {
   top: 3rem;
   right: 0;
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
   padding: 0 1rem 0.5rem;
+
+  display: flex;
+  display: -webkit-flex;
+
+  flex-direction: column;
+  -webkit-flex-direction: column;
 }
 
 .menu-container a {
@@ -471,6 +509,7 @@ footer a {
 
   .tutorial .segments {
     flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
   }
 
   .tutorial .segment {
