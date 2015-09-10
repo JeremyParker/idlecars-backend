@@ -99,6 +99,16 @@ class Car(models.Model):
         return int((self.solo_cost + 6) / 7)
 
     def __unicode__(self):
+        if self.plate and self.year:
+            return '{} {} ({})'.format(self.year, self.make_model, self.plate)
+        elif self.plate:
+            return 'Unkown Car ({})'.format(self.plate)
+        elif self.make_model:
+            return unicode(self.make_model)
+        else:
+            return '{}'.format(self.pk)
+
+    def display_name(self):
         if self.year:
             return '{} {}'.format(self.year, self.make_model)
         else:

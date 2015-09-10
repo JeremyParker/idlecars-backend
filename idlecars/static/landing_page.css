@@ -316,6 +316,10 @@ footer {
   text-align: center;
 }
 
+footer a {
+  text-decoration: underline;
+}
+
 .tm {
   text-align: center;
   font-size: 0.7rem;

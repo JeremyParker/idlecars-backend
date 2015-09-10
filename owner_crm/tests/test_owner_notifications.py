@@ -49,7 +49,7 @@ class TestOwnerNotifications(TestCase):
 
         subjects = [m.subject for m in outbox]
         for car in cars:
-            self.assertTrue('Your {} listing is about to expire.'.format(car.__unicode__()) in subjects)
+            self.assertTrue('Your {} listing is about to expire.'.format(car.display_name()) in subjects)
 
         # validate that the merge vars are being set correctly:
         for message in outbox:
@@ -63,7 +63,7 @@ class TestOwnerNotifications(TestCase):
             self.assertEqual(var['CTA_URL'], idlecars.client_side_routes.renewal_url(renewal))
             self.assertEqual(var['FNAME'], user.first_name)
             self.assertTrue(car.plate in var['TEXT'])
-            self.assertTrue(car.__unicode__() in var['TEXT'])
+            self.assertTrue(car.display_name() in var['TEXT'])
 
     def test_renewable_cars(self):
         '''
