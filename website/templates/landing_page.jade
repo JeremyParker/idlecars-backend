@@ -88,6 +88,11 @@ extends ./base.jade
           img(src="#{ settings.STATIC_URL }img/linkedin.png")
 
   footer
+    p.tm
+      strong Idlecars:
+      a(href="#{ faq }") Help
+      span |
+      a(href="#{ terms_of_service }") Terms & Privacy
+    br
     p.tm © {% now 'Y' %} idlecars
     p.tm All trademarks and images are copyright of their respective owners.
-    p #[a.tm(href="#{ terms_of_service }") terms of service]

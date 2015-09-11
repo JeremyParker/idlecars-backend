@@ -128,8 +128,8 @@ section {
 }
 
 .navbar img {
-  height: 3rem;
-  margin-left: 3rem
+  height: 2rem;
+  margin-left: 30%
 }
 
 .headline {
@@ -352,6 +352,7 @@ footer {
 
 footer a {
   text-decoration: underline;
+
 }
 
 .tm {
@@ -359,8 +360,12 @@ footer a {
   font-size: 0.7rem;
 }
 
-.tm:first-child {
-  font-weight: 500;
+.tm strong {
+  margin-right: 1rem;
+}
+
+.tm span {
+  margin: 0 0.25rem;
 }
 
 .service-logos-small {
@@ -402,7 +407,7 @@ footer a {
   top: 3rem;
   right: 0;
   z-index: 9999;
-  padding: 0 1rem 0.5rem;
+  padding: 0 1.5rem 1rem;
 
   display: flex;
   display: -webkit-flex;
@@ -413,7 +418,7 @@ footer a {
 
 .menu-container a {
   text-align: right;
-  margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
   font-weight: 300;
 }
 

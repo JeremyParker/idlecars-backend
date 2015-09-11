@@ -35,3 +35,7 @@ def owner_password_reset(password_reset):
 def terms_of_service():
     parts = (settings.WEBAPP_URL, '#', 'terms_of_service')
     return '/'.join(parts)
+
+def faq():
+    parts = (settings.WEBAPP_URL, '#', 'faq')
+    return '/'.join(parts)

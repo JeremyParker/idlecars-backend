@@ -21,7 +21,8 @@ actions are both handled through this view.
 def index(request):
     context = {
         'login_url': client_side_routes.driver_account(),
-        'terms_of_service': client_side_routes.terms_of_service()
+        'terms_of_service': client_side_routes.terms_of_service(),
+        'faq': client_side_routes.faq()
     }
     return render(request, 'landing_page.jade', context)
 
