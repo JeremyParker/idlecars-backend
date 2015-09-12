@@ -278,9 +278,9 @@ section {
 }
 
 .tutorial .segment {
-  flex: 1;
-  -ms-flex: 1;
-  -webkit-flex: 1;
+  flex: auto;
+  -ms-flex: auto;
+  -webkit-flex: auto;
 }
 
 .tutorial .image {
