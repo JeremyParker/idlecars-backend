@@ -7,8 +7,11 @@ from user import AuthUser, StaffUser
 from owner import Owner, AuthOwner
 from make_model import MakeModel, MakeModelWithImage, MakeModelWithImages
 from car import Car, BookableCar, CarExpiredListing, CompleteCar
-from user import AuthUser, StaffUser
+<<<<<<< HEAD
 from driver import Driver, CompletedDriver, PaymentMethodDriver, ApprovedDriver
+=======
+from driver import Driver, CompletedDriver, ApprovedDriver
+>>>>>>> checkout-fake-master
 from booking import Booking, ReservedBooking, RequestedBooking, AcceptedBooking, BookedBooking
 from booking import ReturnedBooking, RefundedBooking, IncompleteBooking
 from rideshare_flavor_factory import RideshareFlavorFactory
