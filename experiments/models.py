@@ -86,6 +86,10 @@ class Experiment(Model):
     objects = ExperimentManager()
 
     @property
+    def live(self):
+        return self.start_time < timezone.now() and (self.end_time is None or self.end_time > timezone.now())
+
+    @property
     def alternatives(self):
         return Alternative.objects.get_alternatives(self.identifier)
 

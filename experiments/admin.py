@@ -84,15 +84,12 @@ class ExperimentAdmin(ModelAdmin):
         return instance.conversion_count
     conversion_count.admin_order_field = 'conversion_count'
 
-    def queryset(self, request):
-        queryset = super(ExperimentAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        queryset = super(ExperimentAdmin, self).get_queryset(request)
         queryset = queryset.annotate(
             participant_count=Sum('alternative__participant_count'),
             conversion_count=Sum('alternative__conversion_count'),
         )
-        queryset = queryset.extra(select={
-            'live': "`start_time` < NOW() AND (`end_time` > NOW() OR `end_time` IS NULL)",
-        })
         return queryset
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
