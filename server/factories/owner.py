@@ -4,11 +4,12 @@ from __future__ import unicode_literals
 import random
 import datetime
 
-from factory import LazyAttribute, RelatedFactory
+from factory import LazyAttribute, RelatedFactory, post_generation
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
 from . import UserAccount as UserAccountFactory
+from server.factories import AuthUser
 
 class Owner(Factory):
     class Meta:
@@ -22,3 +23,10 @@ class Owner(Factory):
     rating = random.choice(owner_model.RATING)[0]
 
     user_account = RelatedFactory(UserAccountFactory, 'owner')
+
+
+class AuthOwner(Owner):
+    @post_generation
+    def auth_user(self, create, value, **kwargs):
+        auth_user = AuthUser.create(password='password')
+        self.auth_users.add(auth_user)

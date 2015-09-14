@@ -2,12 +2,15 @@
 from __future__ import unicode_literals
 
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from idlecars import fields
 from server.models import Owner
+from server import models
+from server.serializers import UserSerializer
 
 
-class OwnerSerializer(serializers.ModelSerializer):
+class OwnerContactSerializer(serializers.ModelSerializer):
     address = serializers.SerializerMethodField()
     phone_number = fields.PhoneNumberField(max_length=30)
 
@@ -25,7 +28,15 @@ class OwnerSerializer(serializers.ModelSerializer):
         )
 
     def get_address(self, obj):
-        return 'Some Address'
+        return 'Some Address'  # TODO - return the actual address
 
-    def get_address(self, obj):
-        return 'Some Address'
+
+class OwnerSerializer(ModelSerializer):
+    auth_users = UserSerializer(many=True, read_only=True)
+    class Meta:
+        model = models.Driver
+        fields = (
+            'id',
+            'auth_users',
+        )
+        read_only_fields = ('id', 'auth_users',)

@@ -6,4 +6,4 @@ from rest_framework.serializers import Serializer
 from idlecars import fields
 
 class PhoneNumberSerializer(Serializer):
-    phone_number = fields.PhoneNumberField(max_length=30)
+    phone_number = fields.PhoneNumberField(max_length=30, source='username')
