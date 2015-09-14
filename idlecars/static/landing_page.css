@@ -222,7 +222,7 @@ section {
 }
 
 .manhattan {
-  background: url(img/manhattan.png) no-repeat white;
+  background: url(img/manhattan.jpg) no-repeat white;
   background-size: cover;
   background-position: center;
   height: 507px;
@@ -345,7 +345,6 @@ section {
 
   justify-content: center;
   -webkit-justify-content: center;
-
 }
 
 .ask .app {
@@ -354,6 +353,10 @@ section {
   -webkit-flex: 1;
 
   max-width: 5rem;
+}
+
+.ask .app img {
+  width: 4rem;
 }
 
 footer {
