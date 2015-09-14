@@ -100,7 +100,7 @@ git push staging master
 heroku run python manage.py migrate --app staging-idlecars
 ```
 
-To deploy to master:
+To deploy to production:
 ```
 git push heroku master
 heroku run python manage.py migrate --app idlecars
