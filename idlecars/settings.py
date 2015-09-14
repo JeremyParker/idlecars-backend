@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'website',
     'owner_crm',
     'unsubscribes',
+    'experiments',
     'bt_hooks',
     'django_nose',
     'djrill',
@@ -78,6 +79,12 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 DATABASES = {
     # Parse database configuration from $DATABASE_URL
     'default': dj_database_url.config()
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
 }
 
 # Internationalization
