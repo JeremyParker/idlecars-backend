@@ -53,6 +53,13 @@ section {
   overflow: hidden;
 }
 
+.invisible {
+  margin-top: -3rem;
+  display: block;
+  height: 3rem;
+  visibility: hidden;
+}
+
 .container {
   max-width: 54rem;
   margin: 0 auto;
@@ -91,7 +98,11 @@ section {
 }
 
 .navbar {
+  position: fixed;
+  top: 0;
   background: black;
+  z-index: 9999;
+
   display: flex;
   display: -webkit-flex;
 }
@@ -133,6 +144,7 @@ section {
 }
 
 .headline {
+  margin-top: 3rem;
   background: url(img/loadingscreen.png) no-repeat #141414;
 }
 
@@ -401,12 +413,8 @@ footer a {
 }
 
 .menu-container {
-  position: absolute;
   background-color: black;
   width: 100%;
-  top: 3rem;
-  right: 0;
-  z-index: 9999;
   padding: 0 1.5rem 1rem;
 
   display: flex;
@@ -427,7 +435,7 @@ footer a {
     display: none;
   }
 
-  .navbar .menu-button {
+  .navbar, .navbar .menu-button {
     display: block;
   }
 }
