@@ -135,8 +135,7 @@ class CarSerializer(serializers.ModelSerializer):
         return car_search.search_attrs(obj)
 
     def get_compatibility(self, obj):
-        # TODO: use CarCompatibility model if more complicated logic is needed
-        return CarCompatibility(obj)._get_compatible_flavors()
+        return CarCompatibility(obj).all()
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
@@ -145,7 +144,7 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class CarPickupSerializer(CarSerializer):
-    owner = owner_serializer.OwnerSerializer()
+    owner = owner_serializer.OwnerContactSerializer()
 
     class Meta(CarSerializer.Meta):
         fields = CarSerializer.Meta.fields + (

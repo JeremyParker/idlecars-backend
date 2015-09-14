@@ -133,6 +133,6 @@ class DriverServiceTest(TestCase):
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
             outbox[1].subject,
-            'A driver has booked your {}.'.format(new_booking.car.__unicode__())
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))

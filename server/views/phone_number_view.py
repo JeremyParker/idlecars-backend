@@ -20,5 +20,5 @@ class PhoneNumberDetailView(APIView):
             # TODO(JP) create a new Driver, call start_set_password(auth_user).
             raise Http404
 
-        serializer = PhoneNumberSerializer(driver, many=False)
+        serializer = PhoneNumberSerializer(driver.auth_user, many=False)
         return Response(serializer.data)

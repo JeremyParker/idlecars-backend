@@ -77,9 +77,11 @@ class BookingServiceTest(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_all_docs_uploaded(self):
+        # TODO
         pass
 
     def test_checkout_docs_approved(self):
+        # TODO
         pass
 
     def test_checkout_with_others_too_slow(self):
@@ -104,14 +106,14 @@ class BookingServiceTest(TestCase):
         self.assertEqual(outbox[2].merge_vars.keys()[0], other_driver.email())
         self.assertEqual(
             outbox[2].subject,
-            'Someone else rented your {}.'.format(new_booking.car.__unicode__())
+            'Someone else rented your {}.'.format(new_booking.car.display_name())
         )
 
         # an email to the owner to get the driver on insurance
         self.assertEqual(outbox[3].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
             outbox[3].subject,
-            'A driver has booked your {}.'.format(new_booking.car.__unicode__())
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))

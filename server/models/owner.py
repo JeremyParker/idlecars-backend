@@ -6,9 +6,11 @@ from operator import attrgetter
 from django.db import models
 from django.core.validators import RegexValidator, MinLengthValidator
 from django.core.validators import MaxLengthValidator
+from django.contrib.auth.models import User as AuthUser
 
 
 class Owner(models.Model):
+    auth_users = models.ManyToManyField(AuthUser)
     company_name = models.CharField(max_length=256, blank=True)
     address1 = models.CharField(blank=True, max_length=200)
     address2 = models.CharField(blank=True, max_length=200)
@@ -21,6 +23,18 @@ class Owner(models.Model):
             MaxLengthValidator(5),
         ],
     )
+
+    BANK_ACCOUNT_PENDING = 1
+    BANK_ACCOUNT_APPROVED = 2
+    BANK_ACCOUNT_DECLINED = 3
+    MERCHANT_ACCOUNT_STATE = [
+        (BANK_ACCOUNT_PENDING, 'Pending'),
+        (BANK_ACCOUNT_APPROVED, 'Approved'),
+        (BANK_ACCOUNT_DECLINED, 'Declined'),
+    ]
+    merchant_account_state = models.IntegerField(choices=MERCHANT_ACCOUNT_STATE, null=True)
+    merchant_id = models.CharField(blank=True, max_length=200)
+
     split_shift = models.NullBooleanField(verbose_name="Accepts Split Shifts", blank=True)
     RATING = [
         (0, 'Terrible'),
@@ -41,21 +55,31 @@ class Owner(models.Model):
     def name(self):
         if self.company_name:
             return self.company_name
+        # TODO - free ourselves from the user_account alltogether
         names = sorted(self.user_account.all(), key=attrgetter('last_name'))
         return ', '.join([u.full_name() for u in names])
 
-    # get a value from the associated UserAccount, or return null, or 'multiple values'
     def get_user_account_attr(self, attrib):
-        users = self.user_account.all()
-        if not users:
-            return ''
-        elif users.count() == 1:
-            return getattr(self.user_account.get(), attrib)
-        else:
+        # get a value from the associated User, or return '', or 'multiple values'
+        users = self.auth_users.all()
+        if users.count() == 1:
+            return getattr(users.first(), attrib)
+        elif users.count() > 1:
             return 'multiple values'
 
+        # TODO - free ourselves from the user_account alltogether
+        users = self.user_account.all()
+        if users.count() == 1:
+            if attrib == 'username':
+                attrib = 'phone_number'
+            return getattr(self.user_account.get(), attrib)
+        elif users.count() > 1:
+            return 'multiple values'
+
+        return ''
+
     def phone_number(self):
-        return self.get_user_account_attr('phone_number')
+        return self.get_user_account_attr('username')
 
     def email(self):
         return self.get_user_account_attr('email')
