@@ -6,11 +6,31 @@ import datetime
 from server import models
 
 
+most_recent_request_data = None
+
 next_payment_response = None
 make_payment_log = []
 
 next_payment_method_response = None
 add_payment_method_log = []
+
+
+def confirm_endpoint(challenge):
+    # TODO - for testing, respond to success/failure input
+    return {'success': True}
+
+
+def link_bank_account(braintree_params):
+    global most_recent_request_data
+    most_recent_request_data = braintree_params
+    if not 'tos_accepted' in braintree_params.keys() or not braintree_params['tos_accepted']:
+        return (
+            False,
+            '',  # merchant_account_id
+            ['tos_accepted'],
+            ['Terms Of Service needs to be accepted. Applicant tos_accepted required.'],
+        )
+    return True, 'test_submerchant_account_id', [], []
 
 
 def add_payment_method(driver, nonce):

@@ -25,6 +25,8 @@ class MakeModel(models.Model):
     ]
     body_type = models.IntegerField(choices=BODY_TYPE_CHOICES, blank=False, null=False, default=0)
 
+    passenger_count = models.IntegerField(blank=True, null=True)
+
 
     def __unicode__(self):
         return '{} {}'.format(self.make, self.model)

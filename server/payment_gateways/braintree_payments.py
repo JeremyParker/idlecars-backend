@@ -39,6 +39,33 @@ def initialize_gateway(driver):
     return {'client_token': braintree.ClientToken.generate(),}
 
 
+def confirm_endpoint(challenge):
+    _configure_braintree()
+    return braintree.WebhookNotification.verify(challenge)
+
+
+def link_bank_account(braintree_params):
+    '''
+    Returns success (bool), 'account_id', [error_fields], [error_messages]
+    '''
+    _configure_braintree()
+
+    braintree_params['funding']['destination'] = braintree.MerchantAccount.FundingDestination.Bank
+    braintree_params['master_merchant_account_id'] = settings.MASTER_MERCHANT_ACCOUNT_ID
+
+    response = braintree.MerchantAccount.create(braintree_params)
+    success = getattr(response, "is_success", False)
+    if success:
+        account = response.merchant_account.id if response.merchant_account else ''
+        return success, account, [], []
+    else:
+        return (
+            success,
+            '',  # merchant_account_id
+            [e.attribute for e in response.errors.deep_errors],
+            [e.message for e in response.errors.deep_errors],
+        )
+
 def add_payment_method(driver, nonce):  # TODO: I don't think driver should be passed in. The ID should passed out.
     _configure_braintree()
 

@@ -82,6 +82,7 @@ extends ./base.jade
     .container
       p.ask
         a(href='mailto:support@idlecars.com') ASK US ANYTHING
-        div.last_content
-          | <p class='tm'>© {% now 'Y' %} idlecars</p>
-          p.tm All trademarks and images are copyright of their respective owners.
+      div.last_content
+        | <p class='tm'>© {% now 'Y' %} idlecars</p>
+        p.tm All trademarks and images are copyright of their respective owners.
+      p #[a.tm(href="#{ terms_of_service }") terms of service]

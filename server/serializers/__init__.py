@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from nonce_serializer import NonceSerializer
-from car_compatibility_serializer import CarCompatibilitySerializer
-from owner_serializer import OwnerSerializer
+from user_serializer import UserSerializer
+from owner_serializer import OwnerSerializer, OwnerContactSerializer
 from car_serializer import CarSerializer, CarPickupSerializer
 from booking_serializer import BookingSerializer, BookingDetailsSerializer
 from payment_method_serializer import PaymentMethodSerializer

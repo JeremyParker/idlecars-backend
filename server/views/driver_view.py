@@ -30,7 +30,10 @@ class DriverViewSet(
         ''' override to map 'me' to the current user's driver object '''
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
-            self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
+            try:
+                self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
+            except models.Driver.DoesNotExist:
+                raise Http404
         return super(DriverViewSet, self).get_object()
 
     @detail_route(methods=['post'], permission_classes=[OwnsDriver])

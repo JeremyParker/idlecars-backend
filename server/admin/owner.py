@@ -30,8 +30,44 @@ class CarInline(admin.TabularInline):
         return link(instance, 'details')
 
 
+class AuthUserInline(admin.TabularInline):
+    model = models.Owner.auth_users.through
+    verbose_name = "Users"
+    extra = 0
+    can_delete = False
+    fields = [
+        'detail_link',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'email',
+    ]
+    readonly_fields = [
+        'detail_link',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'email',
+    ]
+    def detail_link(self, instance):
+        return link(instance.user, 'details')
+
+    def first_name(self, instance):
+        return instance.user.first_name
+
+    def last_name(self, instance):
+        return instance.user.last_name
+
+    def phone_number(self, instance):
+        return instance.user.username
+
+    def email(self, instance):
+        return instance.user.email
+
+
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
+        AuthUserInline,
         UserAccountForOwnerInline,
         CarInline,
     ]
@@ -39,6 +75,7 @@ class OwnerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('split_shift', 'rating'),
+                ('merchant_id', 'merchant_account_state',),
                 'notes',
                 'company_name',
                 'address1',
@@ -47,6 +84,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
         }),
     )
+    readonly_fields = ['merchant_id', 'merchant_account_state']
     list_display = [
         'link_name',
         'rating',
@@ -54,8 +92,10 @@ class OwnerAdmin(admin.ModelAdmin):
         'email',
         'cars_available',
         'total_cars',
+        'merchant_account_state',
     ]
     search_fields = [
+        # TDOO - free ourselves from user_account alltogether
         'user_account__last_name',
         'user_account__first_name',
         'user_account__phone_number',

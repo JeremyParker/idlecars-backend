@@ -102,7 +102,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(outbox[0].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
             outbox[0].subject,
-            'A driver has booked your {}.'.format(new_booking.car.__unicode__())
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
         # TODO we should send an email to the driver telling them what happened
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
@@ -121,14 +121,14 @@ class BookingServiceTest(TestCase):
         self.assertEqual(outbox[0].merge_vars.keys()[0], other_driver.email())
         self.assertEqual(
             outbox[0].subject,
-            'Someone else rented your {}.'.format(new_booking.car.__unicode__())
+            'Someone else rented your {}.'.format(new_booking.car.display_name())
         )
 
         # an email to the owner to get the driver on insurance
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
             outbox[1].subject,
-            'A driver has booked your {}.'.format(new_booking.car.__unicode__())
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))

@@ -10,7 +10,7 @@ from server.services import car as car_service
 
 def _render_renewal_body(car):
     template_data = {
-        'CAR_NAME': car.__unicode__(),
+        'CAR_NAME': car.display_name(),
         'CAR_PLATE': car.plate,
     }
     context = Context(autoescape=False)
@@ -20,7 +20,7 @@ def _render_renewal_body(car):
 def renewal_email(car, renewal):
     renewal_url = client_side_routes.renewal_url(renewal)
     body = _render_renewal_body(car)
-    car_desc = car.__unicode__()
+    car_desc = car.display_name()
 
     for user in car.owner.user_account.all():
         if not user.email:
@@ -45,7 +45,7 @@ def renewal_email(car, renewal):
 def new_booking_email(booking):
     headline = '{} has booked your {}, with license plate {}'.format(
         booking.driver.full_name(),
-        booking.car.__unicode__(),
+        booking.car.display_name(),
         booking.car.plate,
     )
 
@@ -84,7 +84,7 @@ def new_booking_email(booking):
         }
         email.send_async(
             template_name='no_button_four_images',
-            subject='A driver has booked your {}.'.format(booking.car.__unicode__()),
+            subject='A driver has booked your {}.'.format(booking.car.display_name()),
             merge_vars=merge_vars,
         )
 
@@ -92,7 +92,7 @@ def new_booking_email(booking):
 def booking_canceled(booking):
     headline = '{} has decided not to rent your {}, with license plate {}'.format(
         booking.driver.full_name(),
-        booking.car.__unicode__(),
+        booking.car.display_name(),
         booking.car.plate,
     )
 
@@ -102,9 +102,9 @@ def booking_canceled(booking):
     already re-listed your car on the site so we can find you another driver as soon as possible.
     '''.format(
         booking.driver.first_name(),
-        booking.car.__unicode__(),
+        booking.car.display_name(),
     )
-    subject = 'Your {} booking has canceled.'.format(booking.car.__unicode__())
+    subject = 'Your {} booking has canceled.'.format(booking.car.display_name())
     for user in booking.car.owner.user_account.all():
         if not user.email:
             continue
@@ -127,3 +127,25 @@ def booking_canceled(booking):
 def insurance_follow_up_email(booking):
     # TODO(JP)
     pass
+
+
+def account_created(password_reset):
+    if not password_reset.auth_user.email:
+        return  # TODO - send some sort of error email, or at least log the error.
+    merge_vars = {
+        password_reset.auth_user.email: {
+            'FNAME': password_reset.auth_user.first_name or None,
+            'HEADLINE': 'An account has been created for you at idlecars.',
+            'TEXT': '''
+            Your car(s) are ready to be listed on the idlecars marketplace. Please click below
+            to secure your account with a password, and link your bank account to get paid.
+            ''',
+            'CTA_LABEL': 'Link your account',
+            'CTA_URL': client_side_routes.owner_password_reset(password_reset),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='An account has been created for you at idlecars',
+        merge_vars=merge_vars,
+    )

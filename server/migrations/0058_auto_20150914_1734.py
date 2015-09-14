@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0053_auto_20150819_2256'),
+        ('server', '0057_merge'),
     ]
 
     operations = [
@@ -18,7 +18,21 @@ class Migration(migrations.Migration):
                 ('amount', models.DecimalField(max_digits=10, decimal_places=2)),
                 ('status', models.IntegerField(default=0, choices=[(0, 'Pending gateway response'), (1, 'Payment approved'), (2, 'Payment declined'), (3, 'Card rejected')])),
                 ('error_message', models.CharField(max_length=256)),
-                ('gateway_token', models.CharField(max_length=32)),
+                ('transaction_id', models.CharField(max_length=32)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='PaymentMethod',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('gateway_name', models.CharField(max_length=16)),
+                ('gateway_token', models.CharField(max_length=256)),
+                ('suffix', models.CharField(max_length=4)),
+                ('card_type', models.CharField(max_length=32)),
+                ('card_logo', models.CharField(max_length=256)),
+                ('expiration_date', models.DateField(default=None, null=True, blank=True)),
+                ('unique_number_identifier', models.CharField(max_length=32)),
+                ('driver', models.ForeignKey(to='server.Driver')),
             ],
         ),
         migrations.AlterField(
@@ -30,5 +44,10 @@ class Migration(migrations.Migration):
             model_name='payment',
             name='booking',
             field=models.ForeignKey(to='server.Booking'),
+        ),
+        migrations.AddField(
+            model_name='payment',
+            name='payment_method',
+            field=models.ForeignKey(blank=True, to='server.PaymentMethod', null=True),
         ),
     ]

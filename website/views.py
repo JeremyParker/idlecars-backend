@@ -51,7 +51,8 @@ def index(request):
         'action': urlresolvers.reverse('website:index') + '#lets-talk',
         'contact_form': contact_form,
         'show_thanks': _show_thanks(),
-        'login_url': client_side_routes.driver_account()
+        'login_url': client_side_routes.driver_account(),
+        'terms_of_service': client_side_routes.terms_of_service()
     }
     return render(request, 'landing_page.jade', context)
 
