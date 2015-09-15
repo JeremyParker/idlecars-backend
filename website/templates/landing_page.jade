@@ -5,15 +5,15 @@ extends ./base.jade
     .logo
       img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
     .links
-      a(href="#tutorial") How it works
-      a(href="#{ login_url }") Join/Login
-      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
+      a(href="#tutorial") #[h5 How it works]
+      a(href="#{ login_url }") #[h5 Join/Login]
+      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
     .menu-button(ng-click='showMenu = !showMenu')
       .burger-button
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-      a(href="#tutorial") How it works
-      a(href="#{ login_url }") Join/Login
-      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
+      a(href="#tutorial") #[h5 How it works]
+      a(href="#{ login_url }") #[h5 Join/Login]
+      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
 
   section.headline
     .phone-background
@@ -30,7 +30,7 @@ extends ./base.jade
   section.get-more
     .container
       h3 Register Today. Drive Tomorrow.
-      p We handle the paperwork, so you can focus on your fares.
+      h5 We handle the paperwork, so you can focus on your fares.
 
   section.select
     .container
@@ -41,12 +41,12 @@ extends ./base.jade
   section.manhattan
     .container
       h3 Your Car, Your Service. When you need it.
-      p Idlecars work with all services including Uber, Lyft and More
+      h4 Idlecars work with all services including Uber, Lyft and More
       img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
   a.invisible(id="tutorial")
   section.tutorial
-    h2 How it works
+    h4 How it works
     .segments
       .segment
         .pane
@@ -74,26 +74,27 @@ extends ./base.jade
           p Once you’re added to the insurance, you’re ready to go. Go pick up your car!
 
   section.ask
-    h3 Your Car is Ready, Are You?
-      a(href='mailto:support@idlecars.com') ASK US ANYTHING
-    h3 Follow Us Too
-    .social
-      .app
-        a(href="https://twitter.com/idlecars" target="_blank")
-          img(src="#{ settings.STATIC_URL }img/twitter.png")
-      .app
-        a(href="https://www.facebook.com/idlecars" target="_blank")
-          img(src="#{ settings.STATIC_URL }img/facebook.png")
-      .app
-        a(href="https://www.linkedin.com/company/10117035" target="_blank")
-          img(src="#{ settings.STATIC_URL }img/linkedin.png")
+    .ask-container
+      h3 Your Car is Ready, Are You?
+        a(href='mailto:support@idlecars.com') ASK US ANYTHING
+      h3 Follow Us Too
+      .social
+        .app
+          a(href="https://twitter.com/idlecars" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/twitter.png")
+        .app
+          a(href="https://www.facebook.com/idlecars" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/facebook.png")
+        .app
+          a(href="https://www.linkedin.com/company/10117035" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/linkedin.png")
 
   footer
-    p.tm
+    h6.tm
       strong Idlecars:
       a(href="#{ faq }") Help
       span |
       a(href="#{ terms_of_service }") Terms & Privacy
     br
-    p.tm © {% now 'Y' %} idlecars
-    p.tm All trademarks and images are copyright of their respective owners.
+    h6.tm © {% now 'Y' %} idlecars
+    h6.tm All trademarks and images are copyright of their respective owners.
