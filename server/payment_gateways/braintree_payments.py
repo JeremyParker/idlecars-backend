@@ -9,11 +9,16 @@ from django.conf import settings
 from server import models
 
 
+configured = False
+
 def _configure_braintree():
-    config = settings.BRAINTREE
-    if isinstance(config["environment"], unicode):
-        config["environment"] = getattr(braintree.Environment, config["environment"])
-    braintree.Configuration.configure(**config)
+    global configured
+    if not configured:
+        config = settings.BRAINTREE
+        if isinstance(config["environment"], unicode):
+            config["environment"] = getattr(braintree.Environment, config["environment"])
+        braintree.Configuration.configure(**config)
+    configured = True
 
 
 def _add_customer(driver):
@@ -106,35 +111,76 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
         return False, error
 
 
-def make_payment(payment, escrow=False, nonce=None, token=None):
-    assert nonce or token
-    _configure_braintree()
-
-    request = {
+def _transaction_request(payment):
+    payment_method = payment.booking.driver.paymentmethod_set.last()
+    return {
+        'payment_method_token': payment_method.gateway_token,
         'amount': str(payment.amount),
         'customer_id': payment.booking.driver.braintree_customer_id,
-        'options': {
-            'submit_for_settlement': True,
-            # 'hold_in_escrow': escrow,
-        },
+        'merchant_account_id': payment.booking.car.owner.merchant_id,
+        'service_fee_amount': payment.service_fee,
     }
 
-    if nonce:
-        request['payment_method_nonce'] = nonce
-    elif token:
-        request['payment_method_token'] = token
+
+def pre_authorize(payment):
+    assert not payment.transaction_id
+    _configure_braintree()
+    request = _transaction_request(payment)
+    request.update({ 'options': { 'submit_for_settlement': False }})
 
     response = braintree.Transaction.sale(request)
-    success = getattr(response, 'is_success', False)
-
-    transaction_id = None
-    if hasattr(response, "transaction"):
-        transaction_id = response.transaction.id
-
-    if success:
-        result = models.Payment.APPROVED
-        error_message = ""
+    if getattr(response, 'is_success', False):
+        if response.transaction.status != 'authorized':
+            # TODO: logging system
+            print 'WARNING: an authorized transaction state was not "authorized"'
+        payment.status = models.Payment.PRE_AUTHORIZED
+        payment.error_message = ""
     else:
-        result, error_message, suspicious_activity = parse_payment_error(response)
+        payment.status, payment.error_message = parse_payment_error(response)  # TODO
 
-    return result, transaction_id, error_message
+    if hasattr(response, "transaction"):
+        payment.transaction_id = response.transaction.id
+
+    return payment
+
+
+def void(payment):
+    assert payment.transaction_id
+    assert payment.status is models.Payment.PRE_AUTHORIZED
+    _configure_braintree()
+
+    response = braintree.Transaction.void(payment.transaction_id)
+    if getattr(response, 'is_success', False):
+        if response.transaction.status != 'voided':
+            # TODO: logging system
+            print 'WARNING: A voided transaction state was not "voided"'
+        payment.status = models.Payment.VOIDED
+        payment.error_message = ""
+    else:
+        payment.status, payment.error_message = parse_payment_error(response)  # TODO
+    return payment
+
+
+def settle(payment):
+    _configure_braintree()
+    if payment.transaction_id:
+        response = braintree.Transaction.submit_for_settlement(payment.transaction_id)
+    else:
+        request = _transaction_request(payment)
+        request.update({ 'options': { 'submit_for_settlement': True }})
+        response = braintree.Transaction.sale(request)
+
+    if getattr(response, 'is_success', False):
+        if response.transaction.status not in [
+            'settlement_pending',
+            'settlement_confirmed',
+            'submitted_for_settlement',
+        ]:
+            # TODO: logging system
+            print 'WARNING: A settled transaction state had a non-settled status'
+
+        payment.status = models.Payment.SETTLED
+        payment.error_message = ""
+    else:
+        payment.status, payment.error_message = parse_payment_error(response)  # TODO
+    return payment

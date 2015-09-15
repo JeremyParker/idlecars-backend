@@ -8,9 +8,6 @@ from server import models
 
 most_recent_request_data = None
 
-next_payment_response = None
-make_payment_log = []
-
 next_payment_method_response = None
 add_payment_method_log = []
 
@@ -52,20 +49,18 @@ def add_payment_method(driver, nonce):
     return result
 
 
-def make_payment(payment, escrow=False, nonce=None, token=None):
-    global next_payment_response
-    make_payment_log.append(payment)
-
-    if next_payment_response:
-        result = next_payment_response
-    elif nonce or token:
-        result = (models.Payment.APPROVED, 'test_transaction_id', '',)
-    else:
-        result = (models.Payment.DECLINED, 'test_transaction_id', 'No funds available',)
-    next_payment_response = None
-    return result
+def pre_authorize(payment):
+    payment.transaction_id = 'transaction id'
+    payment.status = models.Payment.PRE_AUTHORIZED
+    payment.error_message = ""
+    return payment
 
 
-def reset():
-    global make_payment_log
-    make_payment_log = []
+def void(payment):
+    payment.status = models.Payment.VOIDED
+    return payment
+
+
+def settle(payment):
+    payment.status = models.Payment.SETTLED
+    return payment

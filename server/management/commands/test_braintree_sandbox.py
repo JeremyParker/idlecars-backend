@@ -1,15 +1,14 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from braintree.test.nonces import Nonces
+import os, sys
+from random import randint
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from server import payment_gateways, factories
-
-VALID_ROUTING_NUMBER = '071101307'
-VALID_VISA_NONCE = Nonces.TransactableVisa
+from server.payment_gateways import test_braintree_params
+from server import payment_gateways, factories, services, models
 
 
 class Command(BaseCommand):
@@ -20,11 +19,9 @@ class Command(BaseCommand):
     '''
 
     def _run_test(self, test_name, gateway):
-        try:
-            getattr(self, test_name)(gateway)
-            print '.'
-        except Exception as e:
-            print "{} failed for {} with exception {}".format(test_name, gateway, e)
+        func = getattr(self, test_name)
+        func(gateway)
+        print '.'
 
     def handle(self, *args, **options):
         # make sure braintree is set to use the sandbox!
@@ -44,7 +41,11 @@ class Command(BaseCommand):
             self._run_test('test_add_bank_account_individual', g)
             self._run_test('test_add_bank_account_business', g)
             self._run_test('test_add_payment_method', g)
-            self._run_test('test_pay', g)
+            self._run_test('test_pre_authorize', g)
+            self._run_test('test_void', g)
+            self._run_test('test_settle', g)
+            self._run_test('test_settle_fresh', g)
+            # self._run_test('test_pay', g)
 
             self.owner.delete()
             self.driver.delete()
@@ -55,7 +56,7 @@ class Command(BaseCommand):
             print 'test_add_bank_account_failure failed for gateway {}'.format(gateway)
 
     def test_add_bank_account_individual(self, gateway):
-        params = payment_gateways.test_braintree_params.individual_data['to_braintree']
+        params = test_braintree_params.individual_data['to_braintree']
         success, acct, error_fields, error_msgs = gateway.link_bank_account(params)
         if not success or not acct:
             print 'test_add_bank_account_individual failed for gateway {}'.format(gateway)
@@ -64,7 +65,7 @@ class Command(BaseCommand):
         self.owner.save()
 
     def test_add_bank_account_business(self, gateway):
-        params = payment_gateways.test_braintree_params.business_data['to_braintree']
+        params = test_braintree_params.business_data['to_braintree']
         success, acct, error_fields, error_msgs = gateway.link_bank_account(params)
         if not success or not acct:
             print 'test_add_bank_account_business failed for gateway {}'.format(gateway)
@@ -73,19 +74,72 @@ class Command(BaseCommand):
         self.owner.save()
 
     def test_add_payment_method(self, gateway):
-        success, card_info = gateway.add_payment_method(self.driver, VALID_VISA_NONCE)
+        success, card_info = gateway.add_payment_method(
+            self.driver,
+            test_braintree_params.VALID_VISA_NONCE,
+        )
         if not success:
             print 'test_add_payment_method_and_pay failed to add payment_method for gateway {}'.format(gateway)
             return
 
         card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
+        payment_method = models.PaymentMethod.objects.create(
+            driver=self.driver,
+            gateway_name='', # TODO - let's get rid of this
+            gateway_token=card_token,
+            suffix=card_suffix,
+            card_type=card_type,
+            card_logo=card_logo,
+            expiration_date=exp,
+            unique_number_identifier=unique_number_identifier,
+        )
+
+    def _create_payment(self):
+        '''
+        This is a setUp method for a bunch of the tests below.
+        '''
+        car = factories.BookableCar.create(owner=self.owner)
+        booking = factories.Booking.create(car=car, driver=self.driver)
+        dollar_amount = '9.{}'.format(randint(1, 99)) # change so the gateway won't reject as dupe.
+        return services.payment.create_payment(booking, dollar_amount)
+
+    def test_pre_authorize(self, gateway):
+        payment = self._create_payment()
+        payment = gateway.pre_authorize(payment)
+        if not payment.status == models.Payment.PRE_AUTHORIZED:
+            print 'test_pre_authorize failed to authorize for {}'.format(gateway)
+        if not payment.transaction_id:
+            print 'test_pre_authorize failed to get a transaction id for {}'.format(gateway)
+
+    def test_void(self, gateway):
+        payment = self._create_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.void(payment)
+        if not payment.status == models.Payment.VOIDED:
+            print 'test_void failed to void for {}'.format(gateway)
+
+    def test_settle(self, gateway):
+        payment = self._create_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.settle(payment)
+        if not payment.status == models.Payment.SETTLED:
+            print 'test_settle failed to settle for {}'.format(gateway)
+
+
+    def test_settle_fresh(self, gateway):
+        ''' create a payment and go straight to SETTLED (as opposed to pre-authorizing first)'''
+        payment = self._create_payment()
+        payment = gateway.settle(payment)
+        if not payment.status == models.Payment.SETTLED:
+            print 'test_settle_fresh failed to settle for {}'.format(gateway)
+
 
     def test_pay(self, gateway):
         if gateway == payment_gateways.get_gateway('fake'): # not integrated yet
             return
 
         # TODO - hook this up to the braintree_payemnts module
-        # for now just manually make a payment just to proove that we've got all the bits in place
+        # for now just manually make a payment just to prove that we've got all the bits in place
         request = {
             "merchant_account_id": self.owner.merchant_id,
             'amount': '10.50',

@@ -7,29 +7,37 @@ from server import payment_gateways
 from server import models
 
 
-def create_payment(booking, amount, payment_method):
+def create_payment(booking, amount):
+    payment_method = booking.driver.paymentmethod_set.last() # TODO: store 'em all & make latest default
     assert payment_method.driver == booking.driver
+
     payment = models.Payment.objects.create(
         booking=booking,
         amount=amount,
         payment_method=payment_method,
     )
-
-    gateway_name = payment_method.gateway_name if payment_method else settings.PAYMENT_GATEWAY_NAME
-    gateway = payment_gateways.get_gateway(gateway_name)
-
-    result, transaction_id, error_message = gateway.make_payment(
-        payment,
-        token=payment_method.gateway_token
-    )
-    assert result in [
-        models.Payment.APPROVED,
-        models.Payment.DECLINED,
-        models.Payment.REJECTED,
-    ]
-    payment.status = result
-    payment.error_message = error_message
-    payment.transaction_id = transaction_id
-    payment.save()
-
     return payment
+
+
+def _execute(function, payment):
+    '''
+    Execute a payment gatway method on the active gateway. This accomplishes redirection
+    between Braintree or Fake (or another gateway we might switch to in the future.)
+    '''
+    gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
+    func = getattr(gateway, function)
+    payment = func(payment)
+    payment.save()
+    return payment
+
+
+def pre_authorize(payment):
+    return _execute('pre_authorize', payment)
+
+
+def settle(payment):
+    return _execute('settle', payment)
+
+
+def void(payment):
+    return _execute('void', payment)

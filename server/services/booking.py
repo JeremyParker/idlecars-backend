@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
-from server.models import Booking
+from server.models import Booking, Payment
 from . import payment as payment_service
 from server.services import car as car_service
 from server.payment_gateways import braintree_payments
@@ -123,17 +123,17 @@ def can_checkout(booking):
         return False
     return True
 
+
 def checkout(booking):
     if not can_checkout(booking):
         raise Exception("Booking cannot be checked out in its current state")
 
-    payment_method = booking.driver.paymentmethod_set.last() # TODO - store 'em all and make latest the default
     payment = payment_service.create_payment(
         booking,
         booking.car.solo_deposit,
-        payment_method=payment_method,
     )
-    if payment.is_paid():
+    payment = payment_service.pre_authorize(payment)
+    if payment.status == Payment.PRE_AUTHORIZED:
         booking.checkout_time = timezone.now()
         booking.save()
         # TODO - send some kind of confirmation message
