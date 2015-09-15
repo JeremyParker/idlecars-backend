@@ -52,7 +52,6 @@ def add_payment_method(driver, nonce):
 def pre_authorize(payment):
     payment.transaction_id = 'transaction id'
     payment.status = models.Payment.PRE_AUTHORIZED
-    payment.error_message = ""
     return payment
 
 
@@ -62,5 +61,12 @@ def void(payment):
 
 
 def settle(payment):
+    payment.transaction_id = 'transaction id'
     payment.status = models.Payment.SETTLED
+    return payment
+
+
+def escrow(payment):
+    payment.transaction_id = 'transaction id'
+    payment.status = models.Payment.HELD_IN_ESCROW
     return payment

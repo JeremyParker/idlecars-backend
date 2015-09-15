@@ -184,3 +184,33 @@ def settle(payment):
     else:
         payment.status, payment.error_message = parse_payment_error(response)  # TODO
     return payment
+
+
+def escrow(payment):
+    _configure_braintree()
+    if payment.transaction_id:
+        response = braintree.Transaction.hold_in_escrow(payment.transaction_id)
+    else:
+        request = _transaction_request(payment)
+        request.update({
+            'options': {
+                'submit_for_settlement': True,
+                'hold_in_escrow': True,
+            }
+        })
+        response = braintree.Transaction.sale(request)
+
+    if getattr(response, 'is_success', False):
+        if response.transaction.escrow_status not in [
+            'hold_pending',
+            'held',
+        ]:
+            # TODO: logging system
+            print 'WARNING: A transaction in escrow had a non-escrow status: {}'.format(
+                response.transaction.escrow_status
+            )
+        payment.status = models.Payment.HELD_IN_ESCROW
+        payment.error_message = ''
+    else:
+        payment.status, payment.error_message = parse_payment_error(response)  # TODO
+    return payment

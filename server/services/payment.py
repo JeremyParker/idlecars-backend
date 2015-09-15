@@ -41,3 +41,7 @@ def settle(payment):
 
 def void(payment):
     return _execute('void', payment)
+
+
+def escrow(payment):
+    return _execute('escrow', payment)

@@ -45,7 +45,8 @@ class Command(BaseCommand):
             self._run_test('test_void', g)
             self._run_test('test_settle', g)
             self._run_test('test_settle_fresh', g)
-            # self._run_test('test_pay', g)
+            self._run_test('test_escrow', g)
+            self._run_test('test_escrow_fresh', g)
 
             self.owner.delete()
             self.driver.delete()
@@ -125,7 +126,6 @@ class Command(BaseCommand):
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle failed to settle for {}'.format(gateway)
 
-
     def test_settle_fresh(self, gateway):
         ''' create a payment and go straight to SETTLED (as opposed to pre-authorizing first)'''
         payment = self._create_payment()
@@ -133,27 +133,17 @@ class Command(BaseCommand):
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle_fresh failed to settle for {}'.format(gateway)
 
+    def test_escrow(self, gateway):
+        payment = self._create_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.escrow(payment)
+        if not payment.status == models.Payment.HELD_IN_ESCROW:
+            print 'test_escrow failed for {}'.format(gateway)
 
-    def test_pay(self, gateway):
-        if gateway == payment_gateways.get_gateway('fake'): # not integrated yet
-            return
+    def test_escrow_fresh(self, gateway):
+        payment = self._create_payment()
+        payment = gateway.escrow(payment)
+        if not payment.status == models.Payment.HELD_IN_ESCROW:
+            print 'test_escrow_fresh failed for {}'.format(gateway)
 
-        # TODO - hook this up to the braintree_payemnts module
-        # for now just manually make a payment just to prove that we've got all the bits in place
-        request = {
-            "merchant_account_id": self.owner.merchant_id,
-            'amount': '10.50',
-            "service_fee_amount": "1.00",
-            'customer_id': self.driver.braintree_customer_id,
-            'options': {
-                'submit_for_settlement': True,
-                # 'hold_in_escrow': escrow,
-            },
-        }
 
-        import braintree
-        response = braintree.Transaction.sale(request)
-        success = getattr(response, 'is_success', False)
-        if not success:
-            print 'test_pay failed to pay for gateway {}'.format(gateway)
-            return
