@@ -190,7 +190,7 @@ section {
 }
 
 .select {
-  background: url(img/selectthebest.jpg) no-repeat black;
+  background: url(img/selectthebest.jpg) no-repeat #070707;
   background-position: calc(50% + 336px) center;
 }
 
