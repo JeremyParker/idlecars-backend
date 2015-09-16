@@ -12,15 +12,17 @@ class Payment(models.Model):
     PRE_AUTHORIZED = 1
     SETTLED = 2
     HELD_IN_ESCROW = 3
-    VOIDED = 4
-    DECLINED = 5
-    REJECTED = 6
+    REFUNDED = 4
+    VOIDED = 5
+    DECLINED = 6
+    REJECTED = 7
 
     STATUS = (
         (PENDING, 'Pending'),
         (PRE_AUTHORIZED, 'Pre-authorized'),
         (SETTLED, 'Pre-authorized'),
         (HELD_IN_ESCROW, 'In Escrow'),
+        (REFUNDED, 'Payment refunded'),
         (VOIDED, 'Voided'),
         (DECLINED, 'Payment declined'),
         (REJECTED, 'Card rejected'),

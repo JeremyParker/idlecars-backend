@@ -1,7 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import random
+import random, string
 import datetime
 
 from factory import LazyAttribute, RelatedFactory, post_generation
@@ -30,3 +30,9 @@ class AuthOwner(Owner):
     def auth_user(self, create, value, **kwargs):
         auth_user = AuthUser.create(password='password')
         self.auth_users.add(auth_user)
+
+class BankAccountOwner(AuthOwner):
+    merchant_id = LazyAttribute(lambda o: ''.join(
+        [random.choice(string.ascii_uppercase + string.digits) for i in range(18)]
+    ))
+    merchant_account_state = owner_model.BANK_ACCOUNT_APPROVED

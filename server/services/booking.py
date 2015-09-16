@@ -100,7 +100,8 @@ def cancel(booking):
     if Booking.REQUESTED == booking.get_state():
         owner_emails.booking_canceled(booking)
 
-    # TODO - if the booking is checked out, refund the deposit
+    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
+        payment_service.void(payment)
 
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = Booking.REASON_CANCELED
@@ -124,15 +125,22 @@ def can_checkout(booking):
     return True
 
 
-def checkout(booking):
-    if not can_checkout(booking):
-        raise Exception("Booking cannot be checked out in its current state")
-
+def _make_deposit_payment(booking):
     payment = payment_service.create_payment(
         booking,
         booking.car.solo_deposit,
     )
     payment = payment_service.pre_authorize(payment)
+    return payment
+
+
+def checkout(booking):
+    if not can_checkout(booking):
+        raise Exception("Booking cannot be checked out in its current state")
+
+    payment = _make_deposit_payment(booking)
+    # TODO - handle all the error cases
+
     if payment.status == Payment.PRE_AUTHORIZED:
         booking.checkout_time = timezone.now()
         booking.save()
@@ -153,8 +161,41 @@ def can_pickup(booking):
     return booking.get_state() == Booking.ACCEPTED
 
 
+def _find_deposit_payment(booking):
+    try:
+        deposit_payment = booking.payment_set.get(status=Payment.PRE_AUTHORIZED)
+    except Payment.DoesNotExist:
+        try:
+            deposit_payment = booking.payment_set.get(status=Payment.SETTLED)
+        except Payment.DoesNotExist:
+            return None
+    return deposit_payment
+
+
 def pickup(booking):
-    # TODO - payment here
+    deposit_payment = _find_deposit_payment(booking) or _make_deposit_payment(booking)
+    # TODO - error handling with message to the user
+
+    # pre-authorize the payment for the first week's rent
+    rent_payment = payment_service.create_payment(booking, booking.car.solo_cost)
+    rent_payment = payment_service.pre_authorize(rent_payment)
+    if rent_payment.status != Payment.PRE_AUTHORIZED:
+        # TODO - error handling with message to the user
+        return booking
+
+    # hold the deposit in escrow for the duration of the rental
+    if deposit_payment.status is not Payment.HELD_IN_ESCROW:
+        deposit_payment = payment_service.escrow(deposit_payment)
+    if deposit_payment.status != Payment.HELD_IN_ESCROW:
+        # TODO - error handling with message to the user
+        return booking
+
+    # take payment for the first week's rent
+    rent_payment = payment_service.settle(rent_payment)
+    if rent_payment.status != Payment.SETTLED:
+        # TODO - error handling with message to the user
+        return booking
+
     booking.pickup_time = timezone.now()
     booking.save()
     # TODO - send some kind of confirmation message

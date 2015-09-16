@@ -2,12 +2,12 @@
 from __future__ import unicode_literals
 
 from factory import LazyAttribute
-from factory import SubFactory, SelfAttribute
+from factory import SubFactory, SelfAttribute, post_generation
 
 from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import BookableCar, ApprovedDriver, UserAccount
+from server.factories import Payment, BookableCar, ApprovedDriver, PaymentMethodDriver
 from server import models
 
 class Booking(Factory):
@@ -20,6 +20,15 @@ class Booking(Factory):
 
 class ReservedBooking(Booking):
     checkout_time = timezone.now()
+    driver = SubFactory(PaymentMethodDriver)
+
+    @post_generation
+    def payment(self, create, count, **kwargs):
+        Payment.create(
+            booking=self,
+            amount=self.car.solo_deposit,
+            status=models.Payment.PRE_AUTHORIZED,
+        )
 
 
 class RequestedBooking(ReservedBooking):

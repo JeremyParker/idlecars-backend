@@ -9,7 +9,7 @@ from django.conf import settings
 
 from server.services import booking as booking_service
 from server.services import driver as driver_service
-from server import factories, models
+from server import factories, models, payment_gateways
 
 from owner_crm.tests import sample_merge_vars
 
@@ -83,13 +83,21 @@ class BookingServiceTest(TestCase):
         # checkout
         new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.RESERVED)
+
         # TODO we should send an email to the driver and owner telling them what happened
+
+        # there should be a single payment that is in the pre-authorized state
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.last().status, models.Payment.PRE_AUTHORIZED)
 
     def _checkout_approved_driver(self):
         driver = factories.ApprovedDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=driver)
         new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.PRE_AUTHORIZED)), 1)
+        self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.solo_deposit)
         return new_booking
 
     def test_checkout_docs_approved(self):
@@ -133,6 +141,39 @@ class BookingServiceTest(TestCase):
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
+    def _check_payments_after_pickup(self, new_booking):
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)
+        first_week_rent_payment = new_booking.payment_set.filter(status=models.Payment.SETTLED)[0]
+        self.assertEqual(first_week_rent_payment.amount, new_booking.car.solo_cost)
+
+    def test_pickup(self):
+        driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+
+        # pick up the car
+        new_booking = booking_service.pickup(new_booking)
+
+        self.assertEqual(new_booking.get_state(), models.Booking.BOOKED)
+        self._check_payments_after_pickup(new_booking)
+
+        # TODO - test the email messages we should have sent
+
+    def test_pickup_after_failure(self):
+        driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.first().status, models.Payment.PRE_AUTHORIZED)
+
+        # fail to pick up the car
+        next_response = (models.Payment.DECLINED, 'This transaction was declined for some reason.',)
+        gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
+        new_booking = booking_service.pickup(new_booking)
+
+        # successfully pick up the car
+        new_booking = booking_service.pickup(new_booking)
+        self._check_payments_after_pickup(new_booking)
+
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()
         new_booking = booking_service.create_booking(self.car, driver)
@@ -151,6 +192,10 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.create_booking(self.car, approved_driver)
         new_booking = booking_service.checkout(new_booking)
         booking_service.cancel(new_booking)
+
+        # make sure the pre-authorized payment got voided
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.last().status, models.Payment.VOIDED)
 
         ''' we should have sent
         - message to ops about the initial booking

@@ -18,3 +18,10 @@ class Payment(Factory):
 class PreAuthorizedPayment(Payment):
     transaction_id = 'some_transaction_id'
     status = models.Payment.PRE_AUTHORIZED
+
+
+class FailedPayment(Payment):
+    ''' Requires a Booking passed in the create() function '''
+    transaction_id = 'some_transaction_id'
+    status = models.Payment.DECLINED
+    error_message = 'This transaction was declined for some reason.'
