@@ -77,4 +77,5 @@ class DriverSerializer(ModelSerializer):
 
     def get_payment_method(self, instance):
         payment_method = instance.paymentmethod_set.last()
-        return PaymentMethodSerializer(payment_method).data
+        if payment_method:
+            return PaymentMethodSerializer(payment_method).data
