@@ -13,11 +13,10 @@ class PaymentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                'booking_link',
-                ('created_time', 'invoice_item',),
+                ('invoice_item', 'booking_link',),
+                ('created_time', 'amount', 'service_fee', 'payment_method',),
                 ('status', 'error_message',),
-                ('amount', 'service_fee', 'payment_method',),
-                ('transaction_id', 'gateway_link',),
+                ('gateway_link',),
             )
         }),
     )
@@ -31,14 +30,14 @@ class PaymentAdmin(admin.ModelAdmin):
         'payment_method',
         'status',
         'error_message',
-        'transaction_id',
         'gateway_link',
     ]
     list_display = ('created_time', 'invoice_item', 'booking_link', 'amount', 'status')
     date_hierarchy = 'created_time'
     search_fields = [
         'booking__driver__first_name',
-        'booking__driver__last_name'
+        'booking__driver__last_name',
+        'booking__car__plate',
         'transaction_id',
     ]
     list_filter = ['status']
@@ -74,3 +73,6 @@ class PaymentInline(admin.TabularInline):
         return link(instance, instance.created_time.strftime("%b %d, %Y %H:%M:%S"))
     def invoice_item(self, instance):
         return instance.week_ending or 'Deposit'
+    def gateway_link(self, instance):
+        return payment_service.details_link(instance)
+    gateway_link.short_description = 'Gateway link'
