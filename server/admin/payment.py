@@ -13,7 +13,7 @@ class PaymentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('invoice_item', 'booking_link',),
+                ('invoice_description', 'booking_link',),
                 ('created_time', 'amount', 'service_fee', 'payment_method',),
                 ('status', 'error_message',),
                 ('gateway_link',),
@@ -24,7 +24,7 @@ class PaymentAdmin(admin.ModelAdmin):
     readonly_fields = [
         'created_time',
         'booking_link',
-        'invoice_item',
+        'invoice_description',
         'amount',
         'service_fee',
         'payment_method',
@@ -32,7 +32,7 @@ class PaymentAdmin(admin.ModelAdmin):
         'error_message',
         'gateway_link',
     ]
-    list_display = ('created_time', 'invoice_item', 'booking_link', 'amount', 'status')
+    list_display = ('created_time', 'invoice_description', 'booking_link', 'amount', 'status')
     date_hierarchy = 'created_time'
     search_fields = [
         'booking__driver__first_name',
@@ -41,9 +41,6 @@ class PaymentAdmin(admin.ModelAdmin):
         'transaction_id',
     ]
     list_filter = ['status']
-
-    def invoice_item(self, instance):
-        return instance.week_ending or 'Deposit'
 
     def booking_link(self, instance):
         return link(instance.booking)
@@ -67,12 +64,10 @@ class PaymentInline(admin.TabularInline):
     verbose_name = 'Payments'
     extra = 0
     can_delete = False
-    fields = ['time_link', 'invoice_item', 'amount', 'status', 'payment_method']
-    readonly_fields = ['time_link', 'invoice_item', 'amount', 'status', 'payment_method']
+    fields = ['time_link', 'invoice_description', 'amount', 'status', 'payment_method']
+    readonly_fields = ['time_link', 'invoice_description', 'amount', 'status', 'payment_method']
     def time_link(self, instance):
         return link(instance, instance.created_time.strftime("%b %d, %Y %H:%M:%S"))
-    def invoice_item(self, instance):
-        return instance.week_ending or 'Deposit'
     def gateway_link(self, instance):
         return payment_service.details_link(instance)
     gateway_link.short_description = 'Gateway link'

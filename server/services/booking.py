@@ -134,6 +134,17 @@ def _make_deposit_payment(booking):
     return payment
 
 
+def _find_deposit_payment(booking):
+    try:
+        deposit_payment = booking.payment_set.get(status=Payment.PRE_AUTHORIZED)
+    except Payment.DoesNotExist:
+        try:
+            deposit_payment = booking.payment_set.get(status=Payment.SETTLED)
+        except Payment.DoesNotExist:
+            return None
+    return deposit_payment
+
+
 def checkout(booking):
     if not can_checkout(booking):
         raise Exception("Booking cannot be checked out in its current state")
@@ -159,17 +170,6 @@ def checkout(booking):
 
 def can_pickup(booking):
     return booking.get_state() == Booking.ACCEPTED
-
-
-def _find_deposit_payment(booking):
-    try:
-        deposit_payment = booking.payment_set.get(status=Payment.PRE_AUTHORIZED)
-    except Payment.DoesNotExist:
-        try:
-            deposit_payment = booking.payment_set.get(status=Payment.SETTLED)
-        except Payment.DoesNotExist:
-            return None
-    return deposit_payment
 
 
 def pickup(booking):
@@ -217,11 +217,15 @@ def start_time_display(booking):
 
 
 def min_rental_still_limiting(booking):
-    min_notice = timezone.now() + datetime.timedelta(days=7)
+    '''
+    Is the minimum rental time still limiting the first first_valid_end_time, or is
+    it the 7 days' notice?
+    '''
     min_rental = car_service.get_min_rental_duration(booking.car)
     if not min_rental:
         return False
 
+    min_notice = timezone.now() + datetime.timedelta(days=7)
     if not booking.pickup_time or booking.pickup_time + datetime.timedelta(min_rental) > min_notice:
         return True
     return False
@@ -230,7 +234,6 @@ def min_rental_still_limiting(booking):
 def first_valid_end_time(booking):
     '''
     Returns the earliest legal end time of the booking, so the user can't end the booking prematurely.
-    The return value is a list of ints representing [Year, Zero-indexed month, Day].
     '''
     if min_rental_still_limiting(booking):
         min_rental_days = car_service.get_min_rental_duration(booking.car)
