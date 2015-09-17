@@ -69,5 +69,5 @@ class CarCompatibility(object):
 
     def _get_flavor_names(self):
         return {
-            flavor.friendly_id: flavor.name for flavor in RideshareFlavor.objects.all()
+            flavor.friendly_id: flavor.friendly_id for flavor in RideshareFlavor.objects.all()
         }
