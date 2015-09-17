@@ -29,3 +29,4 @@ DEFAULT_FROM_EMAIL = 'support@idlecars.com'
 OPS_EMAIL = 'support@idlecars.com'
 
 PAYMENT_GATEWAY_NAME = 'braintree'
+BRAINTREE_BASE_URL = 'www.braintreegateway.com'

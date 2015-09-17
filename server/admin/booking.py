@@ -6,6 +6,7 @@ from django.contrib import admin
 from idlecars.admin_helpers import link
 
 from server import models
+from server.admin.payment import PaymentInline
 
 
 class BookingAdmin(admin.ModelAdmin):
@@ -38,6 +39,7 @@ class BookingAdmin(admin.ModelAdmin):
             ),
         }),
     )
+    inlines = [PaymentInline]
     list_display = [
         'state',
         'driver_docs_uploaded',
@@ -174,12 +176,14 @@ class BookingForCarInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
+        'incomplete_reason',
         'driver',
         'created_time',
     ]
     readonly_fields = [
         'detail_link',
         'state',
+        'incomplete_reason',
         'driver',
         'created_time',
     ]
@@ -189,12 +193,14 @@ class BookingForDriverInline(BookingInlineBase):
     fields = [
         'detail_link',
         'state',
+        'incomplete_reason',
         'car',
         'created_time',
     ]
     readonly_fields = [
         'detail_link',
         'state',
+        'incomplete_reason',
         'car',
         'created_time',
     ]

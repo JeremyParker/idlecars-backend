@@ -20,7 +20,7 @@ class Payment(models.Model):
     STATUS = (
         (PENDING, 'Pending'),
         (PRE_AUTHORIZED, 'Pre-authorized'),
-        (SETTLED, 'Pre-authorized'),
+        (SETTLED, 'Settled'),
         (HELD_IN_ESCROW, 'In Escrow'),
         (REFUNDED, 'Payment refunded'),
         (VOIDED, 'Voided'),
@@ -28,6 +28,7 @@ class Payment(models.Model):
         (REJECTED, 'Card rejected'),
     )
 
+    created_time = models.DateTimeField(auto_now_add=True)
     booking = models.ForeignKey(Booking)
     week_ending = models.DateTimeField(blank=True, null=True)  # end of the week they're paying for
 

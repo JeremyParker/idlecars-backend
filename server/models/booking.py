@@ -56,7 +56,7 @@ class Booking(models.Model):
         RESERVED: 'Reserved - deposit paid, not requested (waiting for doc review)',
         REQUESTED: 'Requested - waiting for owner/insurance',
         ACCEPTED: 'Accepted - waiting for deposit, ssn, contract',
-        BOOKED: 'Active - car is in the drivers possession and on the road',
+        BOOKED: 'Active - car is in the driver\'s possession and on the road',
         RETURNED: 'Returned - driver returned the car but hasn\'t got deposit back',
         REFUNDED: 'Refunded - car was returned and driver got their deposit back',
         INCOMPLETE: 'Incomplete - this rental didn\'t happen for some reason (see reason field)',
@@ -79,6 +79,9 @@ class Booking(models.Model):
             return Booking.RESERVED
         else:
             return Booking.PENDING
+
+    def __unicode__(self):
+        return '{} on {}'.format(self.driver, self.car)
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),

@@ -195,6 +195,7 @@ CORS_ALLOW_HEADERS = (
 HEAP_APP_ID = '655181858'
 
 PAYMENT_GATEWAY_NAME = 'fake'
+BRAINTREE_BASE_URL = 'sandbox.braintreegateway.com' # doesn't work for fake gateway
 
 MASTER_MERCHANT_ACCOUNT_ID = os.getenv('MASTER_MERCHANT_ACCOUNT_ID', 'idlecarsllc')
 BRAINTREE = {

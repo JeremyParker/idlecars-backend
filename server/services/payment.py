@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 from server import payment_gateways
 from server import models
@@ -45,3 +46,12 @@ def void(payment):
 
 def escrow(payment):
     return _execute('escrow', payment)
+
+
+def details_link(payment):
+    link = '<a href="https://{base_url}/merchants/{account}/transactions/{token}">{token}</a>'.format(
+        base_url=settings.BRAINTREE_BASE_URL,
+        account=settings.BRAINTREE["merchant_id"],
+        token=payment.transaction_id,
+    )
+    return mark_safe(link)
