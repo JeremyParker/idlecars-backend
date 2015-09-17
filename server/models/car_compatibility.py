@@ -58,7 +58,7 @@ class CarCompatibility(object):
 
     def _get_compatible_flavors(self):
         return {
-            flavor.friendly_id: flavor.name for flavor in self.car.make_model.rideshareflavor_set.all()
+            flavor.friendly_id: flavor.friendly_id for flavor in self.car.make_model.rideshareflavor_set.all()
         }
 
     def _flavor_name(self, friendly_id):
