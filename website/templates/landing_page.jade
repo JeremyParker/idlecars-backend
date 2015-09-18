@@ -11,67 +11,68 @@ extends ./base.jade
     .menu-button(ng-click='showMenu = !showMenu')
       .burger-button
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-      a(href="#tutorial") #[h5 How it works]
-      a(href="#{ login_url }") #[h5 Join/Login]
-      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
+      a(href="#tutorial") How it works
+      a(href="#{ login_url }") Join/Login
+      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
 
   section.headline
     .phone-background
       .container
-        div
-          img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-        .content
-          h2 Keep More of #[br] What You Earn
-          p NYC's widest selection of TLC registered #[br] for-hire rentals, at the best price.
-          p No leases, loans or long-term commitments. #[br] Insurance and maintenance included.
-          a.button(href="#{ settings.WEBAPP_URL }") Find your car
-          a.login(href="#{ login_url }") Have an account? #[span Log in]
+        .wrapper
+          div
+            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+          .content
+            h1 Keep More of #[br] What You Earn
+            p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+            p No leases, loans or long-term commitments. Insurance and maintenance included.
+            a.button(href="#{ settings.WEBAPP_URL }") Find your car
+            a.login(href="#{ login_url }") Have an account? #[span Log in]
 
   section.get-more
     .container
-      h3 Register Today. Drive Tomorrow.
-      h5 We handle the paperwork, so you can focus on your fares.
+      h3 Register Today. #[br] Drive Tomorrow.
+      h5 We handle the paperwork, #[br] so you can focus on your fares.
 
   section.select
     .container
       .content
         h3 Choose your car, get insured, and start driving within #[br] #[strong 24 hours.]
-        h1 It's that easy
+        h1 It's that easy.
 
   section.manhattan
     .container
-      h3 Your Car, Your Service. When you need it.
+      h2 Your Car, Your Service. When you need it.
       h4 Idlecars work with all services including Uber, Lyft and More
       img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
   a.invisible(id="tutorial")
   section.tutorial
-    h4 How it works
+    h3 How it works
     .segments
       .segment
         .pane
           .image
             img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
-          p #[strong Pick A Car. Any Car.]
-          p Find the car that fits your style and budget.
+          h6 #[strong Pick A Car. Any Car.]
+          h6 Find the car that fits your style and budget.
       .segment
         .pane
           .image
             img(src="#{ settings.STATIC_URL }img/tutorial2.png")
-          p #[strong Start Your Account.]
-          p Use your smartphone to upload your driving documents.
+          h6 #[strong Start Your Account.]
+          h6 Use your smartphone to upload your driving documents.
       .segment
         .pane
           .image
             img(src="#{ settings.STATIC_URL }img/tutorial3.png")
-          p #[strong Reserve Your Car.]
-          p Use your credit card or bank account to reserve your car.
+          h6.single-line #[strong Reserve Your Car.]
+          h6 Use your credit card or bank account to reserve your car.
       .segment
         .pane
           .image
             img(src="#{ settings.STATIC_URL }img/tutorial4.png")
-          p #[strong DRIVE]
-          p Once you’re added to the insurance, you’re ready to go. Go pick up your car!
+          h6.single-line #[strong DRIVE]
+          h6 Once you’re added to the insurance, you’re ready to go. Go pick up your car!
 
   section.ask
     .ask-container
@@ -90,11 +91,10 @@ extends ./base.jade
             img(src="#{ settings.STATIC_URL }img/linkedin.png")
 
   footer
-    h6.tm
-      strong Idlecars:
+    h5.tm
       a(href="#{ faq }") Help
       span |
       a(href="#{ terms_of_service }") Terms & Privacy
     br
-    h6.tm © {% now 'Y' %} idlecars
-    h6.tm All trademarks and images are copyright of their respective owners.
+    h5.tm #[strong © {% now 'Y' %} idlecars]
+    h5.tm All trademarks and images are copyright of their respective owners.
