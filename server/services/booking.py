@@ -27,6 +27,14 @@ def filter_reserved(booking_queryset):
         incomplete_time__isnull=True,
     )
 
+def filter_booked(booking_queryset):
+    return booking_queryset.filter(
+        incomplete_time__isnull=True,
+        refund_time__isnull=True,
+        return_time__isnull=True,
+        pickup_time__isnull=False,
+    )
+
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
@@ -112,19 +120,6 @@ def cancel(booking):
     return booking
 
 
-def can_checkout(booking):
-    # TODO - check that the car is still available (may have been a race to book)
-    if not booking.driver.all_docs_uploaded():
-        return False
-    if booking.get_state() != Booking.PENDING:
-        return False
-    if not booking.driver.braintree_customer_id:
-        return False
-    if not booking.driver.paymentmethod_set.exists():
-        return False
-    return True
-
-
 def _make_deposit_payment(booking):
     payment = payment_service.create_payment(
         booking,
@@ -143,6 +138,40 @@ def _find_deposit_payment(booking):
         except Payment.DoesNotExist:
             return None
     return deposit_payment
+
+
+def _create_next_rent_payment(booking):
+    previous_payments = booking.payment_set.filter(
+        invoice_start_time__isnull=False,
+        invoice_end_time__isnull=False,
+    ).order_by('invoice_end_time')
+
+    if not previous_payments:  # first rent payment
+        start_time = timezone.now().replace(microsecond=0)
+    else:
+        start_time = previous_payments.last().invoice_end_time + datetime.timedelta(seconds=1)
+    end_time = start_time + datetime.timedelta(days=7) - datetime.timedelta(seconds=1)
+
+    return payment_service.create_payment(
+        booking,
+        booking.weekly_rent(),
+        service_fee=booking.service_fee(),
+        invoice_start_time=start_time,
+        invoice_end_time=end_time,
+    )
+
+
+def can_checkout(booking):
+    # TODO - check that the car is still available (may have been a race to book)
+    if not booking.driver.all_docs_uploaded():
+        return False
+    if booking.get_state() != Booking.PENDING:
+        return False
+    if not booking.driver.braintree_customer_id:
+        return False
+    if not booking.driver.paymentmethod_set.exists():
+        return False
+    return True
 
 
 def checkout(booking):
@@ -177,7 +206,7 @@ def pickup(booking):
     # TODO - error handling with message to the user
 
     # pre-authorize the payment for the first week's rent
-    rent_payment = payment_service.create_payment(booking, booking.car.solo_cost)
+    rent_payment = _create_next_rent_payment(booking)
     rent_payment = payment_service.pre_authorize(rent_payment)
     if rent_payment.status != Payment.PRE_AUTHORIZED:
         # TODO - error handling with message to the user
@@ -200,6 +229,24 @@ def pickup(booking):
     booking.save()
     # TODO - send some kind of confirmation message
     return booking
+
+
+def cron_payments():
+    now = timezone.now()
+    payable_bookings = filter_booked(Booking.objects.all()).exclude(
+        payment__invoice_end_time__gte=now
+    )
+    for booking in payable_bookings:
+        try:
+            payment = _create_next_rent_payment(booking)
+            payment = payment_service.settle(payment)
+        except Exception as e:
+            print e
+            ops_emails.payment_job_failed(booking, e)
+            continue
+
+        if not payment.status == Payment.SETTLED:
+            ops_emails.payment_failed(payment)
 
 
 def start_time_display(booking):

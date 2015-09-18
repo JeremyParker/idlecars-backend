@@ -8,14 +8,23 @@ from server import payment_gateways
 from server import models
 
 
-def create_payment(booking, amount):
+def create_payment(
+    booking,
+    amount,
+    service_fee='0.00',
+    invoice_start_time=None,
+    invoice_end_time=None
+):
     payment_method = booking.driver.paymentmethod_set.last() # TODO: store 'em all & make latest default
     assert payment_method.driver == booking.driver
 
     payment = models.Payment.objects.create(
         booking=booking,
         amount=amount,
+        service_fee=service_fee,
         payment_method=payment_method,
+        invoice_start_time=invoice_start_time,
+        invoice_end_time=invoice_end_time,
     )
     return payment
 

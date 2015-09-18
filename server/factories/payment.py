@@ -20,6 +20,10 @@ class PreAuthorizedPayment(Payment):
     status = models.Payment.PRE_AUTHORIZED
 
 
+class SettledPayment(PreAuthorizedPayment):
+    status = models.Payment.SETTLED
+
+
 class FailedPayment(Payment):
     ''' Requires a Booking passed in the create() function '''
     transaction_id = 'some_transaction_id'

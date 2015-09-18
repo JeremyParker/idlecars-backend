@@ -47,6 +47,8 @@ def add_payment_method(driver, nonce):
 
 # store a queue of (status, error_message) tuples to override gateway responses
 next_payment_response = []
+def push_next_payment_response(status_error_tuple):
+    next_payment_response.append(status_error_tuple)
 
 def fake_payment_function(func):
     def decorated_function(*args, **kwargs):
