@@ -5,6 +5,7 @@ import datetime
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.db.models import F
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
@@ -163,6 +164,7 @@ def _create_next_rent_payment(booking):
 
 def can_checkout(booking):
     # TODO - check that the car is still available (may have been a race to book)
+    # TODO - check the owner's bank creds are OK
     if not booking.driver.all_docs_uploaded():
         return False
     if booking.get_state() != Booking.PENDING:
@@ -235,6 +237,8 @@ def cron_payments():
     now = timezone.now()
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
         payment__invoice_end_time__gte=now
+    ).exclude(
+        payment__invoice_end_time__gte=F('end_time'),
     )
     for booking in payable_bookings:
         try:

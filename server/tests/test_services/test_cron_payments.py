@@ -106,3 +106,15 @@ class TestCronPayments(TestCase):
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+    def test_no_payment_for_ended_booking(self):
+        # the booking ended at the end of the last invoice payment period
+        self.booking.end_time = self.first_rent_payment.invoice_end_time
+        self.booking.save()
+
+        call_command('cron_payments')
+        self.assertEqual(self.booking.payment_set.count(), 2)  # no new payments
+
+    def test_final_payment_is_partial_week(self):
+        # TODO
+        pass
