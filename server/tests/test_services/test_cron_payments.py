@@ -9,7 +9,8 @@ from django.core.management import call_command
 
 from owner_crm.tests import sample_merge_vars
 
-from server import factories, payment_gateways, models
+from server import factories, payment_gateways
+from server.models import Payment
 from server.services import booking as booking_service
 
 
@@ -27,9 +28,9 @@ class TestCronPayments(TestCase):
 
         # simulate pickup that happened a week ago
         deposit = self.booking.payment_set.last()
-        deposit.status = models.Payment.HELD_IN_ESCROW
+        deposit.status = Payment.HELD_IN_ESCROW
         deposit.save()
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW).count(), 1)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
 
         self.now = timezone.now().replace(microsecond=0)
         self.pickup_time = self.now - datetime.timedelta(days=7)
@@ -39,7 +40,7 @@ class TestCronPayments(TestCase):
             service_fee='50.00',
             invoice_start_time=self.pickup_time,
             invoice_end_time=self.now - datetime.timedelta(seconds=1),
-            status=models.Payment.SETTLED,
+            status=Payment.SETTLED,
         )
         self.booking.pickup_time = self.pickup_time
         self.booking.save()
@@ -50,16 +51,16 @@ class TestCronPayments(TestCase):
     def test_make_payment_when_due(self):
         call_command('cron_payments')
         self.assertEqual(self.booking.payment_set.count(), 3)
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW).count(), 1)
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.SETTLED).count(), 2)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
         # make sure we don't add any payments the next time we call cron_payments
         call_command('cron_payments')
         self.assertEqual(self.booking.payment_set.count(), 3)
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW).count(), 1)
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.SETTLED).count(), 2)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
-    def test_correct_time_range_with_multi_past_payments(self):
+    def test_correct_time_range_with_many_past_payments(self):
         # make another payment from the previous week
         previous_rent_payment = factories.Payment.create(
             booking=self.booking,
@@ -72,22 +73,24 @@ class TestCronPayments(TestCase):
         self.assertEqual(self.booking.payment_set.count(), 4)
 
         new_payment = self.booking.payment_set.filter(
-            status=models.Payment.SETTLED
-        ).order_by(
-            'invoice_end_time'
-        ).last()
+            status=Payment.SETTLED,
+        ).order_by('invoice_end_time').last()
 
         self.assertEqual(
             self.first_rent_payment.invoice_end_time + datetime.timedelta(seconds=1),
             new_payment.invoice_start_time,
         )
+        self.assertEqual(
+            self.first_rent_payment.invoice_end_time + datetime.timedelta(days=7),
+            new_payment.invoice_end_time,
+        )
 
     def test_non_settled_payment_sends_email(self):
         gateway = payment_gateways.get_gateway('fake')
-        gateway.push_next_payment_response((models.Payment.DECLINED, 'Sorry, your card failed',))
+        gateway.push_next_payment_response((Payment.DECLINED, 'Sorry, your card failed',))
         call_command('cron_payments')
         self.assertEqual(self.booking.payment_set.count(), 3)
-        self.assertEqual(self.booking.payment_set.filter(status=models.Payment.DECLINED).count(), 1)
+        self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
 
         # check what emails got sent
         from django.core.mail import outbox
