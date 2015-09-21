@@ -11,6 +11,8 @@ from server import models
 from server import services
 from server.admin.booking import BookingForCarInline
 
+from server.models import CarCompatibility
+
 
 class CarStaleListFilter(admin.SimpleListFilter):
     '''
@@ -118,6 +120,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',
+                'work_with',
             )
         }),
     )
@@ -127,10 +130,14 @@ class CarAdmin(admin.ModelAdmin):
         'last_mileage_update',
         'owner_rating',
         'effective_status',
+        'work_with',
     ]
     inlines = [
         BookingForCarInline,
     ]
+
+    def work_with(self, instance):
+        return [str(flavor) for flavor in CarCompatibility(instance).all()]
 
     def description(self, instance):
         return instance.__unicode__()
