@@ -22,6 +22,7 @@ class Booking(Factory):
 
 class ReservedBooking(Booking):
     checkout_time = timezone.now()
+    end_time = checkout_time + datetime.timedelta(days=7 * 6)
     driver = SubFactory(PaymentMethodDriver)
 
     @post_generation
@@ -51,7 +52,7 @@ class BookedBooking(AcceptedBooking):
             booking=self,
             amount=self.car.solo_deposit,
             invoice_start_time=timezone.now(),
-            invoice_end_time=timezone.now() + datetime.timedelta(days=7) - datetime.timedelta(seconds=1)
+            invoice_end_time=timezone.now() + datetime.timedelta(days=7)
         )
 
 class ReturnedBooking(BookedBooking):

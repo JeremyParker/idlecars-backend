@@ -173,14 +173,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         def _format_date(date):
             return date.strftime('%b %d')
 
-        min_duration = car_service.get_min_rental_duration(booking.car)
         if booking.end_time:
             return _format_date(booking.end_time)
-        elif booking.approval_time:
-            time_string = _format_date(booking.approval_time + datetime.timedelta(days=min_duration + 1))
-        elif booking.checkout_time:
-            time_string = _format_date(booking.checkout_time + datetime.timedelta(days=min_duration + 2))
         else:
-            time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
-
-        return time_string
+            return _format_date(booking_service.calculate_end_time(booking))

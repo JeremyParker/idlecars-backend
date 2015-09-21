@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal, ROUND_UP
 
 from django.utils import timezone
 from django.test import TestCase
@@ -39,7 +40,7 @@ class TestCronPayments(TestCase):
             amount=self.booking.car.solo_cost,
             service_fee='50.00',
             invoice_start_time=self.pickup_time,
-            invoice_end_time=self.now - datetime.timedelta(seconds=1),
+            invoice_end_time=self.now,
             status=Payment.SETTLED,
         )
         self.booking.pickup_time = self.pickup_time
@@ -67,22 +68,22 @@ class TestCronPayments(TestCase):
             amount=self.booking.car.solo_cost,
             service_fee='50.00',
             invoice_start_time=self.pickup_time - datetime.timedelta(days=7),
-            invoice_end_time=self.now - datetime.timedelta(days=7, seconds=1),
+            invoice_end_time=self.now - datetime.timedelta(days=7),
         )
         call_command('cron_payments')
         self.assertEqual(self.booking.payment_set.count(), 4)
 
-        new_payment = self.booking.payment_set.filter(
+        most_recent_payment = self.booking.payment_set.filter(
             status=Payment.SETTLED,
         ).order_by('invoice_end_time').last()
 
         self.assertEqual(
-            self.first_rent_payment.invoice_end_time + datetime.timedelta(seconds=1),
-            new_payment.invoice_start_time,
+            self.first_rent_payment.invoice_end_time,
+            most_recent_payment.invoice_start_time,
         )
         self.assertEqual(
             self.first_rent_payment.invoice_end_time + datetime.timedelta(days=7),
-            new_payment.invoice_end_time,
+            most_recent_payment.invoice_end_time,
         )
 
     def test_non_settled_payment_sends_email(self):
@@ -116,5 +117,17 @@ class TestCronPayments(TestCase):
         self.assertEqual(self.booking.payment_set.count(), 2)  # no new payments
 
     def test_final_payment_is_partial_week(self):
-        # TODO
-        pass
+        self.booking.end_time = self.first_rent_payment.invoice_end_time + datetime.timedelta(days=2)
+        self.booking.save()
+        call_command('cron_payments')
+
+        self.assertEqual(self.booking.payment_set.count(), 3)
+
+        most_recent_payment = self.booking.payment_set.filter(
+            status=Payment.SETTLED
+        ).order_by(
+            'invoice_end_time'
+        ).last()
+        daily_rent = self.booking.weekly_rent() / Decimal('7.00')
+        expected_amount = (daily_rent * Decimal('2.00')).quantize(Decimal('.01'), rounding=ROUND_UP)
+        self.assertEqual(most_recent_payment.amount, expected_amount)

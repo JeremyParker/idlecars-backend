@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -150,12 +151,19 @@ def _create_next_rent_payment(booking):
     if not previous_payments:  # first rent payment
         start_time = timezone.now().replace(microsecond=0)
     else:
-        start_time = previous_payments.last().invoice_end_time + datetime.timedelta(seconds=1)
-    end_time = start_time + datetime.timedelta(days=7) - datetime.timedelta(seconds=1)
+        start_time = previous_payments.last().invoice_end_time
+
+    end_time = start_time + datetime.timedelta(days=7)
+
+    amount = booking.weekly_rent()
+    if booking.end_time < end_time:
+        end_time = booking.end_time
+        parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
+        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
 
     return payment_service.create_payment(
         booking,
-        booking.weekly_rent(),
+        amount,
         service_fee=booking.service_fee(),
         invoice_start_time=start_time,
         invoice_end_time=end_time,
@@ -204,6 +212,11 @@ def can_pickup(booking):
 
 
 def pickup(booking):
+    # NB: we don't save() the booking unless successful...
+    booking.pickup_time = timezone.now()
+    if not booking.end_time:
+        booking.end_time = calculate_end_time(booking)
+
     deposit_payment = _find_deposit_payment(booking) or _make_deposit_payment(booking)
     # TODO - error handling with message to the user
 
@@ -227,18 +240,20 @@ def pickup(booking):
         # TODO - error handling with message to the user
         return booking
 
-    booking.pickup_time = timezone.now()
     booking.save()
     # TODO - send some kind of confirmation message
     return booking
 
 
 def cron_payments():
-    now = timezone.now()
+    payment_lead_time_hours = 2  # TODO - get this out of a config system
+    pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
-        payment__invoice_end_time__gte=now
+        payment__invoice_end_time__isnull=False,
+        payment__invoice_end_time__gt=pay_time
     ).exclude(
-        payment__invoice_end_time__gte=F('end_time'),
+        payment__invoice_end_time__isnull=False,
+        payment__invoice_end_time__gte=F('end_time')
     )
     for booking in payable_bookings:
         try:
@@ -272,7 +287,7 @@ def min_rental_still_limiting(booking):
     Is the minimum rental time still limiting the first first_valid_end_time, or is
     it the 7 days' notice?
     '''
-    min_rental = car_service.get_min_rental_duration(booking.car)
+    min_rental = booking.car.minimum_rental_days()
     if not min_rental:
         return False
 
@@ -287,12 +302,31 @@ def first_valid_end_time(booking):
     Returns the earliest legal end time of the booking, so the user can't end the booking prematurely.
     '''
     if min_rental_still_limiting(booking):
-        min_rental_days = car_service.get_min_rental_duration(booking.car)
+        min_rental_days = booking.car.minimum_rental_days()
         return timezone.now() + datetime.timedelta(days=min_rental_days)
     return timezone.now() + datetime.timedelta(days=7)
 
 
+def calculate_end_time(booking):
+    assert not booking.end_time
+    min_duration = booking.car.minimum_rental_days() or 1
+    if booking.pickup_time:
+        return booking.pickup_time + datetime.timedelta(days=min_duration)
+    if booking.approval_time:
+        return booking.approval_time + datetime.timedelta(days=min_duration + 1)
+    elif booking.checkout_time:
+        return booking.checkout_time + datetime.timedelta(days=min_duration + 2)
+    else:
+        return timezone.now() + datetime.timedelta(days=min_duration + 2)
+
+
 def set_end_time(booking, end_time):
-    booking.end_time = end_time
+    booking.end_time = booking.end_time.replace(
+        year=end_time.year
+    ).replace(
+        month=end_time.month
+    ).replace(
+        day=end_time.day
+    )
     booking.save()
     return booking
