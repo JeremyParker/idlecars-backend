@@ -108,7 +108,6 @@ class CarAdmin(admin.ModelAdmin):
                 ('make_model', 'hybrid', 'year'),
                 ('exterior_color', 'interior_color'),
                 ('plate', 'base'),
-                ('work_with'),
                 ('owner', 'owner_link', 'owner_rating'),
                 ('insurance', 'insurance_link'),
                 ('last_known_mileage', 'last_mileage_update'),
@@ -121,6 +120,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',
+                ('work_with'),
             )
         }),
     )
