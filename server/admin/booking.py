@@ -15,7 +15,7 @@ class BookingAdmin(admin.ModelAdmin):
             'fields': (
                 ('state', 'driver_docs_uploaded',),
                 ('driver_link', 'driver_phone', 'driver_email',),
-                ('car_link', 'car_plate', 'car_cost',),
+                ('car_link', 'car_plate', 'car_cost', 'effective_service_percentage',),
                 ('owner_link', 'owner_phone', 'owner_email',),
             ),
         }),
@@ -57,6 +57,7 @@ class BookingAdmin(admin.ModelAdmin):
         'car_link',
         'car_plate',
         'car_cost',
+        'effective_service_percentage',
         'car_insurance',
         'owner_link',
         'owner_phone',
@@ -135,17 +136,20 @@ class BookingAdmin(admin.ModelAdmin):
     car_plate.short_description = 'Plate'
 
     def car_cost(self, instance):
-        if instance.car:
-            return '${}'.format(instance.car.solo_cost)
+        if instance.weekly_rent:
+            return '${}'.format(instance.weekly_rent)
         else:
-            return None
+            return instance.car.solo_cost
     car_cost.short_description = 'Rent'
     car_cost.admin_order_field = 'car__solo_cost'
+
+    def effective_service_percentage(self, instance):
+        return instance.service_percentage or instance.car.owner.effective_service_percentage
+    effective_service_percentage.short_description = 'Take rate'
 
     def car_insurance(self, instance):
         return instance.car.insurance
     car_insurance.admin_order_field = 'car__insurance'
-
 
     def driver_phone(self, instance):
         if instance.driver:
@@ -158,6 +162,7 @@ class BookingAdmin(admin.ModelAdmin):
             return instance.driver.email()
         else:
             return None
+
 
 class BookingInlineBase(admin.TabularInline):
     model = models.Booking

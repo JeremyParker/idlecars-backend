@@ -204,3 +204,5 @@ BRAINTREE = {
     'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
+
+TAKE_RATE = '0.080'  # TODO - move this to a config service

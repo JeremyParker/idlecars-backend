@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal
 from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute, post_generation
 
@@ -24,6 +25,10 @@ class ReservedBooking(Booking):
     checkout_time = timezone.now()
     end_time = checkout_time + datetime.timedelta(days=7 * 6)
     driver = SubFactory(PaymentMethodDriver)
+
+    # checkout locks in the price and service_percentage
+    weekly_rent = SelfAttribute('car.solo_cost')
+    service_percentage = Decimal('0.085')
 
     @post_generation
     def payment(self, create, count, **kwargs):
@@ -54,6 +59,7 @@ class BookedBooking(AcceptedBooking):
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7)
         )
+
 
 class ReturnedBooking(BookedBooking):
     return_time = timezone.now()

@@ -12,12 +12,9 @@ class Booking(models.Model):
     driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
 
-    # TODO - make this a field on the model, and copy the value from car when the booking is made
-    def weekly_rent(self):
-        return self.car.solo_cost
-
-    def service_fee(self):
-        return '20.00'  # TODO - make this a percentage of the weekly rent
+    # these payemnt terms are only set after the driver puts down a deposit on the booking
+    weekly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    service_percentage = models.DecimalField(max_digits=10, decimal_places=4, null=True) # our take rate
 
     end_time = models.DateTimeField(null=True, blank=True)  # end time set by the user
 

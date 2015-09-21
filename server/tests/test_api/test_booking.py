@@ -181,7 +181,6 @@ class BookingStepTest(APITestCase):
         self.driver.address_proof_image = 'some image'
         self.driver.defensive_cert_image = 'some image'
         self.driver.save()
-
         self._pending_with_docs()
 
     def _pending_with_docs(self):
@@ -189,13 +188,12 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
-
         self._driver_adds_payment_method()
 
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
         checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
-
+        self.booking.refresh_from_db()
         self._checked_out_docs_unapproved()
 
     def _pending_docs_approved(self):
@@ -209,6 +207,7 @@ class BookingStepTest(APITestCase):
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
         checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+        self.booking.refresh_from_db()
         self._checked_out_docs_approved()
 
     def _checked_out_docs_unapproved(self):

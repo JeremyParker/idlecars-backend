@@ -145,7 +145,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)
         first_week_rent_payment = new_booking.payment_set.filter(status=models.Payment.SETTLED)[0]
-        self.assertEqual(first_week_rent_payment.amount, new_booking.car.solo_cost)
+        self.assertEqual(first_week_rent_payment.amount, new_booking.weekly_rent)
 
     def test_pickup(self):
         driver = factories.PaymentMethodDriver.create()

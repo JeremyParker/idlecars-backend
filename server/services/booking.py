@@ -155,16 +155,18 @@ def _create_next_rent_payment(booking):
 
     end_time = start_time + datetime.timedelta(days=7)
 
-    amount = booking.weekly_rent()
+    amount = booking.weekly_rent
     if booking.end_time < end_time:
         end_time = booking.end_time
         parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
         amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
 
+    fee = Decimal(amount * booking.service_percentage).quantize(Decimal('.01'), rounding=ROUND_UP)
+
     return payment_service.create_payment(
         booking,
         amount,
-        service_fee=booking.service_fee(),
+        service_fee=fee,
         invoice_start_time=start_time,
         invoice_end_time=end_time,
     )
@@ -193,6 +195,10 @@ def checkout(booking):
 
     if payment.status == Payment.PRE_AUTHORIZED:
         booking.checkout_time = timezone.now()
+
+        # lock-in pricing details by copying them to the booking
+        booking.weekly_rent = booking.car.solo_cost
+        booking.service_percentage = booking.car.owner.effective_service_percentage
         booking.save()
         # TODO - send some kind of confirmation message
 

@@ -128,6 +128,6 @@ class TestCronPayments(TestCase):
         ).order_by(
             'invoice_end_time'
         ).last()
-        daily_rent = self.booking.weekly_rent() / Decimal('7.00')
+        daily_rent = self.booking.weekly_rent / Decimal('7.00')
         expected_amount = (daily_rent * Decimal('2.00')).quantize(Decimal('.01'), rounding=ROUND_UP)
         self.assertEqual(most_recent_payment.amount, expected_amount)

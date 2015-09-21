@@ -76,6 +76,7 @@ class OwnerAdmin(admin.ModelAdmin):
             'fields': (
                 ('split_shift', 'rating'),
                 ('merchant_id', 'merchant_account_state',),
+                ('service_percentage', 'effective_service_percentage',),
                 'notes',
                 'company_name',
                 'address1',
@@ -84,7 +85,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
         }),
     )
-    readonly_fields = ['merchant_id', 'merchant_account_state']
+    readonly_fields = ['merchant_id', 'merchant_account_state', 'effective_service_percentage',]
     list_display = [
         'link_name',
         'rating',
