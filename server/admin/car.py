@@ -120,7 +120,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',
-                ('work_with'),
+                'work_with',
             )
         }),
     )
