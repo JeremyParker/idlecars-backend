@@ -52,6 +52,9 @@ class E2ETestSetup():
         Token.objects.filter(user=self.user_without_docs).update(key='without_docs')
         Token.objects.filter(user=self.user_without_docs_approved).update(key='without_docs_approved')
 
+        Token.objects.filter(user=self.owner_auth_user).update(key='owner')
+        PasswordReset.objects.filter(auth_user=self.owner_auth_user).update(token='test')
+
     def _setup_cars(self):
         '''
             Create 4 cars (also creates 4 owners)
@@ -74,28 +77,6 @@ class E2ETestSetup():
         '''
         owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
 
-    def _setup_user(self):
-        '''
-            Create 3 users(1 staff user)
-        '''
-        self.user_owner = server.factories.UserAccount.create(
-            phone_number='9876543210',
-            email='craig@test.com',
-            first_name='Craig',
-            last_name='List'
-        )
-        self.user_driver = server.factories.AuthUser.create(
-            username='1234567891',
-            email='user@test.com',
-            first_name='Tom',
-            last_name='Cat'
-        )
-        server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
-
-    def _reset_token(self):
-        Token.objects.filter(user=self.owner_auth_user).update(key='owner')
-        PasswordReset.objects.filter(auth_user=self.owner_auth_user).update(token='test')
-
     def _setup_owner(self):
         '''
             Create an owner
@@ -110,13 +91,19 @@ class E2ETestSetup():
             Create 3 bookings
         '''
         server.factories.Booking.create(car=self.delorean, driver=self.driver_without_docs)
-        server.factories.Booking.create(car=self.benz, driver=self.driver_insurance_approved, state=4)
+        server.factories.AcceptedBooking.create(car=self.benz, driver=self.driver_insurance_approved)
         server.factories.Booking.create(car=self.benz, driver=self.driver_without_docs_approved)
 
     def _setup_user(self):
         '''
-            Create 5 users(1 staff user)
+            Create 6 users(1 staff user)
         '''
+        self.user_owner = server.factories.UserAccount.create(
+            phone_number='9876543210',
+            email='craig@test.com',
+            first_name='Craig',
+            last_name='List'
+        )
         self.user_without_booking = server.factories.AuthUser.create(
             username='1234567891',
             email='jerry@test.com',
