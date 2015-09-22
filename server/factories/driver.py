@@ -21,17 +21,15 @@ class CompletedDriver(Driver):
     defensive_cert_image = LazyAttribute(lambda o: faker.url())
     documentation_approved = False
 
+
 class PaymentMethodDriver(CompletedDriver):
     @post_generation
     def payment_method(self, create, count, **kwargs):
         self.braintree_customer_id = 'fake_customer_id'
-        from server.factories import payment_method
+        from server.factories.payment_method import PaymentMethod
         kwargs['driver'] = self
-        payment_method = make_item(create, payment_method.PaymentMethod, **kwargs)
-        # if not create:
-        #     # Fiddle with django internals so self.deal_set.all() works even when building
-        #     self._prefetched_objects_cache = {'payment_method': payment_method}
-        #     self._payment_method = payment_method
+        payment_method = make_item(create, PaymentMethod, **kwargs)
+
 
 class ApprovedDriver(PaymentMethodDriver):
     documentation_approved = True

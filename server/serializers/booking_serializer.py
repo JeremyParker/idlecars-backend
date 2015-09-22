@@ -107,7 +107,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_step(self, obj):
         state = obj.get_state()
-        if state == Booking.BOOKED:
+        if state == Booking.ACTIVE:
             return 5
         elif state in [Booking.RESERVED, Booking.REQUESTED, Booking.ACCEPTED]:
             return 4

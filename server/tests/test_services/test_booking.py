@@ -154,7 +154,7 @@ class BookingServiceTest(TestCase):
         # pick up the car
         new_booking = booking_service.pickup(new_booking)
 
-        self.assertEqual(new_booking.get_state(), models.Booking.BOOKED)
+        self.assertEqual(new_booking.get_state(), models.Booking.ACTIVE)
         self._check_payments_after_pickup(new_booking)
 
         # TODO - test the email messages we should have sent
