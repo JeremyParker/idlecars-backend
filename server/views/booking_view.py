@@ -22,7 +22,8 @@ class BookingViewSet(
     ):
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve', 'partial_update']:
+        detail_actions = ['list', 'retrieve', 'partial_update', 'checkout', 'cancelation', 'pickup']
+        if self.action in detail_actions:
             return BookingDetailsSerializer
         return BookingSerializer
 
@@ -50,9 +51,10 @@ class BookingViewSet(
     def checkout(self, request, pk=None):
         booking = self.get_object()
         if not booking_service.can_checkout(booking):
-            raise ValidationError('Your rental can\'t be created at this time.')
-        serializer = self.get_serializer(booking_service.checkout(booking))
-        return Response(serializer.data)
+            raise ValidationError('Your rental can\'t be reserved at this time.')
+        result_booking = booking_service.checkout(booking)
+        result_serializer = self.get_serializer(result_booking)
+        return Response(result_serializer.data)
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def pickup(self, request, pk=None):

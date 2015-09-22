@@ -10,6 +10,19 @@ from server.admin.booking import BookingForDriverInline
 from server.admin.user_account import UserAccountForDriverInline
 
 
+class PaymentMethodInline(admin.TabularInline):
+    model = models.PaymentMethod
+    verbose_name = "Payment Method"
+    extra = 0
+    fields = [
+        'description',
+    ]
+    readonly_fields = [
+        'description',
+    ]
+    def description(self, instance):
+        return '{} **** **** **** {}'.format(instance.card_type, instance.suffix)
+
 class DriverAdmin(ReverseModelAdmin):
     inline_type = 'tabular'
     inline_reverse = (
@@ -64,7 +77,7 @@ class DriverAdmin(ReverseModelAdmin):
         'dd_link',
         'poa_link',
     ]
-    inlines = [BookingForDriverInline,]
+    inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def link_name(self, instance):

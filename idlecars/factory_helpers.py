@@ -22,3 +22,8 @@ class Factory(DjangoModelFactory):
 
 def random_phone():
     return ''.join(random.SystemRandom().choice(string.digits) for _ in xrange(10))
+
+def make_item(_create, _item_type, **kwargs):
+    attr_name = 'create' if _create else 'build'
+    maker_function = getattr(_item_type, attr_name)
+    return maker_function(**kwargs)

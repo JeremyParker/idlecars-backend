@@ -39,20 +39,3 @@ def get_stale_within(minutes_until_stale):
 
 def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
-
-
-def get_min_rental_duration(car):
-    duration = {
-        '_01_no_min': 0,
-        '_02_one_week': 7,
-        '_03_two_weeks': 14,
-        '_04_three_weeks': 21,
-        '_05_one_month': 30,
-        '_06_six_weeks': 45,
-        '_07_two_months': 60,
-        '_08_three_months': 90,
-        '_09_four_months': 120,
-        '_10_five_months': 150,
-        '_11_six_months': 180,
-    }
-    return duration[car.min_lease]

@@ -107,7 +107,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_step(self, obj):
         state = obj.get_state()
-        if state == Booking.BOOKED:
+        if state == Booking.ACTIVE:
             return 5
         elif state in [Booking.RESERVED, Booking.REQUESTED, Booking.ACCEPTED]:
             return 4
@@ -173,14 +173,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         def _format_date(date):
             return date.strftime('%b %d')
 
-        min_duration = car_service.get_min_rental_duration(booking.car)
         if booking.end_time:
             return _format_date(booking.end_time)
-        elif booking.approval_time:
-            time_string = _format_date(booking.approval_time + datetime.timedelta(days=min_duration + 1))
-        elif booking.checkout_time:
-            time_string = _format_date(booking.checkout_time + datetime.timedelta(days=min_duration + 2))
         else:
-            time_string = _format_date(timezone.now() + datetime.timedelta(days=min_duration + 2))
-
-        return time_string
+            return _format_date(booking_service.calculate_end_time(booking))

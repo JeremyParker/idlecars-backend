@@ -57,6 +57,23 @@ class Car(models.Model):
         max_length=32,
         default='_00_unknown',
     )
+
+    def minimum_rental_days(self):
+        return {
+            '_00_unknown': None,
+            '_01_no_min': 1,
+            '_02_one_week': 7,
+            '_03_two_weeks': 14,
+            '_04_three_weeks': 21,
+            '_05_one_month': 30,
+            '_06_six_weeks': 42,
+            '_07_two_months': 60,
+            '_08_three_months': 90,
+            '_09_four_months': 120,
+            '_10_five_months': 150,
+            '_11_six_months': 180,
+        }[self.min_lease]
+
     notes = models.TextField(blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 

@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from braintree.test.nonces import Nonces
+
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 
@@ -27,11 +29,15 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
     def _test_successful_get(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for k, v in response.data.iteritems():
-            driver_val = getattr(self.driver, k)
+            driver_val = getattr(self.driver, k, None)
             if callable(driver_val):
                 driver_val = driver_val()
             if k == 'phone_number':
                 driver_val = fields.format_phone_number(driver_val)
+            elif k == 'payment_method':
+                continue
+                self.assertEqual(response.data[k], driver_val)
+
             self.assertEqual(response.data[k], driver_val)
 
     def test_get_driver_as_me(self):
@@ -157,3 +163,17 @@ class DriverCreateTest(APITestCase):
         data = {'password': 'test'}
         response = APIClient().post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class AddPaymentMethodTest(AuthenticatedDriverTest):
+    def setUp(self):
+        super(AddPaymentMethodTest, self).setUp()
+        self.url = reverse('server:drivers-payment-method', args=(self.driver.pk,))
+
+    def test_add_payment_method(self):
+        # TDOO - make a fake_payment gateway response & set it to be returned
+        response = self.client.post(self.url, data={'nonce': Nonces.Transactable})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertEqual(data['id'], self.driver.pk)
+        self.assertIsNotNone(response.data['payment_method'])

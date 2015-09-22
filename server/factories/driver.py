@@ -1,10 +1,10 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from factory import SubFactory, LazyAttribute
+from factory import SubFactory, LazyAttribute, post_generation
 
-from idlecars.factory_helpers import Factory, faker
-from . import AuthUser
+from idlecars.factory_helpers import Factory, faker, make_item
+from server.factories import AuthUser
 
 
 class Driver(Factory):
@@ -21,5 +21,15 @@ class CompletedDriver(Driver):
     defensive_cert_image = LazyAttribute(lambda o: faker.url())
     documentation_approved = False
 
-class ApprovedDriver(CompletedDriver):
+
+class PaymentMethodDriver(CompletedDriver):
+    @post_generation
+    def payment_method(self, create, count, **kwargs):
+        self.braintree_customer_id = 'fake_customer_id'
+        from server.factories.payment_method import PaymentMethod
+        kwargs['driver'] = self
+        payment_method = make_item(create, PaymentMethod, **kwargs)
+
+
+class ApprovedDriver(PaymentMethodDriver):
     documentation_approved = True

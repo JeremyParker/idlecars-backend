@@ -72,6 +72,49 @@ def booking_canceled(booking):
     )
 
 
+def payment_failed(payment):
+    merge_vars = {
+        settings.OPS_EMAIL: {
+            'FNAME': 'peeps',
+            'HEADLINE': 'A payment failed',
+            'TEXT': 'the driver with phone {} failed to pay for {}'.format(
+                payment.booking.driver.phone_number(),
+                payment.invoice_description()
+            ),
+            'CTA_LABEL': 'Payment details',
+            'CTA_URL': 'https://www.idlecars.com{}'.format(
+                reverse('admin:server_payment_change', args=(payment.pk,))
+            ),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='A payment failed.',
+        merge_vars=merge_vars,
+    )
+
+
+def payment_job_failed(booking, exception):
+    merge_vars = {
+        settings.OPS_EMAIL: {
+            'FNAME': 'people',
+            'HEADLINE': 'The payment job threw a {}'.format(exception),
+            'TEXT': 'the auto-payment job ran into a problem while processing payment for the booking {}'.format(
+                booking,
+            ),
+            'CTA_LABEL': 'Booking details',
+            'CTA_URL': 'https://www.idlecars.com{}'.format(
+                reverse('admin:server_booking_change', args=(booking.pk,))
+            ),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='The payment job threw an exception.',
+        merge_vars=merge_vars,
+    )
+
+
 def owner_account_result(details, subject):
     merge_vars = {
         settings.OPS_EMAIL: {

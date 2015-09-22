@@ -9,7 +9,7 @@ from django.conf import settings
 
 from server.services import booking as booking_service
 from server.services import driver as driver_service
-from server import factories, models
+from server import factories, models, payment_gateways
 
 from owner_crm.tests import sample_merge_vars
 
@@ -77,46 +77,102 @@ class BookingServiceTest(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_all_docs_uploaded(self):
-        # TODO
-        pass
+        driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.Booking.create(car=self.car, driver=driver)
+
+        # checkout
+        new_booking = booking_service.checkout(new_booking)
+        self.assertEqual(new_booking.get_state(), models.Booking.RESERVED)
+
+        # TODO we should send an email to the driver and owner telling them what happened
+
+        # there should be a single payment that is in the pre-authorized state
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.last().status, models.Payment.PRE_AUTHORIZED)
+
+    def _checkout_approved_driver(self):
+        driver = factories.ApprovedDriver.create()
+        new_booking = factories.Booking.create(car=self.car, driver=driver)
+        new_booking = booking_service.checkout(new_booking)
+        self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.PRE_AUTHORIZED)), 1)
+        self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.solo_deposit)
+        return new_booking
 
     def test_checkout_docs_approved(self):
-        # TODO
-        pass
+        new_booking = self._checkout_approved_driver()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        # an email to the owner to get the driver on insurance
+        self.assertEqual(outbox[0].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
+        )
+        # TODO we should send an email to the driver telling them what happened
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_with_others_too_slow(self):
         # set up the other driver, and create a booking for them
         other_driver = factories.Driver.create()
-        booking_service.create_booking(self.car, other_driver)
+        factories.Booking.create(car=self.car, driver=other_driver)
 
-        driver = factories.ApprovedDriver.create()
-        new_booking = booking_service.create_booking(self.car, driver)
-        new_booking = booking_service.checkout(new_booking)
-        self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
+        new_booking = self._checkout_approved_driver()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 4)
-
-        # two emails to support that there are new bookings
-        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
-        self.assertEqual(outbox[0].subject, 'New Booking from {}'.format(other_driver.phone_number()))
-        self.assertEqual(outbox[1].subject, 'New Booking from {}'.format(driver.phone_number()))
+        self.assertEqual(len(outbox), 2)
 
         # an email to the other driver to know their car is no longer available
-        self.assertEqual(outbox[2].merge_vars.keys()[0], other_driver.email())
+        self.assertEqual(outbox[0].merge_vars.keys()[0], other_driver.email())
         self.assertEqual(
-            outbox[2].subject,
+            outbox[0].subject,
             'Someone else rented your {}.'.format(new_booking.car.display_name())
         )
 
         # an email to the owner to get the driver on insurance
-        self.assertEqual(outbox[3].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.car.owner.email())
         self.assertEqual(
-            outbox[3].subject,
+            outbox[1].subject,
             'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+    def _check_payments_after_pickup(self, new_booking):
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
+        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)
+        first_week_rent_payment = new_booking.payment_set.filter(status=models.Payment.SETTLED)[0]
+        self.assertEqual(first_week_rent_payment.amount, new_booking.weekly_rent)
+
+    def test_pickup(self):
+        driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+
+        # pick up the car
+        new_booking = booking_service.pickup(new_booking)
+
+        self.assertEqual(new_booking.get_state(), models.Booking.ACTIVE)
+        self._check_payments_after_pickup(new_booking)
+
+        # TODO - test the email messages we should have sent
+
+    def test_pickup_after_failure(self):
+        driver = factories.PaymentMethodDriver.create()
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.first().status, models.Payment.PRE_AUTHORIZED)
+
+        # fail to pick up the car
+        next_response = (models.Payment.DECLINED, 'This transaction was declined for some reason.',)
+        gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
+        new_booking = booking_service.pickup(new_booking)
+
+        # successfully pick up the car
+        new_booking = booking_service.pickup(new_booking)
+        self._check_payments_after_pickup(new_booking)
 
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()
@@ -136,6 +192,10 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.create_booking(self.car, approved_driver)
         new_booking = booking_service.checkout(new_booking)
         booking_service.cancel(new_booking)
+
+        # make sure the pre-authorized payment got voided
+        self.assertEqual(len(new_booking.payment_set.all()), 1)
+        self.assertEqual(new_booking.payment_set.last().status, models.Payment.VOIDED)
 
         ''' we should have sent
         - message to ops about the initial booking

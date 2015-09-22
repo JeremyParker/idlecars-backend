@@ -12,6 +12,10 @@ class Booking(models.Model):
     driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)
 
+    # these payemnt terms are only set after the driver puts down a deposit on the booking
+    weekly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    service_percentage = models.DecimalField(max_digits=10, decimal_places=4, null=True) # our take rate
+
     end_time = models.DateTimeField(null=True, blank=True)  # end time set by the user
 
     #state transition times
@@ -19,7 +23,7 @@ class Booking(models.Model):
     checkout_time = models.DateTimeField(null=True, blank=True)         # RESERVED
     requested_time = models.DateTimeField(null=True, blank=True)        # REQUESTED
     approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED
-    pickup_time = models.DateTimeField(null=True, blank=True)           # BOOKED
+    pickup_time = models.DateTimeField(null=True, blank=True)           # ACTIVE
     return_time = models.DateTimeField(null=True, blank=True)           # RETURNED
     refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
     incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
@@ -44,7 +48,7 @@ class Booking(models.Model):
     RESERVED = 2
     REQUESTED = 3
     ACCEPTED = 4
-    BOOKED = 5
+    ACTIVE = 5
     RETURNED = 6
     REFUNDED = 7
     INCOMPLETE = 8
@@ -56,7 +60,7 @@ class Booking(models.Model):
         RESERVED: 'Reserved - deposit paid, not requested (waiting for doc review)',
         REQUESTED: 'Requested - waiting for owner/insurance',
         ACCEPTED: 'Accepted - waiting for deposit, ssn, contract',
-        BOOKED: 'Booked - car marked busy with new available_time',
+        ACTIVE: 'Active - car is in the driver\'s possession and on the road',
         RETURNED: 'Returned - driver returned the car but hasn\'t got deposit back',
         REFUNDED: 'Refunded - car was returned and driver got their deposit back',
         INCOMPLETE: 'Incomplete - this rental didn\'t happen for some reason (see reason field)',
@@ -70,7 +74,7 @@ class Booking(models.Model):
         elif self.return_time:
             return Booking.RETURNED
         elif self.pickup_time:
-            return Booking.BOOKED
+            return Booking.ACTIVE
         elif self.approval_time:
             return Booking.ACCEPTED
         elif self.requested_time:
@@ -79,6 +83,9 @@ class Booking(models.Model):
             return Booking.RESERVED
         else:
             return Booking.PENDING
+
+    def __unicode__(self):
+        return '{} on {}'.format(self.driver, self.car)
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),

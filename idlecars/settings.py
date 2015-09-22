@@ -195,6 +195,7 @@ CORS_ALLOW_HEADERS = (
 HEAP_APP_ID = '655181858'
 
 PAYMENT_GATEWAY_NAME = 'fake'
+BRAINTREE_BASE_URL = 'sandbox.braintreegateway.com' # doesn't work for fake gateway
 
 MASTER_MERCHANT_ACCOUNT_ID = os.getenv('MASTER_MERCHANT_ACCOUNT_ID', 'idlecarsllc')
 BRAINTREE = {
@@ -203,3 +204,5 @@ BRAINTREE = {
     'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
+
+TAKE_RATE = '0.080'  # TODO - move this to a config service

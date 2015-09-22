@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from braintree.test.nonces import Nonces
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -110,7 +111,7 @@ class ListBookingTest(APITestCase):
 class UpdateBookingTest(APITestCase):
     def setUp(self):
         self.booking = factories.Booking.create(
-            end_time=datetime.datetime(2014, 12, 15, 14, tzinfo=timezone.get_current_timezone())
+            end_time=datetime.datetime(2014, 12, 15, 14, 12, 31, tzinfo=timezone.get_current_timezone())
         )
 
         self.client = APIClient()
@@ -120,11 +121,11 @@ class UpdateBookingTest(APITestCase):
         self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
 
     def test_set_end_time(self):
-        data = {'end_time': [2015, 0, 1]}  # happy new year
+        data = {'end_time': [2016, 0, 1]}  # happy new year
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.booking = models.Booking.objects.get(id=self.booking.pk)
-        expected_end = datetime.datetime(2015, 1, 1, tzinfo=timezone.get_current_timezone())
+        expected_end = datetime.datetime(2016, 1, 1, 14, 12, 31, tzinfo=timezone.get_current_timezone())
         self.assertEqual(
             self.booking.end_time.astimezone(timezone.get_current_timezone()),
             expected_end
@@ -136,6 +137,12 @@ class BookingStepTest(APITestCase):
     Test that the booking shows the correct steps at the correct times as it
     transitions through all states
     '''
+    def _driver_adds_payment_method(self):
+        # client adds a payment_method. Don't do this here 'cause we're not testing driver API
+        self.driver.braintree_customer_id = 'fake_customer_id'
+        self.driver.save()
+        factories.PaymentMethod.create(driver=self.driver)
+
     def test_new_driver_starts(self):
         self.driver = factories.Driver.create()
         token = Token.objects.get(user__username=self.driver.auth_user.username)
@@ -161,8 +168,7 @@ class BookingStepTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.booking = factories.Booking.create(driver=self.driver)
         self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-        self._pending_with_docs()
-
+        self._pending_docs_approved()
 
     def _pending_no_docs(self):
         response = self.client.get(self.url, format='json')
@@ -175,7 +181,6 @@ class BookingStepTest(APITestCase):
         self.driver.address_proof_image = 'some image'
         self.driver.defensive_cert_image = 'some image'
         self.driver.save()
-
         self._pending_with_docs()
 
     def _pending_with_docs(self):
@@ -183,11 +188,12 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
+        self._driver_adds_payment_method()
 
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
         checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
-
+        self.booking.refresh_from_db()
         self._checked_out_docs_unapproved()
 
     def _pending_docs_approved(self):
@@ -196,9 +202,12 @@ class BookingStepTest(APITestCase):
         self.assertEqual(response.data['step'], 3)
         self.assertTrue(response.data['start_time_estimated'])
 
-        checkout_url = reverse('server:bookings-cancelation')
-        checkout_response = self.client.post(checkout_url, args=(self.booking.pk,))
+        self._driver_adds_payment_method()
+
+        checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
+        checkout_response = self.client.post(checkout_url, data={})
         self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+        self.booking.refresh_from_db()
         self._checked_out_docs_approved()
 
     def _checked_out_docs_unapproved(self):
