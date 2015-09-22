@@ -86,7 +86,6 @@ class Command(BaseCommand):
         card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
         payment_method = models.PaymentMethod.objects.create(
             driver=self.driver,
-            gateway_name='', # TODO - let's get rid of this
             gateway_token=card_token,
             suffix=card_suffix,
             card_type=card_type,

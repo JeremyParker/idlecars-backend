@@ -256,7 +256,7 @@ def cron_payments():
     pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
         payment__invoice_end_time__isnull=False,
-        payment__invoice_end_time__gt=pay_time
+        payment__invoice_end_time__gt=pay_time,
     ).exclude(
         payment__invoice_end_time__isnull=False,
         payment__invoice_end_time__gte=F('end_time')

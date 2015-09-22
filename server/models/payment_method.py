@@ -7,7 +7,6 @@ from driver import Driver
 
 class PaymentMethod(models.Model):
     driver = models.ForeignKey(Driver)
-    gateway_name = models.CharField(max_length=16)
     gateway_token = models.CharField(max_length=256)
     suffix = models.CharField(max_length=4)
     card_type = models.CharField(max_length=32)

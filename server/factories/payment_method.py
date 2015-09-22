@@ -17,7 +17,6 @@ class PaymentMethod(Factory):
         model = 'server.PaymentMethod'
 
     driver = SubFactory(Driver)
-    gateway_name = 'fake'
     gateway_token = LazyAttribute(lambda o: ''.join(
         [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
     ))
