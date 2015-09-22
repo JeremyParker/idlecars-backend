@@ -18,10 +18,8 @@ from owner_crm.tests import sample_merge_vars
 
 class TestOwnerNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
-        owner = server.factories.Owner.create()
         car = server.factories.BookableCar.create(
             last_status_update=update_time,
-            owner=owner,
         )
         return car
 

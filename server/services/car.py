@@ -28,7 +28,7 @@ def get_listing_queryset():
 
 def get_stale_within(minutes_until_stale):
     '''
-    Returns a list of cars whose listings will expire soon
+    Returns a list of live cars whose listings will expire soon
     '''
     return car_helpers._filter_stale_within(
         minutes_until_stale,

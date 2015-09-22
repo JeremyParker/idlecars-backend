@@ -12,11 +12,9 @@ from server import factories, models
 
 class CarTest(TestCase):
     def setUp(self):
-        owner = factories.Owner.create(state_code='NY')
-        make_model = factories.MakeModel.create()
-        self.car = factories.Car.create(
+        owner = factories.BankAccountOwner.create(state_code='NY')
+        self.car = factories.BookableCar.create(
             owner=owner,
-            make_model=make_model,
             status='available',
             next_available_date=timezone.now().date() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
@@ -93,4 +91,9 @@ class CarTest(TestCase):
         ''' verify that stale_soon doesn't include stale cars. '''
         self.car.last_status_update = timezone.now() - datetime.timedelta(minutes=121)
         self.car.save()
+        self.assertEqual(len(car.get_stale_within(120)), 0)
+
+    def test_car_not_renewable_if_no_owner_bank_account(self):
+        self.car.owner.merchant_account_state = models.Owner.BANK_ACCOUNT_DECLINED
+        self.car.owner.save()
         self.assertEqual(len(car.get_stale_within(120)), 0)
