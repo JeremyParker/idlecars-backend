@@ -9,7 +9,7 @@ extends ./base.jade
       a(href="#{ login_url }") #[h5 Join/Login]
       a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
     .menu-button(ng-click='showMenu = !showMenu')
-      .burger-button
+      .burger-button(ng-class='{active: showMenu}')
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
       a(href="#tutorial") How it works
       a(href="#{ login_url }") Join/Login
