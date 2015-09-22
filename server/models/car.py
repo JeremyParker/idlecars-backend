@@ -60,6 +60,7 @@ class Car(models.Model):
     notes = models.TextField(blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
+    COLOR_BLACK = 0
     COLOR_CHARCOAL = 1
     COLOR_GREY = 2
     COLOR_DARK_BLUE = 3
@@ -68,6 +69,7 @@ class Car(models.Model):
 
     COLOR_CHOICES = [
         (COLOR_BLACK, 'Black'),
+        (COLOR_CHARCOAL, 'Charcoal'),
         (COLOR_GREY, 'Grey'),
         (COLOR_DARK_BLUE, 'Dark Blue'),
         (COLOR_BLUE, 'Blue'),
