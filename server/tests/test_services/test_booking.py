@@ -139,6 +139,12 @@ class BookingServiceTest(TestCase):
             'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
 
+        # an email to the other driver to know their car is no longer available
+        self.assertEqual(outbox[2].merge_vars.keys()[0], self.other_driver.email())
+        self.assertEqual(
+            outbox[2].subject,
+            'Someone else rented your {}.'.format(new_booking.car.display_name())
+        )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def _check_payments_after_pickup(self, new_booking):
@@ -173,6 +179,42 @@ class BookingServiceTest(TestCase):
         # successfully pick up the car
         new_booking = booking_service.pickup(new_booking)
         self._check_payments_after_pickup(new_booking)
+
+        # we should have sent an email to ops telling them about the new booking
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.OPS_EMAIL)
+        self.assertEqual(
+            outbox[0].subject,
+            'New Booking from {}'.format(self.driver.phone_number())
+        )
+
+        # and an email to the driver telling them their docs were approved
+        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[1].subject,
+            "Your documents have been reviewed and approved"
+        )
+
+        # and an email to the owner asking them to add the driver to the insurance
+        self.assertEqual(outbox[2].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(
+            outbox[2].subject,
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
+        )
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+    def test_documents_approved_no_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to idlecars, {}!'.format(self.driver.full_name())
+        )
 
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()

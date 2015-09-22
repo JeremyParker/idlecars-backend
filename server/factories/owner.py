@@ -21,7 +21,6 @@ class Owner(Factory):
     state_code = LazyAttribute(lambda o: faker.state_abbr())
     zipcode = LazyAttribute(lambda o: faker.zipcode())
     rating = random.choice(owner_model.RATING)[0]
-
     user_account = RelatedFactory(UserAccountFactory, 'owner')
 
 
