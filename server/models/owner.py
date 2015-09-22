@@ -39,6 +39,7 @@ class Owner(models.Model):
         max_digits=10,
         decimal_places=4,
         null=True, # if negotiated we use the system default
+        blank=True,
         verbose_name='Negotiated service percentage',
     )
     service_percentage.short_description = 'Negotiated take rate'

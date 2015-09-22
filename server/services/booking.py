@@ -246,6 +246,13 @@ def pickup(booking):
         # TODO - error handling with message to the user
         return booking
 
+    # copy the time of day from the pickup time to the booking end time. Until now it had none.
+    booking.end_time = booking.end_time.replace(
+        hour=booking.pickup_time.hour,
+        minute=booking.pickup_time.minute,
+        second=booking.pickup_time.second,
+    )
+
     booking.save()
     # TODO - send some kind of confirmation message
     return booking
@@ -327,12 +334,14 @@ def calculate_end_time(booking):
 
 
 def set_end_time(booking, end_time):
-    booking.end_time = booking.end_time.replace(
-        year=end_time.year
-    ).replace(
-        month=end_time.month
-    ).replace(
-        day=end_time.day
-    )
+    if booking.end_time:
+        booking.end_time = booking.end_time.replace(
+            year=end_time.year,
+            month=end_time.month,
+            day=end_time.day,
+        )
+    else:
+        booking.end_time = end_time
+
     booking.save()
     return booking

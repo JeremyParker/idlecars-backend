@@ -28,7 +28,13 @@ class OwnerContactSerializer(serializers.ModelSerializer):
         )
 
     def get_address(self, obj):
-        return 'Some Address'  # TODO - return the actual address
+        return '{}\n{}\n{}, {} {}'.format(
+            obj.address1,
+            obj.address2,
+            obj.city,
+            obj.state_code,
+            obj.zipcode,
+        )
 
 
 class OwnerSerializer(ModelSerializer):

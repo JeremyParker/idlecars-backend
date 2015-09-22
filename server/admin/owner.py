@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from django.conf import settings
 
 from idlecars.admin_helpers import link
 
@@ -86,6 +87,9 @@ class OwnerAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['merchant_id', 'merchant_account_state', 'effective_service_percentage',]
+    if settings.DEBUG:
+        readonly_fields = ['merchant_id', 'effective_service_percentage',]
+
     list_display = [
         'link_name',
         'rating',
