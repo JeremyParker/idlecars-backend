@@ -37,14 +37,14 @@ class CarCompatibility(object):
             return self._compatible_flavor_name('uber_xl')
 
     def uber_black(self):
-        if self.car.exterior_color in (0,1) and self.car.interior_color in (0,1):
+        if self.car.exterior_color + self.car.interior_color is 0:
             if self._compatible_flavor_name('uber_suv'):
                 return 'UberBlack'
             else:
                 return self._compatible_flavor_name('uber_black')
 
     def uber_suv(self):
-        if self.car.exterior_color in (0,1) and self.car.interior_color in (0,1):
+        if self.car.exterior_color + self.car.interior_color is 0:
             return self._compatible_flavor_name('uber_suv')
 
     def lyft_standard(self):
