@@ -37,7 +37,7 @@ class CarCompatibility(object):
             return self._compatible_flavor_name('uber_xl')
 
     def uber_black(self):
-        if self.car.exterior_color + self.car.interior_color is 0:
+        if self.car.exterior_color is self.car.COLOR_BLACK and self.car.interior_color is self.car.COLOR_BLACK:
             if self._compatible_flavor_name('uber_suv'):
                 return 'UberBlack'
             else:
