@@ -43,7 +43,7 @@ def add_payment_method(driver, nonce):
         result = next_payment_method_response
     next_payment_method_response = None
 
-    driver.braintree_customer_id = '12'
+    driver.braintree_customer_id = '62358761'
     driver.save()
 
     return result
