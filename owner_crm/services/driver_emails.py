@@ -167,11 +167,10 @@ def password_reset_confirmation(password_reset):
     merge_vars = {
         password_reset.auth_user.email: {
             'FNAME': password_reset.auth_user.first_name or None,
-            'HEADLINE': 'Your password has been set',
+            'HEADLINE': 'Your account password has been set',
             'TEXT': '''
-            Welcome back! If you didn't set your password, or if you think something funny is going
-            on, please call us any time at 1-844-IDLECAR (1-844-435-3227). Now you can rent any car you
-            need, any time you need it.
+                If you didn't set your password, or if you think something funny is going
+                on, please call us any time at 1-844-IDLECAR (1-844-435-3227).
             ''',
             'CTA_LABEL': 'Find your car',
             'CTA_URL': client_side_routes.car_listing_url(),
@@ -191,9 +190,9 @@ def account_created(password_reset):
             'FNAME': password_reset.auth_user.first_name or None,
             'HEADLINE': 'An account has been created for you at idlecars.',
             'TEXT': '''
-            Your documents and details have been stored in your idlecars account. To claim your
-            account just tap the button below. Add a password, and your account  will be secured.
-            Then you can rent any car you need, any time you need it.
+                Your documents and details have been stored in your idlecars account. To claim your
+                account just tap the button below. Add a password, and your account  will be secured.
+                Then you can rent any car you need, any time you need it.
             ''',
             'CTA_LABEL': 'Claim your account',
             'CTA_URL': client_side_routes.password_reset(password_reset),

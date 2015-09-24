@@ -35,3 +35,6 @@ def owner_password_reset(password_reset):
 def terms_of_service():
     parts = (settings.WEBAPP_URL, '#', 'terms_of_service')
     return '/'.join(parts)
+
+def add_car_form():
+    return 'http://goo.gl/forms/4s26I6GUQY'

@@ -8,6 +8,14 @@ from idlecars import email, client_side_routes
 from server.services import car as car_service
 
 
+def _get_car_listing_links(owner):
+    links = ''
+    for car in car_service.filter_live(owner.cars.all()):
+        car_url = client_side_routes.car_details_url(car)
+        links = links + '<a href={}>\n\t{}\n</A>\n'.format(car_url, car_url)
+    return links
+
+
 def _render_renewal_body(car):
     template_data = {
         'CAR_NAME': car.display_name(),
@@ -135,7 +143,7 @@ def account_created(password_reset):
     merge_vars = {
         password_reset.auth_user.email: {
             'FNAME': password_reset.auth_user.first_name or None,
-            'HEADLINE': 'An account has been created for you at idlecars.',
+            'HEADLINE': 'You asked, and we delivered - Idlecars now offers a payment system',
             'TEXT': '''
             Your car(s) are ready to be listed on the idlecars marketplace. Please click below
             to secure your account with a password, and link your bank account to get paid.
@@ -149,3 +157,29 @@ def account_created(password_reset):
         subject='An account has been created for you at idlecars',
         merge_vars=merge_vars,
     )
+
+
+def bank_account_approved(owner):
+    links = _get_car_listing_links(owner)
+    for auth_user in owner.auth_users.all():
+        if not auth_user.email:
+            continue
+        merge_vars = {
+            auth_user.email: {
+                'FNAME': auth_user.first_name,
+                'HEADLINE': 'Your bank account has been approved',
+                'TEXT': '''
+                    Congrats! Your bank information has been approved and your cars have been listed! You can
+                    view your live cars from the links below!
+                    {}
+                    If you have any other cars you would like to list, please go to the submission form here:
+                '''.format(links),
+            'CTA_LABEL': 'List more cars',
+            'CTA_URL': client_side_routes.add_car_form(),
+            }
+        }
+        email.send_async(
+            template_name='one_button_no_image',
+            subject='Your bank account has been approved.',
+            merge_vars=merge_vars,
+        )

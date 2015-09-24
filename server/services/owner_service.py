@@ -8,7 +8,7 @@ import string
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from owner_crm.services import password_reset_service
+from owner_crm.services import password_reset_service, owner_emails, ops_emails
 
 from server.models import Owner, UserAccount
 from server.services import auth_user as auth_user_service
@@ -21,11 +21,15 @@ def add_merchant_id_to_owner(merchant_account_id, owner):
     return owner.save()
 
 
-def update_account_state(merchant_account_id, state):
+def update_account_state(merchant_account_id, state, errors=None):
     owner = Owner.objects.get(merchant_id=merchant_account_id)
     owner.merchant_account_state = state
     owner.save()
 
+    if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
+        owner_emails.bank_account_approved(owner)
+    else:
+        ops_emails.owner_account_declined(owner, errors)
 
 def link_bank_account(owner, params):
     #translate client params into the format Braintree expects.
