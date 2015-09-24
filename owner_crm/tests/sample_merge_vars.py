@@ -68,7 +68,13 @@ merge_vars = {
             'TEXT4': 'Caption for <a href="{}">image #4.</a>'.format(img_4_url),
             'TEXT5': 'this is the text at the end of the email Maybe a wind-up for the call-to-action.',
         },
-    }
+    },
+    'owner_account_invite':  {
+        'jeremy@idlecars.com': {
+            'FNAME': 'Robert',
+            'CTA_URL': 'http://idlecars.com',
+        },
+    },
 }
 
 

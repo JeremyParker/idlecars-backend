@@ -143,18 +143,12 @@ def account_created(password_reset):
     merge_vars = {
         password_reset.auth_user.email: {
             'FNAME': password_reset.auth_user.first_name or None,
-            'HEADLINE': 'You asked, and we delivered - Idlecars now offers a payment system',
-            'TEXT': '''
-            Your car(s) are ready to be listed on the idlecars marketplace. Please click below
-            to secure your account with a password, and link your bank account to get paid.
-            ''',
-            'CTA_LABEL': 'Link your account',
             'CTA_URL': client_side_routes.owner_password_reset(password_reset),
         }
     }
     email.send_async(
-        template_name='one_button_no_image',
-        subject='An account has been created for you at idlecars',
+        template_name='owner_account_invite',
+        subject='You asked, and we delivered - Idlecars now offers a payment system',
         merge_vars=merge_vars,
     )
 
