@@ -11,12 +11,11 @@ img_3_url = 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6e
 img_4_url = 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-011d18c7-47cb-455b-a5b6-56a8c2dc9729-IMAG0574.jpg'
 
 merge_vars = {
-    'single_cta': {  # deprecated
+    'no_button_no_image': {
         'jeremy@idlecars.com': {
-            'FNAME': '',
-            'TEXT': 'test',
-            'CTA_LABEL': 'Click Here',
-            'CTA_URL': 'http://idlecars.com',
+            'FNAME': 'Bob',
+            'TEXT': "<p>You don't have to do anything. This is a test of the most basic kind of notification we can send you.</p>\n<ul><li>You know it's true<li>You don't care<li>We don't care that you don't care</ul></p>",
+            'HEADLINE': 'Test of the template with no buttons and no images',
         },
     },
     'one_button_one_image': {
@@ -69,7 +68,13 @@ merge_vars = {
             'TEXT4': 'Caption for <a href="{}">image #4.</a>'.format(img_4_url),
             'TEXT5': 'this is the text at the end of the email Maybe a wind-up for the call-to-action.',
         },
-    }
+    },
+    'owner_account_invite':  {
+        'jeremy@idlecars.com': {
+            'FNAME': 'Robert',
+            'CTA_URL': 'http://idlecars.com',
+        },
+    },
 }
 
 
