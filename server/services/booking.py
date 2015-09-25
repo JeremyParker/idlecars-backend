@@ -143,25 +143,7 @@ def _find_deposit_payment(booking):
 
 
 def _create_next_rent_payment(booking):
-    previous_payments = booking.payment_set.filter(
-        invoice_start_time__isnull=False,
-        invoice_end_time__isnull=False,
-    ).order_by('invoice_end_time')
-
-    if not previous_payments:  # first rent payment
-        start_time = timezone.now().replace(microsecond=0)
-    else:
-        start_time = previous_payments.last().invoice_end_time
-
-    end_time = start_time + datetime.timedelta(days=7)
-
-    amount = booking.weekly_rent
-    if booking.end_time < end_time:
-        end_time = booking.end_time
-        parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
-        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
-
-    fee = Decimal(amount * booking.service_percentage).quantize(Decimal('.01'), rounding=ROUND_UP)
+    fee, amount, start_time, end_time = calculate_next_rent_payment(booking)
 
     return payment_service.create_payment(
         booking,
@@ -318,6 +300,32 @@ def first_valid_end_time(booking):
         min_rental_days = booking.car.minimum_rental_days()
         return timezone.now() + datetime.timedelta(days=min_rental_days)
     return timezone.now() + datetime.timedelta(days=7)
+
+
+def calculate_next_rent_payment(booking):
+    previous_payments = booking.payment_set.filter(
+        invoice_start_time__isnull=False,
+        invoice_end_time__isnull=False,
+    ).order_by('invoice_end_time')
+
+    if not previous_payments:  # first rent payment
+        start_time = timezone.now().replace(microsecond=0)
+    else:
+        start_time = previous_payments.last().invoice_end_time
+
+    end_time = start_time + datetime.timedelta(days=7)
+
+    amount = booking.weekly_rent
+    if booking.end_time < end_time:
+        end_time = booking.end_time
+        parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
+        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
+    return (
+        Decimal(amount * booking.service_percentage).quantize(Decimal('.01'), rounding=ROUND_UP),
+        amount,
+        start_time,
+        end_time
+    )
 
 
 def calculate_end_time(booking):

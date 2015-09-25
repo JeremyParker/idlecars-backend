@@ -51,6 +51,7 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingDetailsSerializer(serializers.ModelSerializer):
     car = serializers.SerializerMethodField()
+    next_payment = serializers.SerializerMethodField()
     start_time_display = serializers.SerializerMethodField()
     start_time_estimated = serializers.SerializerMethodField()
     end_time_display = serializers.SerializerMethodField()
@@ -69,6 +70,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_display_count',
             'step_details',
+            'next_payment',
             'start_time_display',
             'start_time_estimated',
             'end_time_display',
@@ -82,6 +84,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'step',
             'step_display_count',
             'step_details',
+            'next_payment',
             'start_time_display',
             'start_time_estimated',
             'end_time_display',
@@ -151,6 +154,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
                 'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
             })
         return ret
+
+    def get_next_payment(self,obj):
+        return booking_service.calculate_next_rent_payment(obj)[1]
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)
