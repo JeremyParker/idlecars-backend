@@ -29,6 +29,7 @@ class WebhookTest(TestCase):
             merchant_id='test_id',
             merchant_account_state=Owner.BANK_ACCOUNT_PENDING,
         )
+        factories.BookableCar.create(owner=self.owner)
 
     def test_webhook_success(self):
         with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
