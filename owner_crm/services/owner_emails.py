@@ -12,7 +12,7 @@ def _get_car_listing_links(owner):
     links = ''
     for car in car_service.filter_live(owner.cars.all()):
         car_url = client_side_routes.car_details_url(car)
-        links = links + '<a href={}>\n\t{}\n</A>\n'.format(car_url, car_url)
+        links = links + '<li><a href={}>\n\t{}\n</A>\n'.format(car_url, car_url)
     return links
 
 
@@ -155,6 +155,20 @@ def account_created(password_reset):
 
 def bank_account_approved(owner):
     links = _get_car_listing_links(owner)
+    if links:
+        text = '''
+                Congrats! Your bank information has been approved and your cars have been listed!
+                You can view your live cars from the links below!
+                <ul>{}</ul>
+                If you have any other cars you would like to list, please go to the submission form here:
+            '''.format(links)
+    else:
+        text = '''
+                Congrats! Your bank information has been approved! Now when you rent cars through idlecars, you will
+                receive payment directly from the driver into your bank account.<br>
+                If you have any cars you would like to list, please go to the submission form here:
+            '''.format(links)
+
     for auth_user in owner.auth_users.all():
         if not auth_user.email:
             continue
@@ -162,12 +176,7 @@ def bank_account_approved(owner):
             auth_user.email: {
                 'FNAME': auth_user.first_name,
                 'HEADLINE': 'Your bank account has been approved',
-                'TEXT': '''
-                    Congrats! Your bank information has been approved and your cars have been listed! You can
-                    view your live cars from the links below!
-                    {}
-                    If you have any other cars you would like to list, please go to the submission form here:
-                '''.format(links),
+                'TEXT': text,
             'CTA_LABEL': 'List more cars',
             'CTA_URL': client_side_routes.add_car_form(),
             }

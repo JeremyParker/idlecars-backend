@@ -30,12 +30,17 @@ merge_vars = {
     },
     'one_button_no_image': {
         'jeremy@idlecars.com': {
-            'FNAME': 'Robert',
-            'HEADLINE': 'Welcome to the End Of The World!',
-            'TEXT': 'have lunch with me',
-            'CTA_LABEL': 'Press a button',
-            'CTA_URL': 'http://idlecars.com',
-        },
+            'CTA_LABEL': 'List more cars',
+            'CTA_URL': 'http://goo.gl/forms/4s26I6GUQY',
+            'FNAME': 'Lindell',
+            'HEADLINE': 'Your bank account has been approved',
+            'TEXT': '''Congrats! Your bank information has been approved and your cars have been listed!\nYou can view your live cars from the links below!\n
+                <ul>
+                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/cars/3\n</A>\n
+                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/cars/1\n</A>\n
+                </ul>\n
+                If you have any other cars you would like to list, please go to the submission form here:\n'''
+        }
     },
     'one_button_four_images': {
         'jeremy@idlecars.com': {
