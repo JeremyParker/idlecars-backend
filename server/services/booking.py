@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
-from owner_crm.models import Message
+from owner_crm.services import campaign as campaign_service
 
 from server.models import Booking
 
@@ -43,21 +43,8 @@ def send_reminders():
     remindable_bookings = Booking.objects.filter(
         state=Booking.PENDING,
         created_time__lte=reminder_threshold,
-    ).exclude(
-        message__campaign='document_reminder',
     )
-
-    for booking in remindable_bookings:
-        if not booking.driver.email():
-            continue
-        driver_emails.documents_reminder(booking)
-        Message.objects.create(
-            campaign='document_reminder',
-            owner=booking.car.owner,
-            car=booking.car,
-            driver=booking.driver,
-            booking=booking,
-        )
+    campaign_service.send_to_queryset(remindable_bookings, driver_emails.documents_reminder)
 
 
 def on_documents_uploaded(driver):
