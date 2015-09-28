@@ -64,6 +64,6 @@ def send_reminders():
     reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
     remindable_drivers = server.models.Driver.objects.filter(
         documentation_approved=False,
-        created_time__lte=reminder_threshold,
+        auth_user__date_joined__lte=reminder_threshold,
     )
     campaign_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)

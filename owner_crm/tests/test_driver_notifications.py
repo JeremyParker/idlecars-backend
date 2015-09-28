@@ -19,13 +19,16 @@ class TestDriverNotifications(TestCase):
 
         now = timezone.now()
         created_time = now - datetime.timedelta(hours=1, minutes=5)  # TODO(JP): get the time from config
-        driver.created_time = created_time
-        driver.save()
+        driver.auth_user.date_joined = created_time
+        driver.auth_user.save()
         return driver
 
     def _simulate_new_booking(self):
         driver = self._simulate_new_driver()
-        booking = server.factories.Booking.create(driver=driver, created_time=driver.created_time)
+        booking = server.factories.Booking.create(
+            driver=driver,
+            created_time=driver.auth_user.date_joined
+        )
         return booking
 
     def setUp(self):
