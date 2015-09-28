@@ -19,5 +19,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(backfill_make_model_images),
+        migrations.RunPython(
+            backfill_make_model_images,
+            reverse_code=migrations.RunPython.noop
+        ),
     ]

@@ -71,7 +71,7 @@ class PasswordResetView(views.APIView):
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'_app_notifications': ['Your password has been set.'], 'token': token.key}
+            content = {'_app_notifications': [{'success': 'Your password has been set.'}], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:

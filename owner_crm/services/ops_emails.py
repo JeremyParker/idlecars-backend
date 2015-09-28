@@ -115,18 +115,20 @@ def payment_job_failed(booking, exception):
     )
 
 
-def owner_account_result(details, subject):
+def owner_account_declined(owner, errors):
     merge_vars = {
         settings.OPS_EMAIL: {
             'FNAME': 'Dearest Admin',
-            'HEADLINE': subject,
-            'TEXT': 'detail from braintree (if any):\n' + details,
-            'CTA_LABEL': 'home',
-            'CTA_URL': 'https://idlecars.com',  # TODO - link to the owner's change page
+            'HEADLINE': 'An owner\'s bank account was declined',
+            'TEXT': '''
+                {}'s bank account details were declined by the Braintree gateway.<br>
+                Braintree returned the following error(s):<br>
+                <ul>{}</ul>
+            '''.format(owner.name(), ''.join(['<li>{}'.format(e) for e in errors])),
         }
     }
     email.send_sync(
-        template_name='one_button_no_image',
-        subject=subject,
+        template_name='no_button_no_image',
+        subject='{}\'s bank account was declined'.format(owner.name()),
         merge_vars=merge_vars,
     )

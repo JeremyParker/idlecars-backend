@@ -12,7 +12,6 @@ from idlecars import email
 from server import payment_gateways
 from server.models import Owner
 from server.services import owner_service
-from owner_crm.services import ops_emails
 
 
 def _confirm_bt_endpoint(request):
@@ -30,11 +29,16 @@ def _get_webhook_notification(request):
 def _handle_post(request, new_state):
     try:
         webhook_notification = _get_webhook_notification(request)
+        if hasattr(webhook_notification, 'errors'):
+            errors = [error.message for error in webhook_notification.errors.deep_errors]
+        else:
+            errors = []
+
         owner_service.update_account_state(
             webhook_notification.merchant_account.id,
             new_state,
+            errors,
         )
-        ops_emails.owner_account_result(str(request.POST), 'Owner Bank Account Processed')
         return HttpResponse('')
     except braintree.exceptions.InvalidSignatureError:
         # hide the error - somebody's trying to hack us?

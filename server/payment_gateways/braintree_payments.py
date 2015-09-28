@@ -15,7 +15,7 @@ def _configure_braintree():
     global configured
     if not configured:
         config = settings.BRAINTREE
-        if isinstance(config["environment"], unicode):
+        if isinstance(config["environment"], unicode) or isinstance(config["environment"], str):
             config["environment"] = getattr(braintree.Environment, config["environment"])
         braintree.Configuration.configure(**config)
     configured = True
