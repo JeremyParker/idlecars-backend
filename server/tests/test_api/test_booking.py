@@ -248,8 +248,20 @@ class BookingStepTest(APITestCase):
 
 
 class CheckoutBookingTest(APITestCase):
-    # TODO
-    pass
+    def setUp(self):
+        self.car = factories.Car.create()
+        self.driver = factories.Driver.create()
+        self.booking = factories.ReservedBooking.create(driver=self.driver, car=self.car)
+
+        self.client = APIClient()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+
+    def test_next_rent_payment(self):
+        response = self.client.get(self.url, format='json')
+        self.assertEqual(response.data['next_payment'], self.car.solo_cost)
 
 
 class PickupBookingTest(APITestCase):
