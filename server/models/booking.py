@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from owner_crm.models import MessageTopicModel
 from . import Car, UserAccount, Driver
 
 
-class Booking(models.Model):
+class Booking(MessageTopicModel):
     user_account = models.ForeignKey(UserAccount, null=True) # TODO(JP): remove deprecated field
     driver = models.ForeignKey(Driver, null=True) # TODO(JP): null=False after migration & backfill
     car = models.ForeignKey(Car, null=False)

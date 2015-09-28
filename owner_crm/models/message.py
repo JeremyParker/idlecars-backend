@@ -2,21 +2,21 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 
-from server.models import Driver, Owner, Booking, Car
-
+# from server.models import Driver, Owner, Booking, Car
+from owner_crm.models.message_topic import MessageTopic
 
 class Message(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     campaign = models.CharField(max_length = 255)
 
-    # related objects
-    owner = models.ForeignKey(Owner, blank=True, null=True)
-    car = models.ForeignKey(Car, blank=True, null=True)
-    driver = models.ForeignKey(Driver, blank=True, null=True)
-    booking = models.ForeignKey(Booking, blank=True, null=True)
+    # what object was this message "about"
+    message_topic = models.ForeignKey(MessageTopic, null=True)
+
+    # owner = models.ForeignKey(Owner, blank=True, null=True)
+    # car = models.ForeignKey(Car, blank=True, null=True)
+    # driver = models.ForeignKey(Driver, blank=True, null=True)
+    # booking = models.ForeignKey(Booking, blank=True, null=True)
 
     # TODO: also store what media of message this was: email or sms
 
@@ -29,6 +29,9 @@ class Message(models.Model):
     )
 
     TODO: maybe try to use a GenericForeignKey like:
+    from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.contrib.contenttypes.models import ContentType
+
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')

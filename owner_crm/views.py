@@ -80,7 +80,7 @@ class PasswordResetView(views.APIView):
 
 
 class UpdateRenewalView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = models.Renewal.objects.all()
+    queryset = models.renewal.Renewal.objects.all()
     serializer_class = serializers.Renewal
     lookup_field = 'token'
 

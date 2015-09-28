@@ -124,3 +124,9 @@ class TestCar(TestCase):
             car.last_status_update.replace(microsecond=0),
             timezone.now().replace(microsecond=0),
         )
+
+
+class TestBooking(TestCase):
+    def test_booking_has_topic_object(self):
+        booking = Booking.objects.create();
+        # self.assertIsNotNone(booking.topic_object)
