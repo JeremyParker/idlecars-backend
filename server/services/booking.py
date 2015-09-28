@@ -303,6 +303,9 @@ def first_valid_end_time(booking):
 
 
 def calculate_next_rent_payment(booking):
+    if not booking.checkout_time:
+        return (None, None, None, None)
+
     previous_payments = booking.payment_set.filter(
         invoice_start_time__isnull=False,
         invoice_end_time__isnull=False,
@@ -316,12 +319,17 @@ def calculate_next_rent_payment(booking):
     end_time = start_time + datetime.timedelta(days=7)
 
     amount = booking.weekly_rent
+    take_rate = booking.service_percentage
+
+    if not booking.end_time:
+        booking.end_time = calculate_end_time(booking)
+
     if booking.end_time < end_time:
         end_time = booking.end_time
         parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
         amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
     return (
-        Decimal(amount * booking.service_percentage).quantize(Decimal('.01'), rounding=ROUND_UP),
+        Decimal(amount * take_rate).quantize(Decimal('.01'), rounding=ROUND_UP),
         amount,
         start_time,
         end_time
