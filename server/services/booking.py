@@ -1,13 +1,9 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
-
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
-from owner_crm.services import campaign as campaign_service
 
 from server.models import Booking
 
@@ -33,18 +29,6 @@ def conflicting_bookings(booking):
         car=booking.car,
         state__in=[Booking.PENDING, Booking.FLAKE, Booking.COMPLETE],
     )
-
-
-def send_reminders():
-    # send reminders to drivers who started booking a car, and never submitted docs
-    docs_reminder_delay_hours = 1  # TODO(JP): get from config
-
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
-    remindable_bookings = Booking.objects.filter(
-        state=Booking.PENDING,
-        created_time__lte=reminder_threshold,
-    )
-    campaign_service.send_to_queryset(remindable_bookings, driver_emails.documents_reminder)
 
 
 def on_documents_uploaded(driver):

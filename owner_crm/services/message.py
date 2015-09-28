@@ -14,6 +14,10 @@ def get_booking_kwargs(obj):
     }
 
 
+def get_driver_kwargs(obj):
+    return { 'driver': obj, }
+
+
 def log_message(campaign_name, key_obj):
     kwargs_func_name = 'get_{}_kwargs'.format(key_obj.__class__.__name__).lower()
     kwargs_func = getattr(sys.modules[__name__], kwargs_func_name)

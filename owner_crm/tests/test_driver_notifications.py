@@ -14,18 +14,21 @@ from owner_crm.tests import sample_merge_vars
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
 class TestDriverNotifications(TestCase):
-    def _simulate_new_booking(self):
+    def _simulate_new_driver(self):
         driver = server.factories.Driver.create()
-        booking = server.factories.Booking.create(driver=driver)
 
         now = timezone.now()
-        booking_time = now - datetime.timedelta(hours=1, minutes=5)  # TODO(JP): get the time from config
-        booking.created_time = booking_time
-        booking.save()
+        created_time = now - datetime.timedelta(hours=1, minutes=5)  # TODO(JP): get the time from config
+        driver.created_time = created_time
+        driver.save()
+        return driver
+
+    def _simulate_new_booking(self):
+        driver = self._simulate_new_driver()
+        booking = server.factories.Booking.create(driver=driver, created_time=driver.created_time)
         return booking
 
     def setUp(self):
-        driver = server.factories.Driver.create()
         self.booking = self._simulate_new_booking()
 
     def test_docs_reminder(self):
@@ -39,6 +42,14 @@ class TestDriverNotifications(TestCase):
             outbox[0].subject,
             'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
         )
+
+    def test_driver_no_booking(self):
+        self.booking.delete()
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_no_email_twice(self):
         call_command('driver_notifications')
@@ -57,8 +68,8 @@ class TestDriverNotifications(TestCase):
 
     ''' check that we don't send an email to a driver who already uploaded their docs '''
     def test_docs_reminder_driver_complete(self):
-        self.booking.driver = server.factories.CompletedDriver.create()
-        self.booking.save()
+        self.booking.driver.delete()
+        server.factories.CompletedDriver.create()
         call_command('driver_notifications')
 
         from django.core.mail import outbox
