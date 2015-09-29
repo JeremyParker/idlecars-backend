@@ -6,7 +6,7 @@ import datetime
 from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails
-from owner_crm.services import campaign as campaign_service
+from owner_crm.services import throttle_service
 
 import server.models
 import server.services.booking
@@ -64,4 +64,4 @@ def send_reminders():
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
     )
-    campaign_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)
+    throttle_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)
