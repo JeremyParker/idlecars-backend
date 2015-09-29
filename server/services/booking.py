@@ -5,7 +5,6 @@ import datetime
 from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 from django.db.models import F
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
@@ -45,24 +44,6 @@ def is_visible(booking):
 def filter_visible(booking_queryset):
     ''' Can this booking be seen in the Driver app '''
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
-
-
-def send_reminders():
-    # send reminders to drivers who started booking a car, and never submitted docs
-    docs_reminder_delay_hours = 1  # TODO(JP): get from config
-
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
-    remindable_bookings = filter_pending(
-        Booking.objects.filter(created_time__lte=reminder_threshold)
-    )
-
-    for booking in remindable_bookings:
-        if not booking.driver.email():
-            continue
-        # TODO - send email and mark email sent
-        # driver_emails.documents_reminder(booking)
-        # booking.get_state = Booking.FLAKE
-        # booking.save()
 
 
 def on_documents_approved(driver):
