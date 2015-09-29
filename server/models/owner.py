@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from operator import attrgetter
+from decimal import Decimal
 
 from django.db import models
 from django.conf import settings
@@ -96,7 +97,7 @@ class Owner(models.Model):
     @property
     def effective_service_percentage(self):
         ''' Returns the owner's negotiated rate if we negotiated one, otherwise, the default'''
-        return self.service_percentage or settings.TAKE_RATE
+        return self.service_percentage or Decimal(settings.TAKE_RATE)
 
     def __unicode__(self):
         name = self.name()

@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import dj_database_url
-from decimal import Decimal
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -206,4 +205,4 @@ BRAINTREE = {
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
 
-TAKE_RATE = Decimal('0.080')  # TODO - move this to a config service
+TAKE_RATE = '0.080'  # TODO - move this to a config service
