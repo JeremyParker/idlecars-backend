@@ -124,7 +124,10 @@ def _find_deposit_payment(booking):
     return deposit_payment
 
 
-def _create_next_rent_payment(booking):
+def calculate_next_rent_payment(booking):
+    if not booking.checkout_time:
+        return (None, None, None, None)
+
     previous_payments = booking.payment_set.filter(
         invoice_start_time__isnull=False,
         invoice_end_time__isnull=False,
@@ -138,12 +141,24 @@ def _create_next_rent_payment(booking):
     end_time = start_time + datetime.timedelta(days=7)
 
     amount = booking.weekly_rent
-    if booking.end_time < end_time:
-        end_time = booking.end_time
-        parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
-        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
+    take_rate = booking.service_percentage
 
-    fee = Decimal(amount * booking.service_percentage).quantize(Decimal('.01'), rounding=ROUND_UP)
+    booking_end_time = booking.end_time or calculate_end_time(booking)
+
+    if booking_end_time < end_time:
+        end_time = booking_end_time
+        parital_week = amount * Decimal((booking_end_time - start_time).days) / Decimal(7.00)
+        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
+    return (
+        Decimal(amount * take_rate).quantize(Decimal('.01'), rounding=ROUND_UP),
+        amount,
+        start_time,
+        end_time
+    )
+
+
+def _create_next_rent_payment(booking):
+    fee, amount, start_time, end_time = calculate_next_rent_payment(booking)
 
     return payment_service.create_payment(
         booking,
