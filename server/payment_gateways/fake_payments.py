@@ -90,3 +90,8 @@ def escrow(payment):
     payment.transaction_id = 'transaction id'
     payment.status = models.Payment.HELD_IN_ESCROW
     return payment
+
+@fake_payment_function
+def refund(payment):
+    payment.status = models.Payment.REFUNDED
+    return payment
