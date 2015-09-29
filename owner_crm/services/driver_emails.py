@@ -40,21 +40,17 @@ def _missing_documents_text(driver):
     return docs
 
 
-def _render_reminder_body(booking):
+def _render_booking_reminder_body(booking):
     docs = _missing_documents_text(booking.driver)
     template_data = {
         'CAR_NAME': booking.car.display_name(),
         'DOCS_LIST': docs,
     }
-    context = Context(autoescape=False)
-    return render_to_string("driver_docs_reminder.jade", template_data, context)
+    return render_to_string("docs_reminder_booking.jade", template_data, Context(autoescape=False))
 
 
-def documents_reminder(booking):
-    if not booking.driver.email() or booking.driver.all_docs_uploaded():
-        return
-
-    body = _render_reminder_body(booking)
+def _docs_reminder_for_booking(booking):
+    body = _render_booking_reminder_body(booking)
     cta_url = client_side_routes.doc_upload_url()
     merge_vars = {
         booking.driver.email(): {
@@ -71,6 +67,43 @@ def documents_reminder(booking):
         subject='Your {} is waiting on your driving documents'.format(booking.car.display_name()),
         merge_vars=merge_vars,
     )
+
+
+def _render_driver_reminder_body(driver):
+    docs = _missing_documents_text(driver)
+    template_data = {
+        'DOCS_LIST': docs,
+    }
+    return render_to_string("docs_reminder_driver.jade", template_data, Context(autoescape=False))
+
+
+def _docs_reminder_for_driver(driver):
+    merge_vars = {
+        driver.email(): {
+            'FNAME': driver.first_name() or None,
+            'TEXT': _render_driver_reminder_body(driver),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': client_side_routes.doc_upload_url(),
+            'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='Welcome to idlecars. Don\'t forget to upload your documents.',
+        merge_vars=merge_vars,
+    )
+
+
+def documents_reminder(driver):
+    if not driver.email() or driver.all_docs_uploaded():
+        return
+
+    pending_bookings = driver.booking_set.all()
+    if pending_bookings:
+        booking = pending_bookings.order_by('created_time').last()
+        _docs_reminder_for_booking(booking)
+    else:
+        _docs_reminder_for_driver(driver)
 
 
 def documents_approved(booking):
