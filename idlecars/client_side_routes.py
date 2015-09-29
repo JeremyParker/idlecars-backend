@@ -37,5 +37,5 @@ def terms_of_service():
     return '/'.join(parts)
 
 def faq():
-    parts = (settings.WEBAPP_URL, '#', 'faq')
+    parts = (settings.WEBAPP_URL, '#', 'driver_faq')
     return '/'.join(parts)
