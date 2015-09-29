@@ -161,12 +161,11 @@ def calculate_next_rent_payment(booking):
     amount = booking.weekly_rent
     take_rate = booking.service_percentage
 
-    if not booking.end_time:
-        booking.end_time = calculate_end_time(booking)
+    booking_end_time = booking.end_time or calculate_end_time(booking)
 
-    if booking.end_time < end_time:
-        end_time = booking.end_time
-        parital_week = amount * Decimal((booking.end_time - start_time).days) / Decimal(7.00)
+    if booking_end_time < end_time:
+        end_time = booking_end_time
+        parital_week = amount * Decimal((booking_end_time - start_time).days) / Decimal(7.00)
         amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
     return (
         Decimal(amount * take_rate).quantize(Decimal('.01'), rounding=ROUND_UP),
