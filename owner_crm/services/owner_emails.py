@@ -97,20 +97,11 @@ def new_booking_email(booking):
         )
 
 
-def booking_canceled(booking):
+def _booking_incomplete_email(booking, body_text):
     headline = '{} has decided not to rent your {}, with license plate {}'.format(
         booking.driver.full_name(),
         booking.car.display_name(),
         booking.car.plate,
-    )
-
-    # TODO(JP) track gender of driver and customize this email text
-    text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
-    broker not to add them to the insurance policy? We apologise for any inconvenience. We've
-    already re-listed your car on the site so we can find you another driver as soon as possible.
-    '''.format(
-        booking.driver.first_name(),
-        booking.car.display_name(),
     )
     subject = 'Your {} booking has canceled.'.format(booking.car.display_name())
     for user in booking.car.owner.user_account.all():
@@ -120,7 +111,7 @@ def booking_canceled(booking):
             user.email: {
                 'FNAME': user.first_name or None,
                 'HEADLINE': subject,
-                'TEXT': text,
+                'TEXT': body_text,
                 'CTA_LABEL': 'See your listing',
                 'CTA_URL': client_side_routes.car_details_url(booking.car)
             }
@@ -132,8 +123,34 @@ def booking_canceled(booking):
         )
 
 
+def booking_canceled(booking):
+    # TODO(JP) track gender of driver and customize this email text
+    text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
+    broker not to add them to the insurance policy? We apologise for any inconvenience. We've
+    already re-listed your car on the site so we can find you another driver as soon as possible.
+    '''.format(
+        booking.driver.first_name(),
+        booking.car.display_name(),
+    )
+    _booking_incomplete_email(booking, text)
+
+
+def driver_rejected(booking):
+    text = '''We're sorry. {} has decided not to rent your {}. We apologise for any inconvenience.
+    We've already re-listed your car on the site so we can find you another driver as soon as possible.
+    '''.format(
+        booking.driver.first_name(),
+        booking.car.display_name(),
+    )
+    _booking_incomplete_email(booking, text)
+
+
 def insurance_follow_up_email(booking):
     # TODO(JP)
+    pass
+
+
+def first_rent_payment(booking):
     pass
 
 

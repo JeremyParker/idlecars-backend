@@ -90,6 +90,28 @@ def request_insurance(booking):
     return booking
 
 
+def on_insurance_approved(booking):
+    driver_emails.insurance_approved(booking)
+
+
+def on_returned(booking):
+    # TODO - issue a refund and email all parties
+    pass
+
+
+def on_incomplete(booking, reason):
+    ''' Called when an admin sets a booking to incomplete'''
+    if reason == Booking.REASON_OWNER_REJECTED:
+        driver_emails.insurance_rejected(booking)
+    elif reason == Booking.REASON_DRIVER_REJECTED:
+        owner_emails.driver_rejected(booking)
+    elif reason == Booking.REASON_MISSED:
+        driver_emails.car_rented_elsewhere(booking)
+    # NOTE: elsewhere we handle:
+    # Booking.REASON_ANOTHER_BOOKED
+    # Booking.REASON_CANCELED
+
+
 def create_booking(car, driver):
     '''
     Creates a new booking
