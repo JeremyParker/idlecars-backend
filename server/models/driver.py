@@ -10,6 +10,7 @@ from idlecars import model_helpers, fields
 
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
+
     documentation_approved = models.BooleanField(
         default=False,
         verbose_name='docs approved',

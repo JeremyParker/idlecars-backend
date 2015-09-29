@@ -1,7 +1,13 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from owner_crm.services import ops_emails
+import datetime
+
+from django.utils import timezone
+
+from owner_crm.services import ops_emails, driver_emails
+from owner_crm.services import campaign as campaign_service
+
 import server.models
 import server.services.booking
 
@@ -49,3 +55,15 @@ def get_missing_docs(driver):
         if not getattr(driver, field):
             missing = missing + [name,]
     return missing
+
+
+def send_reminders():
+    # send reminders to drivers who started an account, and never submitted docs
+    docs_reminder_delay_hours = 1  # TODO(JP): get from config
+
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
+    remindable_drivers = server.models.Driver.objects.filter(
+        documentation_approved=False,
+        auth_user__date_joined__lte=reminder_threshold,
+    )
+    campaign_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)
