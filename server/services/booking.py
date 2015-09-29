@@ -6,6 +6,7 @@ from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
 from django.db.models import F
+from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
