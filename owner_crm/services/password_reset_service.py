@@ -13,7 +13,7 @@ def create(phone_number):
         if auth_user.is_active:
             pending_resets = models.PasswordReset.objects.filter(auth_user=auth_user)
             pending_resets.filter(
-                state=models.ConsumableToken.STATE_STATE_PENDING
+                state=models.ConsumableToken.STATE_PENDING
             ).update(
                 state=models.ConsumableToken.STATE_RETRACTED
             )
