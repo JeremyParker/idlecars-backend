@@ -12,7 +12,11 @@ def create(phone_number):
         auth_user = auth.models.User.objects.get(username=phone_number)
         if auth_user.is_active:
             pending_resets = models.PasswordReset.objects.filter(auth_user=auth_user)
-            pending_resets.update(state=models.ConsumableToken.STATE_RETRACTED)
+            pending_resets.filter(
+                state=models.ConsumableToken.STATE_STATE_PENDING
+            ).update(
+                state=models.ConsumableToken.STATE_RETRACTED
+            )
             return models.PasswordReset.objects.create(auth_user=auth_user)
     except auth.models.User.DoesNotExist:
         pass
