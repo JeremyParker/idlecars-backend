@@ -55,9 +55,8 @@ def get_missing_docs(driver):
     return missing
 
 
-def send_reminders():
+def send_reminders(docs_reminder_delay_hours=1):  # TODO(JP): get from config
     # send reminders to drivers who started an account, and never submitted docs
-    docs_reminder_delay_hours = 1  # TODO(JP): get from config
 
     reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
     remindable_drivers = server.models.Driver.objects.filter(

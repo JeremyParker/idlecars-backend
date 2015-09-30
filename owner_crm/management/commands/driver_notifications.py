@@ -11,3 +11,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         driver_service.send_reminders()
+        driver_service.send_reminders(docs_reminder_delay_hours=24)
+        driver_service.send_reminders(docs_reminder_delay_hours=36)
+        driver_service.send_reminders(docs_reminder_delay_hours=48)
