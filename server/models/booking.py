@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from . import Car, UserAccount, Driver
 import datetime
@@ -87,6 +88,27 @@ class Booking(models.Model):
 
     def __unicode__(self):
         return '{} on {}'.format(self.driver, self.car)
+
+    def clean(self, *args, **kwargs):
+        '''
+        Detect if someone is changing the state of the booking through the admin. If so, call
+        the appropriate function to handle the state change.
+        '''
+        from server.services import booking as booking_service
+        super(Booking, self).clean()
+        if self.pk:
+            orig = self.load_from_db()
+            if self.approval_time and not orig.approval_time:
+                booking_service.on_insurance_approved(self)
+
+            if self.return_time and not orig.return_time:
+                booking_service.on_returned(self)
+
+            if self.incomplete_time:
+                if not self.incomplete_reason:
+                    raise ValidationError('To set a booking to incomplete, also select a reason')
+                if not orig.incomplete_time:
+                    booking_service.on_incomplete(self, self.incomplete_reason)
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),

@@ -37,15 +37,13 @@ class TestDriverNotifications(TestCase):
     def test_docs_reminder(self):
         call_command('driver_notifications')
 
-        # TODO
-        # from django.core.mail import outbox
-        # self.assertEqual(len(outbox), 1)
-        # self.assertTrue(sample_merge_vars.check_template_keys(outbox))
-
-        # self.assertEqual(
-        #     outbox[0].subject,
-        #     'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
-        # )
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
+        )
 
     def test_driver_no_booking(self):
         self.booking.delete()

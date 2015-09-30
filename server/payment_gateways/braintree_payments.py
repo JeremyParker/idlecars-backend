@@ -214,3 +214,13 @@ def escrow(payment):
     else:
         payment.status, payment.error_message = parse_payment_error(response)  # TODO
     return payment
+
+
+def refund(payment):
+    _configure_braintree()
+    if payment.transaction_id:
+        result = braintree.Transaction.refund(payment.transaction_id)
+        # TODO - check errors
+        payment.status = models.Payment.REFUNDED
+        payment.error_message = ''
+    return payment

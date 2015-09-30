@@ -132,6 +132,73 @@ def documents_approved(booking):
     )
 
 
+def insurance_approved(booking):
+    if not booking.driver.email():
+        return
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'You have been added to your car\'s insurance',
+            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'TEXT': '''
+                The owner of your {} has added you to the insurance policy of the car. Click below
+                for more information and instructions on how to pick up the car.
+            '''.format(booking.car.display_name()),
+            'CTA_LABEL': 'Pick up your car',
+            'CTA_URL': client_side_routes.bookings(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_one_image',
+        subject='You have been added to your {}\'s insurance.'.format(booking.car.display_name()),
+        merge_vars=merge_vars,
+    )
+
+
+def insurance_rejected(booking):
+    if not booking.driver.email():
+        return
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Sorry, we couldn\'t get you on the insurance.',
+            'TEXT': '''
+            We didn't manage to get you on the insurance for the car you wanted, but now that your
+            account is complete, you can pick another car, and we'll add you to the insurance on that one.
+            ''',
+            'CTA_LABEL': 'Find a new car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='You counldn\'t be added to the insurance on the car you wanted',
+        merge_vars=merge_vars,
+    )
+
+
+def car_rented_elsewhere(booking):
+    if not booking.driver.email():
+        return
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Sorry, the car you wanted was rented out by someone else.',
+            'TEXT': '''
+            Sorry, someone else has already rented out the car you wanted. Sometimes that
+            happens. Still, there are plenty more great cars available.
+            ''',
+            'CTA_LABEL': 'Find a new car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='You counldn\'t be added to the insurance on the car you wanted',
+        merge_vars=merge_vars,
+    )
+
+
 def someone_else_booked(booking):
     if not booking.driver.email():
         return

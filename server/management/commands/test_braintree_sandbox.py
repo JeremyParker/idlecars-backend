@@ -13,9 +13,9 @@ from server import payment_gateways, factories, services, models
 
 class Command(BaseCommand):
     help = '''
-    This command will test the functionality of the braintree_payments library against the
-    Braintree Sandbox environment. The data we send to Braintree here is the data the unit
-    tests validate against.
+    This command tests the functionality of the braintree_payments library against the
+    Braintree Sandbox environment. Where possible he data we send to Braintree here is
+    the data the unit tests validate against.
     '''
 
     def _run_test(self, test_name, gateway):
@@ -139,10 +139,17 @@ class Command(BaseCommand):
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow failed for {}'.format(gateway)
 
-    def test_escrow_fresh(self, gateway):
+    def _create_escrow_payment(self, gateway):
         payment = self._create_payment()
-        payment = gateway.escrow(payment)
+        return gateway.escrow(payment)
+
+    def test_escrow_fresh(self, gateway):
+        payment = self._create_escrow_payment(gateway)
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow_fresh failed for {}'.format(gateway)
 
-
+    def test_refund(self, gateway):
+        payment = self._create_escrow_payment(gateway)
+        payment = gateway.refund(payment)
+        if not payment.status == models.Payment.HELD_IN_ESCROW:
+            print 'test_refund failed for {}'.format(gateway)
