@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 
 from . import Car, UserAccount, Driver
 import datetime
+from idlecars import model_helpers
 
 
 class Booking(models.Model):
@@ -29,6 +30,8 @@ class Booking(models.Model):
     return_time = models.DateTimeField(null=True, blank=True)           # RETURNED
     refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
     incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
+
+    base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
 
     REASON_ANOTHER_BOOKED = 1
     REASON_OWNER_REJECTED = 2
