@@ -97,7 +97,7 @@ class Booking(models.Model):
         from server.services import booking as booking_service
         super(Booking, self).clean()
         if self.pk:
-            orig = self.load_from_db()
+            orig = Booking.objects.get(pk=self.pk)
             if self.approval_time and not orig.approval_time:
                 booking_service.on_insurance_approved(self)
 
