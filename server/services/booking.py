@@ -54,8 +54,11 @@ def on_documents_approved(driver):
         return
 
     for booking in bookings:
-        request_insurance(booking)
+        request_base_letter(booking)
 
+def request_base_letter(booking):
+    #TODO: send street team email to get base letter
+    pass
 
 def someone_else_booked(booking):
     booking.incomplete_time = timezone.now()
@@ -228,7 +231,7 @@ def checkout(booking):
             conflicting_booking = someone_else_booked(conflicting_booking)
 
         if booking.driver.documentation_approved:
-            return request_insurance(booking)
+            return request_base_letter(booking)
 
     return booking
 
