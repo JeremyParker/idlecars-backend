@@ -67,6 +67,7 @@ def someone_else_booked(booking):
 
 def request_insurance(booking):
     owner_emails.new_booking_email(booking)
+    driver_emails.awaiting_insurance_email(booking)
     booking.requested_time = timezone.now()
     booking.save()
     return booking

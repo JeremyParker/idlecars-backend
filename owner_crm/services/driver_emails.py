@@ -122,7 +122,7 @@ def flake_reminder(driver):
     print driver
 
 
-def documents_approved(booking):
+def awaiting_insurance_email(booking):
     if not booking.driver.email():
         return
     template_data = {
