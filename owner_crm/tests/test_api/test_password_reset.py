@@ -50,11 +50,12 @@ class PasswordResetTest(APITestCase):
         response = APIClient().patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_reset_fail_token_consumed(self):
-        self.password_reset.state = models.ConsumableToken.STATE_CONSUMED
-        self.password_reset.save()
-        response = self._make_request()
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    # TODO - put this back in when we consume tokens again
+    # def test_reset_fail_token_consumed(self):
+    #     self.password_reset.state = models.ConsumableToken.STATE_CONSUMED
+    #     self.password_reset.save()
+    #     response = self._make_request()
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reset_token_expired(self):
         # TODO - we should expire the token after a couple of hours
