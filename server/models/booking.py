@@ -101,6 +101,9 @@ class Booking(models.Model):
         super(Booking, self).clean()
         if self.pk:
             orig = Booking.objects.get(pk=self.pk)
+            if self.base_letter and not orig.base_letter:
+                booking_service.request_insurance(self)
+
             if self.approval_time and not orig.approval_time:
                 booking_service.on_insurance_approved(self)
 
