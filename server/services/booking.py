@@ -229,8 +229,8 @@ def checkout(booking):
         for conflicting_booking in conflicting_pending_bookings:
             conflicting_booking = someone_else_booked(conflicting_booking)
 
-        if booking.driver.documentation_approved:
-            return request_base_letter(booking)
+        if booking.driver.documentation_approved and booking.driver.base_letter:
+            return request_insurance(booking)
 
     return booking
 

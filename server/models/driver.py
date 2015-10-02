@@ -70,6 +70,10 @@ class Driver(models.Model):
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
                 )
+        else if self.base_letter:
+            raise exceptions.ValidationError(
+                "You can't save base letter until all documents are approved."
+            )
 
     def save(self, *args, **kwargs):
         import server.services.driver
