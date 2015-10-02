@@ -71,6 +71,7 @@ class OwnerAdmin(admin.ModelAdmin):
         UserAccountForOwnerInline,
         CarInline,
     ]
+    filter_horizontal = ('auth_users',)
     fieldsets = (
         (None, {
             'fields': (
@@ -81,6 +82,7 @@ class OwnerAdmin(admin.ModelAdmin):
                 'address1',
                 'address2',
                 ('city', 'state_code', 'zipcode'),
+                'auth_users',
             )
         }),
     )
