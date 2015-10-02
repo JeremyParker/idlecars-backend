@@ -9,7 +9,8 @@ from idlecars import email, client_side_routes
 from server.services import car as car_service
 
 
-def documents_approved_no_booking(driver):
+def base_letter_approved_no_booking(driver):
+    #TODO: text in this email needs to be updated
     if not driver.email():
         return
     merge_vars = {

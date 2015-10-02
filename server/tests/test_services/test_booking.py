@@ -91,7 +91,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.payment_set.last().status, models.Payment.PRE_AUTHORIZED)
 
     def _checkout_approved_driver(self):
-        driver = factories.ApprovedDriver.create()
+        driver = factories.BaseLetterDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=driver)
         new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
@@ -174,11 +174,15 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.pickup(new_booking)
         self._check_payments_after_pickup(new_booking)
 
-    def test_documents_approved_no_booking(self):
-        self.driver = factories.CompletedDriver.create()
-        self.driver.documentation_approved = True
+    def test_base_letter_approved_no_booking(self):
+        self.driver = factories.ApprovedDriver.create()
+        self.assertFalse(self.driver.base_letter_rejected)
+        self.assertEqual(self.driver.base_letter, '')
+
+        self.driver.base_letter = 'some base letter'
         self.driver.save()
 
+        # we should have sent driver an email telling them about the to book a car
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
@@ -202,7 +206,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 3)
 
     def test_cancel_requested_booking(self):
-        approved_driver = factories.ApprovedDriver.create()
+        approved_driver = factories.BaseLetterDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
         new_booking = booking_service.checkout(new_booking)
         booking_service.cancel(new_booking)
