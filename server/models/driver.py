@@ -59,10 +59,6 @@ class Driver(models.Model):
 
     def clean(self, *args, **kwargs):
         super(Driver, self).clean()
-        if self.pk:
-            orig = Driver.objects.get(pk=self.pk)
-            if self.base_letter and not orig.base_letter:
-                booking_service.request_insurance(self)
 
         if self.documentation_approved:
             if not self.all_docs_uploaded():

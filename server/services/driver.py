@@ -35,6 +35,9 @@ def documents_changed(original, modified):
 def pre_save(modified_driver):
     if modified_driver.pk is not None:
         orig = server.models.Driver.objects.get(pk=modified_driver.pk)
+        if self.base_letter and not orig.base_letter:
+            server.services.booking.request_insurance(self)
+
         if documents_changed(orig, modified_driver):
             modified_driver.documentation_approved = False
             if modified_driver.all_docs_uploaded():
