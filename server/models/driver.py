@@ -20,6 +20,7 @@ class Driver(models.Model):
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+    base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
 
     braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -58,6 +59,10 @@ class Driver(models.Model):
 
     def clean(self, *args, **kwargs):
         super(Driver, self).clean()
+        if self.pk:
+            orig = Driver.objects.get(pk=self.pk)
+            if self.base_letter and not orig.base_letter:
+                booking_service.request_insurance(self)
 
         if self.documentation_approved:
             if not self.all_docs_uploaded():

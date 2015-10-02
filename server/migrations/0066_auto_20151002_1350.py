@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='booking',
+            model_name='driver',
             name='base_letter',
             field=idlecars.model_helpers.StrippedCharField(max_length=300, blank=True),
         ),

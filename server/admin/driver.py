@@ -62,6 +62,7 @@ class DriverAdmin(ReverseModelAdmin):
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
+                ('base_letter','base_letter_link'),
             )
         }),
         ('None', {
@@ -76,6 +77,7 @@ class DriverAdmin(ReverseModelAdmin):
         'fhv_link',
         'dd_link',
         'poa_link',
+        'base_letter_link',
     ]
     inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
@@ -106,3 +108,9 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
     poa_link.short_description = ''
     poa_link.allow_tags = True
+
+    def base_letter_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
+    base_letter_link.short_description = ''
+    base_letter_link.allow_tags = True
+
