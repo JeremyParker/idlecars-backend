@@ -62,6 +62,7 @@ class DriverAdmin(ReverseModelAdmin):
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
+                ('base_letter_rejected'),
                 ('base_letter','base_letter_link'),
             )
         }),

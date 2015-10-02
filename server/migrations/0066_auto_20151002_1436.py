@@ -17,6 +17,11 @@ class Migration(migrations.Migration):
             name='base_letter',
             field=idlecars.model_helpers.StrippedCharField(max_length=300, blank=True),
         ),
+        migrations.AddField(
+            model_name='driver',
+            name='base_letter_rejected',
+            field=models.BooleanField(default=False, verbose_name='base letter rejected'),
+        ),
         migrations.AlterField(
             model_name='owner',
             name='service_percentage',

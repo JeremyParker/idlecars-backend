@@ -47,18 +47,15 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
-def on_documents_approved(driver):
+def on_base_letter_approved(driver):
     bookings = filter_reserved(Booking.objects.filter(driver=driver))
     if not bookings:
-        driver_emails.documents_approved_no_booking(driver)
+        driver_emails.base_letter_approved_no_booking(driver)
         return
 
     for booking in bookings:
-        request_base_letter(booking)
+        request_insurance(booking)
 
-def request_base_letter(booking):
-    #TODO: send street team email to get base letter
-    pass
 
 def someone_else_booked(booking):
     booking.incomplete_time = timezone.now()

@@ -20,7 +20,9 @@ class Driver(models.Model):
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+
     base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
+    base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 
     braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -70,9 +72,14 @@ class Driver(models.Model):
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
                 )
-        else if self.base_letter:
+        elif self.base_letter:
             raise exceptions.ValidationError(
                 "You can't save base letter until all documents are approved."
+            )
+
+        if self.base_letter and self.base_letter_rejected:
+            raise exceptions.ValidationError(
+                "Base letter should be either approved or rejected."
             )
 
     def save(self, *args, **kwargs):

@@ -35,8 +35,12 @@ def documents_changed(original, modified):
 def pre_save(modified_driver):
     if modified_driver.pk is not None:
         orig = server.models.Driver.objects.get(pk=modified_driver.pk)
-        if self.base_letter and not orig.base_letter:
-            server.services.booking.request_insurance(self)
+        if modified_driver.base_letter and not orig.base_letter:
+            server.services.booking.on_base_letter_approved(modified_driver)
+
+        if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
+            #TODO: do something after driver fail to get base letter
+            driver_emails.base_letter_rejected(modified_driver)
 
         if documents_changed(orig, modified_driver):
             modified_driver.documentation_approved = False
@@ -44,7 +48,7 @@ def pre_save(modified_driver):
                 ops_emails.documents_uploaded(modified_driver)
 
         if modified_driver.documentation_approved and not orig.documentation_approved:
-            server.services.booking.on_documents_approved(modified_driver)
+            driver_emails.request_base_letter(modified_driver)
 
     return modified_driver
 

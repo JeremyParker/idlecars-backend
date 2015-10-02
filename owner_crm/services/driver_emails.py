@@ -132,6 +132,18 @@ def documents_approved(booking):
     )
 
 
+def request_base_letter(driver):
+    if not driver.email():
+        return
+    #TODO: send street team email to get base letter
+
+
+def base_letter_rejected(driver):
+    if not driver.email():
+        return
+    #TODO: send something to driver
+
+
 def insurance_approved(booking):
     if not booking.driver.email():
         return
