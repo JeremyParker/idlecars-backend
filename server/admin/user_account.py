@@ -19,8 +19,5 @@ class UserAccountForOwnerInline(admin.StackedInline):
             )
         }),
     )
-    # If there are 0 user_accounts, show an extra inline form for entry
     def get_extra(self, request, obj=None, **kwargs):
-        if obj:
-            return 0
-        return 1
+        return 0
