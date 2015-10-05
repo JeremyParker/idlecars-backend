@@ -97,6 +97,11 @@ class OwnerAdmin(admin.ModelAdmin):
         'merchant_account_state',
     ]
     search_fields = [
+        # TDOO - free ourselves from user_account alltogether
+        'user_account__last_name',
+        'user_account__first_name',
+        'user_account__phone_number',
+        'user_account__email',
         'auth_users__last_name',
         'auth_users__first_name',
         'auth_users__username',
