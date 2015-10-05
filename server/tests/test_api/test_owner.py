@@ -19,7 +19,7 @@ class GetOwnerTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        self.owner = factories.AuthOwner.create()
+        self.owner =  factories.Owner.create()
         # Include an appropriate `Authorization:` header on all requests.
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -43,7 +43,7 @@ class GetOwnerTest(APITestCase):
         )
 
     def test_get_another_owner(self):
-        other_owner = factories.AuthOwner.create()
+        other_owner =  factories.Owner.create()
         self.url = reverse('server:owners-detail', args=(other_owner.pk,))
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -53,7 +53,7 @@ class BankLinkTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        self.owner = factories.AuthOwner.create()
+        self.owner =  factories.Owner.create()
         # Include an appropriate `Authorization:` header on all requests.
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -99,7 +99,7 @@ class BankLinkTest(APITestCase):
             raise e
 
     def test_fail_add_account_to_another(self):
-        other_owner = factories.AuthOwner.create()
+        other_owner =  factories.Owner.create()
         self.assertFalse(other_owner.merchant_id)
         other_url = reverse('server:owners-bank-link', args=(other_owner.pk,))
         response = self.client.post(

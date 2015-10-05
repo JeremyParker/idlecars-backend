@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
+from django.contrib.auth.models import User
 
 import idlecars.client_side_routes
 import server.models
@@ -51,8 +52,8 @@ class TestOwnerNotifications(TestCase):
         # validate that the merge vars are being set correctly:
         for message in outbox:
             email = message.merge_vars.keys()[0]
-            user = server.models.UserAccount.objects.get(email=email)
-            car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
+            user = User.objects.get(email=email)
+            car = server.models.Owner.objects.get(auth_users=user).cars.all()[0]
             renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 

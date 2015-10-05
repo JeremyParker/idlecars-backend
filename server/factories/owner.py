@@ -24,7 +24,6 @@ class Owner(Factory):
     user_account = RelatedFactory(UserAccountFactory, 'owner')
 
 
-class AuthOwner(Owner):
     @post_generation
     def auth_user(self, create, value, **kwargs):
         auth_user = AuthUser.create(password='password')
