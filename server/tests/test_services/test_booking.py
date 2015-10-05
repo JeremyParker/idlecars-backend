@@ -180,6 +180,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(self.driver.base_letter, '')
 
         self.driver.base_letter = 'some base letter'
+        self.driver.clean()
         self.driver.save()
 
         # we should have sent driver an email telling them about the to book a car

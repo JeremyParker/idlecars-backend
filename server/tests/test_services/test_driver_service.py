@@ -6,6 +6,7 @@ from braintree.test.nonces import Nonces
 from django.utils import timezone
 from django.test import TestCase
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from server.services import driver as driver_service
 from server.services import booking as booking_service
@@ -75,19 +76,32 @@ class DriverServiceTest(TestCase):
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
-    # def test_base_letter_approved_no_booking(self):
-    #     self.driver = factories.CompletedDriver.create()
-    #     self.driver.documentation_approved = True
-    #     self.driver.save()
-    #
-    #     from django.core.mail import outbox
-    #     self.assertEqual(len(outbox), 1)
-    #
-    #     self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-    #     self.assertEqual(
-    #         outbox[0].subject,
-    #         'Welcome to idlecars, {}!'.format(self.driver.full_name())
-    #     )
+
+    def test_base_letter_approved_no_docs_approved(self):
+        self.driver = factories.CompletedDriver.create()
+        self.assertEqual(self.driver.base_letter, '')
+        self.driver.base_letter = 'some base letter'
+        with self.assertRaises(ValidationError):
+            self.driver.clean()
+
+
+    def test_base_letter_approved_no_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        self.driver.documentation_approved = True
+        self.driver.base_letter = 'some base letter'
+        self.driver.clean()
+        self.driver.save()
+
+        from django.core.mail import outbox
+        # should be 2 emails once we setup street team email
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to idlecars, {}!'.format(self.driver.full_name())
+        )
+
 
     def test_base_letter_approved_pending_booking(self):
         self.driver = factories.CompletedDriver.create()
@@ -96,6 +110,7 @@ class DriverServiceTest(TestCase):
 
         new_booking.driver.documentation_approved = True
         new_booking.driver.base_letter = 'some base letter'
+        new_booking.driver.clean()
         new_booking.driver.save()
 
         # still in the PENDING state because they never checked out
@@ -114,6 +129,7 @@ class DriverServiceTest(TestCase):
             "Welcome to idlecars, {}!".format(self.driver.full_name())
         )
 
+
     def test_base_letter_approved_reserved_booking(self):
         self.driver = factories.PaymentMethodDriver.create()
         new_booking = factories.ReservedBooking.create(driver=self.driver)
@@ -125,6 +141,7 @@ class DriverServiceTest(TestCase):
         # THEN the documents are approved
         new_booking.driver.documentation_approved = True
         new_booking.driver.base_letter = 'some base letter'
+        new_booking.driver.clean()
         new_booking.driver.save()
 
         from django.core.mail import outbox
@@ -138,7 +155,6 @@ class DriverServiceTest(TestCase):
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
+
     def test_base_letter_rejected(self):
         pass
-
-

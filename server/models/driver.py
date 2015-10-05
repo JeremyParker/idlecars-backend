@@ -8,6 +8,7 @@ from django.core import exceptions
 from idlecars import model_helpers, fields
 
 
+
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_approved = models.BooleanField(
@@ -81,6 +82,16 @@ class Driver(models.Model):
             raise exceptions.ValidationError(
                 "Base letter should be either approved or rejected."
             )
+
+        orig = Driver.objects.get(pk=self.pk)
+        if self.base_letter and not orig.base_letter:
+            import server.services.booking
+            server.services.booking.on_base_letter_approved(self)
+
+        if self.base_letter_rejected and not orig.base_letter_rejected:
+            #TODO: do something after driver fail to get base letter
+            import owner_crm.services.driver_emails
+            owner_crm.services.driver_emails.base_letter_rejected(self)
 
     def save(self, *args, **kwargs):
         import server.services.driver
