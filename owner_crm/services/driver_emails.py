@@ -248,6 +248,12 @@ def car_rented_elsewhere(booking):
     )
 
 
+def checkout_recipt(booking):
+    if not booking.driver.email():
+        return
+    #TODO: text needs to be updated
+
+
 def someone_else_booked(booking):
     if not booking.driver.email():
         return

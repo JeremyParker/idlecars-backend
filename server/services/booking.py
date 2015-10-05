@@ -234,6 +234,8 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
+        driver_emails.checkout_recipt(booking)
+
     return booking
 
 
