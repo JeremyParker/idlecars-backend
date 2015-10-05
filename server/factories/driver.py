@@ -11,6 +11,7 @@ class Driver(Factory):
     class Meta:
         model = 'server.Driver'
     documentation_approved = False
+    base_letter_rejected = False
     auth_user = SubFactory(AuthUser, password='password')
 
 
@@ -33,3 +34,7 @@ class PaymentMethodDriver(CompletedDriver):
 
 class ApprovedDriver(PaymentMethodDriver):
     documentation_approved = True
+
+
+class BaseLetterDriver(ApprovedDriver):
+    base_letter = LazyAttribute(lambda o: faker.url())

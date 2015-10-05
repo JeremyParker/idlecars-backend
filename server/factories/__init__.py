@@ -6,7 +6,7 @@ from user import AuthUser, StaffUser
 from owner import Owner, BankAccountOwner
 from make_model import MakeModel, MakeModelWithImage, MakeModelWithImages
 from car import Car, BookableCar, CarExpiredListing, CompleteCar
-from driver import Driver, CompletedDriver, PaymentMethodDriver, ApprovedDriver
+from driver import Driver, CompletedDriver, PaymentMethodDriver, ApprovedDriver, BaseLetterDriver
 from payment import Payment, PreAuthorizedPayment, SettledPayment, FailedPayment
 from booking import Booking, ReservedBooking, RequestedBooking, AcceptedBooking, BookedBooking
 from booking import ReturnedBooking, RefundedBooking, IncompleteBooking
