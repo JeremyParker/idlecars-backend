@@ -5,21 +5,6 @@ from django.contrib import admin
 
 from server import models
 
-class UserAccountForDriverInline(admin.StackedInline):
-    model = models.UserAccount
-    verbose_name = "Contact Info"
-    fieldsets = (
-        (None, {
-            'fields': (
-                ('first_name', 'last_name'),
-                ('phone_number'),
-                ('email'),
-            )
-        }),
-    )
-    def get_extra(self, request, obj=None, **kwargs):
-        return 0
-
 
 class UserAccountForOwnerInline(admin.StackedInline):
     model = models.UserAccount
