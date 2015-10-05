@@ -9,7 +9,8 @@ from idlecars import email, client_side_routes
 from server.services import car as car_service
 
 
-def documents_approved_no_booking(driver):
+def base_letter_approved_no_booking(driver):
+    #TODO: text in this email needs to be updated
     if not driver.email():
         return
     merge_vars = {
@@ -24,6 +25,26 @@ def documents_approved_no_booking(driver):
     email.send_async(
         template_name='one_button_no_image',
         subject='Welcome to idlecars, {}!'.format(driver.full_name()),
+        merge_vars=merge_vars,
+    )
+
+
+def base_letter_approved_no_checkout(driver):
+    if not driver.email():
+        return
+    #TODO: text in this email needs to be updated
+    merge_vars = {
+        driver.email(): {
+            'FNAME': driver.first_name(),
+            'HEADLINE': 'Your documents have been reviewed and approved.',
+            'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
+            'CTA_LABEL': 'Rent a car now',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='No checkout, {}!'.format(driver.full_name()),
         merge_vars=merge_vars,
     )
 
@@ -146,6 +167,18 @@ def awaiting_insurance_email(booking):
         subject='Your documents have been reviewed and approved',
         merge_vars=merge_vars,
     )
+
+
+def request_base_letter(driver):
+    if not driver.email():
+        return
+    #TODO: send street team email to get base letter
+
+
+def base_letter_rejected(driver):
+    if not driver.email():
+        return
+    #TODO: send something to driver
 
 
 def insurance_approved(booking):

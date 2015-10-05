@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             name='PaymentMethod',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('gateway_name', models.CharField(max_length=16)),
+                ('gateway_name', models.CharField(max_length=16, null=True)),
                 ('gateway_token', models.CharField(max_length=256)),
                 ('suffix', models.CharField(max_length=4)),
                 ('card_type', models.CharField(max_length=32)),

@@ -37,11 +37,12 @@ def pre_save(modified_driver):
         orig = server.models.Driver.objects.get(pk=modified_driver.pk)
         if documents_changed(orig, modified_driver):
             modified_driver.documentation_approved = False
+            modified_driver.base_letter = ''
             if modified_driver.all_docs_uploaded():
                 ops_emails.documents_uploaded(modified_driver)
 
         if modified_driver.documentation_approved and not orig.documentation_approved:
-            server.services.booking.on_documents_approved(modified_driver)
+            driver_emails.request_base_letter(modified_driver)
 
     return modified_driver
 
