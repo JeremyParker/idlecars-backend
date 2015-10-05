@@ -56,7 +56,7 @@ class Owner(models.Model):
         if self.company_name:
             return self.company_name
         sorted_users = sorted(self.auth_users.all(), key=attrgetter('last_name'))
-        return ', '.join([' '.join([u.first_name, u.last_name]) for u in sorted_users])
+        return ', '.join([u.get_full_name() for u in sorted_users])
 
     def get_user_attr(self, attrib):
         # get a value from the associated User, or return '', or 'multiple values'
