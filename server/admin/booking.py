@@ -17,7 +17,6 @@ class BookingAdmin(admin.ModelAdmin):
                 ('driver_link', 'driver_phone', 'driver_email',),
                 ('car_link', 'car_plate', 'car_cost', 'effective_service_percentage',),
                 ('owner_link', 'owner_phone', 'owner_email',),
-                ('base_letter','base_letter_link'),
             ),
         }),
         ('State History', {
@@ -66,7 +65,6 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_link',
         'driver_phone',
         'driver_email',
-        'base_letter_link',
         'created_time',
         # 'checkout_time',
         # 'requested_time',
@@ -165,10 +163,6 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
 
-    def base_letter_link(self, instance):
-        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
-    base_letter_link.short_description = ''
-    base_letter_link.allow_tags = True
 
 
 class BookingInlineBase(admin.TabularInline):

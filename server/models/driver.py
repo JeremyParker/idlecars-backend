@@ -8,6 +8,7 @@ from django.core import exceptions
 from idlecars import model_helpers, fields
 
 
+
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_approved = models.BooleanField(
@@ -20,6 +21,9 @@ class Driver(models.Model):
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+
+    base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
+    base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 
     braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -69,6 +73,25 @@ class Driver(models.Model):
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
                 )
+        elif self.base_letter:
+            raise exceptions.ValidationError(
+                "You can't save base letter until all documents are approved."
+            )
+
+        if self.base_letter and self.base_letter_rejected:
+            raise exceptions.ValidationError(
+                "Base letter should be either approved or rejected."
+            )
+
+        orig = Driver.objects.get(pk=self.pk)
+        if self.base_letter and not orig.base_letter:
+            import server.services.booking
+            server.services.booking.on_base_letter_approved(self)
+
+        if self.base_letter_rejected and not orig.base_letter_rejected:
+            #TODO: do something after driver fail to get base letter
+            import owner_crm.services.driver_emails
+            owner_crm.services.driver_emails.base_letter_rejected(self)
 
     def save(self, *args, **kwargs):
         import server.services.driver

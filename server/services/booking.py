@@ -47,18 +47,19 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
-def on_documents_approved(driver):
-    bookings = filter_reserved(Booking.objects.filter(driver=driver))
-    if not bookings:
-        driver_emails.documents_approved_no_booking(driver)
+def on_base_letter_approved(driver):
+    reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
+    pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
+    if not pending_bookings and not reserved_bookings:
+        driver_emails.base_letter_approved_no_booking(driver)
         return
 
-    for booking in bookings:
-        request_base_letter(booking)
+    for booking in pending_bookings:
+        driver_emails.base_letter_approved_no_checkout(driver)
 
-def request_base_letter(booking):
-    #TODO: send street team email to get base letter
-    pass
+    for booking in reserved_bookings:
+        request_insurance(booking)
+
 
 def someone_else_booked(booking):
     booking.incomplete_time = timezone.now()
@@ -229,8 +230,8 @@ def checkout(booking):
         for conflicting_booking in conflicting_pending_bookings:
             conflicting_booking = someone_else_booked(conflicting_booking)
 
-        if booking.driver.documentation_approved:
-            return request_base_letter(booking)
+        if booking.driver.documentation_approved and booking.driver.base_letter:
+            return request_insurance(booking)
 
     return booking
 
