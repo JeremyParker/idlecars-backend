@@ -68,8 +68,8 @@ class E2ETestSetup():
         '''
             Create 3 users(1 staff user)
         '''
-        self.user_owner = server.factories.UserAccount.create(
-            phone_number='9876543210',
+        self.user_owner = server.factories.AuthUser.create(
+            username='9876543210',
             email='craig@test.com',
             first_name='Craig',
             last_name='List'
@@ -91,9 +91,8 @@ class E2ETestSetup():
             Create an owner
         '''
         owner = server.factories.Owner.create()
-        self.user_owner.owner = owner
-        self.user_owner.save()
-        _, self.owner_auth_user = owner_service.invite_legacy_owner(self.user_owner.phone_number)
+        owner.auth_users.add(self.user_owner)
+        self.owner_auth_user = owner_service.invite_legacy_owner(self.user_owner.username)
 
     def _setup_booking(self):
         '''

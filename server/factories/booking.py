@@ -5,7 +5,7 @@ from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import BookableCar, ApprovedDriver, UserAccount
+from server.factories import BookableCar, ApprovedDriver
 
 class Booking(Factory):
     class Meta:

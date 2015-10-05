@@ -17,7 +17,6 @@ from owner_crm.tests import sample_merge_vars
 class BookingServiceTest(TestCase):
     def setUp(self):
         owner = factories.Owner.create(state_code='NY')
-        user_account = factories.UserAccount.create(owner=owner)
 
         make_model = factories.MakeModel.create()
         self.car = factories.Car.create(

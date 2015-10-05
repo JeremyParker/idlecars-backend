@@ -55,34 +55,23 @@ class Owner(models.Model):
     def name(self):
         if self.company_name:
             return self.company_name
-        # TODO - free ourselves from the user_account alltogether
-        names = sorted(self.user_account.all(), key=attrgetter('last_name'))
-        return ', '.join([u.full_name() for u in names])
+        sorted_users = sorted(self.auth_users.all(), key=attrgetter('last_name'))
+        return ', '.join([' '.join([u.first_name, u.last_name]) for u in sorted_users])
 
-    def get_user_account_attr(self, attrib):
+    def get_user_attr(self, attrib):
         # get a value from the associated User, or return '', or 'multiple values'
         users = self.auth_users.all()
         if users.count() == 1:
             return getattr(users.first(), attrib)
         elif users.count() > 1:
             return 'multiple values'
-
-        # TODO - free ourselves from the user_account alltogether
-        users = self.user_account.all()
-        if users.count() == 1:
-            if attrib == 'username':
-                attrib = 'phone_number'
-            return getattr(self.user_account.get(), attrib)
-        elif users.count() > 1:
-            return 'multiple values'
-
         return ''
 
     def phone_number(self):
-        return self.get_user_account_attr('username')
+        return self.get_user_attr('username')
 
     def email(self):
-        return self.get_user_account_attr('email')
+        return self.get_user_attr('email')
 
     def __unicode__(self):
         name = self.name()

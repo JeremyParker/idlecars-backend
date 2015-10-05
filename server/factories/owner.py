@@ -21,7 +21,6 @@ class Owner(Factory):
     zipcode = LazyAttribute(lambda o: faker.zipcode())
     rating = random.choice(owner_model.RATING)[0]
 
-class AuthOwner(Owner):
     @post_generation
     def auth_user(self, create, value, **kwargs):
         auth_user = AuthUser.create(password='password')
