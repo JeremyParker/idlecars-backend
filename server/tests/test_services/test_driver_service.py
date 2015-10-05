@@ -126,7 +126,7 @@ class DriverServiceTest(TestCase):
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
         self.assertEqual(
             outbox[1].subject,
-            "Welcome to idlecars, {}!".format(self.driver.full_name())
+            "No checkout, {}!".format(self.driver.full_name())
         )
 
 

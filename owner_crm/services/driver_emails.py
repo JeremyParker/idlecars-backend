@@ -29,6 +29,26 @@ def base_letter_approved_no_booking(driver):
     )
 
 
+def base_letter_approved_no_checkout(driver):
+    if not driver.email():
+        return
+    #TODO: text in this email needs to be updated
+    merge_vars = {
+        driver.email(): {
+            'FNAME': driver.first_name(),
+            'HEADLINE': 'Your documents have been reviewed and approved.',
+            'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
+            'CTA_LABEL': 'Rent a car now',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='No checkout, {}!'.format(driver.full_name()),
+        merge_vars=merge_vars,
+    )
+
+
 def _missing_documents_text(driver):
     from server.services import driver as driver_service
     doc_names = driver_service.get_missing_docs(driver)

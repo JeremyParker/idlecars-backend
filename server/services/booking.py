@@ -48,12 +48,16 @@ def filter_visible(booking_queryset):
 
 
 def on_base_letter_approved(driver):
-    bookings = filter_reserved(Booking.objects.filter(driver=driver))
-    if not bookings:
+    reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
+    pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
+    if not pending_bookings and not reserved_bookings:
         driver_emails.base_letter_approved_no_booking(driver)
         return
 
-    for booking in bookings:
+    for booking in pending_bookings:
+        driver_emails.base_letter_approved_no_checkout(driver)
+
+    for booking in reserved_bookings:
         request_insurance(booking)
 
 
