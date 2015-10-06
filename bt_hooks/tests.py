@@ -25,7 +25,7 @@ class WebhookTest(TestCase):
     def setUp(self):
         self.client = Client()  # Reinitialize the client to turn off CSRF
         _configure_braintree()
-        self.owner = factories.AuthOwner.create(
+        self.owner =  factories.Owner.create(
             merchant_id='test_id',
             merchant_account_state=Owner.BANK_ACCOUNT_PENDING,
         )
