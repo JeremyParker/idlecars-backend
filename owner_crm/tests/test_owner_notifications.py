@@ -15,6 +15,7 @@ import owner_crm.factories
 from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 
+from server.services import owner_service
 
 class TestOwnerNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
@@ -70,5 +71,4 @@ class TestOwnerNotifications(TestCase):
         car = self._setup_car_with_update_time(last_update)
         owner_crm.models.Renewal.objects.create(car=car, pk=666)
 
-        command = owner_notifications.Command()
-        self.assertFalse(command._renewable_cars())
+        self.assertFalse(owner_service._renewable_cars())

@@ -115,7 +115,7 @@ def _docs_reminder_for_driver(driver):
     )
 
 
-def _documents_reminder(driver):
+def documents_reminder(driver):
     if not driver.email() or driver.all_docs_uploaded():
         return
 
@@ -128,15 +128,15 @@ def _documents_reminder(driver):
 
 
 def first_documents_reminder(driver):
-    _documents_reminder(driver)
+    documents_reminder(driver)
 
 
 def second_documents_reminder(driver):
-    _documents_reminder(driver)
+    documents_reminder(driver)
 
 
 def third_documents_reminder(driver):
-    _documents_reminder(driver)
+    documents_reminder(driver)
 
 
 def flake_reminder(driver):

@@ -12,7 +12,7 @@ class TestDriverEmails(TestCase):
     def test_documents_reminder_with_no_missing_docs(self):
         '''
         make sure reminders email is robust enough that it doesn't crash
-        if there's driver will all docs uploaded for some reason
+        if there's driver with all docs uploaded for some reason
         '''
         driver = factories.CompletedDriver.create()
         driver_emails.documents_reminder(driver)
