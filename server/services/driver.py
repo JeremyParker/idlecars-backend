@@ -77,17 +77,17 @@ def send_document_reminders(docs_reminder_delay_hours, reminder_name):
 
 
 def process_driver_emails():
-    driver_service.send_document_reminders(
+    send_document_reminders(
       docs_reminder_delay_hours=1,
       reminder_name='first_documents_reminder'
     )
-    driver_service.send_document_reminders(
+    send_document_reminders(
       docs_reminder_delay_hours=24,
       reminder_name='second_documents_reminder'
     )
-    driver_service.send_document_reminders(
+    send_document_reminders(
       docs_reminder_delay_hours=36,
       reminder_name='third_documents_reminder'
     )
 
-    driver_service.send_flake_reminders(flake_reminder_delay_hours=48)
+    send_flake_reminders(flake_reminder_delay_hours=48)
