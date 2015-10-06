@@ -22,6 +22,6 @@ class Command(BaseCommand):
         for phone_number in phone_numbers:
             try:
                 auth_user = owner_service.invite_legacy_owner(phone_number)
-                self.stdout.write('Invite sent to {} for {}.\n'.format(auth_user.email, auth_user.phone_number))
+                self.stdout.write('Invite sent to {} for {}.\n'.format(auth_user.email, auth_user.username))
             except Owner.DoesNotExist:
                 self.stdout.write('ERROR inviting {}. Owner or User didn\'t exist.\n'.format(phone_number))
