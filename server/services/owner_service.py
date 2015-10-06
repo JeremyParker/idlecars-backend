@@ -8,8 +8,9 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 
-from owner_crm.services import password_reset_service, owner_emails, ops_emails, throttle_service
+from owner_crm.services import password_reset_service, driver_emails, owner_emails, ops_emails, throttle_service
 from owner_crm.models import Renewal
 
 from server.models import Booking, Owner, UserAccount
@@ -61,6 +62,12 @@ def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
 def _send_too_slow_email(too_slow_reminder_delay_hours):
     remindable_bookings = _get_remindable_bookings(too_slow_reminder_delay_hours)
     throttle_service.send_to_queryset(remindable_bookings, owner_emails.insurance_too_slow)
+    throttle_service.send_to_queryset(remindable_bookings, driver_emails.insurance_failed)
+
+    for booking in remindable_bookings:
+        booking.incomplete_time = timezone.now()
+        booking.incomplete_reason = Booking.REASON_INSURANCE_TOO_SLOW
+        booking.save()
 
 
 def _reminder_email():
@@ -91,6 +98,7 @@ def _reminder_email():
             reminder_name='second_afternoon_insurance_reminder'
         )
         _send_too_slow_email(delay_hours+48)
+
 
 def process_owner_emails():
     _renewal_email()

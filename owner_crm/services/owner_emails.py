@@ -97,6 +97,22 @@ def new_booking_email(booking):
         )
 
 
+def first_morning_insurance_reminder(booking):
+    pass
+
+
+def second_morning_insurance_reminder(booking):
+    pass
+
+
+def first_afternoon_insurance_reminder(booking):
+    pass
+
+
+def second_afternoon_insurance_reminder(booking):
+    pass
+
+
 def _booking_incomplete_email(booking, body_text):
     headline = '{} has decided not to rent your {}, with license plate {}'.format(
         booking.driver.full_name(),
@@ -143,6 +159,10 @@ def driver_rejected(booking):
         booking.car.display_name(),
     )
     _booking_incomplete_email(booking, text)
+
+
+def insurance_too_slow(booking):
+    pass
 
 
 def insurance_follow_up_email(booking):

@@ -226,6 +226,10 @@ def insurance_rejected(booking):
     )
 
 
+def insurance_failed(booking):
+    pass
+
+
 def car_rented_elsewhere(booking):
     if not booking.driver.email():
         return
