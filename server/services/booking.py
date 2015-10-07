@@ -300,9 +300,6 @@ def cron_payments():
             ops_emails.payment_job_failed(booking, e)
             continue
 
-        if not payment.status == Payment.SETTLED:
-            ops_emails.payment_failed(payment)
-
 
 def start_time_display(booking):
     def _format_date(date):

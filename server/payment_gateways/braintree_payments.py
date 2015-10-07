@@ -8,6 +8,7 @@ from django.conf import settings
 
 from server import models
 
+
 UNABLE_TO_ADD_DRIVER = 'Sorry, we couldn\'t add you to our system. We\'ll look into the problem and get back to you.'
 EXPIRED_CARD_MSG = 'Sorry, it looks like your credit card has expired. Let\'s try another one'
 UNSUPPORTED_PAYMENT_METHOD = 'Sorry, we\'re not accepting that form of payment right now. Try a credit card.'
@@ -62,7 +63,9 @@ def _parse_card_info(payment_method):
 
 def _parse_error(response):
     message = PAYMENT_DECLINED_MSG
+    details = ''
     try:
+        details = unicode(response.transaction.__dict__)
         status = response.transaction.status
         if status == 'gateway_rejected':
             error = response.transaction.gateway_rejection_reason
@@ -98,8 +101,7 @@ def _parse_error(response):
     except Exception:
         message = NETWORK_DOWN_MSG
 
-    # TODO - send ops an email?
-    return message
+    return message, details
 
 
 def initialize_gateway(driver):
@@ -166,7 +168,8 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
             card_info = _parse_card_info(payment_method)
             return True, card_info
     else:
-        return False, _parse_error(response)
+        message, _ = _parse_error(response)  # TODO - log the details somehow
+        return False, message
 
 
 def _transaction_request(payment):
@@ -198,7 +201,7 @@ def pre_authorize(payment):
         payment.error_message = ''
     else:
         payment.status = models.Payment.DECLINED
-        payment.error_message = _parse_error(response)
+        payment.error_message, payment.notes = _parse_error(response)
 
     return payment
 
@@ -217,7 +220,7 @@ def void(payment):
         payment.error_message = ''
     else:
         payment.status = models.Payment.DECLINED
-        payment.error_message = _parse_error(response)
+        payment.error_message, payment.notes = _parse_error(response)
     return payment
 
 
@@ -245,7 +248,7 @@ def settle(payment):
         payment.error_message = ''
     else:
         payment.status = models.Payment.DECLINED
-        payment.error_message = _parse_error(response)
+        payment.error_message, payment.notes = _parse_error(response)
     return payment
 
 
@@ -279,7 +282,7 @@ def escrow(payment):
         payment.error_message = ''
     else:
         payment.status = models.Payment.DECLINED
-        payment.error_message = _parse_error(response)
+        payment.error_message, payment.notes = _parse_error(response)
     return payment
 
 
@@ -291,5 +294,5 @@ def refund(payment):
             payment.status = models.Payment.REFUNDED
             payment.error_message = ''
         else:
-            payment.error_message = _parse_error(response)
+            payment.error_message, payment.notes = _parse_error(response)
     return payment

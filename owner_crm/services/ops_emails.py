@@ -77,9 +77,10 @@ def payment_failed(payment):
         settings.OPS_EMAIL: {
             'FNAME': 'peeps',
             'HEADLINE': 'A payment failed',
-            'TEXT': 'the driver with phone {} failed to pay for {}'.format(
+            'TEXT': 'the driver with phone {} failed to pay for {}. The server response was:<br>{}'.format(
                 payment.booking.driver.phone_number(),
-                payment.invoice_description()
+                payment.invoice_description(),
+                payment.notes,
             ),
             'CTA_LABEL': 'Payment details',
             'CTA_URL': 'https://www.idlecars.com{}'.format(
@@ -89,7 +90,7 @@ def payment_failed(payment):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='A payment failed.',
+        subject='Payment {} for a {} failed.'.format(payment, payment.booking.car),
         merge_vars=merge_vars,
     )
 
