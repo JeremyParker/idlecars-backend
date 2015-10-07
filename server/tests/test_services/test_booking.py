@@ -170,6 +170,9 @@ class BookingServiceTest(TestCase):
         gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
         new_booking = booking_service.pickup(new_booking)
 
+        # make sure there's a declined payment in there
+        self.assertTrue(models.Payment.DECLINED in [p.status for p in new_booking.payment_set.all()])
+
         # successfully pick up the car
         new_booking = booking_service.pickup(new_booking)
         self._check_payments_after_pickup(new_booking)
