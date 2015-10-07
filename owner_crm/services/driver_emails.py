@@ -140,7 +140,8 @@ def third_documents_reminder(driver):
 
 
 def flake_reminder(driver):
-    print driver
+    #TODO: this should not be documents_reminder. just for the convience of test
+    documents_reminder(driver)
 
 
 def awaiting_insurance_email(booking):
