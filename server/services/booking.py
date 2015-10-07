@@ -16,6 +16,12 @@ from server.services import car as car_service
 from server.payment_gateways import braintree_payments
 
 
+class BookingError(Exception):
+    pass
+
+CANCELATION_ERROR = 'There was a problem processing your cancalation. Please call Idlecars at 844-435-3227.'
+
+
 def filter_pending(booking_queryset):
     return booking_queryset.filter(
         checkout_time__isnull=True,
@@ -115,11 +121,16 @@ def can_cancel(booking):
 
 
 def cancel(booking):
+    if not can_cancel(booking):
+        raise BookingError('Sorry, your rental can\'t be canceled at this time.')
+
     if Booking.REQUESTED == booking.get_state():
         owner_emails.booking_canceled(booking)
 
     for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
         payment_service.void(payment)
+        if payment.error_message:
+            raise BookingError(CANCELATION_ERROR)
 
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = Booking.REASON_CANCELED
@@ -211,10 +222,11 @@ def can_checkout(booking):
 
 def checkout(booking):
     if not can_checkout(booking):
-        raise Exception("Booking cannot be checked out in its current state")
+        raise BookingError("Sorry, your rental can\'t be checked out at this time")
 
     payment = _make_deposit_payment(booking)
-    # TODO - handle all the error cases
+    if payment.error_message:
+        raise BookingError(payment.error_message)
 
     if payment.status == Payment.PRE_AUTHORIZED:
         booking.checkout_time = timezone.now()
@@ -241,33 +253,38 @@ def can_pickup(booking):
 
 
 def pickup(booking):
+    '''
+    Warning: this method might change the booking even if it's unsuccessful. Caller should
+    reload the object before relying on its data.
+    '''
+    if not can_pickup(booking):
+        raise BookingError('Sorry, your rental can\'t be picked up at this time.')
+
     # NB: we don't save() the booking unless successful...
     booking.pickup_time = timezone.now()
     if not booking.end_time:
         booking.end_time = calculate_end_time(booking)
 
     deposit_payment = _find_deposit_payment(booking) or _make_deposit_payment(booking)
-    # TODO - error handling with message to the user
+    if deposit_payment.error_message:
+        raise BookingError(deposit_payment.error_message)
 
     # pre-authorize the payment for the first week's rent
     rent_payment = _create_next_rent_payment(booking)
     rent_payment = payment_service.pre_authorize(rent_payment)
     if rent_payment.status != Payment.PRE_AUTHORIZED:
-        # TODO - error handling with message to the user
-        return booking
+        raise BookingError(rent_payment.error_message)
 
     # hold the deposit in escrow for the duration of the rental
     if deposit_payment.status is not Payment.HELD_IN_ESCROW:
         deposit_payment = payment_service.escrow(deposit_payment)
     if deposit_payment.status != Payment.HELD_IN_ESCROW:
-        # TODO - error handling with message to the user
-        return booking
+        raise BookingError(deposit_payment.error_message)
 
     # take payment for the first week's rent
     rent_payment = payment_service.settle(rent_payment)
     if rent_payment.status != Payment.SETTLED:
-        # TODO - error handling with message to the user
-        return booking
+        raise BookingError(rent_payment.error_message)
 
     # copy the time of day from the pickup time to the booking end time. Until now it had none.
     booking.end_time = booking.end_time.replace(
@@ -295,10 +312,12 @@ def cron_payments():
         try:
             payment = _create_next_rent_payment(booking)
             payment = payment_service.settle(payment)
+            if payment.error_message:
+                print payment.error_message
+                print payment.notes
         except Exception as e:
             print e
             ops_emails.payment_job_failed(booking, e)
-            continue
 
 
 def start_time_display(booking):

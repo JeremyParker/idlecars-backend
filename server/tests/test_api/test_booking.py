@@ -192,7 +192,7 @@ class BookingStepTest(APITestCase):
 
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
         checkout_response = self.client.post(checkout_url, data={})
-        self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(checkout_response.status_code, status.HTTP_201_CREATED)
         self.booking.refresh_from_db()
         self._checked_out_docs_unapproved()
 
@@ -206,7 +206,7 @@ class BookingStepTest(APITestCase):
 
         checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
         checkout_response = self.client.post(checkout_url, data={})
-        self.assertEqual(checkout_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(checkout_response.status_code, status.HTTP_201_CREATED)
         self.booking.refresh_from_db()
         self._checked_out_docs_approved()
 
@@ -238,7 +238,7 @@ class BookingStepTest(APITestCase):
         # next the driver picks up the car
         pickup_url = reverse('server:bookings-pickup', args=(self.booking.pk,))
         pickup_response = self.client.post(pickup_url, data={})
-        self.assertEqual(pickup_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(pickup_response.status_code, status.HTTP_201_CREATED)
         self._in_progress_booking()
 
     def _in_progress_booking(self):

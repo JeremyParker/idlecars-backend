@@ -24,7 +24,7 @@ class CancelBookingTest(APITestCase):
 
     def test_cancel_booking_success(self):
         response = self.client.post(self.url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.booking = Booking.objects.get(pk=self.booking.pk)
         self.assertEqual(self.booking.get_state(), Booking.INCOMPLETE)
         self.assertEqual(self.booking.incomplete_reason, Booking.REASON_CANCELED)

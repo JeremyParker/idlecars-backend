@@ -95,11 +95,11 @@ def payment_failed(payment):
     )
 
 
-def payment_job_failed(booking, exception):
+def payment_job_failed(booking, message):
     merge_vars = {
         settings.OPS_EMAIL: {
             'FNAME': 'people',
-            'HEADLINE': 'The payment job threw a {}'.format(exception),
+            'HEADLINE': 'The payment job threw a {}'.format(message),
             'TEXT': 'the auto-payment job ran into a problem while processing payment for the booking {}'.format(
                 booking,
             ),
@@ -111,7 +111,7 @@ def payment_job_failed(booking, exception):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='The payment job threw an exception.',
+        subject='The payment job failed.',
         merge_vars=merge_vars,
     )
 
