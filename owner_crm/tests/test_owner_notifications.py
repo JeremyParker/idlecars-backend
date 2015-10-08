@@ -16,6 +16,10 @@ import owner_crm.factories
 from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 
+from server.services import owner_service
+
+from freezegun import freeze_time
+
 
 class TestOwnerNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
@@ -71,5 +75,99 @@ class TestOwnerNotifications(TestCase):
         car = self._setup_car_with_update_time(last_update)
         owner_crm.models.Renewal.objects.create(car=car, pk=666)
 
-        command = owner_notifications.Command()
-        self.assertFalse(command._renewable_cars())
+        self.assertFalse(owner_service._renewable_cars())
+
+    def _new_requested_booking(self, create_time):
+        with freeze_time(create_time):
+            return server.factories.RequestedBooking.create()
+
+    @freeze_time("2015-10-11 10:00:00")
+    def test_owner_reminder(self):
+        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0) # should be 1. not yet set up
+        # self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        # self.assertEqual(
+        #     outbox[0].subject,
+        #     '')
+        # )
+
+    @freeze_time("2015-10-11 10:00:00")
+    def test_no_booking(self):
+        call_command('owner_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2015-10-11 10:00:00")
+    def test_no_email_twice(self):
+        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+
+        call_command('driver_notifications')
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0) #should be 1
+
+    def test_only_requested_bookings_send_reminder(self):
+        with freeze_time("2015-10-10 18:00:00"):
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.AcceptedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        with freeze_time("2015-10-11 10:00:00"):
+            call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_reminder_emails_morning_until_failure(self):
+        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+
+        with freeze_time("2015-10-11 10:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-11 17:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-12 10:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-12 17:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-13 10:00:00"):
+            call_command('owner_notifications')
+
+        #TODO: we will have owner reminder email once the text ready
+        '''
+            - message to owner: first morning reminder
+            - message to owner: first afternoon reminder
+            - message to owner: second morning reminder
+            - message to owner: second afternoon reminder
+            - message to owner: insurance too slow reminder
+            - message to driver: insurance failed reminder
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0) #should be 6
+
+    def test_reminder_emails_afternoon_until_failure(self):
+        self.booking = self._new_requested_booking("2015-10-10 23:00:00")
+
+        with freeze_time("2015-10-11 17:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-12 10:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-12 17:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-13 10:00:00"):
+            call_command('owner_notifications')
+        with freeze_time("2015-10-13 17:00:00"):
+            call_command('owner_notifications')
+
+        #TODO: we will have owner reminder email once the text ready
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0) #should be 6

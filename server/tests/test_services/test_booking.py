@@ -100,11 +100,23 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.solo_deposit)
         return new_booking
 
+    def test_checkout_recipt(self):
+        pass
+        # driver = factories.ApprovedDriver.create()
+        # new_booking = factories.Booking.create(car=self.car, driver=driver)
+        # new_booking = booking_service.checkout(new_booking)
+
+        # from django.core.mail import outbox
+        # self.assertEqual(len(outbox), 1)
+
+
+
+
     def test_checkout_docs_approved(self):
         new_booking = self._checkout_approved_driver()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 2)
 
         # an email to the owner to get the driver on insurance
         self.assertEqual(outbox[0].merge_vars.keys()[0], new_booking.car.owner.email())
@@ -112,7 +124,13 @@ class BookingServiceTest(TestCase):
             outbox[0].subject,
             'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
-        # TODO we should send an email to the driver telling them what happened
+
+        # an email to the driver that insurance is in progress
+        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[1].subject,
+            'Congratulations! Your documents have been submitted!'
+        )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_with_others_too_slow(self):
@@ -123,7 +141,7 @@ class BookingServiceTest(TestCase):
         new_booking = self._checkout_approved_driver()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
+        self.assertEqual(len(outbox), 3)
 
         # an email to the other driver to know their car is no longer available
         self.assertEqual(outbox[0].merge_vars.keys()[0], other_driver.email())
@@ -137,6 +155,13 @@ class BookingServiceTest(TestCase):
         self.assertEqual(
             outbox[1].subject,
             'A driver has booked your {}.'.format(new_booking.car.display_name())
+        )
+
+        # an email to the driver that insurance is in progress
+        self.assertEqual(outbox[2].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[2].subject,
+            'Congratulations! Your documents have been submitted!'
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
@@ -219,12 +244,13 @@ class BookingServiceTest(TestCase):
         ''' we should have sent
         - message to ops about the initial booking
         - message to the owner to send the insurance docs,
+        - message to the driver to notify the booking was sent to insurance,
         - message to the owner to cancel the insurance request.
         - message to ops when the booking was canceled,
         - message to the driver to confirm the booking was canceled,
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 5)
+        self.assertEqual(len(outbox), 6)
 
     def test_correct_start_time(self):
         driver = factories.Driver.create()

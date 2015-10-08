@@ -1,9 +1,6 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
-
-from django.utils import timezone
 from django.test import TestCase
 
 from idlecars import client_side_routes
@@ -14,6 +11,7 @@ from owner_crm.models import PasswordReset
 from server import factories
 from server.services import owner_service
 from server.models import Owner
+
 
 
 class OwnerInvitationTest(TestCase):
