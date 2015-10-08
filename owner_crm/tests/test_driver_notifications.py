@@ -33,7 +33,7 @@ class TestDriverNotifications(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
         self.assertEqual(
             outbox[0].subject,
-            'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
+            'Your {} is waiting on your driver documents'.format(self.booking.car.display_name())
         )
 
     @freeze_time("2015-10-10 11:00:00")

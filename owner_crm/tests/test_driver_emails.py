@@ -15,7 +15,7 @@ class TestDriverEmails(TestCase):
         if there's driver with all docs uploaded for some reason
         '''
         driver = factories.CompletedDriver.create()
-        driver_emails.documents_reminder(driver)
+        driver_emails.first_documents_reminder(driver)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)

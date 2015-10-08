@@ -61,22 +61,21 @@ def _missing_documents_text(driver):
     return docs
 
 
-def _render_booking_reminder_body(booking):
+def _render_booking_reminder_body(booking, body_template):
     docs = _missing_documents_text(booking.driver)
     template_data = {
         'CAR_NAME': booking.car.display_name(),
         'DOCS_LIST': docs,
     }
-    return render_to_string("docs_reminder_booking.jade", template_data, Context(autoescape=False))
+    return render_to_string(body_template, template_data, Context(autoescape=False))
 
 
-def _docs_reminder_for_booking(booking):
-    body = _render_booking_reminder_body(booking)
+def _docs_reminder_for_booking(booking, subject, body_template):
     cta_url = client_side_routes.doc_upload_url()
     merge_vars = {
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
-            'TEXT': body,
+            'TEXT': _render_booking_reminder_body(booking, body_template),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': cta_url,
             'HEADLINE': 'Your {} is waiting'.format(booking.car.display_name()),
@@ -85,24 +84,24 @@ def _docs_reminder_for_booking(booking):
     }
     email.send_async(
         template_name='one_button_one_image',
-        subject='Your {} is waiting on your driving documents'.format(booking.car.display_name()),
+        subject=subject,
         merge_vars=merge_vars,
     )
 
 
-def _render_driver_reminder_body(driver):
+def _render_driver_reminder_body(driver, body_template):
     docs = _missing_documents_text(driver)
     template_data = {
         'DOCS_LIST': docs,
     }
-    return render_to_string("docs_reminder_driver.jade", template_data, Context(autoescape=False))
+    return render_to_string(body_template, template_data, Context(autoescape=False))
 
 
-def _docs_reminder_for_driver(driver):
+def _docs_reminder_for_driver(driver, subject, body_template):
     merge_vars = {
         driver.email(): {
             'FNAME': driver.first_name() or None,
-            'TEXT': _render_driver_reminder_body(driver),
+            'TEXT': _render_driver_reminder_body(driver, body_template),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': client_side_routes.doc_upload_url(),
             'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
@@ -110,38 +109,75 @@ def _docs_reminder_for_driver(driver):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Welcome to idlecars. Don\'t forget to upload your documents.',
+        subject=subject,
         merge_vars=merge_vars,
     )
 
 
-def documents_reminder(driver):
+def documents_reminder(driver, subject, body_template):
     if not driver.email() or driver.all_docs_uploaded():
         return
 
     pending_bookings = driver.booking_set.all()
+
     if pending_bookings:
         booking = pending_bookings.order_by('created_time').last()
-        _docs_reminder_for_booking(booking)
+        subject[0] = subject[0].format(booking.car.display_name())
+        _docs_reminder_for_booking(booking, subject[0], body_template[0])
     else:
-        _docs_reminder_for_driver(driver)
+        _docs_reminder_for_driver(driver, subject[1], body_template[1])
 
 
 def first_documents_reminder(driver):
-    documents_reminder(driver)
+    subject = [
+        'Your {} is waiting on your driver documents',
+        'Submit your documents now so you are ready to drive later.'
+    ]
+    body_template = [
+        'first_docs_reminder_booking.jade',
+        'first_docs_reminder_driver.jade'
+    ]
+
+    documents_reminder(driver, subject, body_template)
 
 
 def second_documents_reminder(driver):
-    documents_reminder(driver)
+    subject = [
+        'Your {} is still waiting on your driver documents',
+        'Are you ready to drive?'
+    ]
+    body_template = [
+        'second_docs_reminder_booking.jade',
+        'second_docs_reminder_driver.jade'
+    ]
+
+    documents_reminder(driver, subject, body_template)
 
 
 def third_documents_reminder(driver):
-    documents_reminder(driver)
+    subject = [
+        'Don’t miss your booking, submit your driver documents',
+        'Submit your documents now so you are ready to drive later.'
+    ]
+    body_template = [
+        'third_docs_reminder_booking.jade',
+        'third_docs_reminder_driver.jade'
+    ]
+
+    documents_reminder(driver, subject, body_template)
 
 
 def flake_reminder(driver):
-    #TODO: this should not be documents_reminder. just for the convience of test
-    documents_reminder(driver)
+    subject = [
+        'Your booking has been cancelled because we don\'t have your driver documents',
+        'Submit your documents now so you are ready to drive later.'
+    ]
+    body_template = [
+        'flake_reminder_booking.jade',
+        'flake_reminder_driver.jade'
+    ]
+
+    documents_reminder(driver, subject, body_template)
 
 
 def awaiting_insurance_email(booking):
