@@ -37,6 +37,13 @@ def filter_reserved(booking_queryset):
         incomplete_time__isnull=True,
     )
 
+def filter_requested(booking_queryset):
+    return booking_queryset.filter(
+        requested_time__isnull=False,
+        approval_time__isnull=True,
+        incomplete_time__isnull=True,
+    )
+
 def filter_booked(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=True,
@@ -130,14 +137,11 @@ def cancel(booking):
     if Booking.REQUESTED == booking.get_state():
         owner_emails.booking_canceled(booking)
 
-    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
-        payment_service.void(payment)
-        if payment.error_message:
-            raise BookingError(payment.error_message)
-
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = Booking.REASON_CANCELED
     booking.save()
+
+    _void_all_payments(booking)
 
     ops_emails.booking_canceled(booking)
     driver_emails.booking_canceled(booking)
@@ -151,6 +155,13 @@ def _make_deposit_payment(booking):
     )
     payment = payment_service.pre_authorize(payment)
     return payment
+
+
+def _void_all_payments(booking):
+    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
+        payment_service.void(payment)
+        if payment.error_message:
+            raise BookingError(payment.error_message)
 
 
 def find_deposit_payment(booking):
@@ -307,7 +318,7 @@ def pickup(booking):
     return booking
 
 
-def cron_payments():
+def _cron_payments():
     payment_lead_time_hours = 2  # TODO - get this out of a config system
     pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
@@ -327,6 +338,31 @@ def cron_payments():
         except Exception as e:
             print e
             ops_emails.payment_job_failed(booking, e)
+
+
+def _booking_updates():
+    ''' Update the state of bookings based on the passing of time '''
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=60)  # TODO: from config
+    remindable_bookings = filter_requested(Booking.objects.all()).filter(
+        requested_time__lte=reminder_threshold,
+    )
+    for booking in remindable_bookings:
+        try:
+            _void_all_payments(booking)
+
+            booking.incomplete_time = timezone.now()
+            booking.incomplete_reason = Booking.REASON_INSURANCE_TOO_SLOW
+            booking.save()
+
+            owner_emails.insurance_too_slow(booking)
+            driver_emails.insurance_failed(booking)
+        except BookingError:
+            pass  # ops will get an email about the payment failure, and
+
+
+def cron_job():
+    _booking_updates()
+    _cron_payments()
 
 
 def start_time_display(booking):

@@ -58,12 +58,16 @@ def get_missing_docs(driver):
 
 def _get_remindable_drivers(delay_hours):
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
-
     return server.models.Driver.objects.filter(
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
     )
-
+    # TODO - try to .exclude(
+    #     driver_license_image!='',
+    #     fhv_license_image!='',
+    #     address_proof_image!='',
+    #     defensive_cert_image!='',
+    # )
 
 def send_flake_reminders(flake_reminder_delay_hours):
     remindable_drivers = _get_remindable_drivers(flake_reminder_delay_hours)

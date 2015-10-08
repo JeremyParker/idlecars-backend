@@ -29,7 +29,7 @@ class Car(models.Model):
         default=1,
     )
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
-    YEARS = [(y, unicode(y)) for y in range((datetime.datetime.now().year+1), 1995, -1)]
+    YEARS = [(y, unicode(y)) for y in range((timezone.now().year+1), 1995, -1)]
     year = models.IntegerField(choices=YEARS, blank=True, null=True)
     plate = models.CharField(max_length=24, blank=True)
     base = models.CharField(max_length=64, blank=True)

@@ -10,4 +10,4 @@ class Command(BaseCommand):
     help = 'Checks if its time to make any payments, and makes payments if necessary'
 
     def handle(self, *args, **options):
-        booking_service.cron_payments()
+        booking_service.cron_job()

@@ -16,7 +16,11 @@ from owner_crm.models import Renewal
 from server.models import Booking, Owner
 from server.services import auth_user as auth_user_service
 from server.services import car as car_service
+from server.services import  booking as booking_service
 from server import payment_gateways
+
+#TODO: poke_frequency should be from setting, or config
+POKE_FREQUENCY = 60 #minutes
 
 
 def _renewable_cars():
@@ -36,21 +40,15 @@ def _renewal_email():
 
 
 def _in_time(threshold):
-    #TODO: poke_frequency should be from setting
-    poke_frequency = 15 #minutes
-    timedelta = datetime.timedelta(minutes=poke_frequency)/2
-    return threshold - timedelta < datetime.datetime.now() < threshold + timedelta
+    timedelta = datetime.timedelta(minutes=POKE_FREQUENCY)
+    return threshold - timedelta/2 < timezone.now() < threshold + timedelta/2
 
 
 def _get_remindable_bookings(delay_hours):
+    ''' returns booking queryset that were requested more than delay_hours ago '''
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
-
-    return Booking.objects.filter(
+    return booking_service.filter_requested(Booking.objects.all()).filter(
         requested_time__lte=reminder_threshold,
-        checkout_time__isnull=False,
-        requested_time__isnull=False,
-        approval_time__isnull=True,
-        incomplete_time__isnull=True,
     )
 
 
@@ -59,22 +57,10 @@ def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
     throttle_service.send_to_queryset(remindable_bookings, eval('owner_emails.' + reminder_name))
 
 
-def _send_too_slow_email(too_slow_reminder_delay_hours):
-    remindable_bookings = _get_remindable_bookings(too_slow_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_bookings, owner_emails.insurance_too_slow)
-    throttle_service.send_to_queryset(remindable_bookings, driver_emails.insurance_failed)
-
-    for booking in remindable_bookings:
-        booking.incomplete_time = timezone.now()
-        booking.incomplete_reason = Booking.REASON_INSURANCE_TOO_SLOW
-        booking.save()
-
-
 def _reminder_email():
-    #TODO: hour, minute and delay_hours should be from settings
-    morning_threshold = datetime.datetime.now().replace(hour=10, minute=0)
-    afternoon_threshold = datetime.datetime.now().replace(hour=17, minute=0)
-
+    # TODO: hour, minute and delay_hours should be from settings
+    morning_threshold = timezone.now().replace(hour=10, minute=0)
+    afternoon_threshold = timezone.now().replace(hour=17, minute=0)
     delay_hours = 12
 
     if _in_time(morning_threshold):
@@ -86,7 +72,6 @@ def _reminder_email():
             insurance_reminder_delay_hours=delay_hours+24,
             reminder_name='second_morning_insurance_reminder'
         )
-        _send_too_slow_email(delay_hours+48)
 
     elif _in_time(afternoon_threshold):
         _send_reminder_email(
@@ -97,7 +82,6 @@ def _reminder_email():
             insurance_reminder_delay_hours=delay_hours+24,
             reminder_name='second_afternoon_insurance_reminder'
         )
-        _send_too_slow_email(delay_hours+48)
 
 
 def process_owner_emails():

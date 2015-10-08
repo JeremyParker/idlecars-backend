@@ -136,14 +136,19 @@ class TestOwnerNotifications(TestCase):
 
         with freeze_time("2015-10-11 10:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-11 17:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-12 10:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-12 17:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-13 10:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
 
         #TODO: we will have owner reminder email once the text ready
         '''
@@ -162,14 +167,19 @@ class TestOwnerNotifications(TestCase):
 
         with freeze_time("2015-10-11 17:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-12 10:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-12 17:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-13 10:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-13 17:00:00"):
             call_command('owner_notifications')
+            call_command('cron_job')
 
         #TODO: we will have owner reminder email once the text ready
         from django.core.mail import outbox
