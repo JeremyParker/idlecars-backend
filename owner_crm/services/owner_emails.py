@@ -30,7 +30,7 @@ def renewal_email(car, renewal):
     body = _render_renewal_body(car)
     car_desc = car.display_name()
 
-    for user in car.owner.user_account.all():
+    for user in car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {
@@ -62,7 +62,7 @@ def new_booking_email(booking):
     Please have him added to the insurance policy today to ensure
     they are able to start driving tomorrow.'''.format(booking.driver.first_name())
 
-    for user in booking.car.owner.user_account.all():
+    for user in booking.car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {
@@ -98,7 +98,7 @@ def new_booking_email(booking):
 
 
 def first_morning_insurance_reminder(booking):
-    for user in booking.car.owner.user_account.all():
+    for user in booking.car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {
@@ -121,7 +121,7 @@ def first_morning_insurance_reminder(booking):
 
 
 def second_morning_insurance_reminder(booking):
-    for user in booking.car.owner.user_account.all():
+    for user in booking.car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {
@@ -162,7 +162,7 @@ def _booking_incomplete_email(booking, body_text):
         booking.car.plate,
     )
     subject = 'Your {} booking has canceled.'.format(booking.car.display_name())
-    for user in booking.car.owner.user_account.all():
+    for user in booking.car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {
@@ -204,7 +204,7 @@ def driver_rejected(booking):
 
 
 def insurance_too_slow(booking):
-    for user in booking.car.owner.user_account.all():
+    for user in booking.car.owner.auth_users.all():
         if not user.email:
             continue
         merge_vars = {

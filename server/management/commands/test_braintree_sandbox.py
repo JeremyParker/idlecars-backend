@@ -41,12 +41,19 @@ class Command(BaseCommand):
             self._run_test('test_add_bank_account_individual', g)
             self._run_test('test_add_bank_account_business', g)
             self._run_test('test_add_payment_method', g)
+            self._run_test('test_add_payment_method_error', g)
+            self._run_test('test_pre_authorize_error', g)
             self._run_test('test_pre_authorize', g)
             self._run_test('test_void', g)
             self._run_test('test_settle', g)
+            self._run_test('test_settle_fresh_error', g)
             self._run_test('test_settle_fresh', g)
             self._run_test('test_escrow', g)
             self._run_test('test_escrow_fresh', g)
+            self._run_test('test_escrow_fresh_error', g)
+
+            # This test is not working right now. Status has to be "Settled". We can't fake that.
+            # self._run_test('test_refund', g)
 
             self.owner.delete()
             self.driver.delete()
@@ -94,6 +101,20 @@ class Command(BaseCommand):
             unique_number_identifier=unique_number_identifier,
         )
 
+    def test_add_payment_method_error(self, gateway):
+        # we have to fake it for the fake gatway :(
+        if gateway is payment_gateways.get_gateway('fake'):
+            gateway.next_payment_method_response = (False, 'Some fake error',)
+
+        success, info = gateway.add_payment_method(
+            self.driver,
+            test_braintree_params.INVALID_PAYMENT_METHOD_NONCE,
+        )
+        if success:
+            print 'test_add_payment_method_error failed to return False in {}'.format(gateway)
+        if not isinstance(info, unicode):
+            print 'test_add_payment_method_error failed to return an error string in {}'.format(gateway)
+
     def _create_payment(self):
         '''
         This is a setUp method for a bunch of the tests below.
@@ -103,6 +124,16 @@ class Command(BaseCommand):
         dollar_amount = '9.{}'.format(randint(1, 99)) # change so the gateway won't reject as dupe.
         return services.payment.create_payment(booking, dollar_amount)
 
+    def _create_error_payment(self, gateway):
+        # we have to handle each gateway separately :(
+        if gateway is payment_gateways.get_gateway('fake'):
+            next_response = (models.Payment.DECLINED, 'This transaction was declined by the fake gateway.',)
+            gateway.next_payment_response.append(next_response)
+
+        car = factories.BookableCar.create(owner=self.owner)
+        booking = factories.Booking.create(car=car, driver=self.driver, service_percentage='0.000')
+        return services.payment.create_payment(booking, '2078.00')
+
     def test_pre_authorize(self, gateway):
         payment = self._create_payment()
         payment = gateway.pre_authorize(payment)
@@ -110,6 +141,14 @@ class Command(BaseCommand):
             print 'test_pre_authorize failed to authorize for {}'.format(gateway)
         if not payment.transaction_id:
             print 'test_pre_authorize failed to get a transaction id for {}'.format(gateway)
+
+    def test_pre_authorize_error(self, gateway):
+        payment = self._create_error_payment(gateway)
+        payment = gateway.pre_authorize(payment)
+        if not payment.error_message:
+            print '() test_pre_authorize_error: No error message!'.format(gateway)
+        if payment.status != models.Payment.DECLINED:
+            print '{} test_pre_authorize_error: Payment state != DECLINED'.format(gateway)
 
     def test_void(self, gateway):
         payment = self._create_payment()
@@ -125,6 +164,14 @@ class Command(BaseCommand):
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle failed to settle for {}'.format(gateway)
 
+    def test_settle_fresh_error(self, gateway):
+        payment = self._create_error_payment(gateway)
+        payment = gateway.settle(payment)
+        if not payment.error_message:
+            print '{} test_settle_error: No error message!'.format(gateway)
+        if payment.status != models.Payment.DECLINED:
+            print '{} test_settle_error: Payment state != DECLINED'.format(gateway)
+
     def test_settle_fresh(self, gateway):
         ''' create a payment and go straight to SETTLED (as opposed to pre-authorizing first)'''
         payment = self._create_payment()
@@ -135,9 +182,27 @@ class Command(BaseCommand):
     def test_escrow(self, gateway):
         payment = self._create_payment()
         payment = gateway.pre_authorize(payment)
+        if payment.error_message:
+            print 'test_escrow\'s pre_authorize call returned error{}'.format(payment.error_message)
+        if payment.status != models.Payment.PRE_AUTHORIZED:
+            print 'test_escrow\'s pre_authorize left status as {}'.format(payment.status)
+
         payment = gateway.escrow(payment)
+        if payment.error_message:
+            print 'test_escrow\'s escrow call returned error{}\n{}'.format(
+                payment.error_message,
+                payment.notes,
+            )
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow failed for {}'.format(gateway)
+
+    def test_escrow_fresh_error(self, gateway):
+        payment = self._create_error_payment(gateway)
+        payment = gateway.escrow(payment)
+        if not payment.error_message:
+            print '{} test_escrow_fresh_error: No error message!'.format(gateway)
+        if payment.status != models.Payment.DECLINED:
+            print '{} test_escrow_fresh_error: Payment state != DECLINED'.format(gateway)
 
     def _create_escrow_payment(self, gateway):
         payment = self._create_payment()
@@ -151,5 +216,5 @@ class Command(BaseCommand):
     def test_refund(self, gateway):
         payment = self._create_escrow_payment(gateway)
         payment = gateway.refund(payment)
-        if not payment.status == models.Payment.HELD_IN_ESCROW:
-            print 'test_refund failed for {}'.format(gateway)
+        if not payment.status == models.Payment.REFUNDED:
+            print 'test_refund failed with {} for {}'.format(payment.error_message, gateway)

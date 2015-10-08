@@ -183,13 +183,19 @@ class BookingServiceTest(TestCase):
     def test_pickup_after_failure(self):
         driver = factories.PaymentMethodDriver.create()
         new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+        self.assertEqual(new_booking.get_state(), models.Booking.ACCEPTED)
         self.assertEqual(len(new_booking.payment_set.all()), 1)
         self.assertEqual(new_booking.payment_set.first().status, models.Payment.PRE_AUTHORIZED)
 
         # fail to pick up the car
         next_response = (models.Payment.DECLINED, 'This transaction was declined for some reason.',)
         gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
-        new_booking = booking_service.pickup(new_booking)
+        with self.assertRaises(booking_service.BookingError):
+            new_booking = booking_service.pickup(new_booking)
+        new_booking.refresh_from_db()  # make sure our local copy is fresh. pickup() changed it.
+
+        # make sure there's a declined payment in there
+        self.assertTrue(models.Payment.DECLINED in [p.status for p in new_booking.payment_set.all()])
 
         # successfully pick up the car
         new_booking = booking_service.pickup(new_booking)
