@@ -52,7 +52,7 @@ class BookedBooking(AcceptedBooking):
     @post_generation
     def payment(self, create, count, **kwargs):
         for p in self.payment_set.all():
-            p.status = models.Payment.HELD_IN_ESCROW
+            p.status = Payment.HELD_IN_ESCROW
         SettledPayment.create(
             booking=self,
             amount=self.car.solo_deposit,

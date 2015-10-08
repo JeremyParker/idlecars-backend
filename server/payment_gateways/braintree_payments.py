@@ -49,6 +49,11 @@ def confirm_endpoint(challenge):
     return braintree.WebhookNotification.verify(challenge)
 
 
+def parse_webhook_notification(bt_signature, bt_payload):
+    _configure_braintree()
+    return braintree.WebhookNotification.parse(bt_signature, bt_payload)
+
+
 def link_bank_account(braintree_params):
     '''
     Returns success (bool), 'account_id', [error_fields], [error_messages]
