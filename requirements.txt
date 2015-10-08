@@ -1,5 +1,4 @@
 -e git://github.com/syrusakbary/pyjade.git@4dbd2ffd7ccdf20c7de6ad7dd8e6b0942bee50eb#egg=pyjade
-
 coverage==3.7.1
 dj-database-url==0.3.0
 dj-static==0.0.6
