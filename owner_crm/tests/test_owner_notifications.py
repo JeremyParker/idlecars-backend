@@ -85,15 +85,18 @@ class TestOwnerNotifications(TestCase):
     def test_owner_reminder(self):
         self.booking = self._new_requested_booking("2015-10-10 18:00:00")
 
-        call_command('driver_notifications')
+        call_command('owner_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0) # should be 1. not yet set up
-        # self.assertTrue(sample_merge_vars.check_template_keys(outbox))
-        # self.assertEqual(
-        #     outbox[0].subject,
-        #     '')
-        # )
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Has {} been accepted on the {}?'.format(
+                self.booking.driver.full_name(),
+                self.booking.car.display_name()
+            )
+        )
 
     @freeze_time("2015-10-11 10:00:00")
     def test_no_booking(self):
@@ -106,11 +109,11 @@ class TestOwnerNotifications(TestCase):
     def test_no_email_twice(self):
         self.booking = self._new_requested_booking("2015-10-10 18:00:00")
 
-        call_command('driver_notifications')
-        call_command('driver_notifications')
+        call_command('owner_notifications')
+        call_command('owner_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0) #should be 1
+        self.assertEqual(len(outbox), 1)
 
     def test_only_requested_bookings_send_reminder(self):
         with freeze_time("2015-10-10 18:00:00"):
@@ -123,7 +126,7 @@ class TestOwnerNotifications(TestCase):
             server.factories.IncompleteBooking.create()
 
         with freeze_time("2015-10-11 10:00:00"):
-            call_command('driver_notifications')
+            call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
@@ -152,7 +155,7 @@ class TestOwnerNotifications(TestCase):
             - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0) #should be 6
+        self.assertEqual(len(outbox), 6)
 
     def test_reminder_emails_afternoon_until_failure(self):
         self.booking = self._new_requested_booking("2015-10-10 23:00:00")
@@ -170,4 +173,4 @@ class TestOwnerNotifications(TestCase):
 
         #TODO: we will have owner reminder email once the text ready
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0) #should be 6
+        self.assertEqual(len(outbox), 6)

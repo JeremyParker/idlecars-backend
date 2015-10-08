@@ -270,7 +270,25 @@ def insurance_rejected(booking):
 
 
 def insurance_failed(booking):
-    pass
+    if not booking.driver.email():
+        return
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Sorry, We were unable to complete your booking.',
+            'TEXT': '''
+            We are sorry to inform you, but we were unable to get you in the {} due to an issue with the owner.
+            We ask that you go back to our site and choose another car. We sincerely apologize for any inconvenience.
+            '''.format(booking.car.display_name()),
+            'CTA_LABEL': 'Find a new car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+        }
+    }
+    email.send_async(
+        template_name='one_button_no_image',
+        subject='We were unable to complete your {} booking'.format(booking.car.display_name()),
+        merge_vars=merge_vars,
+    )
 
 
 def car_rented_elsewhere(booking):
@@ -283,6 +301,10 @@ def car_rented_elsewhere(booking):
             'TEXT': '''
             Sorry, someone else has already rented out the car you wanted. Sometimes that
             happens. Still, there are plenty more great cars available.
+            <br/>
+            Need help? Contact us:
+            support@idlecars.com
+            1 844 435 3227
             ''',
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),
@@ -298,7 +320,20 @@ def car_rented_elsewhere(booking):
 def checkout_recipt(booking):
     if not booking.driver.email():
         return
-    #TODO: text needs to be updated
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Your {} was successfully reserved'.format(booking.car.display_name()),
+            'TEXT': '''
+            We put a hold on your credit card for the “car” you booked. You will not be charged until you pick up your car.
+            ''',
+        }
+    }
+    email.send_async(
+        template_name='no_button_no_image',
+        subject='Your {} was successfully reserved'.format(booking.car.display_name()),
+        merge_vars=merge_vars,
+    )
 
 
 def someone_else_booked(booking):
