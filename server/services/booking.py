@@ -152,12 +152,16 @@ def _make_deposit_payment(booking):
     return payment
 
 
-def _find_deposit_payment(booking):
+def find_deposit_payment(booking):
+    potential_deposits = booking.payment_set.filter(
+            invoice_start_time__isnull=True,
+            invoice_end_time__isnull=True,
+        )
     try:
-        deposit_payment = booking.payment_set.get(status=Payment.PRE_AUTHORIZED)
+        deposit_payment = potential_deposits.get(status=Payment.PRE_AUTHORIZED)
     except Payment.DoesNotExist:
         try:
-            deposit_payment = booking.payment_set.get(status=Payment.SETTLED)
+            deposit_payment = potential_deposits.get(status=Payment.HELD_IN_ESCROW)
         except Payment.DoesNotExist:
             return None
     return deposit_payment
@@ -267,7 +271,7 @@ def pickup(booking):
     if not booking.end_time:
         booking.end_time = calculate_end_time(booking)
 
-    deposit_payment = _find_deposit_payment(booking) or _make_deposit_payment(booking)
+    deposit_payment = find_deposit_payment(booking) or _make_deposit_payment(booking)
     if deposit_payment.error_message:
         raise BookingError(deposit_payment.error_message)
 
