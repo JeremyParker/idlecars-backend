@@ -158,7 +158,7 @@ class DriverServiceTest(TestCase):
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
         self.assertEqual(
             outbox[1].subject,
-            'Your documents have been reviewed and approved'
+            'Congratulations! Your documents have been submitted!'
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))

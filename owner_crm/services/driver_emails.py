@@ -201,7 +201,7 @@ def awaiting_insurance_email(booking):
     }
     email.send_async(
         template_name='one_button_one_image',
-        subject='Your documents have been reviewed and approved',
+        subject='Congratulations! Your documents have been submitted!',
         merge_vars=merge_vars,
     )
 
