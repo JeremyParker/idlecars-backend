@@ -154,7 +154,7 @@ class TestOwnerNotifications(TestCase):
             - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 5) #should be 6
+        self.assertEqual(len(outbox), 6)
 
     def test_reminder_emails_afternoon_until_failure(self):
         self.booking = self._new_requested_booking("2015-10-10 23:00:00")
@@ -172,4 +172,4 @@ class TestOwnerNotifications(TestCase):
 
         #TODO: we will have owner reminder email once the text ready
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 5) #should be 6
+        self.assertEqual(len(outbox), 6)

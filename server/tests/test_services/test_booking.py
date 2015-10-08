@@ -101,16 +101,12 @@ class BookingServiceTest(TestCase):
         return new_booking
 
     def test_checkout_recipt(self):
-        pass
-        # driver = factories.ApprovedDriver.create()
-        # new_booking = factories.Booking.create(car=self.car, driver=driver)
-        # new_booking = booking_service.checkout(new_booking)
+        driver = factories.ApprovedDriver.create()
+        new_booking = factories.Booking.create(car=self.car, driver=driver)
+        new_booking = booking_service.checkout(new_booking)
 
-        # from django.core.mail import outbox
-        # self.assertEqual(len(outbox), 1)
-
-
-
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
 
     def test_checkout_docs_approved(self):
         new_booking = self._checkout_approved_driver()
