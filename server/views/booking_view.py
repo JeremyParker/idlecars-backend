@@ -6,9 +6,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from server import models
 from server.services import booking as booking_service
+from server.services.booking import BookingError
 from server.serializers import BookingSerializer, BookingDetailsSerializer
 from server.permissions import OwnsBooking
 
@@ -42,25 +44,27 @@ class BookingViewSet(
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def cancelation(self, request, pk=None):
         booking = self.get_object()
-        if not booking_service.can_cancel(booking):
-            raise ValidationError('Your rental can\'t be canceled at this time.')
-        serializer = self.get_serializer(booking_service.cancel(booking))
-        return Response(serializer.data)
+        try:
+            booking = booking_service.cancel(booking)
+            return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
+        except BookingError as booking_error:
+            return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def checkout(self, request, pk=None):
         booking = self.get_object()
-        if not booking_service.can_checkout(booking):
-            raise ValidationError('Your rental can\'t be reserved at this time.')
-        result_booking = booking_service.checkout(booking)
-        result_serializer = self.get_serializer(result_booking)
-        return Response(result_serializer.data)
+        try:
+            booking = booking_service.checkout(booking)
+            return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
+        except BookingError as booking_error:
+            return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def pickup(self, request, pk=None):
         booking = self.get_object()
-        if not booking_service.can_pickup(booking):
-            raise ValidationError('Your rental can\'t be picked up at this time.')
-        serializer = self.get_serializer(booking_service.pickup(booking))
-        return Response(serializer.data)
-
+        booking = self.get_object()
+        try:
+            booking = booking_service.pickup(booking)
+            return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
+        except BookingError as booking_error:
+            return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
