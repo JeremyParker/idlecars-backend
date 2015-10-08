@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from owner_crm.services import ops_emails
 from server import payment_gateways
 from server import models
 
+
+NO_PAYMENT_METHOD = 'Sorry, we don\'t have your payment method on file. Please add a credit card from your "My Account" page.'
 
 def create_payment(
     booking,
@@ -15,9 +18,17 @@ def create_payment(
     invoice_start_time=None,
     invoice_end_time=None
 ):
-    payment_method = booking.driver.paymentmethod_set.last() # TODO: store 'em all & make latest default
-    assert payment_method.driver == booking.driver
+    if booking.driver:
+        payment_method = booking.driver.paymentmethod_set.last() # TODO: store 'em all & make latest default
+    if not payment_method:
+        return models.Payment(
+            booking=booking,
+            error_message=NO_PAYMENT_METHOD,
+            amount=amount,
+            status=models.Payment.REJECTED,
+        )
 
+    assert payment_method.driver == booking.driver
     payment = models.Payment.objects.create(
         booking=booking,
         amount=amount,
@@ -38,6 +49,8 @@ def _execute(function, payment):
     func = getattr(gateway, function)
     payment = func(payment)
     payment.save()
+    if payment.error_message:
+        ops_emails.payment_failed(payment)
     return payment
 
 

@@ -17,6 +17,7 @@ class PaymentAdmin(admin.ModelAdmin):
                 ('created_time', 'amount', 'service_fee', 'payment_method',),
                 ('status', 'error_message',),
                 ('gateway_link',),
+                ('notes',),
             )
         }),
     )

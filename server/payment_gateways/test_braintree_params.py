@@ -14,6 +14,8 @@ be tested in an integration test to make sure they work against the Sandbox.
 
 VALID_ROUTING_NUMBER = '071101307'
 VALID_VISA_NONCE = Nonces.TransactableVisa
+INVALID_PAYMENT_METHOD_NONCE = Nonces.Consumed
+
 
 business_data = {
     'from_client': {
