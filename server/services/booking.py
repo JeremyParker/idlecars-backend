@@ -19,7 +19,9 @@ from server.payment_gateways import braintree_payments
 class BookingError(Exception):
     pass
 
-CANCELATION_ERROR = 'There was a problem processing your cancalation. Please call Idlecars at 844-435-3227.'
+CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at 844-435-3227.'
+PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
+CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 
 
 def filter_pending(booking_queryset):
@@ -122,7 +124,7 @@ def can_cancel(booking):
 
 def cancel(booking):
     if not can_cancel(booking):
-        raise BookingError('Sorry, your rental can\'t be canceled at this time.')
+        raise BookingError(CANCEL_ERROR)
 
     if Booking.REQUESTED == booking.get_state():
         owner_emails.booking_canceled(booking)
@@ -130,7 +132,7 @@ def cancel(booking):
     for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
         payment_service.void(payment)
         if payment.error_message:
-            raise BookingError(CANCELATION_ERROR)
+            raise BookingError(payment.error_message)
 
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = Booking.REASON_CANCELED
@@ -222,7 +224,7 @@ def can_checkout(booking):
 
 def checkout(booking):
     if not can_checkout(booking):
-        raise BookingError("Sorry, your rental can\'t be checked out at this time")
+        raise BookingError(CHECKOUT_ERROR)
 
     payment = _make_deposit_payment(booking)
     if payment.error_message:
@@ -258,7 +260,7 @@ def pickup(booking):
     reload the object before relying on its data.
     '''
     if not can_pickup(booking):
-        raise BookingError('Sorry, your rental can\'t be picked up at this time.')
+        raise BookingError(PICKUP_ERROR)
 
     # NB: we don't save() the booking unless successful...
     booking.pickup_time = timezone.now()

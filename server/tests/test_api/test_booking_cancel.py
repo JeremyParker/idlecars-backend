@@ -42,6 +42,7 @@ class CancelBookingTest(APITestCase):
         url = reverse('server:bookings-cancelation', args=(self.booking.pk,))
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsNotNone(response.data['_app_notifications'])
 
         # make sure the stored booking state is the same as original booking state
         stored_booking = Booking.objects.get(pk=self.booking.pk)

@@ -247,7 +247,7 @@ class BookingStepTest(APITestCase):
         self.assertFalse(response.data['start_time_estimated'])
 
 
-class CheckoutBookingTest(APITestCase):
+class ReservedBookingDetailsTest(APITestCase):
     def setUp(self):
         self.booking = factories.ReservedBooking.create()
 
@@ -264,8 +264,3 @@ class CheckoutBookingTest(APITestCase):
             response.data['next_payment'],
             {'amount': self.booking.car.solo_cost, 'end_time': end_time.strftime('%b %d')}
         )
-
-
-class PickupBookingTest(APITestCase):
-    # TODO
-    pass
