@@ -104,7 +104,7 @@ class Command(BaseCommand):
     def test_add_payment_method_error(self, gateway):
         # we have to fake it for the fake gatway :(
         if gateway is payment_gateways.get_gateway('fake'):
-            gateway.push_next_payment_response((False, 'Some fake error',))
+            gateway.next_payment_method_response = (False, 'Some fake error',)
 
         success, info = gateway.add_payment_method(
             self.driver,
@@ -182,7 +182,17 @@ class Command(BaseCommand):
     def test_escrow(self, gateway):
         payment = self._create_payment()
         payment = gateway.pre_authorize(payment)
+        if payment.error_message:
+            print 'test_escrow\'s pre_authorize call returned error{}'.format(payment.error_message)
+        if payment.status != models.Payment.PRE_AUTHORIZED:
+            print 'test_escrow\'s pre_authorize left status as {}'.format(payment.status)
+
         payment = gateway.escrow(payment)
+        if payment.error_message:
+            print 'test_escrow\'s escrow call returned error{}\n{}'.format(
+                payment.error_message,
+                payment.notes,
+            )
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow failed for {}'.format(gateway)
 
