@@ -55,7 +55,7 @@ def on_base_letter_approved(driver):
         return
 
     for booking in pending_bookings:
-        driver_emails.base_letter_approved_no_checkout(driver)
+        driver_emails.base_letter_approved_no_checkout(booking)
 
     for booking in reserved_bookings:
         request_insurance(booking)
