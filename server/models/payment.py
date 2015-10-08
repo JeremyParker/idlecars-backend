@@ -42,6 +42,7 @@ class Payment(models.Model):
     status = models.IntegerField(choices=STATUS, default=PENDING)
     error_message = models.CharField(max_length=256)
     transaction_id = models.CharField(max_length=32, blank=True)
+    notes = models.TextField(blank=True)
 
     def __unicode__(self):
         return '{} from {}'.format(self.amount, self.booking.driver)
