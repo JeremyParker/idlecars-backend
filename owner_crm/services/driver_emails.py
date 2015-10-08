@@ -29,22 +29,25 @@ def base_letter_approved_no_booking(driver):
     )
 
 
-def base_letter_approved_no_checkout(driver):
-    if not driver.email():
+def base_letter_approved_no_checkout(booking):
+    if not booking.driver.email():
         return
-    #TODO: text in this email needs to be updated
+
+    body = render_to_string("base_letter_approved_no_checkout.jade", {}, Context(autoescape=False))
+
     merge_vars = {
-        driver.email(): {
-            'FNAME': driver.first_name(),
-            'HEADLINE': 'Your documents have been reviewed and approved.',
-            'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
-            'CTA_LABEL': 'Rent a car now',
-            'CTA_URL': client_side_routes.car_listing_url(),
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'TEXT': body,
+            'CTA_LABEL': 'Reserve now',
+            'CTA_URL': client_side_routes.bookings(),
+            'HEADLINE': 'Your {} is waiting'.format(booking.car.display_name()),
+            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
         }
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='No checkout, {}!'.format(driver.full_name()),
+        subject='Your {} is waiting on your payment information!'.format(booking.car.display_name()),
         merge_vars=merge_vars,
     )
 
@@ -221,22 +224,25 @@ def base_letter_rejected(driver):
 def insurance_approved(booking):
     if not booking.driver.email():
         return
+
+    template_data = {
+        'CAR_NAME': booking.car.display_name(),
+    }
+    body = render_to_string("driver_insurance_approved.jade", template_data, Context(autoescape=False))
+
     merge_vars = {
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'HEADLINE': 'You have been added to your car\'s insurance',
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
-            'TEXT': '''
-                The owner of your {} has added you to the insurance policy of the car. Click below
-                for more information and instructions on how to pick up the car.
-            '''.format(booking.car.display_name()),
+            'TEXT': body,
             'CTA_LABEL': 'Pick up your car',
             'CTA_URL': client_side_routes.bookings(),
         }
     }
     email.send_async(
         template_name='one_button_one_image',
-        subject='You have been added to your {}\'s insurance.'.format(booking.car.display_name()),
+        subject='Alright! Your {} is ready to pick up!'.format(booking.car.display_name()),
         merge_vars=merge_vars,
     )
 
