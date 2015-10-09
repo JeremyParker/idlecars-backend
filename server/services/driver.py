@@ -56,13 +56,42 @@ def get_missing_docs(driver):
     return missing
 
 
-def send_reminders():
-    # send reminders to drivers who started an account, and never submitted docs
-    docs_reminder_delay_hours = 1  # TODO(JP): get from config
-
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
-    remindable_drivers = server.models.Driver.objects.filter(
+def _get_remindable_drivers(delay_hours):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    return server.models.Driver.objects.filter(
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
     )
-    throttle_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)
+    # TODO - try to .exclude(
+    #     driver_license_image!='',
+    #     fhv_license_image!='',
+    #     address_proof_image!='',
+    #     defensive_cert_image!='',
+    # )
+
+def send_flake_reminders(flake_reminder_delay_hours):
+    remindable_drivers = _get_remindable_drivers(flake_reminder_delay_hours)
+    throttle_service.send_to_queryset(remindable_drivers, driver_emails.flake_reminder)
+
+
+def send_document_reminders(docs_reminder_delay_hours, reminder_name):
+    # send reminders to drivers who started an account, and never submitted docs
+    remindable_drivers = _get_remindable_drivers(docs_reminder_delay_hours)
+    throttle_service.send_to_queryset(remindable_drivers, eval('driver_emails.' + reminder_name))
+
+
+def process_driver_emails():
+    send_document_reminders(
+      docs_reminder_delay_hours=1,
+      reminder_name='first_documents_reminder'
+    )
+    send_document_reminders(
+      docs_reminder_delay_hours=24,
+      reminder_name='second_documents_reminder'
+    )
+    send_document_reminders(
+      docs_reminder_delay_hours=36,
+      reminder_name='third_documents_reminder'
+    )
+
+    send_flake_reminders(flake_reminder_delay_hours=48)

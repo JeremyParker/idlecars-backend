@@ -50,13 +50,13 @@ class TestCronPayments(TestCase):
         self.assertEqual(self.booking.payment_set.count(), 2)
 
     def test_make_payment_when_due(self):
-        call_command('cron_payments')
+        call_command('cron_job')
         self.assertEqual(self.booking.payment_set.count(), 3)
         self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
         self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
-        # make sure we don't add any payments the next time we call cron_payments
-        call_command('cron_payments')
+        # make sure we don't add any payments the next time we call cron_job
+        call_command('cron_job')
         self.assertEqual(self.booking.payment_set.count(), 3)
         self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
         self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
@@ -70,7 +70,7 @@ class TestCronPayments(TestCase):
             invoice_start_time=self.pickup_time - datetime.timedelta(days=7),
             invoice_end_time=self.now - datetime.timedelta(days=7),
         )
-        call_command('cron_payments')
+        call_command('cron_job')
         self.assertEqual(self.booking.payment_set.count(), 4)
 
         most_recent_payment = self.booking.payment_set.filter(
@@ -89,7 +89,7 @@ class TestCronPayments(TestCase):
     def test_non_settled_payment_sends_email(self):
         gateway = payment_gateways.get_gateway('fake')
         gateway.push_next_payment_response((Payment.DECLINED, 'Sorry, your card failed',))
-        call_command('cron_payments')
+        call_command('cron_job')
         self.assertEqual(self.booking.payment_set.count(), 3)
         self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
 
@@ -101,7 +101,7 @@ class TestCronPayments(TestCase):
     def test_exception_doesnt_kill_job(self):
         gateway = payment_gateways.get_gateway('fake')
         gateway.push_next_payment_response('exception') # <-- This will make it throw an exception
-        call_command('cron_payments')
+        call_command('cron_job')
 
         # check what emails got sent
         from django.core.mail import outbox
@@ -113,13 +113,13 @@ class TestCronPayments(TestCase):
         self.booking.end_time = self.first_rent_payment.invoice_end_time
         self.booking.save()
 
-        call_command('cron_payments')
+        call_command('cron_job')
         self.assertEqual(self.booking.payment_set.count(), 2)  # no new payments
 
     def test_final_payment_is_partial_week(self):
         self.booking.end_time = self.first_rent_payment.invoice_end_time + datetime.timedelta(days=2)
         self.booking.save()
-        call_command('cron_payments')
+        call_command('cron_job')
 
         self.assertEqual(self.booking.payment_set.count(), 3)
 

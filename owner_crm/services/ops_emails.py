@@ -77,7 +77,7 @@ def payment_failed(payment):
         settings.OPS_EMAIL: {
             'FNAME': 'peeps',
             'HEADLINE': 'A payment failed',
-            'TEXT': 'the driver with phone {} failed to pay for {}. The server response was:<br>{}'.format(
+            'TEXT': 'the driver with phone {} had a payment fail for {}. The server response was:<br>{}'.format(
                 payment.booking.driver.phone_number(),
                 payment.invoice_description(),
                 payment.notes,

@@ -11,29 +11,20 @@ import server.factories
 
 from owner_crm.tests import sample_merge_vars
 
+from freezegun import freeze_time
+
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
 class TestDriverNotifications(TestCase):
-    def _simulate_new_driver(self):
-        driver = server.factories.Driver.create()
-
-        now = timezone.now()
-        created_time = now - datetime.timedelta(hours=1, minutes=5)  # TODO(JP): get the time from config
-        driver.auth_user.date_joined = created_time
-        driver.auth_user.save()
-        return driver
-
+    @freeze_time("2015-10-10 9:55:00")
     def _simulate_new_booking(self):
-        driver = self._simulate_new_driver()
-        booking = server.factories.Booking.create(
-            driver=driver,
-            created_time=driver.auth_user.date_joined
-        )
-        return booking
+        driver = server.factories.Driver.create()
+        return server.factories.Booking.create(driver=driver)
 
     def setUp(self):
         self.booking = self._simulate_new_booking()
 
+    @freeze_time("2015-10-10 11:00:00")
     def test_docs_reminder(self):
         call_command('driver_notifications')
 
@@ -42,9 +33,10 @@ class TestDriverNotifications(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
         self.assertEqual(
             outbox[0].subject,
-            'Your {} is waiting on your driving documents'.format(self.booking.car.display_name())
+            'Your {} is waiting on your driver documents'.format(self.booking.car.display_name())
         )
 
+    @freeze_time("2015-10-10 11:00:00")
     def test_driver_no_booking(self):
         self.booking.delete()
         call_command('driver_notifications')
@@ -53,12 +45,14 @@ class TestDriverNotifications(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
+    @freeze_time("2015-10-10 11:00:00")
     def test_no_email_twice(self):
         call_command('driver_notifications')
         call_command('driver_notifications')
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
+    @freeze_time("2015-10-10 11:00:00")
     def test_only_new_driver_get_reminder(self):
         call_command('driver_notifications')
         from django.core.mail import outbox
@@ -69,6 +63,7 @@ class TestDriverNotifications(TestCase):
         self.assertEqual(len(outbox), 2)
 
     ''' check that we don't send an email to a driver who already uploaded their docs '''
+    @freeze_time("2015-10-10 11:00:00")
     def test_docs_reminder_driver_complete(self):
         self.booking.driver.delete()
         server.factories.CompletedDriver.create()
@@ -76,3 +71,17 @@ class TestDriverNotifications(TestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
+
+    def test_reminder_until_flake(self):
+        #TODO: time should be from settings
+        with freeze_time("2015-10-10 11:00:00"):
+            call_command('driver_notifications')
+        with freeze_time("2015-10-11 10:00:00"):
+            call_command('driver_notifications')
+        with freeze_time("2015-10-11 22:00:00"):
+            call_command('driver_notifications')
+        with freeze_time("2015-10-12 10:00:00"):
+            call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 4)

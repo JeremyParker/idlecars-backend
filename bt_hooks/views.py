@@ -23,7 +23,8 @@ def _confirm_bt_endpoint(request):
 def _get_webhook_notification(request):
     bt_signature = request.POST['bt_signature']
     bt_payload = request.POST['bt_payload']
-    return braintree.WebhookNotification.parse(bt_signature, bt_payload)
+    gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
+    return gateway.parse_webhook_notification(bt_signature, bt_payload)
 
 
 def _handle_post(request, new_state):

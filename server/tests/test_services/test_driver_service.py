@@ -126,7 +126,7 @@ class DriverServiceTest(TestCase):
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
         self.assertEqual(
             outbox[1].subject,
-            "No checkout, {}!".format(self.driver.full_name())
+            "Your {} is waiting on your payment information!".format(new_booking.car.display_name())
         )
 
 
@@ -145,7 +145,7 @@ class DriverServiceTest(TestCase):
         new_booking.driver.save()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 2)
 
         # we should have sent an email to the owner asking them to add the driver to the insurance
         self.assertEqual(outbox[0].merge_vars.keys()[0], new_booking.car.owner.email())
@@ -153,6 +153,14 @@ class DriverServiceTest(TestCase):
             outbox[0].subject,
             'A driver has booked your {}.'.format(new_booking.car.display_name())
         )
+
+        # an email to the driver that insurance is in progress
+        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[1].subject,
+            'Congratulations! Your documents have been submitted!'
+        )
+
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
 

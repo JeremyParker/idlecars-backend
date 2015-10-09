@@ -43,6 +43,7 @@ class DriverAdmin(ReverseModelAdmin):
         'all_docs_uploaded',
         'documentation_approved',
         'booking_count',
+        'date_joined',
     ]
     list_filter = [
         'documentation_approved',
@@ -67,11 +68,13 @@ class DriverAdmin(ReverseModelAdmin):
         }),
         ('None', {
             'fields': (
+                'date_joined',
                ('notes'),
             ),
         }),
     )
     readonly_fields = [
+        'date_joined',
         'full_name',
         'dmv_link',
         'fhv_link',
@@ -81,6 +84,10 @@ class DriverAdmin(ReverseModelAdmin):
     ]
     inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
+
+    def date_joined(self, instance):
+        return instance.auth_user.date_joined.date()
+    date_joined.short_description = 'signup date'
 
     def link_name(self, instance):
         return instance.admin_display()

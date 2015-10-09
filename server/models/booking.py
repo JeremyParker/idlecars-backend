@@ -36,6 +36,7 @@ class Booking(models.Model):
     REASON_MISSED = 4
     REASON_TEST_BOOKING = 5
     REASON_CANCELED = 6
+    REASON_INSURANCE_TOO_SLOW = 7
     REASON = (
         (REASON_ANOTHER_BOOKED, 'Too Slow - another driver on our system booked the car'),
         (REASON_OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
@@ -43,6 +44,7 @@ class Booking(models.Model):
         (REASON_MISSED, 'Missed - car rented out elsewhere before we found a driver'),
         (REASON_TEST_BOOKING, 'Test - a booking that one of us created as a test'),
         (REASON_CANCELED, 'Canceled - driver canceled the booking thru the app'),
+        (REASON_INSURANCE_TOO_SLOW, 'Too Slow - insurance is too slow'),
     )
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 
