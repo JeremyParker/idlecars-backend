@@ -33,7 +33,8 @@ def base_letter_approved_no_checkout(booking):
     if not booking.driver.email():
         return
 
-    body = render_to_string("base_letter_approved_no_checkout.jade", {}, Context(autoescape=False))
+    template_data = {'CAR_NAME': booking.car.display_name()}
+    body = render_to_string("base_letter_approved_no_checkout.jade", template_data, Context(autoescape=False))
 
     merge_vars = {
         booking.driver.email(): {
@@ -160,11 +161,11 @@ def second_documents_reminder(driver):
 def third_documents_reminder(driver):
     subject = [
         'Don’t miss your booking, submit your driver documents',
-        'Submit your documents now so you are ready to drive later.'
+        'Are you ready to drive?'
     ]
     body_template = [
         'third_docs_reminder_booking.jade',
-        'third_docs_reminder_driver.jade'
+        'second_docs_reminder_driver.jade'
     ]
 
     documents_reminder(driver, subject, body_template)
@@ -173,11 +174,11 @@ def third_documents_reminder(driver):
 def flake_reminder(driver):
     subject = [
         'Your booking has been cancelled because we don\'t have your driver documents',
-        'Submit your documents now so you are ready to drive later.'
+        'Are you ready to drive?'
     ]
     body_template = [
         'flake_reminder_booking.jade',
-        'flake_reminder_driver.jade'
+        'second_docs_reminder_driver.jade'
     ]
 
     documents_reminder(driver, subject, body_template)

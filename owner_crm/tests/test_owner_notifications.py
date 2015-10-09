@@ -150,7 +150,6 @@ class TestOwnerNotifications(TestCase):
             call_command('owner_notifications')
             call_command('cron_job')
 
-        #TODO: we will have owner reminder email once the text ready
         '''
             - message to owner: first morning reminder
             - message to owner: first afternoon reminder
@@ -181,6 +180,5 @@ class TestOwnerNotifications(TestCase):
             call_command('owner_notifications')
             call_command('cron_job')
 
-        #TODO: we will have owner reminder email once the text ready
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 6)
