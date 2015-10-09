@@ -120,10 +120,6 @@ class E2ETestSetup():
             last_name='Goose')
         server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
-    def _reset_token(self):
-        Token.objects.filter(user=self.owner_user).update(key='owner')
-        PasswordReset.objects.filter(auth_user=self.owner_user).update(token='test')
-
     def _setup_owner(self):
         '''
             Create an owner
