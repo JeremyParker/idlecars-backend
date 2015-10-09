@@ -133,7 +133,7 @@ def second_morning_insurance_reminder(booking):
                     {} to see if they have been accepted on the insurance.
                     You can click below to let us know where they are in the process.
                     Once they are approved, they will contact you to schedule a pickup.
-                    <br/>
+                    <br />
                     We promise drivers that they will get into a car within 24-48 hours,
                     so if we don’t hear back we will have to cancel the booking.
                     We don’t want to do that so please let us know if there are any problems.
@@ -153,6 +153,31 @@ def first_afternoon_insurance_reminder(booking):
 
 def second_afternoon_insurance_reminder(booking):
     second_morning_insurance_reminder(booking)
+
+
+def pickup_confirmation(booking):
+    for user in booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+
+        merge_vars = {
+            booking.driver.email(): {
+                'FNAME': booking.driver.first_name() or None,
+                'HEADLINE': '{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
+                'TEXT': '''
+                    You have received a payment of “booking weekly cost” from {} for the {}
+                    You can now give them the keys to drive.
+                    <br />
+                    Their credit card has been charged and you will receive the payment within 48 hours.
+                    The security deposit of “Security Deposit Amount” has also been placed in escrow for you.
+                '''.format(booking.driver.full_name(), booking.car.display_name()),
+            }
+        }
+        email.send_async(
+            template_name='no_button_no_image',
+            subject='{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
 
 
 def _booking_incomplete_email(booking, body_text):
@@ -215,7 +240,7 @@ def insurance_too_slow(booking):
                     We are sorry to inform you, but we cancelled the {} booking for {}
                     We require drivers get on the insurance and into cars within 24 to 48 hours,
                     so we hope that we will be able to do this next time.
-                    <br/>
+                    <br />
                     If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
                 '''.format(booking.car.display_name(), booking.driver.full_name()),
             }

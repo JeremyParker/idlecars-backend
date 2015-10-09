@@ -314,7 +314,10 @@ def pickup(booking):
     )
 
     booking.save()
-    # TODO - send some kind of confirmation message
+
+    driver_emails.pickup_confirmation(booking)
+    owner_emails.pickup_confirmation(booking)
+
     return booking
 
 
