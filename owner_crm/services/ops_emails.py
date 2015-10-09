@@ -6,6 +6,8 @@ from django.conf import settings
 
 from idlecars import email
 
+from server import models
+
 
 def new_booking_email(booking):
     merge_vars = {
@@ -49,15 +51,16 @@ def documents_uploaded(driver):
     )
 
 
-def booking_canceled(booking):
+def booking_incompleted(booking):
     merge_vars = {
         settings.OPS_EMAIL: {
             'FNAME': 'dudes',
-            'HEADLINE': 'Someone canceled their booking :(',
-            'TEXT': 'the driver with phone {} decided not to rent {}\'s {}'.format(
+            'HEADLINE': 'A booking was just incompleted :(',
+            'TEXT': 'the driver with phone {} just didn\'t rent {}\'s {}. The reason was {}'.format(
                 booking.driver.phone_number(),
                 booking.car.owner.__unicode__(),
                 booking.car.display_name(),
+                dict(models.Booking.REASON)[booking.incomplete_reason],
             ),
             'CTA_LABEL': 'Booking details',
             'CTA_URL': 'https://www.idlecars.com{}'.format(

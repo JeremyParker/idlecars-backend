@@ -133,18 +133,29 @@ def can_cancel(booking):
 def cancel(booking):
     if not can_cancel(booking):
         raise BookingError(CANCEL_ERROR)
+    _make_booking_incomplete(booking, Booking.REASON_CANCELED)
 
-    if Booking.REQUESTED == booking.get_state():
-        owner_emails.booking_canceled(booking)
 
+def _make_booking_incomplete(booking, reason):
     booking.incomplete_time = timezone.now()
-    booking.incomplete_reason = Booking.REASON_CANCELED
+    booking.incomplete_reason = reason
     booking.save()
 
     _void_all_payments(booking)
 
-    ops_emails.booking_canceled(booking)
-    driver_emails.booking_canceled(booking)
+    ops_emails.booking_incomplete(booking)
+
+    # let our customers know what happened
+    if reason == Booking.REASON_CANCELED:
+        driver_emails.booking_canceled(booking)
+        if Booking.REQUESTED == booking.get_state():
+            owner_emails.booking_canceled(booking)
+    elif reason == Booking.REASON_OWNER_TOO_SLOW:
+        owner_emails.insurance_too_slow(booking)
+        driver_emails.insurance_failed(booking)
+    elif reason == Booking.REASON_DRIVER_TOO_SLOW:
+        driver_emails.flake_reminder(booking)
+
     return booking
 
 
@@ -342,20 +353,23 @@ def _cron_payments():
 
 def _booking_updates():
     ''' Update the state of bookings based on the passing of time '''
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=60)  # TODO: from config
-    remindable_bookings = filter_requested(Booking.objects.all()).filter(
-        requested_time__lte=reminder_threshold,
+    expired_bookings = filter_pending(Booking.objects.all()).filter(
+        created_time__lte=timezone.now() - datetime.timedelta(hours=48), # TODO: from config
+        documentation_approved=False,
     )
-    for booking in remindable_bookings:
+    for booking in expired_bookings:
         try:
-            _void_all_payments(booking)
+            if not booking.driver.all_docs_uploaded():
+                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW)
+        except BookingError:
+            pass  # ops will get an email about the payment failure, and
 
-            booking.incomplete_time = timezone.now()
-            booking.incomplete_reason = Booking.REASON_OWNER_TOO_SLOW
-            booking.save()
-
-            owner_emails.insurance_too_slow(booking)
-            driver_emails.insurance_failed(booking)
+    expired_bookings = filter_requested(Booking.objects.all()).filter(
+        requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
+    )
+    for booking in expired_bookings:
+        try:
+            _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
         except BookingError:
             pass  # ops will get an email about the payment failure, and
 
