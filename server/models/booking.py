@@ -36,15 +36,26 @@ class Booking(models.Model):
     REASON_MISSED = 4
     REASON_TEST_BOOKING = 5
     REASON_CANCELED = 6
-    REASON_INSURANCE_TOO_SLOW = 7
+    REASON_OWNER_TOO_SLOW = 7
+    REASON_INSURANCE_REJECTED_AGE = 8
+    REASON_INSURANCE_REJECTED_EXP = 9
+    REASON_INSURANCE_REJECTED_PTS = 10
+    REASON_BASE_LETTER = 11
+    REASON_OTHER = 12
+
     REASON = (
         (REASON_ANOTHER_BOOKED, 'Too Slow - another driver on our system booked the car'),
-        (REASON_OWNER_REJECTED, 'Owner Rejected - driver wasn\t approved'),
-        (REASON_DRIVER_REJECTED, 'Driver Rejected - driver changed their mind'),
+        (REASON_OWNER_REJECTED, 'The Owner Rejected - driver wasn\'t approved. Don\'t know why yet.'),
+        (REASON_DRIVER_REJECTED, 'The Driver Rejected - at pickup'),
         (REASON_MISSED, 'Missed - car rented out elsewhere before we found a driver'),
         (REASON_TEST_BOOKING, 'Test - a booking that one of us created as a test'),
-        (REASON_CANCELED, 'Canceled - driver canceled the booking thru the app'),
-        (REASON_INSURANCE_TOO_SLOW, 'Too Slow - insurance is too slow'),
+        (REASON_CANCELED, 'Canceled - driver canceled thru the app before insurance approval'),
+        (REASON_OWNER_TOO_SLOW, 'Owner Too Slow - the insurance took too long'),
+        (REASON_INSURANCE_REJECTED_AGE, 'Driver rejected from insurance - too young'),
+        (REASON_INSURANCE_REJECTED_EXP, 'Driver rejected from insurance - experience'),
+        (REASON_INSURANCE_REJECTED_PTS, 'Driver rejected from insurance - points'),
+        (REASON_BASE_LETTER, 'No Base Letter - we cannot get a base letter'),
+        (REASON_OTHER, 'Some other reason - see notes field below'),
     )
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 

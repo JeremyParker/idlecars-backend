@@ -351,7 +351,7 @@ def _booking_updates():
             _void_all_payments(booking)
 
             booking.incomplete_time = timezone.now()
-            booking.incomplete_reason = Booking.REASON_INSURANCE_TOO_SLOW
+            booking.incomplete_reason = Booking.REASON_OWNER_TOO_SLOW
             booking.save()
 
             owner_emails.insurance_too_slow(booking)
