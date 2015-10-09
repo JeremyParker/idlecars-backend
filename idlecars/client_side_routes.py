@@ -21,7 +21,7 @@ def car_details_url(car):
     return '/'.join(parts)
 
 def bookings():
-    parts = (settings.WEBAPP_URL, '#', 'bookings')
+    parts = (settings.WEBAPP_URL, '#', 'account', 'bookings')
     return '/'.join(parts)
 
 def password_reset(password_reset):
