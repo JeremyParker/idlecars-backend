@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+from owner_crm.services import message as message_service
 from server.services import owner_service
 from server.services import driver as driver_service
+
 
 def throttle_all_overdue_emails(apps, schema_editor):
     # backfill the driver document reminder email records
