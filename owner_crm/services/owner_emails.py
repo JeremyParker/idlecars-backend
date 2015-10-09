@@ -66,7 +66,7 @@ def new_booking_email(booking):
         if not user.email:
             continue
         merge_vars = {
-            booking.car.owner.email(): {
+            user.email: {
                 'PREVIEW': headline,
                 'FNAME': user.first_name,
                 'HEADLINE': headline,
@@ -87,11 +87,15 @@ def new_booking_email(booking):
                 'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                     booking.driver.address_proof_image
                 ),
-                'TEXT5': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',
+                'IMAGE_5_URL': booking.driver.base_letter,
+                'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
+                    booking.driver.base_letter
+                ),
+                'TEXT6': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',
             }
         }
         email.send_async(
-            template_name='no_button_four_images',
+            template_name='no_button_five_images',
             subject='A driver has booked your {}.'.format(booking.car.display_name()),
             merge_vars=merge_vars,
         )
@@ -102,7 +106,7 @@ def first_morning_insurance_reminder(booking):
         if not user.email:
             continue
         merge_vars = {
-            booking.car.owner.email(): {
+            user.email: {
                 'FNAME': user.first_name,
                 'HEADLINE': 'Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
                 'TEXT': '''
@@ -125,7 +129,7 @@ def second_morning_insurance_reminder(booking):
         if not user.email:
             continue
         merge_vars = {
-            booking.car.owner.email(): {
+            user.email: {
                 'FNAME': user.first_name,
                 'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(booking.car.display_name(), booking.driver.full_name()),
                 'TEXT': '''
@@ -208,7 +212,7 @@ def insurance_too_slow(booking):
         if not user.email:
             continue
         merge_vars = {
-            booking.car.owner.email(): {
+            user.email: {
                 'FNAME': user.first_name,
                 'HEADLINE': 'Your {} booking has been canceled'.format(booking.car.display_name()),
                 'TEXT': '''
