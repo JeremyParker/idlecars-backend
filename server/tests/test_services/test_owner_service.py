@@ -13,7 +13,6 @@ from server.services import owner_service
 from server.models import Owner
 
 
-
 class OwnerInvitationTest(TestCase):
     def setUp(self):
         self.owner = factories.Owner.create()
