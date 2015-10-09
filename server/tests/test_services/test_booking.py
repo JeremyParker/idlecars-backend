@@ -178,7 +178,20 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.get_state(), models.Booking.ACTIVE)
         self._check_payments_after_pickup(new_booking)
 
-        # TODO - test the email messages we should have sent
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+
+        # a pickup confirmation to owner
+        self.assertEqual(
+            outbox[0].subject,
+            'You are ready to drive!'
+        )
+
+        # a pickup confirmation to driver
+        self.assertEqual(
+            outbox[1].subject,
+            '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
+        )
 
     def test_pickup_after_failure(self):
         driver = factories.PaymentMethodDriver.create()
