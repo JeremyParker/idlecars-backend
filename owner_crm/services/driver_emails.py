@@ -303,7 +303,7 @@ def car_rented_elsewhere(booking):
             'TEXT': '''
             Sorry, someone else has already rented out the car you wanted. Sometimes that
             happens. Still, there are plenty more great cars available.
-            <br/>
+            <br />
             Need help? Contact us:
             support@idlecars.com
             1 844 435 3227
@@ -334,6 +334,28 @@ def checkout_recipt(booking):
     email.send_async(
         template_name='no_button_no_image',
         subject='Your {} was successfully reserved'.format(booking.car.display_name()),
+        merge_vars=merge_vars,
+    )
+
+
+def pickup_confirmation(booking):
+    if not booking.driver.email():
+        return
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'You are ready to drive!',
+            'TEXT': '''
+                Success! Your card has been charged {} for the {} booking.
+                The owner should receive an email that the payment was processed and should give you the keys to start driving.
+                <br />
+                Please contact us if there are any issues.
+            '''.format(booking.weekly_rent, booking.car.display_name()),
+        }
+    }
+    email.send_async(
+        template_name='no_button_no_image',
+        subject='You are ready to drive!',
         merge_vars=merge_vars,
     )
 
