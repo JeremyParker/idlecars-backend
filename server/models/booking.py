@@ -36,12 +36,13 @@ class Booking(models.Model):
     REASON_MISSED = 4
     REASON_TEST_BOOKING = 5
     REASON_CANCELED = 6
-    REASON_OWNER_TOO_SLOW = 7
-    REASON_INSURANCE_REJECTED_AGE = 8
-    REASON_INSURANCE_REJECTED_EXP = 9
-    REASON_INSURANCE_REJECTED_PTS = 10
-    REASON_BASE_LETTER = 11
-    REASON_OTHER = 12
+    REASON_DRIVER_TOO_SLOW = 7
+    REASON_OWNER_TOO_SLOW = 8
+    REASON_INSURANCE_REJECTED_AGE = 9
+    REASON_INSURANCE_REJECTED_EXP = 10
+    REASON_INSURANCE_REJECTED_PTS = 11
+    REASON_BASE_LETTER = 12
+    REASON_OTHER = 13
 
     REASON = (
         (REASON_ANOTHER_BOOKED, 'Too Slow - another driver on our system booked the car'),
@@ -50,6 +51,7 @@ class Booking(models.Model):
         (REASON_MISSED, 'Missed - car rented out elsewhere before we found a driver'),
         (REASON_TEST_BOOKING, 'Test - a booking that one of us created as a test'),
         (REASON_CANCELED, 'Canceled - driver canceled thru the app before insurance approval'),
+        (REASON_DRIVER_TOO_SLOW, 'Driver Too Slow - driver did not submit their documents in time'),
         (REASON_OWNER_TOO_SLOW, 'Owner Too Slow - the insurance took too long'),
         (REASON_INSURANCE_REJECTED_AGE, 'Driver rejected from insurance - too young'),
         (REASON_INSURANCE_REJECTED_EXP, 'Driver rejected from insurance - experience'),

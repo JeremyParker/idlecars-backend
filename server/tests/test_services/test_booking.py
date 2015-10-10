@@ -265,6 +265,8 @@ class BookingServiceTest(TestCase):
         - message to the driver to confirm the booking was canceled,
         '''
         from django.core.mail import outbox
+        if not len(outbox) == 6:
+            print [o.subject for o in outbox]
         self.assertEqual(len(outbox), 6)
 
     def test_correct_start_time(self):

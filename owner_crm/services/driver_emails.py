@@ -122,7 +122,8 @@ def documents_reminder(driver, subject, body_template):
     if not driver.email() or driver.all_docs_uploaded():
         return
 
-    pending_bookings = driver.booking_set.all()
+    from server.services import booking as booking_service
+    pending_bookings = booking_service.filter_pending(driver.booking_set)
 
     if pending_bookings:
         booking = pending_bookings.order_by('created_time').last()

@@ -14,7 +14,6 @@ def throttle_all_overdue_emails(apps, schema_editor):
         (1, 'first_documents_reminder'),
         (24, 'second_documents_reminder'),
         (36, 'third_documents_reminder'),
-        (48, 'flake_reminder')
     ]
     for email_spec in email_specs:
         for driver in driver_service._get_remindable_drivers(delay_hours=email_spec[0]):

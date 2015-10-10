@@ -76,12 +76,20 @@ class TestDriverNotifications(TestCase):
         #TODO: time should be from settings
         with freeze_time("2015-10-10 11:00:00"):
             call_command('driver_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-11 10:00:00"):
             call_command('driver_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-11 22:00:00"):
             call_command('driver_notifications')
+            call_command('cron_job')
         with freeze_time("2015-10-12 10:00:00"):
             call_command('driver_notifications')
+            call_command('cron_job')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 4)
+        # We should have sent:
+        # - 3 Timed driver reminders based on sign-up time
+        # - 1 Driver notification when the driver's booking expired
+        # - 1 notification to ops when the booking expired.
+        self.assertEqual(len(outbox), 5)

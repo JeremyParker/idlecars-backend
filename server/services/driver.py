@@ -62,16 +62,6 @@ def _get_remindable_drivers(delay_hours):
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
     )
-    # TODO - try to .exclude(
-    #     driver_license_image!='',
-    #     fhv_license_image!='',
-    #     address_proof_image!='',
-    #     defensive_cert_image!='',
-    # )
-
-def send_flake_reminders(flake_reminder_delay_hours):
-    remindable_drivers = _get_remindable_drivers(flake_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_drivers, driver_emails.flake_reminder)
 
 
 def send_document_reminders(docs_reminder_delay_hours, reminder_name):
@@ -93,5 +83,3 @@ def process_driver_emails():
       docs_reminder_delay_hours=36,
       reminder_name='third_documents_reminder'
     )
-
-    send_flake_reminders(flake_reminder_delay_hours=48)
