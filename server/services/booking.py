@@ -137,24 +137,26 @@ def cancel(booking):
 
 
 def _make_booking_incomplete(booking, reason):
+    original_booking_state = booking.get_state()
+
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = reason
     booking.save()
 
     _void_all_payments(booking)
 
-    ops_emails.booking_incomplete(booking)
+    ops_emails.booking_incompleted(booking)
 
     # let our customers know what happened
     if reason == Booking.REASON_CANCELED:
         driver_emails.booking_canceled(booking)
-        if Booking.REQUESTED == booking.get_state():
+        if Booking.REQUESTED == original_booking_state:
             owner_emails.booking_canceled(booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
         owner_emails.insurance_too_slow(booking)
         driver_emails.insurance_failed(booking)
     elif reason == Booking.REASON_DRIVER_TOO_SLOW:
-        driver_emails.flake_reminder(booking)
+        driver_emails.flake_reminder(booking.driver)
 
     return booking
 
@@ -355,7 +357,7 @@ def _booking_updates():
     ''' Update the state of bookings based on the passing of time '''
     expired_bookings = filter_pending(Booking.objects.all()).filter(
         created_time__lte=timezone.now() - datetime.timedelta(hours=48), # TODO: from config
-        documentation_approved=False,
+        driver__documentation_approved=False,  # TODO: filter out all the completed docs here
     )
     for booking in expired_bookings:
         try:

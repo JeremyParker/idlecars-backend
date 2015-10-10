@@ -52,6 +52,7 @@ def documents_uploaded(driver):
 
 
 def booking_incompleted(booking):
+    reason = dict(models.Booking.REASON)[booking.incomplete_reason]
     merge_vars = {
         settings.OPS_EMAIL: {
             'FNAME': 'dudes',
@@ -60,7 +61,7 @@ def booking_incompleted(booking):
                 booking.driver.phone_number(),
                 booking.car.owner.__unicode__(),
                 booking.car.display_name(),
-                dict(models.Booking.REASON)[booking.incomplete_reason],
+                reason,
             ),
             'CTA_LABEL': 'Booking details',
             'CTA_URL': 'https://www.idlecars.com{}'.format(
@@ -70,7 +71,7 @@ def booking_incompleted(booking):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='A booking got canceled.',
+        subject='A booking is incomplete because {}.'.format(reason),
         merge_vars=merge_vars,
     )
 
