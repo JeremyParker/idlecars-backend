@@ -304,9 +304,9 @@ def car_rented_elsewhere(booking):
             Sorry, someone else has already rented out the car you wanted. Sometimes that
             happens. Still, there are plenty more great cars available.
             <br />
-            Need help? Contact us:
-            support@idlecars.com
-            1 844 435 3227
+            <p>Need help? Contact us:</p>
+            <p>support@idlecars.comn </p>
+            <p>1 844 435 3227</p>
             ''',
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),

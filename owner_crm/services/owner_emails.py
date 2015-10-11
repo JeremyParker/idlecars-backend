@@ -169,12 +169,17 @@ def pickup_confirmation(booking):
                 'FNAME': user.first_name or None,
                 'HEADLINE': '{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
                 'TEXT': '''
-                    You have received a payment of “booking weekly cost” from {} for the {}
+                    You have received a payment of {} from {} for the {}
                     You can now give them the keys to drive.
                     <br />
                     Their credit card has been charged and you will receive the payment within 48 hours.
                     The security deposit of {} has also been placed in escrow for you.
-                '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.solo_deposit),
+                '''.format(
+                    booking.weekly_rent,
+                    booking.driver.full_name(),
+                    booking.car.display_name(),
+                    booking.car.solo_deposit
+                ),
             }
         }
         email.send_async(
