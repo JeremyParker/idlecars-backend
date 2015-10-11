@@ -327,8 +327,8 @@ def checkout_recipt(booking):
             'FNAME': booking.driver.first_name() or None,
             'HEADLINE': 'Your {} was successfully reserved'.format(booking.car.display_name()),
             'TEXT': '''
-            We put a hold on your credit card for the “car” you booked. You will not be charged until you pick up your car.
-            ''',
+            We put a hold on your credit card for the {} you booked. You will not be charged until you pick up your car.
+            '''.format(booking.car.display_name()),
         }
     }
     email.send_async(
