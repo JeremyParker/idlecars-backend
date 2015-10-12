@@ -115,10 +115,12 @@ def first_morning_insurance_reminder(booking):
                     You can click below to let us know where they are in the process.
                     Once they are approved, they will contact you to schedule a pickup.
                 '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
+                'CTA_LABEL': 'Call IDLECARS',
+                'CTA_URL': 'tel:1-844-4353227'
             }
         }
         email.send_async(
-            template_name='no_button_no_image',
+            template_name='one_button_no_image',
             subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
             merge_vars=merge_vars,
         )
@@ -142,10 +144,12 @@ def second_morning_insurance_reminder(booking):
                     so if we don’t hear back we will have to cancel the booking.
                     We don’t want to do that so please let us know if there are any problems.
                 '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
+                'CTA_LABEL': 'Call IDLECARS',
+                'CTA_URL': 'tel:1-844-4353227'
             }
         }
         email.send_async(
-            template_name='no_button_no_image',
+            template_name='one_button_no_image',
             subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
             merge_vars=merge_vars,
         )
