@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.template import Context
 from django.template.loader import render_to_string
+from django.conf import settings
 
 from idlecars import email, client_side_routes
 from server.services import car as car_service
@@ -91,7 +92,7 @@ def new_booking_email(booking):
                 'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
                     booking.driver.base_letter
                 ),
-                'TEXT6': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',
+                'TEXT6': 'Questions? Call us at ' + settings.IDELCARS_PHONE_NUMBER,
             }
         }
         email.send_async(

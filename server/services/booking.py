@@ -7,6 +7,7 @@ from decimal import Decimal, ROUND_UP
 from django.core.urlresolvers import reverse
 from django.db.models import F
 from django.utils import timezone
+from django.conf import settings
 
 from owner_crm.services import ops_emails, driver_emails, owner_emails
 
@@ -19,7 +20,7 @@ from server.payment_gateways import braintree_payments
 class BookingError(Exception):
     pass
 
-CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at 844-435-3227.'
+CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 

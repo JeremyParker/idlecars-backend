@@ -206,3 +206,5 @@ BRAINTREE = {
 }
 
 TAKE_RATE = '0.080'  # TODO - move this to a config service
+
+IDLECARS_PHONE_NUMBER = '1-844-IDLECAR (1-844-435-3227)'
