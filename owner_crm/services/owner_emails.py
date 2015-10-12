@@ -92,7 +92,7 @@ def new_booking_email(booking):
                 'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
                     booking.driver.base_letter
                 ),
-                'TEXT6': 'Questions? Call us at ' + settings.IDELCARS_PHONE_NUMBER,
+                'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
             }
         }
         email.send_async(
