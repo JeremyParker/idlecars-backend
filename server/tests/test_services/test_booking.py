@@ -84,7 +84,10 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.checkout(new_booking)
         self.assertEqual(new_booking.get_state(), models.Booking.RESERVED)
 
-        # TODO we should send an email to the driver and owner telling them what happened
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        # TODO - make sure this is the right email to the right person
 
         # there should be a single payment that is in the pre-authorized state
         self.assertEqual(len(new_booking.payment_set.all()), 1)

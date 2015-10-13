@@ -267,7 +267,6 @@ def checkout(booking):
         booking.weekly_rent = booking.car.solo_cost
         booking.service_percentage = booking.car.owner.effective_service_percentage
         booking.save()
-        # TODO - send some kind of confirmation message
 
         # cancel other conflicting in-progress bookings and notify those drivers
         conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
