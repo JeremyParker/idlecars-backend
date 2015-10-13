@@ -98,14 +98,14 @@ class TestOwnerNotifications(TestCase):
             )
         )
 
-    @freeze_time("2015-10-11 10:00:00")
+    @freeze_time(timezone.localtime(timezone.datetime(2015, 10, 11, 10, 00, 00)))
     def test_no_booking(self):
         call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
-    @freeze_time("2015-10-11 10:00:00")
+    @freeze_time(timezone.localtime(timezone.datetime(2015, 10, 11, 10, 00, 00)))
     def test_no_email_twice(self):
         self.booking = self._new_requested_booking("2015-10-10 18:00:00")
 
