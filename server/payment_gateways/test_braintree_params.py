@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from braintree.test.nonces import Nonces
+
 '''
 Api ==> Services ==> PaymentsGateway ==> Braintree Sandbox
 
@@ -9,6 +11,10 @@ It also contains the expected values that we should be sending to Braintree as
 part of those operations. The expected values that we send to Braintree can then
 be tested in an integration test to make sure they work against the Sandbox.
 '''
+
+VALID_ROUTING_NUMBER = '071101307'
+VALID_VISA_NONCE = Nonces.TransactableVisa
+INVALID_PAYMENT_METHOD_NONCE = Nonces.Consumed
 
 
 business_data = {

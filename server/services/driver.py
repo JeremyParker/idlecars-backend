@@ -6,7 +6,7 @@ import datetime
 from django.utils import timezone
 
 from owner_crm.services import ops_emails, driver_emails
-from owner_crm.services import campaign as campaign_service
+from owner_crm.services import throttle_service
 
 import server.models
 import server.services.booking
@@ -32,20 +32,25 @@ def documents_changed(original, modified):
     return False
 
 
-def pre_save(modified_driver):
-    if modified_driver.pk is not None:
-        orig = server.models.Driver.objects.get(pk=modified_driver.pk)
-        if documents_changed(orig, modified_driver):
-            modified_driver.documentation_approved = False
-            if modified_driver.all_docs_uploaded():
-                ops_emails.documents_uploaded(modified_driver)
-                server.services.booking.on_documents_uploaded(modified_driver)
-                # TODO(JP): maybe send a welcome email to the Driver immediately?
+def pre_save(modified_driver, orig):
+    if documents_changed(orig, modified_driver):
+        modified_driver.documentation_approved = False
+        if modified_driver.all_docs_uploaded():
+            ops_emails.documents_uploaded(modified_driver)
 
-        if modified_driver.documentation_approved and not orig.documentation_approved:
-            server.services.booking.on_documents_approved(modified_driver)
+    if modified_driver.documentation_approved and not orig.documentation_approved:
+        driver_emails.request_base_letter(modified_driver)
 
     return modified_driver
+
+
+def post_save(modified_driver, orig):
+    if modified_driver.base_letter and not orig.base_letter:
+        server.services.booking.on_base_letter_approved(modified_driver)
+
+    if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
+        #TODO: do something after driver fail to get base letter
+        driver_emails.base_letter_rejected(modified_driver)
 
 
 def get_missing_docs(driver):
@@ -57,13 +62,30 @@ def get_missing_docs(driver):
     return missing
 
 
-def send_reminders():
-    # send reminders to drivers who started an account, and never submitted docs
-    docs_reminder_delay_hours = 1  # TODO(JP): get from config
-
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=docs_reminder_delay_hours)
-    remindable_drivers = server.models.Driver.objects.filter(
+def _get_remindable_drivers(delay_hours):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    return server.models.Driver.objects.filter(
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
     )
-    campaign_service.send_to_queryset(remindable_drivers, driver_emails.documents_reminder)
+
+
+def send_document_reminders(docs_reminder_delay_hours, reminder_name):
+    # send reminders to drivers who started an account, and never submitted docs
+    remindable_drivers = _get_remindable_drivers(docs_reminder_delay_hours)
+    throttle_service.send_to_queryset(remindable_drivers, eval('driver_emails.' + reminder_name))
+
+
+def process_driver_emails():
+    send_document_reminders(
+      docs_reminder_delay_hours=1,
+      reminder_name='first_documents_reminder'
+    )
+    send_document_reminders(
+      docs_reminder_delay_hours=24,
+      reminder_name='second_documents_reminder'
+    )
+    send_document_reminders(
+      docs_reminder_delay_hours=36,
+      reminder_name='third_documents_reminder'
+    )

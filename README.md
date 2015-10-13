@@ -84,6 +84,12 @@ Run the migrations to make sure the database is prepared:
 Then start the e2e test server:
 `python manage.py runserver 9999 --settings='idlecars.e2e_test_settings'`
 
+### Running integration tests
+Integration test support is pretty iffy at the time of this writing. To test the Braintree integration against the
+sandbox, follow the instructions above to `create database idlecars_integration_test;`
+Then run
+`./manage.py test_braintree_sandbox --settings='idlecars.integration_test_settings'`
+
 ### Deployment
 We have two apps on Heroku that we deploy to.
 Staging
@@ -100,7 +106,7 @@ git push staging master
 heroku run python manage.py migrate --app staging-idlecars
 ```
 
-To deploy to master:
+To deploy to production:
 ```
 git push heroku master
 heroku run python manage.py migrate --app idlecars

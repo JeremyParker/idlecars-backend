@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.template import Context
 from django.template.loader import render_to_string
+from django.conf import settings
 
 from idlecars import email, client_side_routes
 from server.services import car as car_service
@@ -66,7 +67,7 @@ def new_booking_email(booking):
         if not user.email:
             continue
         merge_vars = {
-            booking.car.owner.email(): {
+            user.email: {
                 'PREVIEW': headline,
                 'FNAME': user.first_name,
                 'HEADLINE': headline,
@@ -87,30 +88,118 @@ def new_booking_email(booking):
                 'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                     booking.driver.address_proof_image
                 ),
-                'TEXT5': 'Questions? Call us at 1-844-IDLECAR (1-844-435-3227)',
+                'IMAGE_5_URL': booking.driver.base_letter,
+                'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
+                    booking.driver.base_letter
+                ),
+                'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
             }
         }
         email.send_async(
-            template_name='no_button_four_images',
+            template_name='no_button_five_images',
             subject='A driver has booked your {}.'.format(booking.car.display_name()),
             merge_vars=merge_vars,
         )
 
 
-def booking_canceled(booking):
+def first_morning_insurance_reminder(booking):
+    for user in booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+        merge_vars = {
+            user.email: {
+                'FNAME': user.first_name,
+                'HEADLINE': 'Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
+                'TEXT': '''
+                    We are just checking in on {} {} booking with plate
+                    {} to see if they have been accepted on the insurance.
+                    You can click below to let us know where they are in the process.
+                    Once they are approved, they will contact you to schedule a pickup.
+                '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
+                'CTA_LABEL': 'Call (844) 435-3227',
+                'CTA_URL': 'tel:1-844-4353227'
+            }
+        }
+        email.send_async(
+            template_name='one_button_no_image',
+            subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
+
+
+def second_morning_insurance_reminder(booking):
+    for user in booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+        merge_vars = {
+            user.email: {
+                'FNAME': user.first_name,
+                'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(booking.car.display_name(), booking.driver.full_name()),
+                'TEXT': '''
+                    We are doing a final checks on {} {} booking with plate
+                    {} to see if they have been accepted on the insurance.
+                    You can click below to let us know where they are in the process.
+                    Once they are approved, they will contact you to schedule a pickup.
+                    <br />
+                    We promise drivers that they will get into a car within 24-48 hours,
+                    so if we don’t hear back we will have to cancel the booking.
+                    We don’t want to do that so please let us know if there are any problems.
+                '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
+                'CTA_LABEL': 'Call (844) 435-3227',
+                'CTA_URL': 'tel:1-844-4353227'
+            }
+        }
+        email.send_async(
+            template_name='one_button_no_image',
+            subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
+
+
+def first_afternoon_insurance_reminder(booking):
+    first_morning_insurance_reminder(booking)
+
+
+def second_afternoon_insurance_reminder(booking):
+    second_morning_insurance_reminder(booking)
+
+
+def pickup_confirmation(booking):
+    for user in booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+
+        merge_vars = {
+            user.email: {
+                'FNAME': user.first_name or None,
+                'HEADLINE': '{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
+                'TEXT': '''
+                    You have received a payment of {} from {} for the {}
+                    You can now give them the keys to drive.
+                    <br />
+                    Their credit card has been charged and you will receive the payment within 48 hours.
+                    The security deposit of {} has also been placed in escrow for you.
+                '''.format(
+                    # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
+                    booking.weekly_rent,
+                    booking.driver.full_name(),
+                    booking.car.display_name(),
+                    booking.car.solo_deposit
+                ),
+            }
+        }
+        email.send_async(
+            template_name='no_button_no_image',
+            subject='{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
+
+
+def _booking_incomplete_email(booking, body_text):
     headline = '{} has decided not to rent your {}, with license plate {}'.format(
         booking.driver.full_name(),
         booking.car.display_name(),
         booking.car.plate,
-    )
-
-    # TODO(JP) track gender of driver and customize this email text
-    text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
-    broker not to add them to the insurance policy? We apologise for any inconvenience. We've
-    already re-listed your car on the site so we can find you another driver as soon as possible.
-    '''.format(
-        booking.driver.first_name(),
-        booking.car.display_name(),
     )
     subject = 'Your {} booking has canceled.'.format(booking.car.display_name())
     for user in booking.car.owner.auth_users.all():
@@ -120,7 +209,7 @@ def booking_canceled(booking):
             user.email: {
                 'FNAME': user.first_name or None,
                 'HEADLINE': subject,
-                'TEXT': text,
+                'TEXT': body_text,
                 'CTA_LABEL': 'See your listing',
                 'CTA_URL': client_side_routes.car_details_url(booking.car)
             }
@@ -132,8 +221,53 @@ def booking_canceled(booking):
         )
 
 
-def insurance_follow_up_email(booking):
-    # TODO(JP)
+def booking_canceled(booking):
+    # TODO(JP) track gender of driver and customize this email text
+    text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
+    broker not to add them to the insurance policy? We apologise for any inconvenience. We've
+    already re-listed your car on the site so we can find you another driver as soon as possible.
+    '''.format(
+        booking.driver.first_name(),
+        booking.car.display_name(),
+    )
+    _booking_incomplete_email(booking, text)
+
+
+def driver_rejected(booking):
+    text = '''We're sorry. {} has decided not to rent your {}. We apologise for any inconvenience.
+    We've already re-listed your car on the site so we can find you another driver as soon as possible.
+    '''.format(
+        booking.driver.first_name(),
+        booking.car.display_name(),
+    )
+    _booking_incomplete_email(booking, text)
+
+
+def insurance_too_slow(booking):
+    for user in booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+        merge_vars = {
+            user.email: {
+                'FNAME': user.first_name,
+                'HEADLINE': 'Your {} booking has been canceled'.format(booking.car.display_name()),
+                'TEXT': '''
+                    We are sorry to inform you, but we cancelled the {} booking for {}
+                    We require drivers get on the insurance and into cars within 24 to 48 hours,
+                    so we hope that we will be able to do this next time.
+                    <br />
+                    If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
+                '''.format(booking.car.display_name(), booking.driver.full_name()),
+            }
+        }
+        email.send_async(
+            template_name='no_button_no_image',
+            subject='Your {} booking has been canceled'.format(booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
+
+
+def first_rent_payment(booking):
     pass
 
 

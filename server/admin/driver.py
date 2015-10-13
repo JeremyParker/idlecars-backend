@@ -9,6 +9,19 @@ from server import models
 from server.admin.booking import BookingForDriverInline
 
 
+class PaymentMethodInline(admin.TabularInline):
+    model = models.PaymentMethod
+    verbose_name = "Payment Method"
+    extra = 0
+    fields = [
+        'description',
+    ]
+    readonly_fields = [
+        'description',
+    ]
+    def description(self, instance):
+        return '{} **** **** **** {}'.format(instance.card_type, instance.suffix)
+
 class DriverAdmin(ReverseModelAdmin):
     inline_type = 'tabular'
     inline_reverse = (
@@ -49,6 +62,8 @@ class DriverAdmin(ReverseModelAdmin):
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
+                ('base_letter_rejected'),
+                ('base_letter','base_letter_link'),
             )
         }),
         ('None', {
@@ -65,8 +80,9 @@ class DriverAdmin(ReverseModelAdmin):
         'fhv_link',
         'dd_link',
         'poa_link',
+        'base_letter_link',
     ]
-    inlines = [BookingForDriverInline,]
+    inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def date_joined(self, instance):
@@ -99,3 +115,9 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
     poa_link.short_description = ''
     poa_link.allow_tags = True
+
+    def base_letter_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
+    base_letter_link.short_description = ''
+    base_letter_link.allow_tags = True
+

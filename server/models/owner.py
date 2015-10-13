@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 from operator import attrgetter
+from decimal import Decimal
 
 from django.db import models
+from django.conf import settings
 from django.core.validators import RegexValidator, MinLengthValidator
 from django.core.validators import MaxLengthValidator
 from django.contrib.auth.models import User as AuthUser
@@ -34,6 +36,14 @@ class Owner(models.Model):
     ]
     merchant_account_state = models.IntegerField(choices=MERCHANT_ACCOUNT_STATE, null=True)
     merchant_id = models.CharField(blank=True, max_length=200)
+    service_percentage = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        null=True, # if negotiated we use the system default
+        blank=True,
+        verbose_name='Negotiated service percentage',
+    )
+    service_percentage.short_description = 'Negotiated take rate'
 
     split_shift = models.NullBooleanField(verbose_name="Accepts Split Shifts", blank=True)
     RATING = [
@@ -72,6 +82,11 @@ class Owner(models.Model):
 
     def email(self):
         return self.get_user_attr('email')
+
+    @property
+    def effective_service_percentage(self):
+        ''' Returns the owner's negotiated rate if we negotiated one, otherwise, the default'''
+        return self.service_percentage or Decimal(settings.TAKE_RATE)
 
     def __unicode__(self):
         name = self.name()

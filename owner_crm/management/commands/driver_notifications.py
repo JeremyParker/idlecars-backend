@@ -10,4 +10,5 @@ class Command(BaseCommand):
     help = 'Sends notifications to drivers'
 
     def handle(self, *args, **options):
-        driver_service.send_reminders()
+        driver_service.process_driver_emails()
+
