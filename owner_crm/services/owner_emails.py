@@ -176,6 +176,7 @@ def pickup_confirmation(booking):
                     Their credit card has been charged and you will receive the payment within 48 hours.
                     The security deposit of {} has also been placed in escrow for you.
                 '''.format(
+                    # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
                     booking.weekly_rent,
                     booking.driver.full_name(),
                     booking.car.display_name(),
