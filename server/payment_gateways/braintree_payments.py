@@ -15,7 +15,7 @@ UNSUPPORTED_PAYMENT_METHOD = 'Sorry, we\'re not accepting that form of payment r
 PAYMENT_DECLINED_MSG = 'Sorry, your payment was declined. Please try another credit card.'
 NETWORK_DOWN_MSG = 'Sorry, something went wrong with your payment. Please try again soon.'
 SPEED_LIMIT_MSG = 'Sorry that didn\'t work. Please wait a minute before using this card again.'
-GENERIC_MSG = 'Sorry that didn\'t work. The payment processor says "{}". Please call Idlecars at 844-435-3227 for help.'
+GENERIC_MSG = 'Sorry that didn\'t work. The payment processor says "{}". Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER + ' for help.'
 
 configured = False
 

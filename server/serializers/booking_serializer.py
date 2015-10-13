@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.utils import timezone
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -142,7 +143,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             },
             5: {
                 'step_title': 'Rental in progress',
-                'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
+                'step_subtitle': 'Trouble with your car? Call idlecars: ' + settings.IDLECARS_PHONE_NUMBER,
             }
         }
         step = self.get_step(obj)

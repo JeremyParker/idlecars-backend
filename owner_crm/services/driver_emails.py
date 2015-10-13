@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.template import Context
 from django.template.loader import render_to_string
+from django.conf import settings
 
 from idlecars import email, client_side_routes
 
@@ -304,10 +305,9 @@ def car_rented_elsewhere(booking):
             Sorry, someone else has already rented out the car you wanted. Sometimes that
             happens. Still, there are plenty more great cars available.
             <br />
-            Need help? Contact us:
-            support@idlecars.com
-            1 844 435 3227
-            ''',
+            <p>Need help? Contact us:</p>
+            <p>support@idlecars.com </p>
+            <p>''' + settings.IDLECARS_PHONE_NUMBER + '</p>',
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
@@ -431,8 +431,7 @@ def password_reset_confirmation(password_reset):
             'HEADLINE': 'Your account password has been set',
             'TEXT': '''
                 If you didn't set your password, or if you think something funny is going
-                on, please call us any time at 1-844-IDLECAR (1-844-435-3227).
-            ''',
+                on, please call us any time at ''' + settings.IDLECARS_PHONE_NUMBER + '.',
             'CTA_LABEL': 'Find your car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
