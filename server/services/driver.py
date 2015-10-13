@@ -35,7 +35,6 @@ def documents_changed(original, modified):
 def pre_save(modified_driver, orig):
     if documents_changed(orig, modified_driver):
         modified_driver.documentation_approved = False
-        modified_driver.base_letter = ''
         if modified_driver.all_docs_uploaded():
             ops_emails.documents_uploaded(modified_driver)
 
