@@ -198,7 +198,7 @@ def awaiting_insurance_email(booking):
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
-            'CTA_LABEL': 'See your car',
+            'CTA_LABEL': 'See your rental',
             'CTA_URL': client_side_routes.bookings(),
             'HEADLINE': 'Your documents have been reviewed and approved',
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),

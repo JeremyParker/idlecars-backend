@@ -115,7 +115,7 @@ def first_morning_insurance_reminder(booking):
                     You can click below to let us know where they are in the process.
                     Once they are approved, they will contact you to schedule a pickup.
                 '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
-                'CTA_LABEL': 'Call IDLECARS',
+                'CTA_LABEL': 'Call (844) 435-3227',
                 'CTA_URL': 'tel:1-844-4353227'
             }
         }
@@ -144,7 +144,7 @@ def second_morning_insurance_reminder(booking):
                     so if we don’t hear back we will have to cancel the booking.
                     We don’t want to do that so please let us know if there are any problems.
                 '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
-                'CTA_LABEL': 'Call IDLECARS',
+                'CTA_LABEL': 'Call (844) 435-3227',
                 'CTA_URL': 'tel:1-844-4353227'
             }
         }
