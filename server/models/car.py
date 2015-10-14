@@ -121,6 +121,7 @@ class Car(models.Model):
         else:
             return self.status
 
+    # TODO: remove this once the client shows cents in the listing price.
     def normalized_cost(self):
         return int((self.solo_cost + 6) / 7)
 

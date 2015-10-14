@@ -116,6 +116,7 @@ class CarSerializer(serializers.ModelSerializer):
     def get_deposit(self, obj):
         return '${}'.format(obj.solo_deposit)
 
+    # TODO: remove this once the client shows cents in the listing price.
     def get_cost(self, obj):
         return unicode(obj.normalized_cost())
 
