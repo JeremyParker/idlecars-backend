@@ -360,6 +360,10 @@ def pickup_confirmation(booking):
     )
 
 
+def payment_recipt(booking):
+    pass
+
+
 def someone_else_booked(booking):
     if not booking.driver.email():
         return
