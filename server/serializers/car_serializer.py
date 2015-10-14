@@ -120,7 +120,7 @@ class CarSerializer(serializers.ModelSerializer):
         return unicode(obj.normalized_cost())
 
     def get_cost_str(self, obj):
-        return str(obj.quantized_cost())
+        return str(obj.quantized_cost()).split('.')
 
     def get_cost_bucket(self, obj):
         # TODO: remove method when front end no longer needs it
