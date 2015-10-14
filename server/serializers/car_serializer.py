@@ -19,6 +19,7 @@ class CarSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     deposit = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
+    cost_str = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
@@ -38,6 +39,7 @@ class CarSerializer(serializers.ModelSerializer):
             'details',
             'deposit',
             'cost',
+            'cost_str',
             'cost_time',
             'cost_bucket',
             'image_url',
@@ -54,6 +56,7 @@ class CarSerializer(serializers.ModelSerializer):
             'certifications',
             'details',
             'cost',
+            'cost_str',
             'cost_time',
             'cost_bucket',
             'image_url',
@@ -113,8 +116,12 @@ class CarSerializer(serializers.ModelSerializer):
     def get_deposit(self, obj):
         return '${}'.format(obj.solo_deposit)
 
+    # TODO: remove this once the client shows cents in the listing price.
     def get_cost(self, obj):
         return unicode(obj.normalized_cost())
+
+    def get_cost_str(self, obj):
+        return str(obj.quantized_cost()).split('.')
 
     def get_cost_bucket(self, obj):
         # TODO: remove method when front end no longer needs it
