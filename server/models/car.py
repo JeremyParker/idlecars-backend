@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from decimal import Decimal, ROUND_UP
+
 from django.db import models
 from django.utils import timezone
 
@@ -121,6 +123,9 @@ class Car(models.Model):
 
     def normalized_cost(self):
         return int((self.solo_cost + 6) / 7)
+
+    def quantized_cost(self):
+        return (self.solo_cost / Decimal(7.00)).quantize(Decimal('.01'), rounding=ROUND_UP)
 
     def __unicode__(self):
         if self.plate and self.year:
