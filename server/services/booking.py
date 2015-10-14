@@ -351,7 +351,8 @@ def _cron_payments():
             if payment.error_message:
                 print payment.error_message
                 print payment.notes
-            driver_emails.payment_recipt(booking)
+                continue
+            driver_emails.payment_receipt(payment)
         except Exception as e:
             print e
             ops_emails.payment_job_failed(booking, e)

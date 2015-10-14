@@ -360,8 +360,49 @@ def pickup_confirmation(booking):
     )
 
 
-def payment_recipt(booking):
-    pass
+def _payment_recipt_text(payment):
+    text = '''
+        Driver Receipt <br />
+        Driver: {} <br />
+        Booking: {} <br /><br />
+
+        Invoice Period: {} - {} <br />
+        Payment Amount: {} <br /><br />
+    '''
+    from server.services import booking as booking_service
+    fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
+    if end_time:
+        text += 'Your next payment of {} will occur on {} <br />'.format(amount, end_time)
+    else:
+        text += 'This is your last payment <br />'
+
+    text += 'Your booking ends on: {}'
+    return text.format(
+        payment.booking.driver.full_name(),
+        payment.booking.car.display_name(),
+        payment.invoice_start_time.strftime('%b %d'),
+        payment.invoice_end_time.strftime('%b %d'),
+        payment.amount,
+        payment.booking.end_time.strftime('%b %d')
+    )
+
+
+def payment_recipt(payment):
+    if not payment.booking.driver.email():
+        return
+
+    merge_vars = {
+        payment.booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'HEADLINE': 'Payment Received: {} Booking'.format(payment.booking.car.display_name()),
+            'TEXT': _payment_recipt_text(payment)
+        }
+    }
+    email.send_async(
+        template_name='no_button_no_image',
+        subject='Payment Received: {} Booking'.format(payment.booking.car.display_name()),
+        merge_vars=merge_vars,
+    )
 
 
 def someone_else_booked(booking):

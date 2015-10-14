@@ -59,9 +59,11 @@ def new_booking_email(booking):
     )
 
     # TODO(JP) track gender of driver and customize this email text
-    text = '''All of {}\'s required documentation is included in this email.
-    Please have him added to the insurance policy today to ensure
-    they are able to start driving tomorrow.'''.format(booking.driver.first_name())
+    text = '''
+        {} has booked your car and has paid the ${} deposit.
+        Please have them added to the insurance policy today to ensure that they can start driving tomorrow.
+        All of their documents are included in this email.
+    '''.format(booking.driver.first_name(), booking.car.solo_deposit)
 
     for user in booking.car.owner.auth_users.all():
         if not user.email:
