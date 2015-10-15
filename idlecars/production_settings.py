@@ -27,6 +27,7 @@ SESSION_COOKIE_SECURE = True  # if True, only sends session cookie over HTTPS
 
 DEFAULT_FROM_EMAIL = 'support@idlecars.com'
 OPS_EMAIL = 'support@idlecars.com'
+STREET_TEAM_EMAIL = 'streetteam@idlecars.com'
 
 PAYMENT_GATEWAY_NAME = 'braintree'
 BRAINTREE_BASE_URL = 'www.braintreegateway.com'

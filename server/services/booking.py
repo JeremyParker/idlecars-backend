@@ -9,7 +9,7 @@ from django.db.models import F
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_emails, driver_emails, owner_emails
+from owner_crm.services import ops_emails, driver_emails, owner_emails, street_team_emails
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -62,6 +62,20 @@ def filter_visible(booking_queryset):
     ''' Can this booking be seen in the Driver app '''
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
+
+def lastest_pending_booking(driver):
+    return driver.booking_set.all().filter(
+        checkout_time__isnull=True,
+        incomplete_time__isnull=True,
+    ).order_by('created_time').last()
+
+
+def on_docs_approved(driver):
+    pending_booking = lastest_pending_booking(driver)
+    if pending_booking:
+        street_team_emails.request_base_letter(pending_booking)
+    else:
+        pass
 
 def on_base_letter_approved(driver):
     reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
