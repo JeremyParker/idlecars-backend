@@ -360,7 +360,7 @@ def pickup_confirmation(booking):
     )
 
 
-def _payment_recipt_text(payment):
+def _payment_receipt_text(payment):
     text = '''
         Driver Receipt <br />
         Driver: {} <br />
@@ -387,15 +387,15 @@ def _payment_recipt_text(payment):
     )
 
 
-def payment_recipt(payment):
+def payment_receipt(payment):
     if not payment.booking.driver.email():
         return
 
     merge_vars = {
         payment.booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+            'FNAME': payment.booking.driver.first_name() or None,
             'HEADLINE': 'Payment Received: {} Booking'.format(payment.booking.car.display_name()),
-            'TEXT': _payment_recipt_text(payment)
+            'TEXT': _payment_receipt_text(payment)
         }
     }
     email.send_async(
