@@ -14,9 +14,12 @@ from server import factories, payment_gateways
 from server.models import Payment
 from server.services import booking as booking_service
 
+from freezegun import freeze_time
+
 
 ''' Tests the cron job that creates recurring payments '''
 class TestCronPayments(TestCase):
+    @freeze_time("2015-10-10 9:55:00")
     def setUp(self):
         self.driver = factories.PaymentMethodDriver.create(documentation_approved=True)
         self.owner = factories.BankAccountOwner.create()
@@ -131,3 +134,34 @@ class TestCronPayments(TestCase):
         daily_rent = self.booking.weekly_rent / Decimal('7.00')
         expected_amount = (daily_rent * Decimal('2.00')).quantize(Decimal('.01'), rounding=ROUND_UP)
         self.assertEqual(most_recent_payment.amount, expected_amount)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Payment Received: {} Booking'.format(self.booking.car.display_name())
+        )
+
+        self.assertTrue(
+            'This is your last payment' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT']
+        )
+
+    def test_multiple_cron_payment_email(self):
+        with freeze_time("2015-10-20 9:55:00"):
+            self.booking.end_time = timezone.now()
+            self.booking.save()
+
+        from django.core.mail import outbox
+
+        with freeze_time("2015-10-10 9:55:00"):
+            call_command('cron_job')
+        with freeze_time("2015-10-17 9:55:00"):
+            call_command('cron_job')
+
+        self.assertEqual(len(outbox), 2)
+        self.assertTrue(
+            'Your next payment of' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT']
+        )
+        self.assertTrue(
+            'This is your last payment' in outbox[1].merge_vars[self.booking.driver.email()]['TEXT']
+        )

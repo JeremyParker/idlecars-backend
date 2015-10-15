@@ -371,7 +371,7 @@ def _payment_receipt_text(payment):
     '''
     from server.services import booking as booking_service
     fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
-    if end_time:
+    if amount > 0:
         text += 'Your next payment of {} will occur on {} <br />'.format(amount, end_time)
     else:
         text += 'This is your last payment <br />'
