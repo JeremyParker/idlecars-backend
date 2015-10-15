@@ -194,6 +194,7 @@ def find_deposit_payment(booking):
 
 
 def calculate_next_rent_payment(booking):
+    ''' Returns a tuple of (service_fee, rent_amount, start_time, end_time).'''
     if not booking.checkout_time:
         return (None, None, None, None)
 
@@ -276,7 +277,7 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
-        driver_emails.checkout_recipt(booking)
+        driver_emails.checkout_receipt(booking)
 
     return booking
 
@@ -353,6 +354,7 @@ def _cron_payments():
                 print payment.notes
                 continue
             driver_emails.payment_receipt(payment)
+            owner_emails.payment_receipt(payment)
         except Exception as e:
             print e
             ops_emails.payment_job_failed(booking, e)

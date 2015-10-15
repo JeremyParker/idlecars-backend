@@ -319,7 +319,8 @@ def car_rented_elsewhere(booking):
     )
 
 
-def checkout_recipt(booking):
+def checkout_receipt(booking):
+    from server.services import booking as booking_service
     if not booking.driver.email():
         return
     merge_vars = {
@@ -327,8 +328,14 @@ def checkout_recipt(booking):
             'FNAME': booking.driver.first_name() or None,
             'HEADLINE': 'Your {} was successfully reserved'.format(booking.car.display_name()),
             'TEXT': '''
-            We put a hold on your credit card for the {} you booked. You will not be charged until you pick up your car.
-            '''.format(booking.car.display_name()),
+            We put a hold of ${} on your credit card for the {} you booked. You will not be charged until
+            you inspect, approve, and pick up your car. Once you approve the car in the app, the hold on
+            your card will be processed, and your card will be charged for the first rental payment of ${}.
+            '''.format(
+                booking.car.solo_deposit,
+                booking.car.display_name(),
+                booking_service.calculate_next_rent_payment(booking)[1],
+            ),
         }
     }
     email.send_async(
@@ -372,7 +379,7 @@ def _payment_receipt_text(payment):
     from server.services import booking as booking_service
     fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
     if amount > 0:
-        text += 'Your next payment of {} will occur on {} <br />'.format(amount, end_time)
+        text += 'Your next payment of {} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
     else:
         text += 'This is your last payment <br />'
 

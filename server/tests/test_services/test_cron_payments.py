@@ -103,7 +103,7 @@ class TestCronPayments(TestCase):
 
     def test_exception_doesnt_kill_job(self):
         gateway = payment_gateways.get_gateway('fake')
-        gateway.push_next_payment_response('exception') # <-- This will make it throw an exception
+        gateway.push_next_payment_response('ignore this output') # <-- This will make it throw an exception
         call_command('cron_job')
 
         # check what emails got sent
@@ -136,32 +136,32 @@ class TestCronPayments(TestCase):
         self.assertEqual(most_recent_payment.amount, expected_amount)
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 2)
         self.assertEqual(
             outbox[0].subject,
             'Payment Received: {} Booking'.format(self.booking.car.display_name())
         )
-
-        self.assertTrue(
-            'This is your last payment' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT']
-        )
+        self.assertTrue('This is your last payment' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT'])
+        owner_email = self.booking.car.owner.auth_users.first().email
+        self.assertTrue('This is the last payment' in outbox[1].merge_vars[owner_email]['TEXT'])
 
     def test_multiple_cron_payment_email(self):
         with freeze_time("2015-10-20 9:55:00"):
             self.booking.end_time = timezone.now()
             self.booking.save()
 
-        from django.core.mail import outbox
-
         with freeze_time("2015-10-10 9:55:00"):
             call_command('cron_job')
         with freeze_time("2015-10-17 9:55:00"):
             call_command('cron_job')
 
-        self.assertEqual(len(outbox), 2)
-        self.assertTrue(
-            'Your next payment of' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT']
-        )
-        self.assertTrue(
-            'This is your last payment' in outbox[1].merge_vars[self.booking.driver.email()]['TEXT']
-        )
+        from django.core.mail import outbox
+        driver_email = self.booking.driver.email()
+        owner_email = self.booking.car.owner.auth_users.first().email
+        # we should have sent two receipts to the driver and two notifications to the owner.
+        self.assertEqual(len(outbox), 4)
+        self.assertTrue('Your next payment of' in outbox[0].merge_vars[driver_email]['TEXT'])
+        self.assertTrue('The next payment of' in outbox[1].merge_vars[owner_email]['TEXT'])
+        self.assertTrue('This is your last payment' in outbox[2].merge_vars[driver_email]['TEXT'])
+        self.assertTrue('This is the last payment' in outbox[3].merge_vars[owner_email]['TEXT'])
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
