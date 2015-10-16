@@ -139,7 +139,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             },
             4: {
                 'step_title': 'Pick up your car',
-                'step_subtitle': "Your insurance has been approved. Pick up your car!",
+                'step_subtitle': "Your insurance has been approved. Arrange to pick up your car.",
             },
             5: {
                 'step_title': 'Rental in progress',
