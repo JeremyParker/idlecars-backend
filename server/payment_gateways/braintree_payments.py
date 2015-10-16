@@ -65,39 +65,43 @@ def _parse_error(response):
     message = PAYMENT_DECLINED_MSG
     details = ''
     try:
-        details = unicode(response.transaction.__dict__)
-        status = response.transaction.status
-        if status == 'gateway_rejected':
-            error = response.transaction.gateway_rejection_reason
-            gateway_errors = {
-                'duplicate': SPEED_LIMIT_MSG,
-                'fraud': PAYMENT_DECLINED_MSG,
-            }
-            if error in gateway_errors:
-                message = gateway_errors[error]
-        elif status in {'processor_declined', 'failed'}:
-            processor_errors = {
-                '2000': PAYMENT_DECLINED_MSG,   # Do Not Honor
-                '2001': PAYMENT_DECLINED_MSG,   # Insufficient Funds
-                '2003': PAYMENT_DECLINED_MSG,   # Cardholder's Activity Limit Exceeded
-                '2004': EXPIRED_CARD_MSG,       # Expired Card
-                '2005': PAYMENT_DECLINED_MSG,   # Invalid Credit Card Number
-                '2011': PAYMENT_DECLINED_MSG,   # Voice Authorization Required
-                '2015': PAYMENT_DECLINED_MSG,   # Transaction Not Allowed
-                '2024': PAYMENT_DECLINED_MSG,   # Card Type Not Enabled
-                '2038': PAYMENT_DECLINED_MSG,   # Processor Declined
-                '2046': PAYMENT_DECLINED_MSG,   # Declined
-                '2047': PAYMENT_DECLINED_MSG,   # Call Issuer. Pick Up Card.
-                '2053': PAYMENT_DECLINED_MSG,   # Card reported as lost or stolen
-                '2057': PAYMENT_DECLINED_MSG,   # Issuer or Cardholder has put a restriction on the card
-                '3000': NETWORK_DOWN_MSG,       # Processor Network Unavailable - Try Again
-            }
-            processor_error = response.transaction.processor_response_code
-            if processor_error in processor_errors:
-                message = processor_errors[processor_error]
-            else:
-                msg = response.transaction.processor_response_code.processor_response_text
-                message = GENERIC_MSG.format(msg)
+        if response.transaction:
+            details = unicode(response.transaction.__dict__)
+            status = response.transaction.status
+            if status == 'gateway_rejected':
+                error = response.transaction.gateway_rejection_reason
+                gateway_errors = {
+                    'duplicate': SPEED_LIMIT_MSG,
+                    'fraud': PAYMENT_DECLINED_MSG,
+                }
+                if error in gateway_errors:
+                    message = gateway_errors[error]
+            elif status in {'processor_declined', 'failed'}:
+                processor_errors = {
+                    '2000': PAYMENT_DECLINED_MSG,   # Do Not Honor
+                    '2001': PAYMENT_DECLINED_MSG,   # Insufficient Funds
+                    '2003': PAYMENT_DECLINED_MSG,   # Cardholder's Activity Limit Exceeded
+                    '2004': EXPIRED_CARD_MSG,       # Expired Card
+                    '2005': PAYMENT_DECLINED_MSG,   # Invalid Credit Card Number
+                    '2011': PAYMENT_DECLINED_MSG,   # Voice Authorization Required
+                    '2015': PAYMENT_DECLINED_MSG,   # Transaction Not Allowed
+                    '2024': PAYMENT_DECLINED_MSG,   # Card Type Not Enabled
+                    '2038': PAYMENT_DECLINED_MSG,   # Processor Declined
+                    '2046': PAYMENT_DECLINED_MSG,   # Declined
+                    '2047': PAYMENT_DECLINED_MSG,   # Call Issuer. Pick Up Card.
+                    '2053': PAYMENT_DECLINED_MSG,   # Card reported as lost or stolen
+                    '2057': PAYMENT_DECLINED_MSG,   # Issuer or Cardholder has put a restriction on the card
+                    '3000': NETWORK_DOWN_MSG,       # Processor Network Unavailable - Try Again
+                }
+                processor_error = response.transaction.processor_response_code
+                if processor_error in processor_errors:
+                    message = processor_errors[processor_error]
+                else:
+                    msg = response.transaction.processor_response_code.processor_response_text
+                    message = GENERIC_MSG.format(msg)
+        else:
+            details = response.errors.errors.data
+            message = NETWORK_DOWN_MSG
     except Exception:
         message = NETWORK_DOWN_MSG
 
@@ -190,6 +194,12 @@ def _transaction_request(payment):
 
 def pre_authorize(payment):
     assert not payment.transaction_id
+
+    if not payment.amount:
+        payment.status = models.Payment.PRE_AUTHORIZED
+        payment.error_message = ''
+        return payment
+
     _configure_braintree()
     request = _transaction_request(payment)
     request.update({ 'options': { 'submit_for_settlement': False }})
@@ -212,8 +222,14 @@ def pre_authorize(payment):
 
 
 def void(payment):
-    assert payment.transaction_id
     assert payment.status is models.Payment.PRE_AUTHORIZED
+
+    if not payment.amount:
+        payment.status = models.Payment.VOIDED
+        payment.error_message = ''
+        return payment
+
+    assert payment.transaction_id
     _configure_braintree()
 
     response = braintree.Transaction.void(payment.transaction_id)
@@ -230,6 +246,11 @@ def void(payment):
 
 
 def settle(payment):
+    if not payment.amount:
+        payment.status = models.Payment.SETTLED
+        payment.error_message = ''
+        return payment
+
     _configure_braintree()
     if payment.transaction_id:
         response = braintree.Transaction.submit_for_settlement(payment.transaction_id)
@@ -258,6 +279,11 @@ def settle(payment):
 
 
 def escrow(payment):
+    if not payment.amount:
+        payment.status = models.Payment.HELD_IN_ESCROW
+        payment.error_message = ''
+        return payment
+
     _configure_braintree()
     if payment.transaction_id:
         response = braintree.Transaction.hold_in_escrow(payment.transaction_id)

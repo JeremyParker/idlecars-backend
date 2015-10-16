@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import os, sys
 from random import randint
+from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -42,6 +43,10 @@ class Command(BaseCommand):
             self._run_test('test_add_bank_account_business', g)
             self._run_test('test_add_payment_method', g)
             self._run_test('test_add_payment_method_error', g)
+            self._run_test('test_pre_authorize_zero_dollars', g)
+            self._run_test('test_void_zero_dollars', g)
+            self._run_test('test_settle_zero_dollars', g)
+            self._run_test('test_escrow_zero_dollars', g)
             self._run_test('test_pre_authorize_error', g)
             self._run_test('test_pre_authorize', g)
             self._run_test('test_void', g)
@@ -124,6 +129,11 @@ class Command(BaseCommand):
         dollar_amount = '9.{}'.format(randint(1, 99)) # change so the gateway won't reject as dupe.
         return services.payment.create_payment(booking, dollar_amount)
 
+    def _create_zero_payment(self):
+        payment = self._create_payment()
+        payment.amount = Decimal('0.00')
+        return payment
+
     def _create_error_payment(self, gateway):
         # we have to handle each gateway separately :(
         if gateway is payment_gateways.get_gateway('fake'):
@@ -133,6 +143,33 @@ class Command(BaseCommand):
         car = factories.BookableCar.create(owner=self.owner)
         booking = factories.Booking.create(car=car, driver=self.driver, service_percentage='0.000')
         return services.payment.create_payment(booking, '2078.00')
+
+    def test_pre_authorize_zero_dollars(self, gateway):
+        payment = self._create_zero_payment()
+        payment = gateway.pre_authorize(payment)
+        if not payment.status == models.Payment.PRE_AUTHORIZED:
+            print 'test_pre_authorize_zero_dollars failed to authorize for {}'.format(gateway)
+
+    def test_void_zero_dollars(self, gateway):
+        payment = self._create_zero_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.void(payment)
+        if not payment.status == models.Payment.VOIDED:
+            print 'test_void_zero_dollars failed to void for {}'.format(gateway)
+
+    def test_settle_zero_dollars(self, gateway):
+        payment = self._create_zero_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.settle(payment)
+        if not payment.status == models.Payment.SETTLED:
+            print 'test_settle_zero_dollars failed to void for {}'.format(gateway)
+
+    def test_escrow_zero_dollars(self, gateway):
+        payment = self._create_zero_payment()
+        payment = gateway.pre_authorize(payment)
+        payment = gateway.escrow(payment)
+        if not payment.status == models.Payment.HELD_IN_ESCROW:
+            print 'test_escrow_zero_dollars failed to void for {}'.format(gateway)
 
     def test_pre_authorize(self, gateway):
         payment = self._create_payment()
