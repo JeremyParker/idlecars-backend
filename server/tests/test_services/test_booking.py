@@ -103,7 +103,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.solo_deposit)
         return new_booking
 
-    def test_checkout_recipt(self):
+    def test_checkout_receipt(self):
         driver = factories.ApprovedDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=driver)
         new_booking = booking_service.checkout(new_booking)

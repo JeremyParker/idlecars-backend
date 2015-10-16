@@ -59,9 +59,11 @@ def new_booking_email(booking):
     )
 
     # TODO(JP) track gender of driver and customize this email text
-    text = '''All of {}\'s required documentation is included in this email.
-    Please have him added to the insurance policy today to ensure
-    they are able to start driving tomorrow.'''.format(booking.driver.first_name())
+    text = '''
+        {} has booked your car and has paid the ${} deposit.
+        Please have them added to the insurance policy today to ensure that they can start driving tomorrow.
+        All of their documents are included in this email.
+    '''.format(booking.driver.first_name(), booking.car.solo_deposit)
 
     for user in booking.car.owner.auth_users.all():
         if not user.email:
@@ -174,11 +176,11 @@ def pickup_confirmation(booking):
                 'FNAME': user.first_name or None,
                 'HEADLINE': '{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
                 'TEXT': '''
-                    You have received a payment of {} from {} for the {}
+                    You have received a payment of ${} from {} for the {}
                     You can now give them the keys to drive.
                     <br />
-                    Their credit card has been charged and you will receive the payment within 48 hours.
-                    The security deposit of {} has also been placed in escrow for you.
+                    Their credit card has been charged and you will receive the payment within 48 hours. The security
+                    deposit of ${} has also been placed in escrow for you.
                 '''.format(
                     # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
                     booking.weekly_rent,
@@ -191,6 +193,68 @@ def pickup_confirmation(booking):
         email.send_async(
             template_name='no_button_no_image',
             subject='{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
+            merge_vars=merge_vars,
+        )
+
+
+def _payment_receipt_text(payment):
+    text = '''
+        You have received a payment through idlecars. <br /><br />
+        Car: {} with license plate {} <br />
+        Driver: {} <br /><br />
+
+        Invoice Period: {} - {} <br />
+        Payment Amount: ${} <br />
+        Service Fee: ${} <br />
+        ---------------------------------- <br />
+        Total disbursement: ${} <br />
+        <br /><br />
+    '''.format(
+            payment.booking.car.display_name(),
+            payment.booking.car.plate,
+            payment.booking.driver.full_name(),
+
+            payment.invoice_start_time.strftime('%b %d'),
+            payment.invoice_end_time.strftime('%b %d'),
+            payment.amount,
+            payment.service_fee,
+            payment.amount - payment.service_fee,
+        )
+
+    from server.services import booking as booking_service
+    fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
+    if amount > 0:
+        text += 'The next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+    else:
+        text += 'This is the last payment. The driver should contact you to arrange dropoff.<br />'
+
+    text += '''
+        This booking will end on: {} <br /><br />
+        As always, if you have any questions, please call us at {}.<br />
+        Thank you.
+    '''.format(
+        payment.booking.end_time.strftime('%b %d'),
+        settings.IDLECARS_PHONE_NUMBER,
+    )
+    return text
+
+
+def payment_receipt(payment):
+    for user in payment.booking.car.owner.auth_users.all():
+        if not user.email:
+            continue
+        merge_vars = {
+            user.email: {
+                'FNAME': user.first_name or None,
+                'HEADLINE': 'Payment received for your {}'.format(payment.booking.car.display_name()),
+                'TEXT': _payment_receipt_text(payment)
+            }
+        }
+        email.send_async(
+            template_name='no_button_no_image',
+            subject='Payment receipt from idlecars rental license plate {}'.format(
+                payment.booking.car.plate
+            ),
             merge_vars=merge_vars,
         )
 
@@ -265,10 +329,6 @@ def insurance_too_slow(booking):
             subject='Your {} booking has been canceled'.format(booking.car.display_name()),
             merge_vars=merge_vars,
         )
-
-
-def first_rent_payment(booking):
-    pass
 
 
 def account_created(password_reset):
