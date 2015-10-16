@@ -158,9 +158,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_next_payment(self,obj):
         fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(obj)
-        if end_time:
-            end_time = end_time.strftime('%b %d')
-        return {'amount':amount, 'end_time': end_time}
+        if start_time:
+            start_time = start_time.strftime('%b %d')
+        return {'amount':amount, 'start_time': start_time}
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)

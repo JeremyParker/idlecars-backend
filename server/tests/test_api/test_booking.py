@@ -259,8 +259,8 @@ class ReservedBookingDetailsTest(APITestCase):
 
     def test_next_rent_payment(self):
         response = self.client.get(self.url, format='json')
-        end_time = self.booking.checkout_time + datetime.timedelta(days=7)
+        start_time = self.booking.checkout_time
         self.assertEqual(
             response.data['next_payment'],
-            {'amount': self.booking.car.solo_cost, 'end_time': end_time.strftime('%b %d')}
+            {'amount': self.booking.car.solo_cost, 'start_time': start_time.strftime('%b %d')}
         )
