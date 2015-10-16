@@ -199,13 +199,28 @@ def pickup_confirmation(booking):
 
 def _payment_receipt_text(payment):
     text = '''
-        You have received a payment through idlecars. <br />
+        You have received a payment through idlecars. <br /><br />
+        Car: {} with license plate {} <br />
+        Driver: {} <br /><br />
+
         Invoice Period: {} - {} <br />
         Payment Amount: ${} <br />
-        For your {} with license plate {} <br />
-        From Driver: {} <br />
+        Service Fee: ${} <br />
+        ---------------------------------- <br />
+        Total disbursement: ${} <br />
         <br /><br />
-    '''
+    '''.format(
+            payment.booking.car.display_name(),
+            payment.booking.car.plate,
+            payment.booking.driver.full_name(),
+
+            payment.invoice_start_time.strftime('%b %d'),
+            payment.invoice_end_time.strftime('%b %d'),
+            payment.amount,
+            payment.service_fee,
+            payment.amount - payment.service_fee,
+        )
+
     from server.services import booking as booking_service
     fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
     if amount > 0:
@@ -217,17 +232,11 @@ def _payment_receipt_text(payment):
         This booking will end on: {} <br /><br />
         As always, if you have any questions, please call us at {}.<br />
         Thank you.
-    '''
-    return text.format(
-        payment.invoice_start_time.strftime('%b %d'),
-        payment.invoice_end_time.strftime('%b %d'),
-        payment.amount,
-        payment.booking.car.display_name(),
-        payment.booking.car.plate,
-        payment.booking.driver.full_name(),
+    '''.format(
         payment.booking.end_time.strftime('%b %d'),
         settings.IDLECARS_PHONE_NUMBER,
     )
+    return text
 
 
 def payment_receipt(payment):

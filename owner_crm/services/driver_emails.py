@@ -369,9 +369,9 @@ def pickup_confirmation(booking):
 
 def _payment_receipt_text(payment):
     text = '''
-        Driver Receipt <br />
+        Your weekly rental fee has been paid. <br />
         Driver: {} <br />
-        Booking: {} <br /><br />
+        Car: {} <br /><br />
 
         Invoice Period: {} - {} <br />
         Payment Amount: {} <br /><br />
@@ -379,11 +379,11 @@ def _payment_receipt_text(payment):
     from server.services import booking as booking_service
     fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
     if amount > 0:
-        text += 'Your next payment of {} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+        text += 'Your next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
     else:
-        text += 'This is your last payment <br />'
+        text += 'This is your last payment. <br />'
 
-    text += 'Your booking ends on: {}'
+    text += 'Your booking will end on {}. <br /><br />Thank you for using idlecars.'
     return text.format(
         payment.booking.driver.full_name(),
         payment.booking.car.display_name(),
