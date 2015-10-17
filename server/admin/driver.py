@@ -12,6 +12,7 @@ from server.admin.booking import BookingForDriverInline
 class PaymentMethodInline(admin.TabularInline):
     model = models.PaymentMethod
     verbose_name = "Payment Method"
+    can_delete = False
     extra = 0
     fields = [
         'description',

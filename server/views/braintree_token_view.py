@@ -14,6 +14,5 @@ class BraintreeTokenView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        driver = Driver.objects.get(auth_user=self.request.user)
-        data = braintree_payments.initialize_gateway(driver)
+        data = braintree_payments.initialize_gateway()
         return Response(data, status=status.HTTP_200_OK)
