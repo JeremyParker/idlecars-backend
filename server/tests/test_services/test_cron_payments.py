@@ -19,7 +19,7 @@ from freezegun import freeze_time
 
 ''' Tests the cron job that creates recurring payments '''
 class TestCronPayments(TestCase):
-    @freeze_time("2015-10-10 9:55:00")
+    @freeze_time("2014-10-10 9:55:00")
     def setUp(self):
         self.driver = factories.PaymentMethodDriver.create(documentation_approved=True)
         self.owner = factories.BankAccountOwner.create()
@@ -53,16 +53,17 @@ class TestCronPayments(TestCase):
         self.assertEqual(self.booking.payment_set.count(), 2)
 
     def test_make_payment_when_due(self):
-        call_command('cron_job')
-        self.assertEqual(self.booking.payment_set.count(), 3)
-        self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
-        self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
+        with freeze_time("2014-10-10 9:55:00"):
+            call_command('cron_job')
+            self.assertEqual(self.booking.payment_set.count(), 3)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
-        # make sure we don't add any payments the next time we call cron_job
-        call_command('cron_job')
-        self.assertEqual(self.booking.payment_set.count(), 3)
-        self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
-        self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
+            # make sure we don't add any payments the next time we call cron_job
+            call_command('cron_job')
+            self.assertEqual(self.booking.payment_set.count(), 3)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
     def test_correct_time_range_with_many_past_payments(self):
         # make another payment from the previous week
@@ -146,13 +147,13 @@ class TestCronPayments(TestCase):
         self.assertTrue('This is the last payment' in outbox[1].merge_vars[owner_email]['TEXT'])
 
     def test_multiple_cron_payment_email(self):
-        with freeze_time("2015-10-20 9:55:00"):
+        with freeze_time("2014-10-20 9:55:00"):
             self.booking.end_time = timezone.now()
             self.booking.save()
 
-        with freeze_time("2015-10-10 9:55:00"):
+        with freeze_time("2014-10-10 9:55:00"):
             call_command('cron_job')
-        with freeze_time("2015-10-17 9:55:00"):
+        with freeze_time("2014-10-17 9:55:00"):
             call_command('cron_job')
 
         from django.core.mail import outbox
