@@ -342,7 +342,7 @@ def account_created(password_reset):
     }
     email.send_async(
         template_name='owner_account_invite',
-        subject='Welcome to Idle Cars - complete your owner account, so you can get paid',
+        subject='Complete your account today - sign up with your bank account and start getting paid',
         merge_vars=merge_vars,
     )
 
