@@ -27,6 +27,7 @@ class DriverServiceTest(TestCase):
             setattr(self.driver, doc, 'http://whatever.com')
         self.driver.save()
 
+
     def _validate_new_booking_email(self, email, booking):
         self.assertEqual(
             email.subject,
@@ -36,6 +37,35 @@ class DriverServiceTest(TestCase):
         self.assertEqual(
             email.merge_vars[settings.OPS_EMAIL]['CTA_URL'].split('/')[-2],
             unicode(booking.pk),
+        )
+
+
+    def _validate_base_letter_email(self, new_booking):
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        # and an email to the street team to get the base letter
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
+        self.assertEqual(
+            outbox[0].subject,
+            "Base letter request for {}".format(new_booking.driver.full_name())
+        )
+
+
+    def _validate_no_booking_email(self):
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to idlecars, {}!'.format(self.driver.full_name())
         )
 
 
@@ -79,83 +109,44 @@ class DriverServiceTest(TestCase):
 
     def test_docs_approved_no_booking(self):
         self.driver = factories.CompletedDriver.create()
-        self.driver.documentation_approved = True
-        self.driver.save()
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-        self.assertEqual(
-            outbox[0].subject,
-            'Welcome to idlecars, {}!'.format(self.driver.full_name())
-        )
+        self._validate_no_booking_email()
 
 
     def test_docs_approved_pending_booking(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.Booking.create(car=self.car, driver=self.driver)
-        self.driver.documentation_approved = True
-        self.driver.save()
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        # and an email to the street team to get the base letter
-        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
-        self.assertEqual(
-            outbox[0].subject,
-            "Base letter request for {}".format(new_booking.driver.full_name())
-        )
+        self._validate_base_letter_email(new_booking)
 
 
     def test_docs_approved_reserved_booking(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.ReservedBooking.create(car=self.car, driver=self.driver)
-        self.driver.documentation_approved = True
-        self.driver.save()
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self._validate_base_letter_email(new_booking)
 
-        # and an email to the street team to get the base letter
-        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
-        self.assertEqual(
-            outbox[0].subject,
-            "Base letter request for {}".format(new_booking.driver.full_name())
-        )
+
+    def test_docs_approved_accepted_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=self.driver)
+
+        self._validate_base_letter_email(new_booking)
 
 
     def test_docs_approved_return_booking(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.ReturnedBooking.create(car=self.car, driver=self.driver)
-        self.driver.documentation_approved = True
-        self.driver.save()
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-        self.assertEqual(
-            outbox[0].subject,
-            'Welcome to idlecars, {}!'.format(self.driver.full_name())
-        )
+        self._validate_no_booking_email()
 
 
     def test_docs_approved_incomplete_booking(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.IncompleteBooking.create(car=self.car, driver=self.driver)
-        self.driver.documentation_approved = True
-        self.driver.save()
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self._validate_no_booking_email()
 
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-        self.assertEqual(
-            outbox[0].subject,
-            'Welcome to idlecars, {}!'.format(self.driver.full_name())
-        )
 
 
     def test_docs_approved_with_base_letter(self):
