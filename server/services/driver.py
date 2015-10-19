@@ -39,7 +39,7 @@ def pre_save(modified_driver, orig):
             ops_emails.documents_uploaded(modified_driver)
 
     if modified_driver.documentation_approved and not orig.documentation_approved:
-        driver_emails.request_base_letter(modified_driver)
+        server.services.booking.on_docs_approved(modified_driver)
 
     return modified_driver
 

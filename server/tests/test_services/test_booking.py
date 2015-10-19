@@ -72,9 +72,14 @@ class BookingServiceTest(TestCase):
 
         # check we sent the right email
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 2)
         self._validate_new_booking_email(outbox[0], new_booking)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Base letter request for {}'.format(new_booking.driver.full_name())
+        )
 
     def test_checkout_all_docs_uploaded(self):
         driver = factories.PaymentMethodDriver.create()
@@ -216,25 +221,6 @@ class BookingServiceTest(TestCase):
         # successfully pick up the car
         new_booking = booking_service.pickup(new_booking)
         self._check_payments_after_pickup(new_booking)
-
-    def test_base_letter_approved_no_booking(self):
-        self.driver = factories.ApprovedDriver.create()
-        self.assertFalse(self.driver.base_letter_rejected)
-        self.assertEqual(self.driver.base_letter, '')
-
-        self.driver.base_letter = 'some base letter'
-        self.driver.clean()
-        self.driver.save()
-
-        # we should have sent driver an email telling them about the to book a car
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-        self.assertEqual(
-            outbox[0].subject,
-            'Welcome to idlecars, {}!'.format(self.driver.full_name())
-        )
 
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()

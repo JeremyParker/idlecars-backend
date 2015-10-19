@@ -9,7 +9,7 @@ from django.db.models import F
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_emails, driver_emails, owner_emails
+from owner_crm.services import ops_emails, driver_emails, owner_emails, street_team_emails
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -63,12 +63,20 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
+def on_docs_approved(driver):
+    if not driver.base_letter:
+        bookings = Booking.objects.filter(driver=driver)
+
+        if bookings:
+            latest_booking = bookings.order_by('created_time').last()
+            street_team_emails.request_base_letter(latest_booking)
+        else:
+            driver_emails.docs_approved_no_booking(driver)
+
+
 def on_base_letter_approved(driver):
     reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
-    if not pending_bookings and not reserved_bookings:
-        driver_emails.base_letter_approved_no_booking(driver)
-        return
 
     for booking in pending_bookings:
         driver_emails.base_letter_approved_no_checkout(booking)
@@ -124,6 +132,9 @@ def create_booking(car, driver):
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
     ops_emails.new_booking_email(booking)
+
+    if booking.driver.documentation_approved and not booking.driver.base_letter:
+        street_team_emails.request_base_letter(booking)
     return booking
 
 

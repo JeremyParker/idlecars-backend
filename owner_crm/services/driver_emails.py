@@ -10,7 +10,7 @@ from idlecars import email, client_side_routes
 from server.services import car as car_service
 
 
-def base_letter_approved_no_booking(driver):
+def docs_approved_no_booking(driver):
     #TODO: text in this email needs to be updated
     if not driver.email():
         return
@@ -210,12 +210,6 @@ def awaiting_insurance_email(booking):
         subject='Congratulations! Your documents have been submitted!',
         merge_vars=merge_vars,
     )
-
-
-def request_base_letter(driver):
-    if not driver.email():
-        return
-    #TODO: send street team email to get base letter
 
 
 def base_letter_rejected(driver):
