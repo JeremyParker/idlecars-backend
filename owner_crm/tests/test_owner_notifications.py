@@ -81,9 +81,9 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(create_time):
             return server.factories.RequestedBooking.create()
 
-    @freeze_time("2015-10-11 10:00:00")
+    @freeze_time("2014-10-11 10:00:00")
     def test_owner_reminder(self):
-        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
         call_command('owner_notifications')
 
@@ -98,16 +98,16 @@ class TestOwnerNotifications(TestCase):
             )
         )
 
-    @freeze_time("2015-10-11 10:00:00")
+    @freeze_time("2014-10-11 10:00:00")
     def test_no_booking(self):
         call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
-    @freeze_time("2015-10-11 10:00:00")
+    @freeze_time("2014-10-11 10:00:00")
     def test_no_email_twice(self):
-        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
         call_command('owner_notifications')
         call_command('owner_notifications')
@@ -116,7 +116,7 @@ class TestOwnerNotifications(TestCase):
         self.assertEqual(len(outbox), 1)
 
     def test_only_requested_bookings_send_reminder(self):
-        with freeze_time("2015-10-10 18:00:00"):
+        with freeze_time("2014-10-10 18:00:00"):
             server.factories.Booking.create()
             server.factories.ReservedBooking.create()
             server.factories.AcceptedBooking.create()
@@ -125,28 +125,28 @@ class TestOwnerNotifications(TestCase):
             server.factories.RefundedBooking.create()
             server.factories.IncompleteBooking.create()
 
-        with freeze_time("2015-10-11 10:00:00"):
+        with freeze_time("2014-10-11 10:00:00"):
             call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
     def test_reminder_emails_morning_until_failure(self):
-        self.booking = self._new_requested_booking("2015-10-10 18:00:00")
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
-        with freeze_time("2015-10-11 10:00:00"):
+        with freeze_time("2014-10-11 10:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-11 17:00:00"):
+        with freeze_time("2014-10-11 17:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-12 10:00:00"):
+        with freeze_time("2014-10-12 10:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-12 17:00:00"):
+        with freeze_time("2014-10-12 17:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-13 10:00:00"):
+        with freeze_time("2014-10-13 10:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
 
@@ -163,21 +163,21 @@ class TestOwnerNotifications(TestCase):
         self.assertEqual(len(outbox), 7)
 
     def test_reminder_emails_afternoon_until_failure(self):
-        self.booking = self._new_requested_booking("2015-10-10 23:00:00")
+        self.booking = self._new_requested_booking("2014-10-10 23:00:00")
 
-        with freeze_time("2015-10-11 17:00:00"):
+        with freeze_time("2014-10-11 17:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-12 10:00:00"):
+        with freeze_time("2014-10-12 10:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-12 17:00:00"):
+        with freeze_time("2014-10-12 17:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-13 10:00:00"):
+        with freeze_time("2014-10-13 10:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2015-10-13 17:00:00"):
+        with freeze_time("2014-10-13 17:00:00"):
             call_command('owner_notifications')
             call_command('cron_job')
 
