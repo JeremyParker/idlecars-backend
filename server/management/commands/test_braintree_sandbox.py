@@ -56,7 +56,6 @@ class Command(BaseCommand):
             self._run_test('test_escrow', g)
             self._run_test('test_escrow_fresh', g)
             self._run_test('test_escrow_fresh_error', g)
-            self._run_test('test_pre_with_multiple_methods', g)
 
             # This test is not working right now. Status has to be "Settled". We can't fake that.
             # self._run_test('test_refund', g)
