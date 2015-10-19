@@ -77,23 +77,12 @@ class DriverServiceTest(TestCase):
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
 
-    def test_base_letter_approved_no_docs_approved(self):
-        self.driver = factories.CompletedDriver.create()
-        self.assertEqual(self.driver.base_letter, '')
-        self.driver.base_letter = 'some base letter'
-        with self.assertRaises(ValidationError):
-            self.driver.clean()
-
-
-    def test_base_letter_approved_no_booking(self):
+    def test_docs_approved_no_booking(self):
         self.driver = factories.CompletedDriver.create()
         self.driver.documentation_approved = True
-        self.driver.base_letter = 'some base letter'
-        self.driver.clean()
         self.driver.save()
 
         from django.core.mail import outbox
-        # should be 2 emails once we setup street team email
         self.assertEqual(len(outbox), 1)
 
         self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
@@ -103,12 +92,90 @@ class DriverServiceTest(TestCase):
         )
 
 
-    def test_base_letter_approved_pending_booking(self):
+    def test_docs_approved_pending_booking(self):
         self.driver = factories.CompletedDriver.create()
+        new_booking = factories.Booking.create(car=self.car, driver=self.driver)
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        # and an email to the street team to get the base letter
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
+        self.assertEqual(
+            outbox[0].subject,
+            "Base letter request for {}".format(new_booking.driver.full_name())
+        )
+
+
+    def test_docs_approved_reserved_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        new_booking = factories.ReservedBooking.create(car=self.car, driver=self.driver)
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        # and an email to the street team to get the base letter
+        self.assertEqual(outbox[0].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
+        self.assertEqual(
+            outbox[0].subject,
+            "Base letter request for {}".format(new_booking.driver.full_name())
+        )
+
+
+    def test_docs_approved_return_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        new_booking = factories.ReturnedBooking.create(car=self.car, driver=self.driver)
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to idlecars, {}!'.format(self.driver.full_name())
+        )
+
+
+    def test_docs_approved_incomplete_booking(self):
+        self.driver = factories.CompletedDriver.create()
+        new_booking = factories.IncompleteBooking.create(car=self.car, driver=self.driver)
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to idlecars, {}!'.format(self.driver.full_name())
+        )
+
+
+    def test_docs_approved_with_base_letter(self):
+        self.driver = factories.CompletedDriver.create()
+        self.driver.base_letter = 'some base letter'
+        self.driver.save()
+
+        new_booking = factories.ReservedBooking.create(car=self.car, driver=self.driver)
+        self.driver.documentation_approved = True
+        self.driver.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+
+    def test_base_letter_approved_pending_booking(self):
+        self.driver = factories.ApprovedDriver.create()
         new_booking = booking_service.create_booking(self.car, self.driver)
         self.assertEqual(new_booking.get_state(), Booking.PENDING)
 
-        new_booking.driver.documentation_approved = True
         new_booking.driver.base_letter = 'some base letter'
         new_booking.driver.clean()
         new_booking.driver.save()
@@ -117,29 +184,34 @@ class DriverServiceTest(TestCase):
         self.assertEqual(new_booking.get_state(), Booking.PENDING)
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
+        self.assertEqual(len(outbox), 3)
 
         # we should have sent an email to ops telling them about the new booking
         self._validate_new_booking_email(outbox[0], new_booking)
 
-        # and an email to the driver telling them their docs and base letter were approved
-        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
+        # and an email to the street team to get the base letter
+        self.assertEqual(outbox[1].merge_vars.keys()[0], settings.STREET_TEAM_EMAIL)
         self.assertEqual(
             outbox[1].subject,
+            "Base letter request for {}".format(new_booking.driver.full_name())
+        )
+
+        # and an email to the driver telling them their docs and base letter were approved
+        self.assertEqual(outbox[2].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[2].subject,
             "Your {} is waiting on your payment information!".format(new_booking.car.display_name())
         )
 
 
     def test_base_letter_approved_reserved_booking(self):
-        self.driver = factories.PaymentMethodDriver.create()
+        self.driver = factories.ApprovedDriver.create()
         new_booking = factories.ReservedBooking.create(driver=self.driver)
         self.assertEqual(new_booking.get_state(), Booking.RESERVED)
-        self.assertFalse(self.driver.documentation_approved)
         self.assertFalse(self.driver.base_letter_rejected)
         self.assertEqual(self.driver.base_letter, '')
 
         # THEN the documents are approved
-        new_booking.driver.documentation_approved = True
         new_booking.driver.base_letter = 'some base letter'
         new_booking.driver.clean()
         new_booking.driver.save()

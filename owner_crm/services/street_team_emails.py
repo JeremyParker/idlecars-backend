@@ -19,7 +19,7 @@ def request_base_letter(booking):
                 Phone number: {} <br />
                 TLC plate number: {}
             '''.format(
-                booking.driver.full_name,
+                booking.driver.full_name(),
                 booking.driver.email(),
                 booking.driver.phone_number(),
                 booking.car.plate

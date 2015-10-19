@@ -73,10 +73,11 @@ def on_docs_approved(driver):
     uncompleted_bookings = filter_uncompleted(Booking.objects.filter(driver=driver))
 
     if uncompleted_bookings:
-        latest_uncompleted_booking = uncompleted_bookings.order_by('created_time').last()
-        street_team_emails.request_base_letter(latest_uncompleted_booking)
+        if not driver.base_letter:
+            latest_uncompleted_booking = uncompleted_bookings.order_by('created_time').last()
+            street_team_emails.request_base_letter(latest_uncompleted_booking)
     else:
-        driver.docs_approved_no_booking(driver)
+        driver_emails.docs_approved_no_booking(driver)
 
 
 def on_base_letter_approved(driver):
@@ -138,7 +139,7 @@ def create_booking(car, driver):
     booking = Booking.objects.create(car=car, driver=driver,)
     ops_emails.new_booking_email(booking)
 
-    if booking.driver.all_docs_uploaded() and not booking.driver.base_letter:
+    if booking.driver.documentation_approved and not booking.driver.base_letter:
         street_team_emails.request_base_letter(booking)
     return booking
 
