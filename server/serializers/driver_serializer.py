@@ -10,6 +10,7 @@ from rest_framework.serializers import SerializerMethodField
 from idlecars import fields
 from server import models
 from server.serializers import PaymentMethodSerializer
+from server.services import driver as driver_service
 
 
 class DriverSerializer(ModelSerializer):
@@ -76,6 +77,6 @@ class DriverSerializer(ModelSerializer):
         return instance
 
     def get_payment_method(self, instance):
-        payment_method = instance.paymentmethod_set.last()
+        payment_method = driver_service.get_default_payment_method(instance)
         if payment_method:
             return PaymentMethodSerializer(payment_method).data

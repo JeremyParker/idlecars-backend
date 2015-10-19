@@ -53,6 +53,12 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
         response = self.client.get(self.url, {'pk': 'me'})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_we_show_default_payment_method(self):
+        factories.PaymentMethod.create(driver=self.driver)
+        factories.PaymentMethod.create(driver=self.driver, suffix='1234')
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self.assertEqual(response.data['payment_method']['suffix'], '1234')
+
 
 class DriverUpdateTest(AuthenticatedDriverTest):
     def test_update_incomplete_model(self):

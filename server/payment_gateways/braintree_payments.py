@@ -108,7 +108,7 @@ def _parse_error(response):
     return message, details
 
 
-def initialize_gateway(driver):
+def initialize_gateway():
     _configure_braintree()
     return {'client_token': braintree.ClientToken.generate(),}
 
@@ -182,9 +182,8 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
 
 
 def _transaction_request(payment):
-    payment_method = payment.booking.driver.paymentmethod_set.last()
     return {
-        'payment_method_token': payment_method.gateway_token,
+        'payment_method_token': payment.payment_method.gateway_token,
         'amount': str(payment.amount),
         'customer_id': payment.booking.driver.braintree_customer_id,
         'merchant_account_id': payment.booking.car.owner.merchant_id,

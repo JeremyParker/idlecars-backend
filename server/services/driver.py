@@ -62,6 +62,10 @@ def get_missing_docs(driver):
     return missing
 
 
+def get_default_payment_method(driver):
+    return driver.paymentmethod_set.order_by('pk').last()
+
+
 def _get_remindable_drivers(delay_hours):
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
     return server.models.Driver.objects.filter(
@@ -70,22 +74,22 @@ def _get_remindable_drivers(delay_hours):
     )
 
 
-def send_document_reminders(docs_reminder_delay_hours, reminder_name):
+def _send_document_reminders(docs_reminder_delay_hours, reminder_name):
     # send reminders to drivers who started an account, and never submitted docs
     remindable_drivers = _get_remindable_drivers(docs_reminder_delay_hours)
     throttle_service.send_to_queryset(remindable_drivers, eval('driver_emails.' + reminder_name))
 
 
 def process_driver_emails():
-    send_document_reminders(
+    _send_document_reminders(
       docs_reminder_delay_hours=1,
       reminder_name='first_documents_reminder'
     )
-    send_document_reminders(
+    _send_document_reminders(
       docs_reminder_delay_hours=24,
       reminder_name='second_documents_reminder'
     )
-    send_document_reminders(
+    _send_document_reminders(
       docs_reminder_delay_hours=36,
       reminder_name='third_documents_reminder'
     )
