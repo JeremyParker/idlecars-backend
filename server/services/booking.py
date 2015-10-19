@@ -53,6 +53,12 @@ def filter_booked(booking_queryset):
         pickup_time__isnull=False,
     )
 
+def filter_uncompleted(booking_queryset):
+    return booking_queryset.filter(
+        return_time__isnull=True,
+        incomplete_time__isnull=True,
+    )
+
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
@@ -63,26 +69,19 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
-def lastest_pending_booking(driver):
-    return driver.booking_set.all().filter(
-        checkout_time__isnull=True,
-        incomplete_time__isnull=True,
-    ).order_by('created_time').last()
-
-
 def on_docs_approved(driver):
-    pending_booking = lastest_pending_booking(driver)
-    if pending_booking:
-        street_team_emails.request_base_letter(pending_booking)
+    uncompleted_bookings = filter_uncompleted(Booking.objects.filter(driver=driver))
+
+    if uncompleted_bookings:
+        latest_uncompleted_booking = uncompleted_bookings.order_by('created_time').last()
+        street_team_emails.request_base_letter(latest_uncompleted_booking)
     else:
-        pass
+        driver.docs_approved_no_booking(driver)
+
 
 def on_base_letter_approved(driver):
     reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
-    if not pending_bookings and not reserved_bookings:
-        driver_emails.base_letter_approved_no_booking(driver)
-        return
 
     for booking in pending_bookings:
         driver_emails.base_letter_approved_no_checkout(booking)
@@ -138,6 +137,9 @@ def create_booking(car, driver):
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
     ops_emails.new_booking_email(booking)
+
+    if booking.driver.all_docs_uploaded() and not booking.driver.base_letter:
+        street_team_emails.request_base_letter(booking)
     return booking
 
 

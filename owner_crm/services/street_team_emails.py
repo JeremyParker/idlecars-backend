@@ -29,7 +29,7 @@ def request_base_letter(booking):
             'CAR_IMAGE_URL': booking.driver.fhv_license_image,
         }
     }
-    email.send_sync(
+    email.send_async(
         template_name='one_button_one_image',
         subject='Base letter request for {}'.format(booking.driver.full_name()),
         merge_vars=merge_vars,

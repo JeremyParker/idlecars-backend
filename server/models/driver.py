@@ -73,10 +73,6 @@ class Driver(models.Model):
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
                 )
-        elif self.base_letter:
-            raise exceptions.ValidationError(
-                "You can't save base letter until all documents are approved."
-            )
 
         if self.base_letter and self.base_letter_rejected:
             raise exceptions.ValidationError(
