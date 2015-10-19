@@ -56,6 +56,7 @@ class Command(BaseCommand):
             self._run_test('test_escrow', g)
             self._run_test('test_escrow_fresh', g)
             self._run_test('test_escrow_fresh_error', g)
+            self._run_test('test_pre_with_multiple_methods', g)
 
             # This test is not working right now. Status has to be "Settled". We can't fake that.
             # self._run_test('test_refund', g)
@@ -255,3 +256,23 @@ class Command(BaseCommand):
         payment = gateway.refund(payment)
         if not payment.status == models.Payment.REFUNDED:
             print 'test_refund failed with {} for {}'.format(payment.error_message, gateway)
+
+    def test_pre_with_multiple_methods(self, gateway):
+        success, card_info = gateway.add_payment_method(
+            self.driver,
+            test_braintree_params.VALID_VISA_NONCE,
+        )
+        assert(success)
+
+        success, card_info = gateway.add_payment_method(
+            self.driver,
+            test_braintree_params.VALID_VISA_NONCE,
+        )
+        assert(success)
+
+        payment = self._create_payment()
+        payment = gateway.pre_authorize(payment)
+        if not payment.status == models.Payment.PRE_AUTHORIZED:
+            print 'test_pre_with_multiple_methods failed to authorize for {}'.format(gateway)
+        if not payment.transaction_id:
+            print 'test_pre_with_multiple_methods failed to get a transaction id for {}'.format(gateway)
