@@ -127,9 +127,9 @@ class DriverServiceTest(TestCase):
         self._validate_base_letter_email(new_booking)
 
 
-    def test_docs_approved_accepted_booking(self):
+    def test_docs_approved_requested_booking(self):
         self.driver = factories.CompletedDriver.create()
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=self.driver)
+        new_booking = factories.RequestedBooking.create(car=self.car, driver=self.driver)
 
         self._validate_base_letter_email(new_booking)
 
