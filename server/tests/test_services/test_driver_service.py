@@ -148,7 +148,6 @@ class DriverServiceTest(TestCase):
         self._validate_no_booking_email()
 
 
-
     def test_docs_approved_with_base_letter(self):
         self.driver = factories.CompletedDriver.create()
         self.driver.base_letter = 'some base letter'
