@@ -53,12 +53,6 @@ def filter_booked(booking_queryset):
         pickup_time__isnull=False,
     )
 
-def filter_uncompleted(booking_queryset):
-    return booking_queryset.filter(
-        return_time__isnull=True,
-        incomplete_time__isnull=True,
-    )
-
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
@@ -70,14 +64,14 @@ def filter_visible(booking_queryset):
 
 
 def on_docs_approved(driver):
-    uncompleted_bookings = filter_uncompleted(Booking.objects.filter(driver=driver))
+    if not driver.base_letter:
+        bookings = Booking.objects.filter(driver=driver)
 
-    if uncompleted_bookings:
-        if not driver.base_letter:
-            latest_uncompleted_booking = uncompleted_bookings.order_by('created_time').last()
-            street_team_emails.request_base_letter(latest_uncompleted_booking)
-    else:
-        driver_emails.docs_approved_no_booking(driver)
+        if bookings:
+            latest_booking = bookings.order_by('created_time').last()
+            street_team_emails.request_base_letter(latest_booking)
+        else:
+            driver_emails.docs_approved_no_booking(driver)
 
 
 def on_base_letter_approved(driver):

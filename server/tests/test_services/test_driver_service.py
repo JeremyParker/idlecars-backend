@@ -27,7 +27,6 @@ class DriverServiceTest(TestCase):
             setattr(self.driver, doc, 'http://whatever.com')
         self.driver.save()
 
-
     def _validate_new_booking_email(self, email, booking):
         self.assertEqual(
             email.subject,
@@ -138,14 +137,14 @@ class DriverServiceTest(TestCase):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.ReturnedBooking.create(car=self.car, driver=self.driver)
 
-        self._validate_no_booking_email()
+        self._validate_base_letter_email(new_booking)
 
 
     def test_docs_approved_incomplete_booking(self):
         self.driver = factories.CompletedDriver.create()
         new_booking = factories.IncompleteBooking.create(car=self.car, driver=self.driver)
 
-        self._validate_no_booking_email()
+        self._validate_base_letter_email(new_booking)
 
 
     def test_docs_approved_with_base_letter(self):
@@ -201,7 +200,6 @@ class DriverServiceTest(TestCase):
         self.assertFalse(self.driver.base_letter_rejected)
         self.assertEqual(self.driver.base_letter, '')
 
-        # THEN the documents are approved
         new_booking.driver.base_letter = 'some base letter'
         new_booking.driver.clean()
         new_booking.driver.save()
