@@ -45,5 +45,5 @@ def faq():
     return '/'.join(parts)
 
 def add_car_form():
-    return 'http://goo.gl/forms/4s26I6GUQY'
+    return 'https://goo.gl/NhIGM6'
 
