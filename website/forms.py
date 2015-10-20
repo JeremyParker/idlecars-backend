@@ -5,14 +5,6 @@ from django import forms
 
 import models
 
-class ContactForm(forms.ModelForm):
-    class Meta:
-        model = models.Contact
-        fields = ['role', 'email', 'zipcode']
-        widgets = {
-            'role': forms.RadioSelect(),
-        }
-
 
 class DriverSurveyForm(forms.ModelForm):
     class Meta:

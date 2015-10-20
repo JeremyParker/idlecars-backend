@@ -1,88 +1,100 @@
 extends ./base.jade
 
 - block content
+  section.navbar
+    .logo
+      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+    .links
+      a(href="#tutorial") #[h5 How it works]
+      a(href="#{ login_url }") #[h5 Join/Login]
+      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
+    .menu-button(ng-click='showMenu = !showMenu')
+      .burger-button(ng-class='{active: showMenu}')
+    .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+      a(href="#tutorial") How it works
+      a(href="#{ login_url }") Join/Login
+      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
+
   section.headline
-    .container
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
-      .content
-        h1 Start renting #[br] Start earning
-        a.button(href="#{ settings.WEBAPP_URL }") Find your car
-        a.login(href="#{ login_url }") Have an account? #[span Log in]
+    .phone-background
+      .container
+        .wrapper
+          div
+            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+          .content
+            h1 Keep More of #[br] What You Earn
+            p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+            p No leases, loans or long-term commitments. Insurance and maintenance included.
+            a.button(href="#{ settings.WEBAPP_URL }") Find your car
+            a.login(href="#{ login_url }") Have an account? #[span Log in]
 
   section.get-more
     .container
-      h2 A better marketplace
-      p for professional drivers to rent for-hire vehicles, on-demand.
+      h3 Register Today. #[br] Drive Tomorrow.
+      h5 We handle the paperwork, #[br] so you can focus on your fares.
 
   section.select
     .container
       .content
-        h2 Ready to drive
-        p Every idlecar is inspected and is already registered with the TLC.
-        p Find a car and start driving the next day. No leases, loans or long-term commitments.
+        h3 Choose your car, get insured, and start driving within #[br] #[strong 24 hours.]
+        h1 It's that easy.
 
-  section.get-more
+  section.manhattan
     .container
-      h2 It’s your choice
-      p Our cars allow you to drive for any base.
-      img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
-      img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
+      h2 Your Car, Your Service. When you need it.
+      h4 Idlecars work with all services including Uber, Lyft and More
+      img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
-  section.get-more.convenient
-    .container
-      h2 Convenient for you
-      p We take care of all the paperwork, insurance, and maintenance.
-      p The listed price is all you pay.
+  a.invisible(id="tutorial")
+  section.tutorial
+    h3 How it works
+    .segments
+      .segment
+        .pane
+          .image
+            img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
+          h6 #[strong Pick A Car. Any Car.]
+          h6 Find the car that fits your style and budget.
+      .segment
+        .pane
+          .image
+            img(src="#{ settings.STATIC_URL }img/tutorial2.png")
+          h6 #[strong Start Your Account.]
+          h6 Use your smartphone to upload your driving documents.
+      .segment
+        .pane
+          .image
+            img(src="#{ settings.STATIC_URL }img/tutorial3.png")
+          h6.single-line #[strong Reserve Your Car.]
+          h6 Use your credit card or bank account to reserve your car.
+      .segment
+        .pane
+          .image
+            img(src="#{ settings.STATIC_URL }img/tutorial4.png")
+          h6.single-line #[strong DRIVE]
+          h6 Once you’re added to the insurance, you’re ready to go. Go pick up your car!
 
-  #lets-talk
-  - if show_thanks
-    section.thanks
-      .container
-        .content
-          h2 Thanks!
-          p Expect an email from us shortly.
-          p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
-
-  section.form
-    .container
-      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
-        - csrf_token
-
-        ul.role(ng-init="role = 'driver'")
-          li
-            input#id_role_0(name='role', type='radio', value='driver', checked, ng-model='role')
-            div
-              label(for='id_role_0') I’m a driver.
-              p Show me the available cars.
-          li
-            input#id_role_1(name='role', type='radio', value='owner', ng-model='role')
-            div
-              label(for='id_role_1') I own a car.
-              p I want my car to make me money.
-
-        ul.contact(ng-show="role == 'owner'")
-          li
-            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
-
-            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
-
-          li
-            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
-
-            input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
-
-
-        input.button(ng-show="role == 'owner'", type="submit", value="Let's Talk", ng-click='validation($event)')
-
-        a.button(ng-show="role == 'driver'", href="#{ settings.WEBAPP_URL }") Find your car
-
-
+  section.ask
+    .ask-container
+      h3 Your Car is Ready, Are You?
+        a(href='mailto:support@idlecars.com') ASK US ANYTHING
+      h3 Follow Us Too
+      .social
+        .app
+          a(href="https://twitter.com/idlecars" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/twitter.png")
+        .app
+          a(href="https://www.facebook.com/idlecars" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/facebook.png")
+        .app
+          a(href="https://www.linkedin.com/company/10117035" target="_blank")
+            img(src="#{ settings.STATIC_URL }img/linkedin.png")
 
   footer
-    .container
-      p.ask
-        a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      div.last_content
-        | <p class='tm'>© {% now 'Y' %} idlecars</p>
-        p.tm All trademarks and images are copyright of their respective owners.
-      p #[a.tm(href="#{ terms_of_service }") terms of service]
+    h5.tm
+      a(href="#{ faq }") Help
+      span |
+      a(href="#{ terms_of_service }") Terms & Privacy
+    br
+    h5.tm #[strong © {% now 'Y' %} idlecars]
+    h5.tm All trademarks and images are copyright of their respective owners.
