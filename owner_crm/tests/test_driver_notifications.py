@@ -88,8 +88,9 @@ class TestDriverNotifications(TestCase):
             call_command('cron_job')
 
         from django.core.mail import outbox
-        # We should have sent:
-        # - 3 Timed driver reminders based on sign-up time
-        # - 1 Driver notification when the driver's booking expired
-        # - 1 notification to ops when the booking expired.
-        self.assertEqual(len(outbox), 5)
+        '''
+        We should have sent:
+        - 3 Timed driver reminders based on sign-up time
+        - 1 Driver notification when the driver's booking expired
+        '''
+        self.assertEqual(len(outbox), 4)

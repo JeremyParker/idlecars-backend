@@ -157,10 +157,9 @@ class TestOwnerNotifications(TestCase):
             - message to owner: second afternoon reminder
             - message to owner: insurance too slow reminder
             - message to driver: insurance failed reminder
-            - message to ops: Booking incomplete because insurance failed.
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 7)
+        self.assertEqual(len(outbox), 6)
 
     def test_reminder_emails_afternoon_until_failure(self):
         self.booking = self._new_requested_booking("2014-10-10 23:00:00")
@@ -181,5 +180,13 @@ class TestOwnerNotifications(TestCase):
             call_command('owner_notifications')
             call_command('cron_job')
 
+        '''
+            - message to owner: first morning reminder
+            - message to owner: first afternoon reminder
+            - message to owner: second morning reminder
+            - message to owner: second afternoon reminder
+            - message to owner: insurance too slow reminder
+            - message to driver: insurance failed reminder
+        '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 7)  # see list above for what emails we send.
+        self.assertEqual(len(outbox), 6)
