@@ -1,18 +1,119 @@
 extends ./base.jade
 
 - block content
-  section.navbar
-    .logo
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-    .links
-      a(href="#tutorial") #[h5 How it works]
-      a(href="#{ login_url }") #[h5 Join/Login]
-      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
-    .menu-button(ng-click='showMenu = !showMenu')
-      .burger-button(ng-class='{active: showMenu}')
-    .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-      a(href="#tutorial") How it works
-      a(href="#{ login_url }") Join/Login
-      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
+  .about-page(ng-controller='aboutCtrl')
+    section.navbar
+      .logo
+        img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+      .links
+        a(href="#tutorial") #[h5 How it works]
+        a(href="#{ login_url }") #[h5 Join/Login]
+        a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
+      .menu-button(ng-click='showMenu = !showMenu')
+        .burger-button(ng-class='{active: showMenu}')
+      .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+        a(href="#tutorial") How it works
+        a(href="#{ login_url }") Join/Login
+        a(href="http://goo.gl/forms/4s26I6GUQY") List your car
 
-  section.header-photo
+    section.header-photo
+
+    section.about-us
+      .section-container
+        h2 About Us
+        p Two friends, encountering a problem faced by millions of people, daily, founded Idle Cars in September 2014.
+        br
+        p
+          | Upon returning from a business trip to London Brian and Jeremy met a kind,
+          |  single mother living in New York City trying to make ends meet.
+          |  She was inspired by the prospect of bringing in some desperately needed income by becoming a professional rideshare driver,
+          |  but was struggling to find a vehicle to rent and drive. Unfortunately,
+          |  this agonizing process of renting for-hire vehicles is stuck in the 1930s when it first began.
+          |  It has yet to adapt with improvements in safety and efficiency that technology has brought to other parts of our lives.
+        br
+        p
+          | Idle Cars is improving the efficiency, safety, and access of renting for-hire vehicles to millions of people, globally.
+          |  With the ongoing “reversal of the suburban exodus”, the world’s population will be faced with the
+          |  problem of utilize idle assets more efficiently. We will be forced to leverage the idle cars,
+          |  which remain parked for long blocks of time when other drivers are not on the clock.
+        br
+        p Idle Cars provides the tools to participate in the on-demand revolution.
+
+    hr
+
+    section.our-team
+      .section-container
+        .topics
+          h3(ng-class='{underline: true}') Our Team
+          h3(ng-class='{underline: selected2}') Cities
+          h3(ng-class='{underline: selected3}') Careers
+        .title
+          h2(ng-if='true') Our Team
+          h2(ng-if='false') Cities
+          h2(ng-if='false') Careers
+        .panes
+          .pane
+            .profile-image
+              img(src="#{ settings.STATIC_URL }img/headshot_brian.png")
+            .description
+              p.bold Brian Claypool –CEO & Co-Founder
+              p
+                | After spending nearly a decade with GE,  becoming skilled in sales, finance,
+                |  logistics and supply chain, he determined that today’s problems with renting
+                |  for-hire vehicles was to large of an issue to let someone else tackle it.
+          .pane
+            .profile-image
+              img(src="#{ settings.STATIC_URL }img/headshot_jeremy.png")
+            .description
+              p.bold Jeremy Parker –CTO & Co-Founder
+              p
+                | Jeremy is a software engineer with a love of creativity, efficiency and great user experiences.
+                |  He helped build startups and has worked with top tech companies.
+                |  He obsesses with solving the problem of making more efficient use of for-hire vehicles.
+          .pane
+            .profile-image
+              img(src="#{ settings.STATIC_URL }img/headshot_craig.png")
+            .description
+              p.bold Chengxing (Craig) Zhang – Lead Software Engineer
+              p
+                | Craig, a Chinese engineer, came to study at one of the finest institutions in the US - NYU.
+                |  He has a strong background in Software and Mechanical Engineering.
+                |  He is focused on simplifying the process of for-hire vehicle rentals by leveraging software.
+          .pane
+            .profile-image
+              img(src="#{ settings.STATIC_URL }img/headshot_will.png")
+            .description
+              p.bold Will Brennan – Head of Product Marketing
+              p
+                | Will, a Civil Engineer undergrad from Bucknell, has a passion for entrepreneurship.
+                |  After finishing undergrad, he completed Lehigh’s advanced entrepreneurship program.
+                |  He leads marketing to our underserved customers of for-hire rentals.
+
+    hr
+
+    section.get-in-touch
+      .section-container
+        h2 Get In Touch
+        form
+          .input
+            p First name:
+            input(type='text', name='first_name')
+          .input
+            p Email:
+            input(type='email', name='email')
+          .input
+            p Message:
+            textarea(rows='10', cols='50')
+
+          input.bold(type='submit', value='Say Hello!')
+
+
+
+    footer
+      h5.tm
+        a(href="#{ faq }") Help
+        span |
+        a(href="#{ terms_of_service }") Terms & Privacy
+      br
+      h5.tm #[strong © {% now 'Y' %} idlecars]
+      h5.tm All trademarks and images are copyright of their respective owners.
