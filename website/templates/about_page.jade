@@ -39,57 +39,60 @@ extends ./base.jade
         br
         p Idle Cars provides the tools to participate in the on-demand revolution.
 
-    hr
-
     section.our-team
-      .section-container
+      .section-container(ng-init="selection='team'", ng-switch='selection')
         .topics
-          h3(ng-class='{underline: true}') Our Team
-          h3(ng-class='{underline: selected2}') Cities
-          h3(ng-class='{underline: selected3}') Careers
-        .title
-          h2(ng-if='true') Our Team
-          h2(ng-if='false') Cities
-          h2(ng-if='false') Careers
-        .panes
-          .pane
-            .profile-image
-              img(src="#{ settings.STATIC_URL }img/headshot_brian.png")
-            .description
-              p.bold Brian Claypool –CEO & Co-Founder
-              p
-                | After spending nearly a decade with GE,  becoming skilled in sales, finance,
-                |  logistics and supply chain, he determined that today’s problems with renting
-                |  for-hire vehicles was to large of an issue to let someone else tackle it.
-          .pane
-            .profile-image
-              img(src="#{ settings.STATIC_URL }img/headshot_jeremy.png")
-            .description
-              p.bold Jeremy Parker –CTO & Co-Founder
-              p
-                | Jeremy is a software engineer with a love of creativity, efficiency and great user experiences.
-                |  He helped build startups and has worked with top tech companies.
-                |  He obsesses with solving the problem of making more efficient use of for-hire vehicles.
-          .pane
-            .profile-image
-              img(src="#{ settings.STATIC_URL }img/headshot_craig.png")
-            .description
-              p.bold Chengxing (Craig) Zhang – Lead Software Engineer
-              p
-                | Craig, a Chinese engineer, came to study at one of the finest institutions in the US - NYU.
-                |  He has a strong background in Software and Mechanical Engineering.
-                |  He is focused on simplifying the process of for-hire vehicle rentals by leveraging software.
-          .pane
-            .profile-image
-              img(src="#{ settings.STATIC_URL }img/headshot_will.png")
-            .description
-              p.bold Will Brennan – Head of Product Marketing
-              p
-                | Will, a Civil Engineer undergrad from Bucknell, has a passion for entrepreneurship.
-                |  After finishing undergrad, he completed Lehigh’s advanced entrepreneurship program.
-                |  He leads marketing to our underserved customers of for-hire rentals.
+          h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team
+          h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities
+          h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers
 
-    hr
+        .content(ng-switch-default)
+          .title
+            h2 Our Team
+
+          .panes
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_brian.png")
+              .description
+                p.bold Brian Claypool –CEO & Co-Founder
+                p
+                  | After spending nearly a decade with GE,  becoming skilled in sales, finance,
+                  |  logistics and supply chain, he determined that today’s problems with renting
+                  |  for-hire vehicles was to large of an issue to let someone else tackle it.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_jeremy.png")
+              .description
+                p.bold Jeremy Parker –CTO & Co-Founder
+                p
+                  | Jeremy is a software engineer with a love of creativity, efficiency and great user experiences.
+                  |  He helped build startups and has worked with top tech companies.
+                  |  He obsesses with solving the problem of making more efficient use of for-hire vehicles.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_craig.png")
+              .description
+                p.bold Chengxing (Craig) Zhang – Lead Software Engineer
+                p
+                  | Craig, a Chinese engineer, came to study at one of the finest institutions in the US - NYU.
+                  |  He has a strong background in Software and Mechanical Engineering.
+                  |  He is focused on simplifying the process of for-hire vehicle rentals by leveraging software.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_will.png")
+              .description
+                p.bold Will Brennan – Head of Product Marketing
+                p
+                  | Will, a Civil Engineer undergrad from Bucknell, has a passion for entrepreneurship.
+                  |  After finishing undergrad, he completed Lehigh’s advanced entrepreneurship program.
+                  |  He leads marketing to our underserved customers of for-hire rentals.
+
+        .content(ng-switch-when='cities')
+          h2 Cities
+
+        .content(ng-switch-when='careers')
+          h2 Careers
 
     section.get-in-touch
       .section-container
@@ -106,8 +109,6 @@ extends ./base.jade
             textarea(rows='10', cols='50')
 
           input.bold(type='submit', value='Say Hello!')
-
-
 
     footer
       h5.tm
