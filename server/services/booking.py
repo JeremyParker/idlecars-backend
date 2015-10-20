@@ -7,8 +7,9 @@ from decimal import Decimal, ROUND_UP
 from django.core.urlresolvers import reverse
 from django.db.models import F
 from django.utils import timezone
+from django.conf import settings
 
-from owner_crm.services import ops_emails, driver_emails, owner_emails
+from owner_crm.services import ops_emails, driver_emails, owner_emails, street_team_emails
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -19,7 +20,7 @@ from server.payment_gateways import braintree_payments
 class BookingError(Exception):
     pass
 
-CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at 844-435-3227.'
+CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 
@@ -62,12 +63,20 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
+def on_docs_approved(driver):
+    if not driver.base_letter:
+        bookings = Booking.objects.filter(driver=driver)
+
+        if bookings:
+            latest_booking = bookings.order_by('created_time').last()
+            street_team_emails.request_base_letter(latest_booking)
+        else:
+            driver_emails.docs_approved_no_booking(driver)
+
+
 def on_base_letter_approved(driver):
     reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
-    if not pending_bookings and not reserved_bookings:
-        driver_emails.base_letter_approved_no_booking(driver)
-        return
 
     for booking in pending_bookings:
         driver_emails.base_letter_approved_no_checkout(booking)
@@ -122,7 +131,8 @@ def create_booking(car, driver):
     - driver: the driver making the booking
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
-    ops_emails.new_booking_email(booking)
+    if booking.driver.documentation_approved and not booking.driver.base_letter:
+        street_team_emails.request_base_letter(booking)
     return booking
 
 
@@ -144,8 +154,6 @@ def _make_booking_incomplete(booking, reason):
     booking.save()
 
     _void_all_payments(booking)
-
-    ops_emails.booking_incompleted(booking)
 
     # let our customers know what happened
     if reason == Booking.REASON_CANCELED:
@@ -193,6 +201,7 @@ def find_deposit_payment(booking):
 
 
 def calculate_next_rent_payment(booking):
+    ''' Returns a tuple of (service_fee, rent_amount, start_time, end_time).'''
     if not booking.checkout_time:
         return (None, None, None, None)
 
@@ -266,7 +275,6 @@ def checkout(booking):
         booking.weekly_rent = booking.car.solo_cost
         booking.service_percentage = booking.car.owner.effective_service_percentage
         booking.save()
-        # TODO - send some kind of confirmation message
 
         # cancel other conflicting in-progress bookings and notify those drivers
         conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
@@ -276,7 +284,7 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
-        driver_emails.checkout_recipt(booking)
+        driver_emails.checkout_receipt(booking)
 
     return booking
 
@@ -351,6 +359,9 @@ def _cron_payments():
             if payment.error_message:
                 print payment.error_message
                 print payment.notes
+                continue
+            driver_emails.payment_receipt(payment)
+            owner_emails.payment_receipt(payment)
         except Exception as e:
             print e
             ops_emails.payment_job_failed(booking, e)

@@ -73,27 +73,19 @@ class Driver(models.Model):
                 raise exceptions.ValidationError(
                     "Please fill in the user's name and save, then set documentation approved."
                 )
-        elif self.base_letter:
-            raise exceptions.ValidationError(
-                "You can't save base letter until all documents are approved."
-            )
 
         if self.base_letter and self.base_letter_rejected:
             raise exceptions.ValidationError(
                 "Base letter should be either approved or rejected."
             )
 
-        orig = Driver.objects.get(pk=self.pk)
-        if self.base_letter and not orig.base_letter:
-            import server.services.booking
-            server.services.booking.on_base_letter_approved(self)
-
-        if self.base_letter_rejected and not orig.base_letter_rejected:
-            #TODO: do something after driver fail to get base letter
-            import owner_crm.services.driver_emails
-            owner_crm.services.driver_emails.base_letter_rejected(self)
 
     def save(self, *args, **kwargs):
-        import server.services.driver
-        self = server.services.driver.pre_save(self)
-        super(Driver, self).save(*args, **kwargs)
+        if self.pk is not None:
+            import server.services.driver
+            orig = Driver.objects.get(pk=self.pk)
+            self = server.services.driver.pre_save(self, orig)
+            super(Driver, self).save(*args, **kwargs)
+            server.services.driver.post_save(self, orig)
+        else:
+            super(Driver, self).save(*args, **kwargs)

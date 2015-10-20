@@ -175,6 +175,7 @@ MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ')  # if 
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'test@idlecars.com'
 OPS_EMAIL = 'test@idlecars.com'
+STREET_TEAM_EMAIL = 'test@idlecars.com'
 
 # default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
 QUEUE_IMPLEMENTATION = 'FakeQueue'
@@ -206,3 +207,5 @@ BRAINTREE = {
 }
 
 TAKE_RATE = '0.080'  # TODO - move this to a config service
+
+IDLECARS_PHONE_NUMBER = '1-844-IDLECAR (1-844-435-3227)'

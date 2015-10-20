@@ -62,7 +62,6 @@ class BookingViewSet(
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
     def pickup(self, request, pk=None):
         booking = self.get_object()
-        booking = self.get_object()
         try:
             booking = booking_service.pickup(booking)
             return Response(self.get_serializer(booking).data, HTTP_201_CREATED)

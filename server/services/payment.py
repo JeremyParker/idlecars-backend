@@ -18,8 +18,9 @@ def create_payment(
     invoice_start_time=None,
     invoice_end_time=None
 ):
-    if booking.driver:
-        payment_method = booking.driver.paymentmethod_set.last() # TODO: store 'em all & make latest default
+    from server.services import driver as driver_service
+    payment_method = driver_service.get_default_payment_method(booking.driver)
+
     if not payment_method:
         return models.Payment(
             booking=booking,

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.utils import timezone
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -138,11 +139,11 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             },
             4: {
                 'step_title': 'Pick up your car',
-                'step_subtitle': "Your insurance has been approved. Pick up your car!",
+                'step_subtitle': "Your insurance has been approved. Arrange to pick up your car.",
             },
             5: {
                 'step_title': 'Rental in progress',
-                'step_subtitle': 'Trouble with your car? Call idlecars: (844) 435-3227',
+                'step_subtitle': 'Trouble with your car? Call idlecars: ' + settings.IDLECARS_PHONE_NUMBER,
             }
         }
         step = self.get_step(obj)
@@ -157,9 +158,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_next_payment(self,obj):
         fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(obj)
-        if end_time:
-            end_time = end_time.strftime('%b %d')
-        return {'amount':amount, 'end_time': end_time}
+        if start_time:
+            start_time = start_time.strftime('%b %d')
+        return {'amount':amount, 'start_time': start_time}
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)

@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 
 from django.template import Context
 from django.template.loader import render_to_string
+from django.conf import settings
 
 from idlecars import email, client_side_routes
 
 from server.services import car as car_service
 
 
-def base_letter_approved_no_booking(driver):
+def docs_approved_no_booking(driver):
     #TODO: text in this email needs to be updated
     if not driver.email():
         return
@@ -198,8 +199,8 @@ def awaiting_insurance_email(booking):
         booking.driver.email(): {
             'FNAME': booking.driver.first_name() or None,
             'TEXT': body,
-            'CTA_LABEL': 'See your car',  # TODO: send them to their booking details
-            'CTA_URL': client_side_routes.car_details_url(booking.car),
+            'CTA_LABEL': 'See your rental',
+            'CTA_URL': client_side_routes.bookings(),
             'HEADLINE': 'Your documents have been reviewed and approved',
             'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
         }
@@ -209,12 +210,6 @@ def awaiting_insurance_email(booking):
         subject='Congratulations! Your documents have been submitted!',
         merge_vars=merge_vars,
     )
-
-
-def request_base_letter(driver):
-    if not driver.email():
-        return
-    #TODO: send street team email to get base letter
 
 
 def base_letter_rejected(driver):
@@ -304,10 +299,9 @@ def car_rented_elsewhere(booking):
             Sorry, someone else has already rented out the car you wanted. Sometimes that
             happens. Still, there are plenty more great cars available.
             <br />
-            Need help? Contact us:
-            support@idlecars.com
-            1 844 435 3227
-            ''',
+            <p>Need help? Contact us:</p>
+            <p>support@idlecars.com </p>
+            <p>''' + settings.IDLECARS_PHONE_NUMBER + '</p>',
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
@@ -319,7 +313,8 @@ def car_rented_elsewhere(booking):
     )
 
 
-def checkout_recipt(booking):
+def checkout_receipt(booking):
+    from server.services import booking as booking_service
     if not booking.driver.email():
         return
     merge_vars = {
@@ -327,8 +322,14 @@ def checkout_recipt(booking):
             'FNAME': booking.driver.first_name() or None,
             'HEADLINE': 'Your {} was successfully reserved'.format(booking.car.display_name()),
             'TEXT': '''
-            We put a hold on your credit card for the {} you booked. You will not be charged until you pick up your car.
-            '''.format(booking.car.display_name()),
+            We put a hold of ${} on your credit card for the {} you booked. You will not be charged until
+            you inspect, approve, and pick up your car. Once you approve the car in the app, the hold on
+            your card will be processed, and your card will be charged for the first rental payment of ${}.
+            '''.format(
+                booking.car.solo_deposit,
+                booking.car.display_name(),
+                booking_service.calculate_next_rent_payment(booking)[1],
+            ),
         }
     }
     email.send_async(
@@ -356,6 +357,51 @@ def pickup_confirmation(booking):
     email.send_async(
         template_name='no_button_no_image',
         subject='You are ready to drive!',
+        merge_vars=merge_vars,
+    )
+
+
+def _payment_receipt_text(payment):
+    text = '''
+        Your weekly rental fee has been paid. <br />
+        Driver: {} <br />
+        Car: {} <br /><br />
+
+        Invoice Period: {} - {} <br />
+        Payment Amount: {} <br /><br />
+    '''
+    from server.services import booking as booking_service
+    fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
+    if amount > 0:
+        text += 'Your next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+    else:
+        text += 'This is your last payment. <br />'
+
+    text += 'Your booking will end on {}. <br /><br />Thank you for using idlecars.'
+    return text.format(
+        payment.booking.driver.full_name(),
+        payment.booking.car.display_name(),
+        payment.invoice_start_time.strftime('%b %d'),
+        payment.invoice_end_time.strftime('%b %d'),
+        payment.amount,
+        payment.booking.end_time.strftime('%b %d')
+    )
+
+
+def payment_receipt(payment):
+    if not payment.booking.driver.email():
+        return
+
+    merge_vars = {
+        payment.booking.driver.email(): {
+            'FNAME': payment.booking.driver.first_name() or None,
+            'HEADLINE': 'Payment Received: {} Booking'.format(payment.booking.car.display_name()),
+            'TEXT': _payment_receipt_text(payment)
+        }
+    }
+    email.send_async(
+        template_name='no_button_no_image',
+        subject='Payment Received: {} Booking'.format(payment.booking.car.display_name()),
         merge_vars=merge_vars,
     )
 
@@ -431,8 +477,7 @@ def password_reset_confirmation(password_reset):
             'HEADLINE': 'Your account password has been set',
             'TEXT': '''
                 If you didn't set your password, or if you think something funny is going
-                on, please call us any time at 1-844-IDLECAR (1-844-435-3227).
-            ''',
+                on, please call us any time at ''' + settings.IDLECARS_PHONE_NUMBER + '.',
             'CTA_LABEL': 'Find your car',
             'CTA_URL': client_side_routes.car_listing_url(),
         }
