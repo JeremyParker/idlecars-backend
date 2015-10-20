@@ -28,6 +28,14 @@ def index(request):
 
 
 '''
+View that presents the about page
+'''
+def about(request):
+    context = {}
+    return render(request, 'about_page.jade', context)
+
+
+'''
 View to handle the driver survey form, store form info and respond with a thank you message.
 '''
 def driver_survey(request, pk=None):
