@@ -119,7 +119,7 @@ class PhoneNumberDetailView(APIView):
             driver = models.Driver.objects.get(auth_user__username=fields.parse_phone_number(pk))
         except models.Driver.DoesNotExist:
             # TODO(JP) create a new Driver, call start_set_password(auth_user).
-            raise Http404
+            return Response('', status.HTTP_404_NOT_FOUND)
 
         serializer = PhoneNumberSerializer(driver.auth_user, many=False)
         return Response(serializer.data)
@@ -129,25 +129,11 @@ class OwnerPhoneNumberDetailView(APIView):
     def get(self, request, pk, format=None):
         phone_number = fields.parse_phone_number(pk)
         try:
-            created, auth_user = owner_service.invite_legacy_owner(phone_number)
-        except Owner.DoesNotExist:
-            content = {'_app_notifications': [
-                '''
-                Sorry, something went wrong. We couldn't find a record of you as a car-owner
-                in our system. Please contact idlecars, to set up your owner account.
-                '''
-            ],}
-            return Response(content, status.HTTP_404_NOT_FOUND)
+            auth_user = User.objects.get(username=phone_number)
+            owner = models.Owner.objects.get(auth_users=auth_user)
+        except (Owner.DoesNotExist, User.DoesNotExist):
+            return Response('', status.HTTP_404_NOT_FOUND)
 
-        if created:
-            content = PhoneNumberSerializer(auth_user).data
-            content.update({'_app_notifications': [
-                '''
-                Great, you're in our system already! An email has been sent to your address
-                with instructions for setting your password.
-                '''
-            ],})
-            return Response(content, status.HTTP_404_NOT_FOUND)
-        else:
-            serializer = PhoneNumberSerializer(auth_user)
-            return Response(serializer.data, status.HTTP_200_OK)
+        content = PhoneNumberSerializer(auth_user).data
+        serializer = PhoneNumberSerializer(auth_user)
+        return Response(serializer.data, status.HTTP_200_OK)

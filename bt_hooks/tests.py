@@ -7,6 +7,8 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 
+from owner_crm.tests import sample_merge_vars
+from idlecars import client_side_routes
 from server import factories
 from server.models import Owner
 
@@ -23,11 +25,11 @@ class WebhookTest(TestCase):
     def setUp(self):
         self.client = Client()  # Reinitialize the client to turn off CSRF
         _configure_braintree()
-        self.owner = factories.AuthOwner.create(
+        self.owner =  factories.Owner.create(
             merchant_id='test_id',
             merchant_account_state=Owner.BANK_ACCOUNT_PENDING,
         )
-
+        factories.BookableCar.create(owner=self.owner)
 
     def test_webhook_success(self):
         with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
@@ -44,6 +46,15 @@ class WebhookTest(TestCase):
                 Owner.BANK_ACCOUNT_APPROVED,
             )
 
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Your bank account has been approved.')
+        self.assertEqual(outbox[0].merge_vars.keys()[0], self.owner.auth_users.first().email)
+        self.assertEqual(
+            outbox[0].merge_vars[self.owner.auth_users.first().email]['CTA_URL'],
+            client_side_routes.add_car_form(),
+        )
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_webhook_declined(self):
         with self.settings(PAYMENT_GATEWAY_NAME='braintree'):
@@ -60,6 +71,10 @@ class WebhookTest(TestCase):
                 Owner.BANK_ACCOUNT_DECLINED,
             )
 
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        merge_vars = outbox[0].merge_vars[settings.OPS_EMAIL]
+        self.assertTrue('<ul><li>' in merge_vars['TEXT'])
 
     def test_webhook_no_owner(self):
         with self.settings(PAYMENT_GATEWAY_NAME='braintree'):

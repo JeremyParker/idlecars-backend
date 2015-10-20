@@ -1,8 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from server import models
-
+from server.models import Booking, Car
 from . import car_helpers, make_model_service
 
 
@@ -19,21 +18,23 @@ def filter_needs_renewal(queryset):
 
 
 def filter_booking_in_progress(queryset):
-    return queryset.filter(car_helpers.q_booking_in_progress)
+    active_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
+    return queryset.filter(id__in=[b.car.id for b in active_bookings])
 
 
-listing_queryset = filter_live(models.Car.objects.all())
+def get_listing_queryset():
+    return filter_live(Car.objects.all())
 
 
 def get_stale_within(minutes_until_stale):
     '''
-    Returns a list of cars whose listings will expire soon
+    Returns a list of live cars whose listings will expire soon
     '''
     return car_helpers._filter_stale_within(
         minutes_until_stale,
         car_helpers._filter_data_complete(
             car_helpers._filter_bookable(
-                models.Car.objects.all())))
+                Car.objects.all())))
 
 
 def get_image_url(car):

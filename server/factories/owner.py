@@ -1,10 +1,10 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import random
+import random, string
 import datetime
 
-from factory import LazyAttribute, post_generation
+from factory import LazyAttribute, RelatedFactory, post_generation
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
@@ -21,8 +21,14 @@ class Owner(Factory):
     zipcode = LazyAttribute(lambda o: faker.zipcode())
     rating = random.choice(owner_model.RATING)[0]
 
-class AuthOwner(Owner):
     @post_generation
     def auth_user(self, create, value, **kwargs):
         auth_user = AuthUser.create(password='password')
         self.auth_users.add(auth_user)
+
+
+class BankAccountOwner(Owner):
+    merchant_id = LazyAttribute(lambda o: ''.join(
+        [random.choice(string.ascii_uppercase + string.digits) for i in range(18)]
+    ))
+    merchant_account_state = owner_model.BANK_ACCOUNT_APPROVED

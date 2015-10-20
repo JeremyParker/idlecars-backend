@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
+from django.contrib.auth.models import User
 
 import idlecars.client_side_routes
 import server.models
@@ -15,15 +16,16 @@ import owner_crm.factories
 from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 
+from server.services import owner_service
+
+from freezegun import freeze_time
+
 
 class TestOwnerNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
-        owner = server.factories.Owner.create()
         car = server.factories.BookableCar.create(
             last_status_update=update_time,
-            owner=owner,
         )
-        server.factories.UserAccount.create(owner=owner)
         return car
 
     def _update_time_about_to_go_stale(self):
@@ -54,8 +56,8 @@ class TestOwnerNotifications(TestCase):
         # validate that the merge vars are being set correctly:
         for message in outbox:
             email = message.merge_vars.keys()[0]
-            user = server.models.UserAccount.objects.get(email=email)
-            car =server.models.Owner.objects.get(user_account=user).cars.all()[0]
+            user = User.objects.get(email=email)
+            car = server.models.Owner.objects.get(auth_users=user).cars.all()[0]
             renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
@@ -73,5 +75,111 @@ class TestOwnerNotifications(TestCase):
         car = self._setup_car_with_update_time(last_update)
         owner_crm.models.Renewal.objects.create(car=car, pk=666)
 
-        command = owner_notifications.Command()
-        self.assertFalse(command._renewable_cars())
+        self.assertFalse(owner_service._renewable_cars())
+
+    def _new_requested_booking(self, create_time):
+        with freeze_time(create_time):
+            return server.factories.RequestedBooking.create()
+
+    @freeze_time("2014-10-11 10:00:00")
+    def test_owner_reminder(self):
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
+
+        call_command('owner_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Has {} been accepted on the {}?'.format(
+                self.booking.driver.full_name(),
+                self.booking.car.display_name()
+            )
+        )
+
+    @freeze_time("2014-10-11 10:00:00")
+    def test_no_booking(self):
+        call_command('owner_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2014-10-11 10:00:00")
+    def test_no_email_twice(self):
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
+
+        call_command('owner_notifications')
+        call_command('owner_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_only_requested_bookings_send_reminder(self):
+        with freeze_time("2014-10-10 18:00:00"):
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.AcceptedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        with freeze_time("2014-10-11 10:00:00"):
+            call_command('owner_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_reminder_emails_morning_until_failure(self):
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
+
+        with freeze_time("2014-10-11 10:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-11 17:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-12 10:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-12 17:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-13 10:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+
+        '''
+            - message to owner: first morning reminder
+            - message to owner: first afternoon reminder
+            - message to owner: second morning reminder
+            - message to owner: second afternoon reminder
+            - message to owner: insurance too slow reminder
+            - message to driver: insurance failed reminder
+            - message to ops: Booking incomplete because insurance failed.
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 7)
+
+    def test_reminder_emails_afternoon_until_failure(self):
+        self.booking = self._new_requested_booking("2014-10-10 23:00:00")
+
+        with freeze_time("2014-10-11 17:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-12 10:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-12 17:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-13 10:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+        with freeze_time("2014-10-13 17:00:00"):
+            call_command('owner_notifications')
+            call_command('cron_job')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 7)  # see list above for what emails we send.

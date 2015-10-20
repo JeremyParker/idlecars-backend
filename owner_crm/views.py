@@ -54,11 +54,12 @@ class PasswordResetView(views.APIView):
 
         try:
             password_reset = models.PasswordReset.objects.get(token=token)
-            if password_reset.state != models.ConsumableToken.STATE_PENDING:
-                # TODO(JP) - we should expire the token after a couple of hours
-                # TODO(JP) - it'd be cool if we could just send them a new link here.
-                content = {'_app_notifications': ['Sorry, this link doen\'t work any more.']}
-                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            # TODO - put this security feature back in as sson as owners can sign up more easily.
+            # if password_reset.state != models.ConsumableToken.STATE_PENDING:
+            #     # TODO(JP) - we should expire the token after a couple of hours
+            #     # TODO(JP) - it'd be cool if we could just send them a new link here.
+            #     content = {'_app_notifications': ['Sorry, this link doen\'t work any more.']}
+            #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
             user = password_reset.auth_user
             user.set_password(password)
@@ -71,7 +72,7 @@ class PasswordResetView(views.APIView):
             password_reset.save()
             driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'_app_notifications': ['Your password has been set.'], 'token': token.key}
+            content = {'_app_notifications': [{'success': 'Your password has been set.'}], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:

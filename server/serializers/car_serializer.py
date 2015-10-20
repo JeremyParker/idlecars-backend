@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from server.models import Car, CarCompatibility
 from server.services import car as car_service, car_search
+import owner_serializer
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -16,7 +17,9 @@ class CarSerializer(serializers.ModelSerializer):
     headline_features = serializers.SerializerMethodField()
     certifications = serializers.SerializerMethodField()
     details = serializers.SerializerMethodField()
+    deposit = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
+    cost_str = serializers.SerializerMethodField()
     cost_time = serializers.SerializerMethodField()
     cost_bucket = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
@@ -34,7 +37,26 @@ class CarSerializer(serializers.ModelSerializer):
             'headline_features',
             'certifications',
             'details',
+            'deposit',
             'cost',
+            'cost_str',
+            'cost_time',
+            'cost_bucket',
+            'image_url',
+            'zipcode',
+            'searchable',
+            'compatibility',
+        )
+        read_only_fields = (
+            'id',
+            'name',
+            'listing_features',
+            'booked_features',
+            'headline_features',
+            'certifications',
+            'details',
+            'cost',
+            'cost_str',
             'cost_time',
             'cost_bucket',
             'image_url',
@@ -91,8 +113,15 @@ class CarSerializer(serializers.ModelSerializer):
             details = [['Hybrid ☑', ''],] + details
         return details
 
+    def get_deposit(self, obj):
+        return '${}'.format(obj.solo_deposit)
+
+    # TODO: remove this once the client shows cents in the listing price.
     def get_cost(self, obj):
         return unicode(obj.normalized_cost())
+
+    def get_cost_str(self, obj):
+        return str(obj.quantized_cost()).split('.')
 
     def get_cost_bucket(self, obj):
         # TODO: remove method when front end no longer needs it
@@ -119,3 +148,17 @@ class CarSerializer(serializers.ModelSerializer):
         if obj.next_available_date and obj.next_available_date > timezone.now().date():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
+
+
+class CarPickupSerializer(CarSerializer):
+    owner = owner_serializer.OwnerContactSerializer()
+
+    class Meta(CarSerializer.Meta):
+        fields = CarSerializer.Meta.fields + (
+            'owner',
+            'plate',
+        )
+        read_only_fields = CarSerializer.Meta.read_only_fields + (
+            'owner',
+            'plate',
+        )

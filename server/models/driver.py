@@ -8,6 +8,7 @@ from django.core import exceptions
 from idlecars import model_helpers, fields
 
 
+
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_approved = models.BooleanField(
@@ -20,6 +21,9 @@ class Driver(models.Model):
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+
+    base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
+    base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 
     braintree_customer_id = models.CharField(max_length=32, null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -70,7 +74,18 @@ class Driver(models.Model):
                     "Please fill in the user's name and save, then set documentation approved."
                 )
 
+        if self.base_letter and self.base_letter_rejected:
+            raise exceptions.ValidationError(
+                "Base letter should be either approved or rejected."
+            )
+
+
     def save(self, *args, **kwargs):
-        import server.services.driver
-        self = server.services.driver.pre_save(self)
-        super(Driver, self).save(*args, **kwargs)
+        if self.pk is not None:
+            import server.services.driver
+            orig = Driver.objects.get(pk=self.pk)
+            self = server.services.driver.pre_save(self, orig)
+            super(Driver, self).save(*args, **kwargs)
+            server.services.driver.post_save(self, orig)
+        else:
+            super(Driver, self).save(*args, **kwargs)

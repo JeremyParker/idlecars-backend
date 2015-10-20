@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from decimal import Decimal, ROUND_UP
+
 from django.db import models
 from django.utils import timezone
 
@@ -29,7 +31,7 @@ class Car(models.Model):
         default=1,
     )
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
-    YEARS = [(y, unicode(y)) for y in range((datetime.datetime.now().year+1), 1995, -1)]
+    YEARS = [(y, unicode(y)) for y in range((timezone.now().year+1), 1995, -1)]
     year = models.IntegerField(choices=YEARS, blank=True, null=True)
     plate = models.CharField(max_length=24, blank=True)
     base = models.CharField(max_length=64, blank=True)
@@ -57,16 +59,40 @@ class Car(models.Model):
         max_length=32,
         default='_00_unknown',
     )
+
+    def minimum_rental_days(self):
+        return {
+            '_00_unknown': None,
+            '_01_no_min': 1,
+            '_02_one_week': 7,
+            '_03_two_weeks': 14,
+            '_04_three_weeks': 21,
+            '_05_one_month': 30,
+            '_06_six_weeks': 42,
+            '_07_two_months': 60,
+            '_08_three_months': 90,
+            '_09_four_months': 120,
+            '_10_five_months': 150,
+            '_11_six_months': 180,
+        }[self.min_lease]
+
     notes = models.TextField(blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
+    COLOR_BLACK = 0
+    COLOR_CHARCOAL = 1
+    COLOR_GREY = 2
+    COLOR_DARK_BLUE = 3
+    COLOR_BLUE = 4
+    COLOR_TAN = 5
+
     COLOR_CHOICES = [
-        (0, 'Black'),
-        (1, 'Charcoal'),
-        (2, 'Grey'),
-        (3, 'Dark Blue'),
-        (4, 'Blue'),
-        (5, 'Tan'),
+        (COLOR_BLACK, 'Black'),
+        (COLOR_CHARCOAL, 'Charcoal'),
+        (COLOR_GREY, 'Grey'),
+        (COLOR_DARK_BLUE, 'Dark Blue'),
+        (COLOR_BLUE, 'Blue'),
+        (COLOR_TAN, 'Tan'),
     ]
     exterior_color = models.IntegerField(
         choices=COLOR_CHOICES,
@@ -95,8 +121,12 @@ class Car(models.Model):
         else:
             return self.status
 
+    # TODO: remove this once the client shows cents in the listing price.
     def normalized_cost(self):
         return int((self.solo_cost + 6) / 7)
+
+    def quantized_cost(self):
+        return (self.solo_cost / Decimal(7.00)).quantize(Decimal('.01'), rounding=ROUND_UP)
 
     def __unicode__(self):
         if self.plate and self.year:

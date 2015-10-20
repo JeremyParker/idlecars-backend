@@ -12,7 +12,7 @@ from factory import SubFactory, SelfAttribute
 from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Owner, MakeModel, Insurance
+from server.factories import Owner, BankAccountOwner, MakeModel, Insurance
 from server import models
 
 class Car(Factory):
@@ -37,6 +37,7 @@ class Car(Factory):
 
 
 class BookableCar(Car):
+    owner = SubFactory(BankAccountOwner)
     status = models.Car.STATUS_AVAILABLE
     min_lease = '_02_one_week'
 

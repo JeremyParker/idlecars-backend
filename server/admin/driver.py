@@ -7,8 +7,21 @@ from django.contrib import auth
 from idlecars.reverse_admin import ReverseModelAdmin
 from server import models
 from server.admin.booking import BookingForDriverInline
-from server.admin.user_account import UserAccountForDriverInline
 
+
+class PaymentMethodInline(admin.TabularInline):
+    model = models.PaymentMethod
+    verbose_name = "Payment Method"
+    can_delete = False
+    extra = 0
+    fields = [
+        'description',
+    ]
+    readonly_fields = [
+        'description',
+    ]
+    def description(self, instance):
+        return '{} **** **** **** {}'.format(instance.card_type, instance.suffix)
 
 class DriverAdmin(ReverseModelAdmin):
     inline_type = 'tabular'
@@ -31,6 +44,7 @@ class DriverAdmin(ReverseModelAdmin):
         'all_docs_uploaded',
         'documentation_approved',
         'booking_count',
+        'date_joined',
     ]
     list_filter = [
         'documentation_approved',
@@ -49,23 +63,32 @@ class DriverAdmin(ReverseModelAdmin):
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
+                ('base_letter_rejected'),
+                ('base_letter','base_letter_link'),
             )
         }),
         ('None', {
             'fields': (
+                'date_joined',
                ('notes'),
             ),
         }),
     )
     readonly_fields = [
+        'date_joined',
         'full_name',
         'dmv_link',
         'fhv_link',
         'dd_link',
         'poa_link',
+        'base_letter_link',
     ]
-    inlines = [BookingForDriverInline,]
+    inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
+
+    def date_joined(self, instance):
+        return instance.auth_user.date_joined.date()
+    date_joined.short_description = 'signup date'
 
     def link_name(self, instance):
         return instance.admin_display()
@@ -93,3 +116,9 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
     poa_link.short_description = ''
     poa_link.allow_tags = True
+
+    def base_letter_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
+    base_letter_link.short_description = ''
+    base_letter_link.allow_tags = True
+

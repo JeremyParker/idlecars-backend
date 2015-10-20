@@ -64,10 +64,12 @@ class CarTest(APITestCase):
                         ['TLC Base', car.base]
                     ]
                 ),
+                ('deposit', '${}'.format(car.solo_deposit)),
                 ('cost', '{0:.0f}'.format(int((car.solo_cost) + 6) / 7)),
+                ('cost_str', ['14', '29']), # this number base on car.solo_cost, which is $100 in the test
                 ('cost_time', 'a day'),
-                ('cost_bucket', 'cheap'),
-                ('searchable', {'body_type': 'Sedan', 'lux_level': 'Standard', 'cost_bucket': 'cheap'}),
+                ('cost_bucket', ['cheap']),
+                ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['cheap'], 'work_with': []}),
                 ('booked_features', booked_features.format(
                         models.Car.MIN_LEASE_CHOICES[car.min_lease],
                         car.owner.city,

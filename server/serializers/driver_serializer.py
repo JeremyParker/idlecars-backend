@@ -5,9 +5,12 @@ from django.contrib import auth
 from django.core.exceptions import PermissionDenied
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
+from rest_framework.serializers import SerializerMethodField
 
 from idlecars import fields
 from server import models
+from server.serializers import PaymentMethodSerializer
+from server.services import driver as driver_service
 
 
 class DriverSerializer(ModelSerializer):
@@ -17,6 +20,7 @@ class DriverSerializer(ModelSerializer):
     email = EmailField(required=False, allow_blank=True)
     first_name = CharField(max_length=30, required=False, allow_blank=True)
     last_name = CharField(max_length=30, required=False, allow_blank=True)
+    payment_method = SerializerMethodField()
 
     class Meta:
         model = models.Driver
@@ -35,8 +39,9 @@ class DriverSerializer(ModelSerializer):
             'first_name',
             'last_name',
             'client_display',
+            'payment_method',
         )
-        read_only_fields = ('id', 'all_docs_uploaded',)
+        read_only_fields = ('id', 'all_docs_uploaded', 'payment_method',)
 
     def create(self, validated_data):
         phone_number = validated_data.get('phone_number')
@@ -70,3 +75,8 @@ class DriverSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+    def get_payment_method(self, instance):
+        payment_method = driver_service.get_default_payment_method(instance)
+        if payment_method:
+            return PaymentMethodSerializer(payment_method).data

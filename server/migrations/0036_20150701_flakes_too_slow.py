@@ -23,5 +23,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(flakes_are_too_slow),
+        migrations.RunPython(
+            flakes_are_too_slow,
+            reverse_code=migrations.RunPython.noop
+        ),
     ]

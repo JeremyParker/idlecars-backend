@@ -23,16 +23,29 @@ class CarCompatibility(object):
         return [method() for method in services if method()]
 
     def uber_x(self):
-        return self._compatible_flavor_name('uber_x')
+        if (self._compatible_flavor_name('uber_xl') or
+            self._compatible_flavor_name('uber_black') or
+            self._compatible_flavor_name('uber_suv')):
+            return 'UberX'
+        else:
+            return self._compatible_flavor_name('uber_x')
 
     def uber_xl(self):
-        return self._compatible_flavor_name('uber_xl')
+        if self._compatible_flavor_name('uber_suv'):
+            return 'UberXL'
+        else:
+            return self._compatible_flavor_name('uber_xl')
 
     def uber_black(self):
-        return self._compatible_flavor_name('uber_black')
+        if self.car.exterior_color is self.car.COLOR_BLACK and self.car.interior_color is self.car.COLOR_BLACK:
+            if self._compatible_flavor_name('uber_suv'):
+                return 'UberBlack'
+            else:
+                return self._compatible_flavor_name('uber_black')
 
     def uber_suv(self):
-        return self._compatible_flavor_name('uber_suv')
+        if self.car.exterior_color is self.car.COLOR_BLACK and self.car.interior_color is self.car.COLOR_BLACK:
+            return self._compatible_flavor_name('uber_suv')
 
     def lyft_standard(self):
         if self.car.make_model.passenger_count < 6:
