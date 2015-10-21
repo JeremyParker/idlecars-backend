@@ -69,8 +69,8 @@ class DriverAdmin(ReverseModelAdmin):
         }),
         ('None', {
             'fields': (
-                'date_joined',
-               ('notes'),
+                ('date_joined', 'braintree_customer_id'),
+                ('notes'),
             ),
         }),
     )
@@ -82,6 +82,7 @@ class DriverAdmin(ReverseModelAdmin):
         'dd_link',
         'poa_link',
         'base_letter_link',
+        'braintree_customer_id',
     ]
     inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
