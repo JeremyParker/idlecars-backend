@@ -1,127 +1,80 @@
 .underline {
-  text-decoration: underline;
-}
+  text-decoration: underline; }
 
 .bold {
-  font-weight: 500;
-}
+  font-weight: 500; }
 
 .about-page {
-  color: black;
-}
-
-.about-page h2 {
-  font-size: 36px;
-  font-weight: 500;
-}
-
-.about-page h3 {
-  font-size: 24px;
-  font-weight: 500;
-}
-
-.about-page p {
-  font-size: 18px;
-}
-
-.about-page .section-container {
-  padding: 76px 48px 100px;
-  margin: 0 auto;
-  max-width: 1058px;
-
-}
-
-.header-photo {
-  background: url(img/team_photo.jpg) no-repeat white;
-  background-size: cover;
-  background-position: center;
-  height: 594px;
-  margin-top: 48px;
-}
-
-.about-us, .get-in-touch{
-  background: #f2f2f2;
-}
-
-.about-us h2 {
-  margin-bottom: 36px;
-}
-
-.our-team {
-  background: #fff;
-}
-
-.our-team .pane, .our-team .topics {
-  display: flex;
-  display: -webkit-flex;
-}
-
-.our-team .topics {
-  margin-bottom: 100px;
-  color: #008aff;
-}
-
-.our-team .topics h3 {
-  flex: 1;
-  -ms-flex: 1;
-  -webkit-flex: 1;
-
-  text-align: center;
-}
-
-.our-team .topics h3:hover {
-  cursor: pointer;
-}
-
-.our-team .pane {
-  margin: 76px auto 0;
-}
-
-.our-team .profile-image {
-  margin-right: 24px;
-}
-
-.our-team .profile-image img {
-  height: 125px;
-}
-
-.our-team .description p:first-child {
-  margin-bottom: 18px;
-}
-
-.get-in-touch p {
-  color: #6f6f6f;
-  margin-bottom: 5px;
-}
-
-.get-in-touch .input, .get-in-touch input[type="submit"] {
-  margin-top: 36px;
-}
-
-.get-in-touch input[type="text"], .get-in-touch input[type="email"] {
-  width: 300px;
-}
-
-.get-in-touch textarea {
-  border: none;
-}
-
-.get-in-touch input[type="submit"] {
-  background: #008aff;
-  padding: 10px 50px;
-  color: white;
-}
+  color: black; }
+  .about-page h2 {
+    font-size: 36px;
+    font-weight: 500; }
+  .about-page h3 {
+    font-size: 24px;
+    font-weight: 500; }
+  .about-page p {
+    font-size: 18px; }
+  .about-page .section-container {
+    padding: 76px 48px 100px;
+    margin: 0 auto;
+    max-width: 1058px; }
+  .about-page .header-photo {
+    background: url(../img/team_photo.jpg) no-repeat white;
+    background-size: cover;
+    background-position: center;
+    height: 594px;
+    margin-top: 48px; }
+  .about-page .about-us, .about-page .get-in-touch {
+    background: #f2f2f2; }
+  .about-page .about-us h2 {
+    margin-bottom: 36px; }
+  .about-page .our-team {
+    background: #fff; }
+    .about-page .our-team .pane {
+      display: flex;
+      display: -webkit-flex; }
+    .about-page .our-team .topics {
+      display: flex;
+      display: -webkit-flex;
+      margin-bottom: 100px;
+      color: #008aff; }
+      .about-page .our-team .topics h3 {
+        flex: 1;
+        -ms-flex: 1;
+        -webkit-flex: 1;
+        text-align: center; }
+        .about-page .our-team .topics h3:hover {
+          cursor: pointer; }
+    .about-page .our-team .pane {
+      margin: 76px auto 0; }
+    .about-page .our-team .profile-image {
+      margin-right: 24px; }
+      .about-page .our-team .profile-image img {
+        height: 125px; }
+    .about-page .our-team .description p:first-child {
+      margin-bottom: 18px; }
+  .about-page .get-in-touch p {
+    color: #6f6f6f;
+    margin-bottom: 5px; }
+  .about-page .get-in-touch .input {
+    margin-top: 36px; }
+  .about-page .get-in-touch input[type="submit"] {
+    margin-top: 36px; }
+  .about-page .get-in-touch input[type="text"], .about-page .get-in-touch input[type="email"] {
+    width: 300px; }
+  .about-page .get-in-touch textarea {
+    border: none; }
+  .about-page .get-in-touch input[type="submit"] {
+    background: #008aff;
+    padding: 10px 50px;
+    color: white; }
 
 @media (max-width: 530px) {
   .about-page h2 {
-    font-size: 28px;
-  }
-
+    font-size: 28px; }
   .about-page h3 {
-    font-size: 20px;
-  }
-
+    font-size: 20px; }
   .about-page p {
-    font-size: 16px;
-  }
-}
+    font-size: 16px; } }
+
+/*# sourceMappingURL=about_page.css.map */

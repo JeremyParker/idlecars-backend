@@ -1,0 +1,100 @@
+.underline
+  text-decoration: underline
+
+.bold
+  font-weight: 500
+
+.about-page
+  color: black
+
+  h2
+    font-size: 36px
+    font-weight: 500
+  h3
+    font-size: 24px
+    font-weight: 500
+  p
+    font-size: 18px
+
+  .section-container
+    padding: 76px 48px 100px
+    margin: 0 auto
+    max-width: 1058px
+
+  .header-photo
+    background: url(../img/team_photo.jpg) no-repeat white
+    background-size: cover
+    background-position: center
+    height: 594px
+    margin-top: 48px
+
+  .about-us, .get-in-touch
+    background: #f2f2f2
+
+  .about-us h2
+    margin-bottom: 36px
+
+  .our-team
+    background: #fff
+
+    .pane
+      display: flex
+      display: -webkit-flex
+
+    .topics
+      display: flex
+      display: -webkit-flex
+      margin-bottom: 100px
+      color: #008aff
+
+      h3
+        flex: 1
+        -ms-flex: 1
+        -webkit-flex: 1
+        text-align: center
+        &:hover
+          cursor: pointer
+
+    .pane
+      margin: 76px auto 0
+
+    .profile-image
+      margin-right: 24px
+
+      img
+        height: 125px
+
+    .description p:first-child
+      margin-bottom: 18px
+
+  .get-in-touch
+    p
+      color: #6f6f6f
+      margin-bottom: 5px
+
+    .input
+      margin-top: 36px
+
+    input
+      &[type="submit"]
+        margin-top: 36px
+
+      &[type="text"], &[type="email"]
+        width: 300px
+
+    textarea
+      border: none
+
+    input[type="submit"]
+      background: #008aff
+      padding: 10px 50px
+      color: white
+
+@media (max-width: 530px)
+  .about-page
+    h2
+      font-size: 28px
+    h3
+      font-size: 20px
+    p
+      font-size: 16px

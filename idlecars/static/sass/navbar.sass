@@ -1,0 +1,64 @@
+.navbar
+  position: fixed
+  top: 0
+  background: black
+  z-index: 9999
+
+  .logo
+    height: 3rem
+    max-width: 65rem
+    padding: 0.5rem 2rem
+    margin: 0 auto
+
+  img
+    height: 2rem
+
+  .links
+    position: absolute
+    top: 0
+    right: 2rem
+    height: 3rem
+    width: 35rem
+    padding: 0.5rem 0
+    display: flex
+    display: -webkit-flex
+    flex: 1
+    align-items: center
+
+  a
+    flex: 1
+    -ms-flex: 1
+    -webkit-flex: 1
+    text-align: center
+
+  h5
+    font-weight: 500
+
+  .menu-button
+    display: none
+    cursor: pointer
+    position: relative
+    left: calc(100% - 2.75rem)
+    width: 2.75rem
+    height: 3rem
+
+  .menu-container
+    background-color: black
+    width: 100%
+    padding: 0 1.5rem 1rem
+
+    a
+      display: block
+      text-align: right
+      padding: 0.5rem 0
+      font-weight: 300
+
+@media (max-width: 875px)
+  .navbar
+    display: block
+
+    .links, .logo
+      display: none
+
+    .menu-button
+      display: block
