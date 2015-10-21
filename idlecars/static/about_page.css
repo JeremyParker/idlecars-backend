@@ -36,6 +36,7 @@
   background-size: cover;
   background-position: center;
   height: 594px;
+  margin-top: 48px;
 }
 
 .about-us, .get-in-touch{
@@ -109,4 +110,18 @@
   background: #008aff;
   padding: 10px 50px;
   color: white;
+}
+
+@media (max-width: 530px) {
+  .about-page h2 {
+    font-size: 28px;
+  }
+
+  .about-page h3 {
+    font-size: 20px;
+  }
+
+  .about-page p {
+    font-size: 16px;
+  }
 }
