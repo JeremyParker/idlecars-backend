@@ -1,100 +1,101 @@
 extends ./base.jade
 
 - block content
-  section.navbar
-    .logo
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-    .links
-      a(href="#tutorial") #[h5 How it works]
-      a(href="#{ login_url }") #[h5 Join/Login]
-      a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
-    .menu-button(ng-click='showMenu = !showMenu')
-      .burger-button(ng-class='{active: showMenu}')
-    .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-      a(href="#tutorial") How it works
-      a(href="#{ login_url }") Join/Login
-      a(href="http://goo.gl/forms/4s26I6GUQY") List your car
+  .landing-page
+    section.navbar
+      .logo
+        img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+      .links
+        a(href="#tutorial") #[h5 How it works]
+        a(href="#{ login_url }") #[h5 Join/Login]
+        a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
+      .menu-button(ng-click='showMenu = !showMenu')
+        .burger-button(ng-class='{active: showMenu}')
+      .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+        a(href="#tutorial") How it works
+        a(href="#{ login_url }") Join/Login
+        a(href="http://goo.gl/forms/4s26I6GUQY") List your car
 
-  section.headline
-    .phone-background
+    section.headline
+      .phone-background
+        .container
+          .wrapper
+            div
+              img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+            .content
+              h1 Keep More of #[br] What You Earn
+              p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+              p No leases, loans or long-term commitments. Insurance and maintenance included.
+              a.button(href="#{ settings.WEBAPP_URL }") Find your car
+              a.login(href="#{ login_url }") Have an account? #[span Log in]
+
+    section.get-more
       .container
-        .wrapper
-          div
-            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-          .content
-            h1 Keep More of #[br] What You Earn
-            p NYC's widest selection of TLC registered for-hire rentals, at the best price.
-            p No leases, loans or long-term commitments. Insurance and maintenance included.
-            a.button(href="#{ settings.WEBAPP_URL }") Find your car
-            a.login(href="#{ login_url }") Have an account? #[span Log in]
+        h3 Register Today. #[br] Drive Tomorrow.
+        h5 We handle the paperwork, #[br] so you can focus on your fares.
 
-  section.get-more
-    .container
-      h3 Register Today. #[br] Drive Tomorrow.
-      h5 We handle the paperwork, #[br] so you can focus on your fares.
+    section.select
+      .container
+        .content
+          h3 Choose your car, get insured, and start driving within #[br] #[strong 24 hours.]
+          h1 It's that easy.
 
-  section.select
-    .container
-      .content
-        h3 Choose your car, get insured, and start driving within #[br] #[strong 24 hours.]
-        h1 It's that easy.
+    section.manhattan
+      .container
+        h2 Your Car, Your Service. When you need it.
+        h4 Idlecars work with all services including Uber, Lyft and More
+        img(src="#{ settings.STATIC_URL }img/services_stacked.png")
 
-  section.manhattan
-    .container
-      h2 Your Car, Your Service. When you need it.
-      h4 Idlecars work with all services including Uber, Lyft and More
-      img(src="#{ settings.STATIC_URL }img/services_stacked.png")
+    a.invisible(id="tutorial")
+    section.tutorial
+      h3 How it works
+      .segments
+        .segment
+          .pane
+            .image
+              img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
+            h6 #[strong Pick A Car. Any Car.]
+            h6 Find the car that fits your style and budget.
+        .segment
+          .pane
+            .image
+              img(src="#{ settings.STATIC_URL }img/tutorial2.png")
+            h6 #[strong Start Your Account.]
+            h6 Use your smartphone to upload your driving documents.
+        .segment
+          .pane
+            .image
+              img(src="#{ settings.STATIC_URL }img/tutorial3.png")
+            h6.single-line #[strong Reserve Your Car.]
+            h6 Use your credit card or bank account to reserve your car.
+        .segment
+          .pane
+            .image
+              img(src="#{ settings.STATIC_URL }img/tutorial4.png")
+            h6.single-line #[strong DRIVE]
+            h6 Once you’re added to the insurance, you’re ready to go. Go pick up your car!
 
-  a.invisible(id="tutorial")
-  section.tutorial
-    h3 How it works
-    .segments
-      .segment
-        .pane
-          .image
-            img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
-          h6 #[strong Pick A Car. Any Car.]
-          h6 Find the car that fits your style and budget.
-      .segment
-        .pane
-          .image
-            img(src="#{ settings.STATIC_URL }img/tutorial2.png")
-          h6 #[strong Start Your Account.]
-          h6 Use your smartphone to upload your driving documents.
-      .segment
-        .pane
-          .image
-            img(src="#{ settings.STATIC_URL }img/tutorial3.png")
-          h6.single-line #[strong Reserve Your Car.]
-          h6 Use your credit card or bank account to reserve your car.
-      .segment
-        .pane
-          .image
-            img(src="#{ settings.STATIC_URL }img/tutorial4.png")
-          h6.single-line #[strong DRIVE]
-          h6 Once you’re added to the insurance, you’re ready to go. Go pick up your car!
+    section.ask
+      .ask-container
+        h3 Your Car is Ready, Are You?
+          a(href='mailto:support@idlecars.com') ASK US ANYTHING
+        h3 Follow Us Too
+        .social
+          .app
+            a(href="https://twitter.com/idlecars" target="_blank")
+              img(src="#{ settings.STATIC_URL }img/twitter.png")
+          .app
+            a(href="https://www.facebook.com/idlecars" target="_blank")
+              img(src="#{ settings.STATIC_URL }img/facebook.png")
+          .app
+            a(href="https://www.linkedin.com/company/10117035" target="_blank")
+              img(src="#{ settings.STATIC_URL }img/linkedin.png")
 
-  section.ask
-    .ask-container
-      h3 Your Car is Ready, Are You?
-        a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      h3 Follow Us Too
-      .social
-        .app
-          a(href="https://twitter.com/idlecars" target="_blank")
-            img(src="#{ settings.STATIC_URL }img/twitter.png")
-        .app
-          a(href="https://www.facebook.com/idlecars" target="_blank")
-            img(src="#{ settings.STATIC_URL }img/facebook.png")
-        .app
-          a(href="https://www.linkedin.com/company/10117035" target="_blank")
-            img(src="#{ settings.STATIC_URL }img/linkedin.png")
-
-  footer
-    h5.tm
-      a(href="#{ faq }") Help
-      span |
-      a(href="#{ terms_of_service }") Terms & Privacy
-    br
-    h5.tm #[strong © {% now 'Y' %} idlecars]
-    h5.tm All trademarks and images are copyright of their respective owners.
+    footer
+      h5.tm
+        a(href="#{ faq }") Help
+        span |
+        a(href="#{ terms_of_service }") Terms & Privacy
+      br
+      h5.tm #[strong © {% now 'Y' %} idlecars]
+      h5.tm All trademarks and images are copyright of their respective owners.

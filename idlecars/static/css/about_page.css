@@ -6,14 +6,6 @@
 
 .about-page {
   color: black; }
-  .about-page h2 {
-    font-size: 36px;
-    font-weight: 500; }
-  .about-page h3 {
-    font-size: 24px;
-    font-weight: 500; }
-  .about-page p {
-    font-size: 18px; }
   .about-page .section-container {
     padding: 76px 48px 100px;
     margin: 0 auto;
@@ -68,13 +60,5 @@
     background: #008aff;
     padding: 10px 50px;
     color: white; }
-
-@media (max-width: 530px) {
-  .about-page h2 {
-    font-size: 28px; }
-  .about-page h3 {
-    font-size: 20px; }
-  .about-page p {
-    font-size: 16px; } }
 
 /*# sourceMappingURL=about_page.css.map */
