@@ -1,0 +1,40 @@
+%flex
+  display: flex
+  display: -webkit-flex
+
+%flex_cell
+  flex: 1
+  -ms-flex: 1
+  -webkit-flex: 1
+
+%flex_cell_auto
+  flex: auto
+  -ms-flex: auto
+  -webkit-flex: auto
+
+%flex_align_items_center
+  flex-direction: column
+  -webkit-flex-direction: column
+
+%flex_justify_content_center
+  justify-content: center
+  -webkit-justify-content: center
+
+.flex
+  @extend %flex
+
+.flex-cell
+  @extend %flex_cell
+
+.flex-center
+  @extend %flex
+  @extend %flex_justify_content_center
+  @extend %flex_align_items_center
+
+.flex-center-verticle
+  @extend %flex
+  @extend %flex_align_items_center
+
+.flex-center-horizontal
+  @extend %flex
+  @extend %flex_justify_content_center

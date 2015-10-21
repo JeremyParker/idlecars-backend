@@ -1,177 +1,168 @@
-.landing-page .invisible {
-  margin-top: -3rem;
-  height: 3rem; }
-.landing-page .container {
-  max-width: 65rem;
-  padding: 8rem 2rem;
+.flex, .flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .flex-center-horizontal, .landing-page .tutorial .segments {
   display: flex;
-  display: -webkit-flex;
-  flex-direction: column;
-  -webkit-flex-direction: column;
-  justify-content: center;
-  -webkit-justify-content: center; }
-.landing-page .button {
-  width: 15rem;
-  font-size: 0.9rem; }
-.landing-page .headline {
-  margin-top: 3rem;
-  background: url(../img/loadingscreen.png) no-repeat #141414; }
-  .landing-page .headline .phone-background {
-    background: url(../img/phone.png) no-repeat transparent;
-    background-position: calc(50% + 250px) center; }
-  .landing-page .headline .container {
-    height: 695px;
-    position: relative; }
-  .landing-page .headline img {
-    display: none; }
-  .landing-page .headline h1 {
-    line-height: 1.25em;
-    margin-bottom: 2rem; }
-  .landing-page .headline p {
-    margin-bottom: 1rem;
-    max-width: 26rem; }
-  .landing-page .headline .button {
-    background: #008aff;
-    color: white;
-    margin: 2rem 0; }
-.landing-page .login {
-  font-size: 0.8rem;
-  font-weight: 200; }
-  .landing-page .login span {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #008aff;
-    text-shadow: 2px 2px 0px black; }
-.landing-page .select {
-  background: url(../img/selectthebest.jpg) no-repeat #070707;
-  background-position: calc(50% + 336px) center; }
-  .landing-page .select h3 {
-    max-width: 25rem;
-    margin: 0 auto 3rem; }
-  .landing-page .select .container {
-    height: 522px;
-    text-align: center; }
-  .landing-page .select .content {
-    max-width: 31rem; }
-.landing-page .get-more {
-  background: white;
-  color: black;
-  text-align: center; }
-  .landing-page .get-more .container {
-    padding: 4rem 1rem; }
-  .landing-page .get-more h3 {
-    font-weight: 500; }
-  .landing-page .get-more br {
-    display: none; }
-.landing-page .manhattan {
-  background: url(../img/manhattan.jpg) no-repeat white;
-  background-size: cover;
-  background-position: center;
-  height: 507px;
-  color: black;
-  text-align: center; }
-  .landing-page .manhattan .container {
-    height: 100%;
-    padding: 0;
-    align-items: center;
-    -webkit-align-items: center; }
-  .landing-page .manhattan h2 {
-    font-weight: 500;
-    margin-bottom: 1rem; }
-  .landing-page .manhattan img {
-    max-width: 25rem;
-    margin-top: 2rem; }
-.landing-page .tutorial {
-  background-color: #008aff;
-  text-align: center;
-  display: flex;
-  display: -webkit-flex;
+  display: -webkit-flex; }
+
+.flex-cell, .landing-page .tutorial .segments {
+  flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1; }
+
+.landing-page .tutorial .segment {
+  flex: auto;
+  -ms-flex: auto;
+  -webkit-flex: auto; }
+
+.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container {
   flex-direction: column;
   -webkit-flex-direction: column; }
-  .landing-page .tutorial h3 {
-    margin: 3rem 0;
-    font-weight: 500; }
-  .landing-page .tutorial h6:first-of-type {
+
+.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-horizontal, .landing-page .tutorial .segments {
+  justify-content: center;
+  -webkit-justify-content: center; }
+
+.landing-page {
+  margin-top: 3rem; }
+  .landing-page .invisible {
+    margin-top: -3rem;
+    height: 3rem; }
+  .landing-page .container {
+    max-width: 65rem; }
+  .landing-page .hero-asset {
+    background: url(../img/hero_bottom.png) no-repeat #fff;
+    background-position: center;
+    height: 600px; }
+    .landing-page .hero-asset .hero-top {
+      background: url(../img/hero_top.png) no-repeat transparent;
+      background-position: right;
+      max-width: 50%;
+      min-width: 500px;
+      height: 100%;
+      padding: 64px 0 64px 48px; }
+    .landing-page .hero-asset .content h1 {
+      line-height: 1.25em; }
+    .landing-page .hero-asset .content p:first-of-type {
+      max-width: 400px;
+      margin-top: 36px;
+      margin-bottom: 24px; }
+    .landing-page .hero-asset .content p:last-of-type {
+      max-width: 300px;
+      margin-bottom: 48px; }
+    .landing-page .hero-asset .content .button {
+      width: 15rem; }
+  .landing-page .phone {
+    background: #f2f2f2;
+    height: 100%; }
+    .landing-page .phone .phone-background {
+      background: url(../img/phone.png) no-repeat transparent;
+      background-size: auto 100%;
+      background-position: 20% center;
+      min-height: 500px; }
+    .landing-page .phone .content {
+      position: relative;
+      left: 50%;
+      color: black;
+      max-width: 380px; }
+  .landing-page .tutorial {
+    background: white;
+    text-align: center;
+    color: black; }
+    .landing-page .tutorial .container {
+      padding: 72px 48px 140px; }
+    .landing-page .tutorial p:first-of-type {
+      min-height: 54px;
+      margin: 16px 0; }
+    .landing-page .tutorial .segments {
+      margin-top: 100px; }
+    .landing-page .tutorial .pane {
+      max-width: 13rem;
+      margin: 0 auto; }
+    .landing-page .tutorial .image {
+      height: 100px; }
+      .landing-page .tutorial .image:before, .landing-page .tutorial .image img {
+        display: inline-block;
+        vertical-align: middle; }
+      .landing-page .tutorial .image:before {
+        content: " ";
+        height: 100%; }
+      .landing-page .tutorial .image img {
+        max-height: 100px;
+        max-width: 96px; }
+  .landing-page .select {
+    background: url(../img/selectthebest.jpg) no-repeat #070707;
+    background-position: calc(50% + 336px) center; }
+    .landing-page .select h3 {
+      max-width: 25rem;
+      margin: 0 auto 3rem; }
+    .landing-page .select .container {
+      height: 522px;
+      text-align: center; }
+    .landing-page .select .content {
+      max-width: 31rem; }
+  .landing-page .get-more {
+    background: white;
+    color: black;
+    text-align: center; }
+    .landing-page .get-more .container {
+      padding: 4rem 1rem; }
+    .landing-page .get-more h3 {
+      font-weight: 500; }
+    .landing-page .get-more br {
+      display: none; }
+  .landing-page .manhattan {
+    background: url(../img/manhattan.jpg) no-repeat white;
+    background-size: cover;
+    background-position: center;
+    height: 507px;
+    color: black;
+    text-align: center; }
+    .landing-page .manhattan .container {
+      height: 100%;
+      padding: 0;
+      align-items: center;
+      -webkit-align-items: center; }
+    .landing-page .manhattan h2 {
+      font-weight: 500;
+      margin-bottom: 1rem; }
+    .landing-page .manhattan img {
+      max-width: 25rem;
+      margin-top: 2rem; }
+  .landing-page .ask {
+    text-align: center;
+    padding: 3rem 1rem;
+    height: 25rem; }
+  .landing-page .ask-container {
+    width: 100%;
+    height: 100%;
     display: flex;
     display: -webkit-flex;
-    align-items: center;
-    -webkit-align-items: center;
+    flex-direction: column;
+    -webkit-flex-direction: column;
     justify-content: center;
     -webkit-justify-content: center;
-    min-height: 2.75rem;
-    margin: 1rem 0; }
-  .landing-page .tutorial strong {
+    align-items: center;
+    -webkit-align-items: center; }
+  .landing-page .ask a {
     display: block;
-    font-weight: 700; }
-  .landing-page .tutorial .segments {
-    flex: 1;
-    -ms-flex: 1;
-    -webkit-flex: 1;
+    font-weight: 500;
+    text-decoration: underline;
+    color: #008aff; }
+    .landing-page .ask a:hover {
+      color: #ddd; }
+  .landing-page .ask h3 + h3 {
+    margin: 3rem 0 1rem; }
+  .landing-page .ask .social {
     display: flex;
     display: -webkit-flex;
     justify-content: center;
     -webkit-justify-content: center; }
-  .landing-page .tutorial .segment {
-    flex: auto;
-    -ms-flex: auto;
-    -webkit-flex: auto; }
-  .landing-page .tutorial .image {
-    height: 5rem; }
-    .landing-page .tutorial .image:before {
-      content: " ";
-      display: inline-block;
-      vertical-align: middle;
-      height: 100%; }
-  .landing-page .tutorial img {
-    vertical-align: middle;
-    display: inline-block;
-    max-height: 5rem;
-    max-width: 6rem; }
-  .landing-page .tutorial .pane {
-    max-width: 13rem;
-    margin: 0 auto 4rem auto; }
-.landing-page .ask {
-  text-align: center;
-  padding: 3rem 1rem;
-  height: 25rem; }
-.landing-page .ask-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  display: -webkit-flex;
-  flex-direction: column;
-  -webkit-flex-direction: column;
-  justify-content: center;
-  -webkit-justify-content: center;
-  align-items: center;
-  -webkit-align-items: center; }
-.landing-page .ask a {
-  display: block;
-  font-weight: 500;
-  text-decoration: underline;
-  color: #008aff; }
-  .landing-page .ask a:hover {
-    color: #ddd; }
-.landing-page .ask h3 + h3 {
-  margin: 3rem 0 1rem; }
-.landing-page .ask .social {
-  display: flex;
-  display: -webkit-flex;
-  justify-content: center;
-  -webkit-justify-content: center; }
-.landing-page .ask .app {
-  flex: 1;
-  -ms-flex: 1;
-  -webkit-flex: 1;
-  max-width: 5rem;
-  margin: 0 0.5rem; }
-  .landing-page .ask .app img {
-    width: 4rem; }
-.landing-page .service-logos-small {
-  display: none; }
-.landing-page .service-logos-big {
-  margin-top: 2rem;
-  max-width: 100%; }
+  .landing-page .ask .app {
+    flex: 1;
+    -ms-flex: 1;
+    -webkit-flex: 1;
+    max-width: 5rem;
+    margin: 0 0.5rem; }
+    .landing-page .ask .app img {
+      width: 4rem; }
 
 @media (max-width: 875px) {
   .headline .container, .select .container {

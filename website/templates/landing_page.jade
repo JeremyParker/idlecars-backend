@@ -16,23 +16,50 @@ extends ./base.jade
         a(href="#{ login_url }") Join/Login
         a(href="http://goo.gl/forms/4s26I6GUQY") List your car
 
-    section.headline
-      .phone-background
-        .container
-          .wrapper
-            div
-              img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-            .content
-              h1 Keep More of #[br] What You Earn
-              p NYC's widest selection of TLC registered for-hire rentals, at the best price.
-              p No leases, loans or long-term commitments. Insurance and maintenance included.
-              a.button(href="#{ settings.WEBAPP_URL }") Find your car
-              a.login(href="#{ login_url }") Have an account? #[span Log in]
+    section.hero-asset
+      .hero-top
+        .content
+          h1 Keep More of #[br] What You Earn
+          p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+          p No leases, loans or long-term commitments. Insurance and maintenance included.
+          a.button(href="#{ settings.WEBAPP_URL }") Find your car
 
-    section.get-more
+    section.phone
+      .phone-background
+        .content
+          h2 Renting a car has #[br] never been easier
+          p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
+          a.bold #[p Learn more]
+
+    a.invisible(id="tutorial")
+    section.tutorial
       .container
-        h3 Register Today. #[br] Drive Tomorrow.
-        h5 We handle the paperwork, #[br] so you can focus on your fares.
+        h3 How it works
+        .segments
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
+              p.bold Pick A Car. Any Car.
+              p Find the car that fits your style and budget.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial2.png")
+              p.bold Start Your Account.
+              p Use your smartphone to upload your driving documents.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial3.png")
+              p.single-line.bold Reserve Your Car.
+              p Use your credit card or bank account to reserve your car.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial4.png")
+              p.single-line.bold DRIVE
+              p Once you’re added to the insurance, you’re ready to go!
 
     section.select
       .container
@@ -45,35 +72,6 @@ extends ./base.jade
         h2 Your Car, Your Service. When you need it.
         h4 Idlecars work with all services including Uber, Lyft and More
         img(src="#{ settings.STATIC_URL }img/services_stacked.png")
-
-    a.invisible(id="tutorial")
-    section.tutorial
-      h3 How it works
-      .segments
-        .segment
-          .pane
-            .image
-              img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
-            h6 #[strong Pick A Car. Any Car.]
-            h6 Find the car that fits your style and budget.
-        .segment
-          .pane
-            .image
-              img(src="#{ settings.STATIC_URL }img/tutorial2.png")
-            h6 #[strong Start Your Account.]
-            h6 Use your smartphone to upload your driving documents.
-        .segment
-          .pane
-            .image
-              img(src="#{ settings.STATIC_URL }img/tutorial3.png")
-            h6.single-line #[strong Reserve Your Car.]
-            h6 Use your credit card or bank account to reserve your car.
-        .segment
-          .pane
-            .image
-              img(src="#{ settings.STATIC_URL }img/tutorial4.png")
-            h6.single-line #[strong DRIVE]
-            h6 Once you’re added to the insurance, you’re ready to go. Go pick up your car!
 
     section.ask
       .ask-container

@@ -1,52 +1,104 @@
+@import flex
+
 .landing-page
+  margin-top: 3rem
+
   .invisible
     margin-top: -3rem
     height: 3rem
 
   .container
     max-width: 65rem
-    padding: 8rem 2rem
-    display: flex
-    display: -webkit-flex
-    flex-direction: column
-    -webkit-flex-direction: column
-    justify-content: center
-    -webkit-justify-content: center
 
-  .button
-    width: 15rem
-    font-size: 0.9rem
+  .hero-asset
+    background: url(../img/hero_bottom.png) no-repeat #fff
+    background-position: center
+    height: 600px
 
-  .headline
-    margin-top: 3rem
-    background: url(../img/loadingscreen.png) no-repeat #141414
+    .hero-top
+      @extend .flex-center
+      background: url(../img/hero_top.png) no-repeat transparent
+      background-position: right
+
+      max-width: 50%
+      min-width: 500px
+
+      height: 100%
+      padding: 64px 0 64px 48px
+
+    .content
+      h1
+        line-height: 1.25em
+
+      p:first-of-type
+        max-width: 400px
+        margin-top: 36px
+        margin-bottom: 24px
+
+      p:last-of-type
+        max-width: 300px
+        margin-bottom: 48px
+
+      .button
+        width: 15rem
+
+  .phone
+    background: #f2f2f2
+    height: 100%
+
     .phone-background
+      @extend .flex-center
       background: url(../img/phone.png) no-repeat transparent
-      background-position: calc(50% + 250px) center
-    .container
-      height: 695px
-      position: relative
-    img
-      display: none
-    h1
-      line-height: 1.25em
-      margin-bottom: 2rem
-    p
-      margin-bottom: 1rem
-      max-width: 26rem
-    .button
-      background: #008aff
-      color: white
-      margin: 2rem 0
+      background-size: auto 100%
+      background-position: 20% center
+      min-height: 500px
 
-  .login
-    font-size: 0.8rem
-    font-weight: 200
-    span
-      font-size: 1rem
-      font-weight: 500
-      color: #008aff
-      text-shadow: 2px 2px 0px rgba(0, 0, 0, 1)
+    .content
+      position: relative
+      left: 50%
+      color: black
+      max-width: 380px
+
+  .tutorial
+    background: white
+    text-align: center
+    color: black
+
+    .container
+      @extend .flex-center-verticle
+      padding: 72px 48px 140px
+
+    p:first-of-type
+      @extend .flex-center
+      min-height: 54px
+      margin: 16px 0
+
+    .segments
+      @extend .flex-cell
+      @extend .flex-center-horizontal
+      margin-top: 100px
+
+    .segment
+      @extend %flex_cell_auto
+
+    .pane
+      max-width: 13rem
+      margin: 0 auto
+
+    .image
+      height: 100px
+
+      &:before, img
+        display: inline-block
+        vertical-align: middle
+
+      &:before
+        content: ' '
+        height: 100%
+
+      img
+        max-height: 100px
+        max-width: 96px
 
   .select
     background: url(../img/selectthebest.jpg) no-repeat #070707
@@ -90,55 +142,7 @@
       max-width: 25rem
       margin-top: 2rem
 
-  .tutorial
-    background-color: #008aff
-    text-align: center
-    display: flex
-    display: -webkit-flex
-    flex-direction: column
-    -webkit-flex-direction: column
-    h3
-      margin: 3rem 0
-      font-weight: 500
-    h6:first-of-type
-      display: flex
-      display: -webkit-flex
-      align-items: center
-      -webkit-align-items: center
-      justify-content: center
-      -webkit-justify-content: center
-      min-height: 2.75rem
-      margin: 1rem 0
-    strong
-      display: block
-      font-weight: 700
-    .segments
-      flex: 1
-      -ms-flex: 1
-      -webkit-flex: 1
-      display: flex
-      display: -webkit-flex
-      justify-content: center
-      -webkit-justify-content: center
-    .segment
-      flex: auto
-      -ms-flex: auto
-      -webkit-flex: auto
-    .image
-      height: 5rem
-      &:before
-        content: ' '
-        display: inline-block
-        vertical-align: middle
-        height: 100%
-    img
-      vertical-align: middle
-      display: inline-block
-      max-height: 5rem
-      max-width: 6rem
-    .pane
-      max-width: 13rem
-      margin: 0 auto 4rem auto
+
 
   .ask
     text-align: center
@@ -180,13 +184,6 @@
       margin: 0 0.5rem
       img
         width: 4rem
-
-  .service-logos-small
-    display: none
-
-  .service-logos-big
-    margin-top: 2rem
-    max-width: 100%
 
 @media (max-width: 875px)
   .headline .container, .select .container
