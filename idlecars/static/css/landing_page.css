@@ -168,11 +168,11 @@ section {
 
 .headline {
   margin-top: 3rem;
-  background: url(img/loadingscreen.png) no-repeat #141414;
+  background: url(../img/loadingscreen.png) no-repeat #141414;
 }
 
 .headline .phone-background {
-  background: url(img/phone.png) no-repeat transparent;
+  background: url(../img/phone.png) no-repeat transparent;
   background-position: calc(50% + 250px) center;
 }
 
@@ -214,7 +214,7 @@ section {
 }
 
 .select {
-  background: url(img/selectthebest.jpg) no-repeat #070707;
+  background: url(../img/selectthebest.jpg) no-repeat #070707;
   background-position: calc(50% + 336px) center;
 }
 
@@ -251,7 +251,7 @@ section {
 }
 
 .manhattan {
-  background: url(img/manhattan.jpg) no-repeat white;
+  background: url(../img/manhattan.jpg) no-repeat white;
   background-size: cover;
   background-position: center;
   height: 507px;
