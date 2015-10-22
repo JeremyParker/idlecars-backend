@@ -109,7 +109,7 @@ class Command(BaseCommand):
     def test_add_payment_method_error(self, gateway):
         # we have to fake it for the fake gatway :(
         if gateway is payment_gateways.get_gateway('fake'):
-            gateway.next_payment_method_response = (False, 'Some fake error',)
+            gateway.next_payment_method_response = (False, self.driver, 'Some fake error',)
 
         success, info = gateway.add_payment_method(
             self.driver,

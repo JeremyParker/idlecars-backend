@@ -41,8 +41,7 @@ def _add_customer(driver):
         success = getattr(response, 'is_success', False)
 
         if success:
-            customer_id = response.customer.id
-            driver.braintree_customer_id = customer_id
+            driver.braintree_customer_id = response.customer.id
             driver.save()
             return driver, None
         else:
@@ -157,7 +156,7 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
     if not driver.braintree_customer_id:
         driver, error = _add_customer(driver)
         if not driver.braintree_customer_id:
-            return False, error
+            return False, driver, error
 
     request = {
         'customer_id': driver.braintree_customer_id,
@@ -171,14 +170,14 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
     if success:
         payment_method = response.payment_method
         if payment_method.is_expired:
-            return False, EXPIRED_CARD_MSG
+            return False, driver, EXPIRED_CARD_MSG
 
         if isinstance(payment_method, braintree.CreditCard):
             card_info = _parse_card_info(payment_method)
-            return True, card_info
+            return True, driver, card_info
     else:
         message, _ = _parse_error(response)  # TODO - log the details somehow
-        return False, message
+        return False, driver, message
 
 
 def _transaction_request(payment):

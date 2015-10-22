@@ -13,7 +13,7 @@ class PaymentMethoError(Exception):
 
 def add_payment_method(driver, nonce):
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
-    success, details = gateway.add_payment_method(driver, nonce)
+    success, driver, details = gateway.add_payment_method(driver, nonce)
 
     if success:
         token, suffix, card_type, card_logo, expiration_date, unique_number_identifier = details
