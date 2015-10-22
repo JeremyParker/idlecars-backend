@@ -20,6 +20,10 @@
   justify-content: center
   -webkit-justify-content: center
 
+%flex_space_between
+  justify-content: space-between
+  -webkit-justify-content: space-between
+
 .flex
   @extend %flex
 
@@ -38,3 +42,7 @@
 .flex-center-horizontal
   @extend %flex
   @extend %flex_justify_content_center
+
+.flex-space-between
+  @extend %flex
+  @extend %flex_space_between
