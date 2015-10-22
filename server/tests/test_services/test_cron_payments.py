@@ -40,7 +40,7 @@ class TestCronPayments(TestCase):
         self.pickup_time = self.now - datetime.timedelta(days=7)
         self.first_rent_payment = factories.Payment.create(
             booking=self.booking,
-            amount=self.booking.car.solo_cost,
+            amount=self.booking.weekly_rent,
             service_fee='50.00',
             invoice_start_time=self.pickup_time,
             invoice_end_time=self.now,
@@ -69,7 +69,7 @@ class TestCronPayments(TestCase):
         # make another payment from the previous week
         previous_rent_payment = factories.Payment.create(
             booking=self.booking,
-            amount=self.booking.car.solo_cost,
+            amount=self.booking.weekly_rent,
             service_fee='50.00',
             invoice_start_time=self.pickup_time - datetime.timedelta(days=7),
             invoice_end_time=self.now - datetime.timedelta(days=7),

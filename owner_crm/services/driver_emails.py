@@ -261,7 +261,7 @@ def insurance_rejected(booking):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='You counldn\'t be added to the insurance on the car you wanted',
+        subject='You couldn\'t be added to the insurance on the car you wanted',
         merge_vars=merge_vars,
     )
 
@@ -308,7 +308,7 @@ def car_rented_elsewhere(booking):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='You counldn\'t be added to the insurance on the car you wanted',
+        subject='Sorry, someone else rented out the car you wanted.',
         merge_vars=merge_vars,
     )
 
