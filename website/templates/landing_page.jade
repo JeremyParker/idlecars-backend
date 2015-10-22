@@ -2,23 +2,6 @@ extends ./base.jade
 
 - block content
   .landing-page
-    section.navbar
-      .logo
-        img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-      .links
-        a(href="#tutorial") #[p How it works]
-        a(href='/about') #[p About Us]
-        a(href="#{ add_car_form }") #[p List your car]
-        a(href="#{ login_url }") #[p Join]
-
-      .menu-button(ng-click='showMenu = !showMenu')
-        .burger-button(ng-class='{active: showMenu}')
-
-      .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-        a(href="#tutorial") How it Works
-        a(href='/about') About Us
-        a(href="#{ add_car_form }") List Your Car
-        a(href="#{ login_url }") Join
 
     section.hero-asset
       .hero-top
@@ -30,10 +13,17 @@ extends ./base.jade
 
     section.phone
       .phone-background
+        .content.desktop
+          h2 Renting a car has #[br] never been easier
+          p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
+          p.bold #[a Learn more]
+
+    section.phone-content.mobile
+      .container
         .content
           h2 Renting a car has #[br] never been easier
           p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-          a.bold #[p Learn more]
+          p.bold #[a Learn more]
 
     a.invisible(id="tutorial")
     section.tutorial
@@ -67,6 +57,13 @@ extends ./base.jade
 
     section.select
       .container
+        .content.desktop
+          h2 Join now and start driving in less than a day
+          p Choose your car, get insured, and start driving in less than 24 hours.
+          p It's that easy.
+
+    section.select-content.mobile
+      .container
         .content
           h2 Join now and start driving in less than a day
           p Choose your car, get insured, and start driving in less than 24 hours.
@@ -74,43 +71,6 @@ extends ./base.jade
 
     section.manhattan
       .container
-        h2 Services we work with
-        p Idlecars work with all services, including Uber, Lyft and More.
+        h2 Services we #[br.mobile] work with
+        p Idlecars work with all services,#[br.mobile] including Uber, Lyft and More.
         img(src="#{ settings.STATIC_URL }img/services_stacked.png")
-
-    footer
-      .footer-container
-        .content-text
-          p.bold
-            a.underline(href="/") Home
-            span |
-            a.underline(href="/about") About Us
-            span |
-            a.underline(href="/#tutorial") How it Works
-            span |
-            a.underline(href="#{ add_car_form }") List Your Car
-            span |
-            a.underline(href="#{ login_url }") Join
-
-          p
-            a.underline(href="#{ faq }") Help
-            span |
-            a.underline(href="#{ terms_of_service }") Terms & Privacy
-
-          p.bold Copyright © {% now 'Y' %} idlecars. All Rights Reserved
-          p 95 Morton St, New York, 10014
-
-        .content-social
-          p.bold Follow us on
-
-          .apps
-            .app
-              a(href="https://twitter.com/idlecars" target="_blank")
-                img(src="#{ settings.STATIC_URL }img/twitter.png")
-            .app
-              a(href="https://www.facebook.com/idlecars" target="_blank")
-                img(src="#{ settings.STATIC_URL }img/facebook.png")
-            .app
-              a(href="https://www.linkedin.com/company/10117035" target="_blank")
-                img(src="#{ settings.STATIC_URL }img/linkedin.png")
-

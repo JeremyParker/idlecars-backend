@@ -7,10 +7,6 @@
     margin-top: -3rem
     height: 3rem
 
-  .container
-    max-width: 65rem
-    padding-left: 48px
-
   .hero-asset
     background: url(../img/hero_bottom.png) no-repeat #fff
     background-position: center
@@ -50,15 +46,22 @@
     .phone-background
       @extend .flex-center
       background: url(../img/phone.png) no-repeat transparent
-      background-size: auto 100%
+      background-size: auto 500px
       background-position: 20% center
-      min-height: 500px
+      height: 500px
 
     .content
       position: relative
       left: 50%
       color: black
       max-width: 380px
+
+  .phone-content
+    .container
+      background: #e3e3e3
+      color: black
+    a
+      color: #008aff
 
   .tutorial
     background: white
@@ -76,15 +79,15 @@
       margin: 16px 0
 
     .segments
-      @extend .flex-cell
-      @extend .flex-center-horizontal
+      @extend .flex-space-between
+      width: 100%
       margin-top: 100px
 
     .segment
       @extend %flex_cell_auto
+      max-width: 200px
 
     .pane
-      max-width: 13rem
       margin: 0 auto
 
     .image
@@ -105,18 +108,18 @@
   .select
     background: url(../img/selectthebest.jpg) no-repeat #070707
     background-position: calc(50% + 336px) center
-
-    h2
-      margin-bottom: 36px
+    height: 522px
 
     p:first-of-type
+      margin-top: 36px
       margin-bottom: 24px
-
-    .container
-      height: 522px
 
     .content
       max-width: 480px
+
+  .select-content
+    p:first-of-type
+      margin: 20px 0
 
   .manhattan
     background: url(../img/manhattan.jpg) no-repeat white
@@ -128,72 +131,53 @@
     text-align: center
 
     .container
-      height: 100%
-      padding: 0
-      align-items: center
-      -webkit-align-items: center
+      @extend %flex_align_items_center
 
     p
-      margin-top: 16px
-      margin-bottom: 32px
+      margin-top: 20px
+      margin-bottom: 60px
 
     img
       max-width: 400px
 
 @media (max-width: 875px)
-  .headline .container, .select .container
-    background: rgba(0, 0, 0, 0.5)
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 1)
+  .landing-page
+    .phone
+      .phone-background
+        background-position: center
+        background-size: auto 370px
+        height: 370px
 
-@media (max-width: 415px)
-  .headline
-    h1
-      font-size: 32px
-    .container
-      height: 500px
-      padding: 3rem 0.7rem
-    .wrapper
-      max-width: 18.75rem
-      margin: 0 auto
-    img
-      display: block
-      height: 3rem
-      margin-bottom: 2.5rem
-    h1
-      margin-bottom: 1rem
-    .button
-      text-shadow: none
-      margin: 1.5rem 0
-  .select
-    background-position: calc(50% + 205px) center
-    .container
-      height: 400px
-      padding: 3rem 0.5rem
-    h3
-      max-width: 18rem
-  .convenient .container
-    min-height: initial
-  .get-more
-    .container
-      padding: 2rem
-    br
-      display: initial
-  .manhattan
-    height: 400px
-    img, h3
-      max-width: 20rem
-    h4
-      max-width: 16rem
-  .tutorial
-    h4
-      margin: 2rem auto
-    h6.single-line
-      min-height: 1rem
-    .segments
-      flex-wrap: wrap
-      -webkit-flex-wrap: wrap
-    .segment
-      min-width: 9rem
-    .pane
-      max-width: 9rem
-      margin-bottom: 3rem
+      p:first-of-type
+        margin-top: 20px
+
+    .select
+      background-size: auto 300px
+      background-position: center
+      height: 300px
+
+    .tutorial
+      .container
+        padding-top: 48px
+        padding-bottom: 64px
+
+      .segments
+        justify-content: center
+        -webkit-justify-content: center
+        flex-wrap: wrap
+        -webkit-flex-wrap: wrap
+
+        margin-top: 64px
+
+      .segment
+        min-width: 241.5px
+        margin-bottom: 80px
+
+        &:last-of-type
+          margin-bottom: 0
+
+    .manhattan
+      height: 100%
+
+      img
+        max-width: 320px

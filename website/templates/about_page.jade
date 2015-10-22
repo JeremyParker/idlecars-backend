@@ -2,20 +2,6 @@ extends ./base.jade
 
 - block content
   .about-page(ng-controller='aboutCtrl')
-    section.navbar
-      .logo
-        img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-      .links
-        a(href="#tutorial") #[h5 How it works]
-        a(href="#{ login_url }") #[h5 Join/Login]
-        a(href="http://goo.gl/forms/4s26I6GUQY") #[h5 List your car]
-      .menu-button(ng-click='showMenu = !showMenu')
-        .burger-button(ng-class='{active: showMenu}')
-      .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-        a(href="#tutorial") How it works
-        a(href="#{ login_url }") Join/Login
-        a(href="http://goo.gl/forms/4s26I6GUQY") List your car
-
     section.header-photo
 
     section.about-us
@@ -109,12 +95,3 @@ extends ./base.jade
             textarea(rows='10', cols='50')
 
           input.bold(type='submit', value='Say Hello!')
-
-    footer
-      h5.tm
-        a(href="#{ faq }") Help
-        span |
-        a(href="#{ terms_of_service }") Terms & Privacy
-      br
-      h5.tm #[strong © {% now 'Y' %} idlecars]
-      h5.tm All trademarks and images are copyright of their respective owners.

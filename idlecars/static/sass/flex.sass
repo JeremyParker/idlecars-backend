@@ -12,9 +12,13 @@
   -ms-flex: auto
   -webkit-flex: auto
 
-%flex_align_items_center
+%flex_direction_column
   flex-direction: column
   -webkit-flex-direction: column
+
+%flex_align_items_center
+  align-items: center
+  -webkit-align-items: center
 
 %flex_justify_content_center
   justify-content: center
@@ -23,6 +27,10 @@
 %flex_space_between
   justify-content: space-between
   -webkit-justify-content: space-between
+
+%flex_wrap
+  flex-wrap: wrap
+  -webkit-flex-wrap: wrap
 
 .flex
   @extend %flex

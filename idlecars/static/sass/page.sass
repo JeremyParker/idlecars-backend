@@ -1,3 +1,4 @@
+@import flex
 *
   box-sizing: border-box
 
@@ -7,10 +8,15 @@ body
   font-family: 'Gotham SSm A', 'Gotham SSm B', sans-serif
 
 .container
+  @extend .flex-center-horizontal
+  @extend %flex_direction_column
+
+  padding: 48px 48px 64px
   margin: 0 auto
-  display: flex
-  display: -webkit-flex
-  flex-direction: column
-  -webkit-flex-direction: column
-  justify-content: center
-  -webkit-justify-content: center
+
+  max-width: 950px
+  height: 100%
+
+@media (max-width: 875px)
+  .container
+    padding: 48px 24px 64px
