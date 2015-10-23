@@ -97,20 +97,24 @@ class Command(BaseCommand):
         if not self.driver.braintree_customer_id:
             print 'test_add_payment_method_and_pay failed to add a braintree_customer_id for {}'.format(gateway)
 
+        record_count = len(payment_method.braintreerequest_set.all())
+        if not record_count == 2:
+            print 'test_add_payment_method saved {} records for {}'.format(record_count, gateway)
+
         if not success:
             print 'test_add_payment_method_and_pay failed to add payment_method for gateway {}'.format(gateway)
             return
 
-        card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
-        payment_method = models.PaymentMethod.objects.create(
-            driver=self.driver,
-            gateway_token=card_token,
-            suffix=card_suffix,
-            card_type=card_type,
-            card_logo=card_logo,
-            expiration_date=exp,
-            unique_number_identifier=unique_number_identifier,
-        )
+        # save for later use in this set of tests
+        token, suffix, card_type, card_logo, expiration_date, unique_number_identifier = card_info
+        payment_method.gateway_token = token
+        payment_method.suffix = suffix
+        payment_method.card_type = card_type
+        payment_method.card_logo = card_logo
+        payment_method.expiration_date = expiration_date
+        payment_method.unique_number_identifier = unique_number_identifier
+        payment_method.save()
+
 
     def test_add_payment_method_error(self, gateway):
         # we have to fake it for the fake gatway :(

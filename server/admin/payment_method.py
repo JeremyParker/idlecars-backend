@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from idlecars.admin_helpers import link
-from server import models
 from server.admin import BraintreeRequestInline
 
 
