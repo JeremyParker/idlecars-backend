@@ -17,6 +17,7 @@ from booking import Booking
 from payment import Payment
 from rideshare_flavor import RideshareFlavor
 from car_compatibility import CarCompatibility
+from braintree_request import BraintreeRequest
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

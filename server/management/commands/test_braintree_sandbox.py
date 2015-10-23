@@ -87,10 +87,13 @@ class Command(BaseCommand):
         self.owner.save()
 
     def test_add_payment_method(self, gateway):
-        success, card_info = gateway.add_payment_method(
+        success, _, card_info = gateway.add_payment_method(
             self.driver,
             test_braintree_params.VALID_VISA_NONCE,
         )
+        if not self.driver.braintree_customer_id:
+            print 'test_add_payment_method_and_pay failed to add a braintree_customer_id for {}'.format(gateway)
+
         if not success:
             print 'test_add_payment_method_and_pay failed to add payment_method for gateway {}'.format(gateway)
             return
@@ -111,10 +114,13 @@ class Command(BaseCommand):
         if gateway is payment_gateways.get_gateway('fake'):
             gateway.next_payment_method_response = (False, self.driver, 'Some fake error',)
 
-        success, info = gateway.add_payment_method(
+        success, _, info = gateway.add_payment_method(
             self.driver,
             test_braintree_params.INVALID_PAYMENT_METHOD_NONCE,
         )
+        if not self.driver.braintree_customer_id:
+            print 'test_add_payment_method_error ALSO failed to add a braintree_customer_id in {}'.format(gateway)
+
         if success:
             print 'test_add_payment_method_error failed to return False in {}'.format(gateway)
         if not isinstance(info, unicode):
@@ -178,6 +184,8 @@ class Command(BaseCommand):
             print 'test_pre_authorize failed to authorize for {}'.format(gateway)
         if not payment.transaction_id:
             print 'test_pre_authorize failed to get a transaction id for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 1:
+            print 'test_pre_authorize failed to save a record for {}'.format(gateway)
 
     def test_pre_authorize_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -193,6 +201,8 @@ class Command(BaseCommand):
         payment = gateway.void(payment)
         if not payment.status == models.Payment.VOIDED:
             print 'test_void failed to void for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 2:
+            print 'test_void failed to save two records for {}'.format(gateway)
 
     def test_settle(self, gateway):
         payment = self._create_payment()
@@ -200,6 +210,8 @@ class Command(BaseCommand):
         payment = gateway.settle(payment)
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle failed to settle for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 2:
+            print 'test_settle failed to store 2 records for {}'.format(gateway)
 
     def test_settle_fresh_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -208,6 +220,8 @@ class Command(BaseCommand):
             print '{} test_settle_error: No error message!'.format(gateway)
         if payment.status != models.Payment.DECLINED:
             print '{} test_settle_error: Payment state != DECLINED'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print 'test_settle_fresh_error failed to create a request record for {}'.format(gateway)
 
     def test_settle_fresh(self, gateway):
         ''' create a payment and go straight to SETTLED (as opposed to pre-authorizing first)'''
@@ -215,6 +229,8 @@ class Command(BaseCommand):
         payment = gateway.settle(payment)
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle_fresh failed to settle for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print 'test_settle_fresh failed to create a request record for {}'.format(gateway)
 
     def test_escrow(self, gateway):
         payment = self._create_payment()
@@ -232,6 +248,8 @@ class Command(BaseCommand):
             )
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow failed for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 2:
+            print 'test_escrow did not create 2 braintree_request records for {}'.format(gateway)
 
     def test_escrow_fresh_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -249,6 +267,8 @@ class Command(BaseCommand):
         payment = self._create_escrow_payment(gateway)
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow_fresh failed for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print '{} test_escrow_fresh failed to create 1 braintree_payment record'.format(gateway)
 
     def test_refund(self, gateway):
         payment = self._create_escrow_payment(gateway)

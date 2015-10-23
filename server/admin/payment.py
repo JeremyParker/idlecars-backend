@@ -6,6 +6,7 @@ from django.contrib import admin
 from idlecars.admin_helpers import link
 from server import models
 from server.services import payment as payment_service
+from server.admin import BraintreeRequestInline
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -14,7 +15,7 @@ class PaymentAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('invoice_description', 'booking_link',),
-                ('created_time', 'amount', 'service_fee', 'payment_method',),
+                ('created_time', 'amount', 'service_fee', 'payment_method_link',),
                 ('status', 'error_message',),
                 ('gateway_link',),
                 ('notes',),
@@ -28,17 +29,15 @@ class PaymentAdmin(admin.ModelAdmin):
         'invoice_description',
         'amount',
         'service_fee',
-        'payment_method',
+        'payment_method_link',
         'status',
         'error_message',
         'gateway_link',
     ]
+    inlines = [BraintreeRequestInline,]
     list_display = ('created_time', 'invoice_description', 'booking_link', 'amount', 'status')
     date_hierarchy = 'created_time'
     search_fields = [
-        'booking__driver__first_name',
-        'booking__driver__last_name',
-        'booking__car__plate',
         'transaction_id',
     ]
     list_filter = ['status']
@@ -50,6 +49,10 @@ class PaymentAdmin(admin.ModelAdmin):
     def gateway_link(self, instance):
         return payment_service.details_link(instance)
     gateway_link.short_description = 'Gateway link'
+
+    def payment_method_link(self, instance):
+        return link(instance.payment_method)
+    payment_method_link.short_description = 'Payment method'
 
     def queryset(self, request):
         return super(PaymentAdmin, self).queryset(request).prefetch_related(

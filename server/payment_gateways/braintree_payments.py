@@ -190,6 +190,18 @@ def _transaction_request(payment):
     }
 
 
+def _execute_transaction_request(payment, func, arg):
+    record = models.BraintreeRequest.objects.create(
+        payment=payment,
+        endpoint=func,
+        request=arg,
+    )
+    f = getattr(braintree.Transaction, func)
+    record.response = f(arg)
+    record.save()
+    return record.response
+
+
 def pre_authorize(payment):
     assert not payment.transaction_id
 
@@ -201,7 +213,7 @@ def pre_authorize(payment):
     _configure_braintree()
     request = _transaction_request(payment)
     request.update({ 'options': { 'submit_for_settlement': False }})
-    response = braintree.Transaction.sale(request)
+    response = _execute_transaction_request(payment, 'sale', request)
     if hasattr(response, 'transaction') and response.transaction:
         payment.transaction_id = response.transaction.id
 
@@ -230,7 +242,7 @@ def void(payment):
     assert payment.transaction_id
     _configure_braintree()
 
-    response = braintree.Transaction.void(payment.transaction_id)
+    response = _execute_transaction_request(payment, 'void', payment.transaction_id)
     if getattr(response, 'is_success', False):
         if response.transaction.status != 'voided':
             # TODO: logging system
@@ -251,11 +263,15 @@ def settle(payment):
 
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.submit_for_settlement(payment.transaction_id)
+        response = _execute_transaction_request(
+            payment,
+            'submit_for_settlement',
+            payment.transaction_id,
+        )
     else:
         request = _transaction_request(payment)
         request.update({ 'options': { 'submit_for_settlement': True }})
-        response = braintree.Transaction.sale(request)
+        response = _execute_transaction_request(payment, 'sale', request)
 
     if getattr(response, 'is_success', False):
         if response.transaction.status not in [
@@ -284,7 +300,7 @@ def escrow(payment):
 
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.hold_in_escrow(payment.transaction_id)
+        response = _execute_transaction_request(payment, 'hold_in_escrow', payment.transaction_id)
     else:
         request = _transaction_request(payment)
         request.update({
@@ -293,7 +309,7 @@ def escrow(payment):
                 'hold_in_escrow': True,
             }
         })
-        response = braintree.Transaction.sale(request)
+        response = _execute_transaction_request(payment, 'sale', request)
         if hasattr(response, 'transaction') and response.transaction:
             payment.transaction_id = response.transaction.id
 
@@ -318,7 +334,7 @@ def escrow(payment):
 def refund(payment):
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.refund(payment.transaction_id)
+        response = _execute_transaction_request(payment, 'refund', payment.transaction_id)
         if getattr(response, 'is_success', False):
             payment.status = models.Payment.REFUNDED
             payment.error_message = ''
