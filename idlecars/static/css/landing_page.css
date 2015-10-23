@@ -1,8 +1,8 @@
-.flex, .flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .flex-center-horizontal, .flex-space-between, .landing-page .tutorial .segments {
+.flex, .flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .flex-center-horizontal, .flex-space-between, .landing-page .tutorial .segments {
   display: flex;
   display: -webkit-flex; }
 
-.flex-cell {
+.flex-cell, .landing-page .phone .phone-image, .landing-page .phone .container {
   flex: 1;
   -ms-flex: 1;
   -webkit-flex: 1; }
@@ -12,11 +12,11 @@
   -ms-flex: auto;
   -webkit-flex: auto; }
 
-.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .landing-page .manhattan .container {
+.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .landing-page .manhattan .container {
   align-items: center;
   -webkit-align-items: center; }
 
-.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone .phone-background, .landing-page .tutorial p:first-of-type, .flex-center-horizontal {
+.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-horizontal {
   justify-content: center;
   -webkit-justify-content: center; }
 
@@ -54,16 +54,18 @@
   .landing-page .phone {
     background: #f2f2f2;
     height: 100%; }
-    .landing-page .phone .phone-background {
-      background: url(../img/phone.png) no-repeat transparent;
-      background-size: auto 500px;
-      background-position: 20% center;
+    .landing-page .phone .phone-image {
+      text-align: center; }
+    .landing-page .phone img {
+      display: block;
       height: 500px; }
     .landing-page .phone .content {
-      position: relative;
-      left: 50%;
       color: black;
       max-width: 380px; }
+      .landing-page .phone .content p:first-of-type {
+        margin: 36px 0; }
+    .landing-page .phone a {
+      color: #008aff; }
   .landing-page .phone-content .container {
     background: #e3e3e3;
     color: black; }
@@ -122,12 +124,10 @@
       max-width: 400px; }
 
 @media (max-width: 875px) {
-  .landing-page .phone .phone-background {
-    background-position: center;
-    background-size: auto 370px;
+  .landing-page .phone, .landing-page .phone img {
     height: 370px; }
-  .landing-page .phone p:first-of-type {
-    margin-top: 20px; }
+    .landing-page .phone p:first-of-type, .landing-page .phone img p:first-of-type {
+      margin-top: 20px; }
   .landing-page .select {
     background-size: auto 300px;
     background-position: center;

@@ -12,8 +12,10 @@ extends ./base.jade
           a.button(href="#{ settings.WEBAPP_URL }") Find your car
 
     section.phone
-      .phone-background
-        .content.desktop
+      .phone-image
+        img(src='#{ settings.STATIC_URL }img/phone.png')
+      .container(id='desktop')
+        .content
           h2 Renting a car has #[br] never been easier
           p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
           p.bold #[a Learn more]
@@ -56,8 +58,8 @@ extends ./base.jade
               p Once you’re added to the insurance, you’re ready to go!
 
     section.select
-      .container
-        .content.desktop
+      .container(id='desktop')
+        .content
           h2 Join now and start driving in less than a day
           p Choose your car, get insured, and start driving in less than 24 hours.
           p It's that easy.
