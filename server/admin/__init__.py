@@ -23,7 +23,7 @@ admin.site.register(models.MakeModel, MakeModelAdmin)
 admin.site.register(models.Driver, DriverAdmin)
 admin.site.register(models.Insurance)
 admin.site.register(models.Payment, PaymentAdmin)
-admin.site.register(models.PaymentMethod)
+admin.site.register(models.PaymentMethod, PaymentMethodAdmin)
 admin.site.register(models.RideshareFlavor, RideshareFlavorAdmin)
 admin.site.register(models.BraintreeRequest)
 

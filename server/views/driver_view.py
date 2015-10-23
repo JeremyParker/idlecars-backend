@@ -49,7 +49,7 @@ class DriverViewSet(
         try:
             driver = self.get_object()
             nonce = serializer.validated_data['nonce']
-            driver = payment_method_service.add_payment_method(driver, nonce)
+            payment_method_service.add_payment_method(driver, nonce)
             result_serializer = self.get_serializer(driver)
             return Response(result_serializer.data)
         except Http404:

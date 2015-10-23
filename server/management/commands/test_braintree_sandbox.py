@@ -87,8 +87,11 @@ class Command(BaseCommand):
         self.owner.save()
 
     def test_add_payment_method(self, gateway):
-        success, _, card_info = gateway.add_payment_method(
-            self.driver,
+        payment_method = models.PaymentMethod.objects.create(
+            driver=self.driver,
+        )
+        success, card_info = gateway.add_payment_method(
+            payment_method,
             test_braintree_params.VALID_VISA_NONCE,
         )
         if not self.driver.braintree_customer_id:
@@ -112,10 +115,13 @@ class Command(BaseCommand):
     def test_add_payment_method_error(self, gateway):
         # we have to fake it for the fake gatway :(
         if gateway is payment_gateways.get_gateway('fake'):
-            gateway.next_payment_method_response = (False, self.driver, 'Some fake error',)
+            gateway.next_payment_method_response = (False, 'Some fake error',)
 
-        success, _, info = gateway.add_payment_method(
-            self.driver,
+        payment_method = models.PaymentMethod.objects.create(
+            driver=self.driver,
+        )
+        success, info = gateway.add_payment_method(
+            payment_method,
             test_braintree_params.INVALID_PAYMENT_METHOD_NONCE,
         )
         if not self.driver.braintree_customer_id:

@@ -5,7 +5,7 @@ from django.contrib import admin
 
 from idlecars.admin_helpers import link
 from server import models
-# from . import BraintreeRequestInline
+from server.admin import BraintreeRequestInline
 
 
 class PaymentMethodAdmin(admin.ModelAdmin):
@@ -13,4 +13,4 @@ class PaymentMethodAdmin(admin.ModelAdmin):
     search_fields = [
         'gateway_token',
     ]
-    # inlines = [BraintreeRequestInline]
+    inlines = [BraintreeRequestInline]

@@ -348,9 +348,11 @@ def _cron_payments():
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
         payment__invoice_end_time__isnull=False,
         payment__invoice_end_time__gt=pay_time,
+        # payment_status=Payment.SETTLED,
     ).exclude(
         payment__invoice_end_time__isnull=False,
-        payment__invoice_end_time__gte=F('end_time')
+        payment__invoice_end_time__gte=F('end_time'),
+        # payment_status=Payment.SETTLED,
     )
     for booking in payable_bookings:
         try:
