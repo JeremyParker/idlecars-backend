@@ -29,23 +29,31 @@ def _configure_braintree():
     configured = True
 
 
-def _add_customer(driver):
+def _add_customer(payment_method):
         request = {
-            'first_name': driver.first_name(),
-            'last_name': driver.last_name(),
+            'first_name': payment_method.driver.first_name(),
+            'last_name': payment_method.driver.last_name(),
             'custom_fields': {
-                'idlecars_customer_id': driver.id,
+                'idlecars_customer_id': payment_method.driver.id,
             }
         }
-        response = braintree.Customer.create(request)
-        success = getattr(response, 'is_success', False)
+
+        record = models.BraintreeRequest.objects.create(
+            payment_method=payment_method,
+            endpoint='Customer.create',
+            request=request,
+        )
+        record.response = braintree.Customer.create(request)
+        record.save()
+
+        success = getattr(record.response, 'is_success', False)
 
         if success:
-            driver.braintree_customer_id = response.customer.id
-            driver.save()
-            return driver, None
+            payment_method.driver.braintree_customer_id = record.response.customer.id
+            payment_method.driver.save()
+            return payment_method.driver, None
         else:
-            return driver, UNABLE_TO_ADD_DRIVER
+            return payment_method.driver, UNABLE_TO_ADD_DRIVER
 
 def _parse_card_info(payment_method):
     '''
@@ -145,7 +153,7 @@ def link_bank_account(braintree_params):
         )
 
 
-def add_payment_method(driver, nonce):  # TODO: I don't think driver should be passed in. The ID should passed in/out.
+def add_payment_method(payment_method, nonce):
     '''
     Returns a bool, info pair. Bool = success/failure. The info should be either
     - card info tuple or
@@ -153,31 +161,39 @@ def add_payment_method(driver, nonce):  # TODO: I don't think driver should be p
     '''
     _configure_braintree()
 
-    if not driver.braintree_customer_id:
-        driver, error = _add_customer(driver)
-        if not driver.braintree_customer_id:
-            return False, driver, error
+    if not payment_method.driver.braintree_customer_id:
+        payment_method.driver, error = _add_customer(payment_method)
+        if not payment_method.driver.braintree_customer_id:
+            return False, error
 
     request = {
-        'customer_id': driver.braintree_customer_id,
+        'customer_id': payment_method.driver.braintree_customer_id,
         'payment_method_nonce': nonce,
         'options': {
             'make_default': True,
         }
     }
-    response = braintree.PaymentMethod.create(request)
-    success = getattr(response, 'is_success', False)
-    if success:
-        payment_method = response.payment_method
-        if payment_method.is_expired:
-            return False, driver, EXPIRED_CARD_MSG
+    record = models.BraintreeRequest.objects.create(
+        payment_method=payment_method,
+        endpoint='PaymentMethod.create',
+        request=request,
+    )
 
-        if isinstance(payment_method, braintree.CreditCard):
-            card_info = _parse_card_info(payment_method)
-            return True, driver, card_info
+    record.response = braintree.PaymentMethod.create(request)
+    record.save()
+
+    success = getattr(record.response, 'is_success', False)
+    if success:
+        method = record.response.payment_method
+        if method.is_expired:
+            return False, EXPIRED_CARD_MSG
+
+        if isinstance(method, braintree.CreditCard):
+            card_info = _parse_card_info(method)
+            return True, card_info
     else:
-        message, _ = _parse_error(response)  # TODO - log the details somehow
-        return False, driver, message
+        message, _ = _parse_error(record.response)
+        return False, message
 
 
 def _transaction_request(payment):
@@ -188,6 +204,18 @@ def _transaction_request(payment):
         'merchant_account_id': payment.booking.car.owner.merchant_id,
         'service_fee_amount': payment.service_fee,
     }
+
+
+def _execute_transaction_request(payment, func, arg):
+    record = models.BraintreeRequest.objects.create(
+        payment=payment,
+        endpoint=func,
+        request=arg,
+    )
+    f = getattr(braintree.Transaction, func)
+    record.response = f(arg)
+    record.save()
+    return record.response
 
 
 def pre_authorize(payment):
@@ -201,7 +229,7 @@ def pre_authorize(payment):
     _configure_braintree()
     request = _transaction_request(payment)
     request.update({ 'options': { 'submit_for_settlement': False }})
-    response = braintree.Transaction.sale(request)
+    response = _execute_transaction_request(payment, 'sale', request)
     if hasattr(response, 'transaction') and response.transaction:
         payment.transaction_id = response.transaction.id
 
@@ -230,7 +258,7 @@ def void(payment):
     assert payment.transaction_id
     _configure_braintree()
 
-    response = braintree.Transaction.void(payment.transaction_id)
+    response = _execute_transaction_request(payment, 'void', payment.transaction_id)
     if getattr(response, 'is_success', False):
         if response.transaction.status != 'voided':
             # TODO: logging system
@@ -251,11 +279,15 @@ def settle(payment):
 
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.submit_for_settlement(payment.transaction_id)
+        response = _execute_transaction_request(
+            payment,
+            'submit_for_settlement',
+            payment.transaction_id,
+        )
     else:
         request = _transaction_request(payment)
         request.update({ 'options': { 'submit_for_settlement': True }})
-        response = braintree.Transaction.sale(request)
+        response = _execute_transaction_request(payment, 'sale', request)
 
     if getattr(response, 'is_success', False):
         if response.transaction.status not in [
@@ -284,7 +316,7 @@ def escrow(payment):
 
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.hold_in_escrow(payment.transaction_id)
+        response = _execute_transaction_request(payment, 'hold_in_escrow', payment.transaction_id)
     else:
         request = _transaction_request(payment)
         request.update({
@@ -293,7 +325,7 @@ def escrow(payment):
                 'hold_in_escrow': True,
             }
         })
-        response = braintree.Transaction.sale(request)
+        response = _execute_transaction_request(payment, 'sale', request)
         if hasattr(response, 'transaction') and response.transaction:
             payment.transaction_id = response.transaction.id
 
@@ -318,7 +350,7 @@ def escrow(payment):
 def refund(payment):
     _configure_braintree()
     if payment.transaction_id:
-        response = braintree.Transaction.refund(payment.transaction_id)
+        response = _execute_transaction_request(payment, 'refund', payment.transaction_id)
         if getattr(response, 'is_success', False):
             payment.status = models.Payment.REFUNDED
             payment.error_message = ''

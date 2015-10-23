@@ -28,14 +28,14 @@ def link_bank_account(braintree_params):
     return True, 'test_submerchant_account_id', [], []
 
 
-def add_payment_method(driver, nonce):
+def add_payment_method(payment_method, nonce):
     global next_payment_method_response
 
-    driver.braintree_customer_id = 'fake_customer_id'
-    driver.save()
+    payment_method.driver.braintree_customer_id = 'fake_customer_id'
+    payment_method.driver.save()
 
     if next_payment_method_response is None:
-        result = True, driver, (
+        result = True, (
             'some-token',
             '1234',
             'Visa',
