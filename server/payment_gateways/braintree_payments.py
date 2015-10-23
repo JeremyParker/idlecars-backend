@@ -213,7 +213,10 @@ def _execute_transaction_request(payment, func, arg):
         request=arg,
     )
     f = getattr(braintree.Transaction, func)
-    record.response = f(arg)
+    try:
+        record.response = f(arg)
+    except Exception as e:
+        record.response = '{}: {}'.format(e.__repr__(), e.__doc__)
     record.save()
     return record.response
 
