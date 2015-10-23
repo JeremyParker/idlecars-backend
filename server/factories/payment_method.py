@@ -12,11 +12,13 @@ from idlecars.factory_helpers import Factory, faker, make_item
 from server.factories import Driver
 
 
-class PaymentMethod(Factory):
+class RejectedPaymentMethod(Factory):
     class Meta:
         model = 'server.PaymentMethod'
-
     driver = SubFactory(Driver)
+
+
+class PaymentMethod(RejectedPaymentMethod):
     gateway_token = LazyAttribute(lambda o: ''.join(
         [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
     ))

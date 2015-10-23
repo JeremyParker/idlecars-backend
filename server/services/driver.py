@@ -63,7 +63,7 @@ def get_missing_docs(driver):
 
 
 def get_default_payment_method(driver):
-    return driver.paymentmethod_set.filter(gateway_token__isnull=False).order_by('pk').last()
+    return driver.paymentmethod_set.exclude(gateway_token='').order_by('pk').last()
 
 
 def _get_remindable_drivers(delay_hours):
