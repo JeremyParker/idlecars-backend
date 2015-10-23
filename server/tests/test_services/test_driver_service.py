@@ -16,6 +16,15 @@ from server.models import Booking
 from owner_crm.tests import sample_merge_vars
 
 
+class DriverPaymentMethodTest(TestCase):
+    def test_default_payment_method(self):
+        self.driver = factories.Driver.create()
+        legit = factories.PaymentMethod.create(driver=self.driver)
+        rejected = factories.RejectedPaymentMethod.create(driver=self.driver)
+        default = driver_service.get_default_payment_method(self.driver)
+        self.assertEqual(default, legit)
+
+
 class DriverServiceTest(TestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
