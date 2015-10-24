@@ -87,34 +87,50 @@ class Command(BaseCommand):
         self.owner.save()
 
     def test_add_payment_method(self, gateway):
+        payment_method = models.PaymentMethod.objects.create(
+            driver=self.driver,
+        )
         success, card_info = gateway.add_payment_method(
-            self.driver,
+            payment_method,
             test_braintree_params.VALID_VISA_NONCE,
         )
+        if not self.driver.braintree_customer_id:
+            print 'test_add_payment_method_and_pay failed to add a braintree_customer_id for {}'.format(gateway)
+
+        record_count = len(payment_method.braintreerequest_set.all())
+        if not record_count == 2:
+            print 'test_add_payment_method saved {} records for {}'.format(record_count, gateway)
+
         if not success:
             print 'test_add_payment_method_and_pay failed to add payment_method for gateway {}'.format(gateway)
             return
 
-        card_token, card_suffix, card_type, card_logo, exp, unique_number_identifier = card_info
-        payment_method = models.PaymentMethod.objects.create(
-            driver=self.driver,
-            gateway_token=card_token,
-            suffix=card_suffix,
-            card_type=card_type,
-            card_logo=card_logo,
-            expiration_date=exp,
-            unique_number_identifier=unique_number_identifier,
-        )
+        # save for later use in this set of tests
+        token, suffix, card_type, card_logo, expiration_date, unique_number_identifier = card_info
+        payment_method.gateway_token = token
+        payment_method.suffix = suffix
+        payment_method.card_type = card_type
+        payment_method.card_logo = card_logo
+        payment_method.expiration_date = expiration_date
+        payment_method.unique_number_identifier = unique_number_identifier
+        payment_method.save()
+
 
     def test_add_payment_method_error(self, gateway):
         # we have to fake it for the fake gatway :(
         if gateway is payment_gateways.get_gateway('fake'):
             gateway.next_payment_method_response = (False, 'Some fake error',)
 
+        payment_method = models.PaymentMethod.objects.create(
+            driver=self.driver,
+        )
         success, info = gateway.add_payment_method(
-            self.driver,
+            payment_method,
             test_braintree_params.INVALID_PAYMENT_METHOD_NONCE,
         )
+        if not self.driver.braintree_customer_id:
+            print 'test_add_payment_method_error ALSO failed to add a braintree_customer_id in {}'.format(gateway)
+
         if success:
             print 'test_add_payment_method_error failed to return False in {}'.format(gateway)
         if not isinstance(info, unicode):
@@ -178,6 +194,8 @@ class Command(BaseCommand):
             print 'test_pre_authorize failed to authorize for {}'.format(gateway)
         if not payment.transaction_id:
             print 'test_pre_authorize failed to get a transaction id for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 1:
+            print 'test_pre_authorize failed to save a record for {}'.format(gateway)
 
     def test_pre_authorize_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -193,6 +211,8 @@ class Command(BaseCommand):
         payment = gateway.void(payment)
         if not payment.status == models.Payment.VOIDED:
             print 'test_void failed to void for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 2:
+            print 'test_void failed to save two records for {}'.format(gateway)
 
     def test_settle(self, gateway):
         payment = self._create_payment()
@@ -200,6 +220,8 @@ class Command(BaseCommand):
         payment = gateway.settle(payment)
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle failed to settle for {}'.format(gateway)
+        if not len(payment.braintreerequest_set.all()) == 2:
+            print 'test_settle failed to store 2 records for {}'.format(gateway)
 
     def test_settle_fresh_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -208,6 +230,8 @@ class Command(BaseCommand):
             print '{} test_settle_error: No error message!'.format(gateway)
         if payment.status != models.Payment.DECLINED:
             print '{} test_settle_error: Payment state != DECLINED'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print 'test_settle_fresh_error failed to create a request record for {}'.format(gateway)
 
     def test_settle_fresh(self, gateway):
         ''' create a payment and go straight to SETTLED (as opposed to pre-authorizing first)'''
@@ -215,6 +239,8 @@ class Command(BaseCommand):
         payment = gateway.settle(payment)
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle_fresh failed to settle for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print 'test_settle_fresh failed to create a request record for {}'.format(gateway)
 
     def test_escrow(self, gateway):
         payment = self._create_payment()
@@ -232,6 +258,8 @@ class Command(BaseCommand):
             )
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow failed for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 2:
+            print 'test_escrow did not create 2 braintree_request records for {}'.format(gateway)
 
     def test_escrow_fresh_error(self, gateway):
         payment = self._create_error_payment(gateway)
@@ -249,6 +277,8 @@ class Command(BaseCommand):
         payment = self._create_escrow_payment(gateway)
         if not payment.status == models.Payment.HELD_IN_ESCROW:
             print 'test_escrow_fresh failed for {}'.format(gateway)
+        if len(payment.braintreerequest_set.all()) != 1:
+            print '{} test_escrow_fresh failed to create 1 braintree_payment record'.format(gateway)
 
     def test_refund(self, gateway):
         payment = self._create_escrow_payment(gateway)

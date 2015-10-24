@@ -139,7 +139,7 @@ class BookingAdmin(admin.ModelAdmin):
         if instance.weekly_rent:
             return '${}'.format(instance.weekly_rent)
         else:
-            return instance.car.solo_cost
+            return '${}'.format(instance.car.solo_cost)
     car_cost.short_description = 'Rent'
     car_cost.admin_order_field = 'car__solo_cost'
 

@@ -131,8 +131,6 @@ def create_booking(car, driver):
     - driver: the driver making the booking
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
-    ops_emails.new_booking_email(booking)
-
     if booking.driver.documentation_approved and not booking.driver.base_letter:
         street_team_emails.request_base_letter(booking)
     return booking
@@ -156,8 +154,6 @@ def _make_booking_incomplete(booking, reason):
     booking.save()
 
     _void_all_payments(booking)
-
-    ops_emails.booking_incompleted(booking)
 
     # let our customers know what happened
     if reason == Booking.REASON_CANCELED:
@@ -352,9 +348,11 @@ def _cron_payments():
     payable_bookings = filter_booked(Booking.objects.all()).exclude(
         payment__invoice_end_time__isnull=False,
         payment__invoice_end_time__gt=pay_time,
+        # payment_status=Payment.SETTLED,
     ).exclude(
         payment__invoice_end_time__isnull=False,
-        payment__invoice_end_time__gte=F('end_time')
+        payment__invoice_end_time__gte=F('end_time'),
+        # payment_status=Payment.SETTLED,
     )
     for booking in payable_bookings:
         try:

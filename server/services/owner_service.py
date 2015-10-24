@@ -59,8 +59,8 @@ def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
 
 def _reminder_email():
     # TODO: hour, minute and delay_hours should be from settings
-    morning_threshold = timezone.now().replace(hour=10, minute=0)
-    afternoon_threshold = timezone.now().replace(hour=17, minute=0)
+    morning_threshold = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
+    afternoon_threshold = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
     delay_hours = 12
 
     if _in_time(morning_threshold):

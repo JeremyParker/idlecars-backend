@@ -9,27 +9,6 @@ from idlecars import email
 from server import models
 
 
-def new_booking_email(booking):
-    merge_vars = {
-        settings.OPS_EMAIL: {
-            'FNAME': 'guys',
-            'HEADLINE': 'New Booking!',
-            'TEXT': 'Driver {} booked {}\'s {}.'.format(
-                booking.driver.phone_number(),
-                booking.car.owner.name(),
-                booking.car.display_name()),
-            'CTA_LABEL': 'Check it out',
-            'CTA_URL': 'https://www.idlecars.com{}'.format(
-                reverse('admin:server_booking_change', args=(booking.pk,))
-            ),
-        }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='New Booking from {}'.format(booking.driver.phone_number()),
-        merge_vars=merge_vars,
-    )
-
 def documents_uploaded(driver):
     merge_vars = {
         settings.OPS_EMAIL: {
@@ -47,31 +26,6 @@ def documents_uploaded(driver):
     email.send_async(
         template_name='one_button_no_image',
         subject='Uploaded documents from {}'.format(driver.phone_number()),
-        merge_vars=merge_vars,
-    )
-
-
-def booking_incompleted(booking):
-    reason = dict(models.Booking.REASON)[booking.incomplete_reason]
-    merge_vars = {
-        settings.OPS_EMAIL: {
-            'FNAME': 'dudes',
-            'HEADLINE': 'A booking was just incompleted :(',
-            'TEXT': 'the driver with phone {} just didn\'t rent {}\'s {}. The reason was {}'.format(
-                booking.driver.phone_number(),
-                booking.car.owner.__unicode__(),
-                booking.car.display_name(),
-                reason,
-            ),
-            'CTA_LABEL': 'Booking details',
-            'CTA_URL': 'https://www.idlecars.com{}'.format(
-                reverse('admin:server_booking_change', args=(booking.pk,))
-            ),
-        }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='A booking is incomplete because {}.'.format(reason),
         merge_vars=merge_vars,
     )
 

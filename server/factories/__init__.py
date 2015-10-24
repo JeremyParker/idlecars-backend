@@ -11,4 +11,4 @@ from payment import Payment, PreAuthorizedPayment, SettledPayment, FailedPayment
 from booking import Booking, ReservedBooking, RequestedBooking, AcceptedBooking, BookedBooking
 from booking import ReturnedBooking, RefundedBooking, IncompleteBooking
 from rideshare_flavor_factory import RideshareFlavorFactory
-from payment_method import PaymentMethod
+from payment_method import PaymentMethod, RejectedPaymentMethod

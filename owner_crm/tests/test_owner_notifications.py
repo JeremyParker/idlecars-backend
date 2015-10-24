@@ -81,7 +81,7 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(create_time):
             return server.factories.RequestedBooking.create()
 
-    @freeze_time("2014-10-11 10:00:00")
+    @freeze_time(timezone.datetime(2014, 10, 11, 10, 00, 00, tzinfo=timezone.get_current_timezone()))
     def test_owner_reminder(self):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
@@ -98,16 +98,18 @@ class TestOwnerNotifications(TestCase):
             )
         )
 
-    @freeze_time("2014-10-11 10:00:00")
+
+    @freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=timezone.get_current_timezone()))
     def test_no_booking(self):
         call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
-    @freeze_time("2014-10-11 10:00:00")
+    @freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=timezone.get_current_timezone()))
     def test_no_email_twice(self):
-        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
+        booking_time = timezone.datetime(2014, 10, 10, 18, tzinfo=timezone.get_current_timezone())
+        self.booking = self._new_requested_booking(booking_time)
 
         call_command('owner_notifications')
         call_command('owner_notifications')
@@ -116,7 +118,8 @@ class TestOwnerNotifications(TestCase):
         self.assertEqual(len(outbox), 1)
 
     def test_only_requested_bookings_send_reminder(self):
-        with freeze_time("2014-10-10 18:00:00"):
+        tz = timezone.get_current_timezone()
+        with freeze_time(timezone.datetime(2014, 10, 11, 18, 00, 00, tzinfo=tz)):
             server.factories.Booking.create()
             server.factories.ReservedBooking.create()
             server.factories.AcceptedBooking.create()
@@ -125,28 +128,29 @@ class TestOwnerNotifications(TestCase):
             server.factories.RefundedBooking.create()
             server.factories.IncompleteBooking.create()
 
-        with freeze_time("2014-10-11 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=timezone.get_current_timezone())):
             call_command('owner_notifications')
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
     def test_reminder_emails_morning_until_failure(self):
-        self.booking = self._new_requested_booking("2014-10-10 18:00:00")
+        tz = timezone.get_current_timezone()
+        self.booking = self._new_requested_booking("2014-10-10 18:00:00") # UTC
 
-        with freeze_time("2014-10-11 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-11 17:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-12 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-12 17:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-13 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
 
@@ -157,29 +161,37 @@ class TestOwnerNotifications(TestCase):
             - message to owner: second afternoon reminder
             - message to owner: insurance too slow reminder
             - message to driver: insurance failed reminder
-            - message to ops: Booking incomplete because insurance failed.
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 7)
+        self.assertEqual(len(outbox), 6)
 
     def test_reminder_emails_afternoon_until_failure(self):
-        self.booking = self._new_requested_booking("2014-10-10 23:00:00")
+        tz = timezone.get_current_timezone()
+        self.booking = self._new_requested_booking(timezone.datetime(2014, 10, 10, 23, tzinfo=tz))
 
-        with freeze_time("2014-10-11 17:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-12 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-12 17:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-13 10:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-        with freeze_time("2014-10-13 17:00:00"):
+        with freeze_time(timezone.datetime(2014, 10, 13, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
 
+        '''
+            - message to owner: first morning reminder
+            - message to owner: first afternoon reminder
+            - message to owner: second morning reminder
+            - message to owner: second afternoon reminder
+            - message to owner: insurance too slow reminder
+            - message to driver: insurance failed reminder
+        '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 7)  # see list above for what emails we send.
+        self.assertEqual(len(outbox), 6)

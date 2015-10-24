@@ -76,7 +76,7 @@ class Booking(models.Model):
         PENDING: 'Pending - booking has been created but not reserved yet',
         RESERVED: 'Reserved - deposit paid, not requested (waiting for doc review)',
         REQUESTED: 'Requested - waiting for owner/insurance',
-        ACCEPTED: 'Accepted - waiting for deposit, ssn, contract',
+        ACCEPTED: 'Accepted - waiting for driver to pick up the car',
         ACTIVE: 'Active - car is in the driver\'s possession and on the road',
         RETURNED: 'Returned - driver returned the car but hasn\'t got deposit back',
         REFUNDED: 'Refunded - car was returned and driver got their deposit back',
