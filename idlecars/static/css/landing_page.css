@@ -1,24 +1,35 @@
 /*
-Error: Undefined variable: "$light_gray".
-        on line 44 of sass/landing_page.sass
+Error: Undefined variable: "$light_black".
+        on line 51 of sass/landing_page.sass
 
-39:         width: 15rem
-40: 
-41: 
-42:   .phone
-43:     @extend .flex-center
-44:     background: $light_gray
-45:     height: 100%
-46: 
-47:     .phone-image
-48:       text-align: center
-49: 
+46:     height: 300px
+47: 
+48: 
+49:   .hero-content
+50:     .container
+51:       background: $light_black
+52: 
+53: 
+54:   .phone
+55:     @extend .flex-center
+56:     background: $light_gray
 
 Backtrace:
-sass/landing_page.sass:44
+sass/landing_page.sass:51
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/script/tree/variable.rb:49:in `_perform'
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/script/tree/node.rb:50:in `perform'
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:394:in `visit_prop'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/stack.rb:79:in `block in with_base'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/stack.rb:115:in `with_frame'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/stack.rb:79:in `with_base'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:430:in `block (2 levels) in visit_rule'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:430:in `map'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:430:in `block in visit_rule'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:428:in `visit_rule'
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
 /Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/stack.rb:79:in `block in with_base'
@@ -79,4 +90,4 @@ sass/landing_page.sass:44
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: Undefined variable: \"$light_gray\".\A         on line 44 of sass/landing_page.sass\A \A 39:         width: 15rem\A 40: \A 41: \A 42:   .phone\A 43:     @extend .flex-center\A 44:     background: $light_gray\A 45:     height: 100%\A 46: \A 47:     .phone-image\A 48:       text-align: center\A 49: "; }
+  content: "Error: Undefined variable: \"$light_black\".\A         on line 51 of sass/landing_page.sass\A \A 46:     height: 300px\A 47: \A 48: \A 49:   .hero-content\A 50:     .container\A 51:       background: $light_black\A 52: \A 53: \A 54:   .phone\A 55:     @extend .flex-center\A 56:     background: $light_gray"; }

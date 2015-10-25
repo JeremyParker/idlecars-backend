@@ -3,13 +3,24 @@ extends ./base.jade
 - block content
   .landing-page
 
-    section.hero-asset
+    section.hero-asset.desktop
       .hero-top
         .content
           h1 Keep More of #[br] What You Earn
           p NYC's widest selection of TLC registered for-hire rentals, at the best price.
           p No leases, loans or long-term commitments. Insurance and maintenance included.
           a.button(href="#{ settings.WEBAPP_URL }") Find your car
+
+    section.hero-asset-mobile(id="mobile")
+
+    section.hero-content.mobile
+      .container
+        .content
+          h1 Keep More of #[br] What You Earn
+          p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+          p No leases, loans or long-term commitments. Insurance and maintenance included.
+          a.button(href="#{ settings.WEBAPP_URL }") Find your car
+
 
     section.phone
       .phone-image

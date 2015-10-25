@@ -44,12 +44,12 @@ section
   &:hover
     opacity: 0.9
 
-.mobile
+.mobile, #mobile
   display: none
 
 @media (max-width: $mobile_width_threshold)
   .desktop, #desktop
     display: none
 
-  .mobile
-    display: initial
+  .mobile, #mobile
+    display: block

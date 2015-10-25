@@ -5,6 +5,22 @@
     margin-top: -3rem
     height: 3rem
 
+  .hero-asset, .hero-content
+    .content
+      h1
+        line-height: 1.25em
+
+      p:first-of-type
+        max-width: 400px
+        margin-top: 36px
+        margin-bottom: 24px
+
+      p:last-of-type
+        max-width: 300px
+        margin-bottom: 48px
+
+      .button
+        width: 200px
 
   .hero-asset
     background: url(../img/hero_bottom.png) no-repeat #fff
@@ -22,21 +38,17 @@
       height: 100%
       padding: 64px 0 64px 48px
 
-    .content
-      h1
-        line-height: 1.25em
+  .hero-asset-mobile
+    background: url(../img/hero_asset_mobile.jpg) no-repeat white
+    background-size: cover
+    background-position: center
 
-      p:first-of-type
-        max-width: 400px
-        margin-top: 36px
-        margin-bottom: 24px
+    height: 300px
 
-      p:last-of-type
-        max-width: 300px
-        margin-bottom: 48px
 
-      .button
-        width: 15rem
+  .hero-content
+    .container
+      background: $light_black
 
 
   .phone
@@ -44,19 +56,16 @@
     background: $light_gray
     height: 100%
 
-    .phone-image
-      text-align: center
-
     img
       display: block
       height: 500px
-
+      margin: 0 auto
 
     .phone-image, .container
       @extend .flex-cell
 
     .content
-      color: black
+      color: $black
       max-width: 380px
 
       p:first-of-type
@@ -68,15 +77,15 @@
   .phone-content
     .container
       background: $medium_gray
-      color: black
+      color: $black
     a
       color: $ic_blue
 
 
   .tutorial
-    background: white
+    background: $white
     text-align: center
-    color: black
+    color: $black
 
     .container
       @extend .flex-center-verticle
@@ -139,7 +148,7 @@
     background-position: center
 
     height: 507px
-    color: black
+    color: $black
     text-align: center
 
     .container
