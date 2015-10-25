@@ -56,17 +56,32 @@
     background: $light_gray
     height: 100%
 
-    img
-      display: block
-      height: 500px
-      margin: 0 auto
+    .phone-background
+      background: url(../img/phone.png) no-repeat transparent
+      background-size: auto 500px
+      background-position: left
 
-    .phone-image, .container
-      @extend .flex-cell
+      height: 500px
+      max-width: 900px
+
+    .container
+      display: block
+
+      &:before
+        display: inline-block
+        content: ''
+        width: 400px
+
+    .content-wrapper
+      float: right
+      height: 100%
 
     .content
+      @extend .flex-center-horizontal
+      @extend %flex_direction_column
       color: $black
       max-width: 380px
+      height: 100%
 
       p:first-of-type
         margin: 36px 0
@@ -163,13 +178,26 @@
 
 
 
+@media (max-width: $phone_backgraound_threshold)
+  .phone
+    .container
+      background: rgba(255,255,255,0.5)
+      text-shadow: 1px 1px 3px rgba(255, 255, 255, 1)
+
+
+
 @media (max-width: $mobile_width_threshold)
   .landing-page
-    .phone, .phone img
+    .phone, .phone-background
       height: 370px
 
-      p:first-of-type
-        margin-top: 20px
+      .phone-background
+        background-size: auto 370px
+        background-position: center
+
+      .container
+        background: none
+        text-shadow: none
 
 
     .select

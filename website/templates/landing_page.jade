@@ -21,15 +21,14 @@ extends ./base.jade
           p No leases, loans or long-term commitments. Insurance and maintenance included.
           a.button(href="#{ settings.WEBAPP_URL }") Find your car
 
-
     section.phone
-      .phone-image
-        img(src='#{ settings.STATIC_URL }img/phone.png')
-      .container(id='desktop')
-        .content
-          h2 Renting a car has #[br] never been easier
-          p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-          p.bold #[a Learn more]
+      .phone-background
+        .container
+          .content-wrapper(id='desktop')
+            .content
+              h2 Renting a car has #[br] never been easier
+              p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
+              p.bold #[a Learn more]
 
     section.phone-content.mobile
       .container
