@@ -14,21 +14,17 @@
     height: 2rem
 
   .links
+    @extend .flex-center-verticle
+    @extend .flex-cell
     position: absolute
     top: 0
     right: 2rem
     height: 3rem
     width: 35rem
     padding: 0.5rem 0
-    display: flex
-    display: -webkit-flex
-    flex: 1
-    align-items: center
 
   a
-    flex: 1
-    -ms-flex: 1
-    -webkit-flex: 1
+    @extend .flex-cell
     text-align: center
 
   h5
@@ -57,7 +53,10 @@
   .navbar
     display: block
 
-    .links, .logo
+    .logo
+      position: absolute
+
+    .links
       display: none
 
     .menu-button

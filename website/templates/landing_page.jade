@@ -22,13 +22,14 @@ extends ./base.jade
           a.button(href="#{ settings.WEBAPP_URL }") Find your car
 
     section.phone
-      .phone-background
-        .container
-          .content-wrapper(id='desktop')
-            .content
-              h2 Renting a car has #[br] never been easier
-              p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-              a #[p.bold Learn more]
+      .container
+        .phone-image
+          img(src="#{ settings.STATIC_URL }img/phone.png")
+        .content-wrapper(id='desktop')
+          .content
+            h2 Renting a car has #[br] never been easier
+            p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
+            a #[p.bold Learn more]
 
     section.phone-content.mobile
       .container
