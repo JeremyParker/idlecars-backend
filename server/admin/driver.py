@@ -5,23 +5,11 @@ from django.contrib import admin
 from django.contrib import auth
 
 from idlecars.reverse_admin import ReverseModelAdmin
+
 from server import models
 from server.admin.booking import BookingForDriverInline
+from server.admin.payment_method import PaymentMethodInline
 
-
-class PaymentMethodInline(admin.TabularInline):
-    model = models.PaymentMethod
-    verbose_name = "Payment Method"
-    can_delete = False
-    extra = 0
-    fields = [
-        'description',
-    ]
-    readonly_fields = [
-        'description',
-    ]
-    def description(self, instance):
-        return '{} **** **** **** {}'.format(instance.card_type, instance.suffix)
 
 class DriverAdmin(ReverseModelAdmin):
     inline_type = 'tabular'
@@ -54,6 +42,7 @@ class DriverAdmin(ReverseModelAdmin):
         'auth_user__last_name',
         'auth_user__username',
         'auth_user__email',
+        'braintree_customer_id',
     ]
     fieldsets = (
         ('Documentation', {

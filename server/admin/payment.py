@@ -58,7 +58,6 @@ class PaymentAdmin(admin.ModelAdmin):
         return super(PaymentAdmin, self).queryset(request).prefetch_related(
             'booking',
             'booking__driver',
-            'booking__car',
             'booking__payment_method',
         )
 

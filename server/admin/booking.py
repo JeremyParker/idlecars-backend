@@ -163,6 +163,12 @@ class BookingAdmin(admin.ModelAdmin):
         else:
             return None
 
+    def queryset(self, request):
+        return super(BookingAdmin, self).queryset(request).prefetch_related(
+            'driver',
+            'car',
+        )
+
 
 
 class BookingInlineBase(admin.TabularInline):
