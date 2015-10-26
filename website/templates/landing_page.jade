@@ -28,14 +28,14 @@ extends ./base.jade
             .content
               h2 Renting a car has #[br] never been easier
               p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-              p.bold #[a Learn more]
+              a #[p.bold Learn more]
 
     section.phone-content.mobile
       .container
         .content
-          h2 Renting a car has #[br] never been easier
+          h2 Renting a car has never been easier
           p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-          p.bold #[a Learn more]
+          a #[p.bold Learn more]
 
     a.invisible(id="tutorial")
     section.tutorial
@@ -45,25 +45,25 @@ extends ./base.jade
           .segment
             .pane
               .image
-                img(src="#{ settings.STATIC_URL }img/tutorial1.png", align="middle")
+                img(src="#{ settings.STATIC_URL }img/tutorial1.svg", align="middle")
               p.bold Pick A Car. Any Car.
               p Find the car that fits your style and budget.
           .segment
             .pane
               .image
-                img(src="#{ settings.STATIC_URL }img/tutorial2.png")
+                img(src="#{ settings.STATIC_URL }img/tutorial2.svg")
               p.bold Start Your Account.
               p Use your smartphone to upload your driving documents.
           .segment
             .pane
               .image
-                img(src="#{ settings.STATIC_URL }img/tutorial3.png")
+                img(src="#{ settings.STATIC_URL }img/tutorial3.svg")
               p.single-line.bold Reserve Your Car.
               p Use your credit card or bank account to reserve your car.
           .segment
             .pane
               .image
-                img(src="#{ settings.STATIC_URL }img/tutorial4.png")
+                img(src="#{ settings.STATIC_URL }img/tutorial4.svg")
               p.single-line.bold DRIVE
               p Once you’re added to the insurance, you’re ready to go!
 
@@ -83,6 +83,7 @@ extends ./base.jade
 
     section.manhattan
       .container
-        h2 Services we #[br.mobile] work with
-        p Idlecars work with all services,#[br.mobile] including Uber, Lyft and More.
-        img(src="#{ settings.STATIC_URL }img/services_stacked.png")
+        .content
+          h2 Services we #[br.mobile] work with
+          p Idlecars work with all services,#[br.mobile] including Uber, Lyft and More.
+          img(src="#{ settings.STATIC_URL }img/services_stacked.png")

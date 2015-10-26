@@ -32,7 +32,12 @@ def index(request):
 View that presents the about page
 '''
 def about(request):
-    context = {}
+    context = {
+        'login_url': client_side_routes.driver_account(),
+        'terms_of_service': client_side_routes.terms_of_service(),
+        'faq': client_side_routes.faq(),
+        'add_car_form': client_side_routes.add_car_form(),
+    }
     return render(request, 'about_page.jade', context)
 
 

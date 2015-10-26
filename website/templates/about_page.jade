@@ -1,7 +1,7 @@
 extends ./base.jade
 
 - block content
-  .about-page(ng-controller='aboutCtrl')
+  .about-page
     section.header-photo
 
     section.about-us
@@ -26,12 +26,12 @@ extends ./base.jade
         p Idle Cars provides the tools to participate in the on-demand revolution.
 
     section.our-team
-      .section-container(ng-init="selection='team'", ng-switch='selection')
+      .section-container(ng-init="selection='cities'", ng-switch='selection')
         .desktop
           .topics
-            h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team
-            h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities
-            h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers
+            div #[h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team]
+            div #[h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities]
+            div #[h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers]
 
         .mobile
           .topics
@@ -84,11 +84,30 @@ extends ./base.jade
                   |  After finishing undergrad, he completed Lehigh’s advanced entrepreneurship program.
                   |  He leads marketing to our underserved customers of for-hire rentals.
 
-        .content(ng-switch-when='cities')
+        .content.cities(ng-switch-when='cities')
           h2 Cities
 
+          img(src="#{ settings.STATIC_URL }img/cities_nyc.jpg")
+          p
+            | According to the 2014 census, carried out by U. S. Census Bureau, New York City had a population of over 8 million people.
+            |  Carrying the local and tourist population daily is a network of over 130,000 licensed for-hire vehicle drivers -
+            |  and 75% of them rent their cars. So, how does a city with a ever expanding population and growing need of for-hire drivers,
+            |  ensure that it functions efficiently?
+          br
+          p
+            | That is where Idle Cars comes in. We decided to launch Idles Cars in New York City first,
+            |  to ensure that drivers who are willing, but are unable to own a car,
+            |  are able to easily access a pool of idle cars leveraging an online marketplace.
+            |  We hope to provide an opportunity to generate income, on-demand, to anyone who lives New York City.
+          br
+          p
+            | If you do not see your city here, don’t worry. We are quickly expanding to other cities in North America.
+            |  Kindly sign up to be notified when we launch in your hometown.
+
+
         .content(ng-switch-when='careers')
-          h2 Careers
+          .title
+            h2 Careers
 
     section.get-in-touch
       .section-container

@@ -1,6 +1,9 @@
 footer
   background-color: $light_black
 
+  .mobile-line,
+    display: none
+
   .container
     padding-bottom: 48px
 
@@ -9,12 +12,13 @@ footer
     @extend .flex-space-between
 
   .text.desktop
-    p:last-of-type
-      margin-top: 20px
-      margin-bottom: 72px
-
     span
       margin: 0 10px
+
+    p
+      margin-bottom: 20px
+    p:last-of-type
+      margin-bottom: 72px
 
   .apps
     @extend .flex
@@ -38,10 +42,28 @@ footer
     p:last-of-type
       margin-bottom: 64px
 
-@media (max-width: $mobile_width_threshold)
+
+
+@media (max-width: $footer_break_line)
+  footer
+    .mobile-line
+      display: block
+
+    .desktop-line
+      display: none
+
+
+
+@media (max-width: $footer_mobile_width)
   footer
     .apps
       .app
         margin-left: 12px
       img
         height: 32px
+
+    .desktop, #desktop
+      display: none
+
+    .mobile, #mobile
+      display: block

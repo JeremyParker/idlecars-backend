@@ -15,7 +15,6 @@ html(lang="en", ng-app="app")
 
     script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js")
     script(src='/static/javascript/formCtrl.js')
-    script(src='/static/javascript/aboutCtrl.js')
 
 
     script(type="text/javascript").
@@ -28,10 +27,10 @@ html(lang="en", ng-app="app")
         .logo
           img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
         .links
-          a(href="#tutorial") #[p How it works]
-          a(href='/about') #[p About Us]
-          a(href="#{ add_car_form }") #[p List your car]
-          a(href="#{ login_url }") #[p Join]
+          a(href="/#tutorial") #[p.bold How it works]
+          a(href='/about') #[p.bold About Us]
+          a(href="#{ add_car_form }") #[p.bold List your car]
+          a(href="#{ login_url }") #[p.bold Join]
 
         .menu-button(ng-click='showMenu = !showMenu')
           .burger-button(ng-class='{active: showMenu}')
@@ -51,20 +50,25 @@ html(lang="en", ng-app="app")
           .content
             .text.desktop
               p.bold
-                a.underline(href="/") Home
+                a(href="/") Home
                 span |
-                a.underline(href="/about") About Us
+                a(href="/about") About Us
                 span |
-                a.underline(href="/#tutorial") How it Works
+                a(href="/#tutorial") How it Works
+                span.desktop-line |
+                a.desktop-line(href="#{ add_car_form }") List Your Car
+                span.desktop-line |
+                a.desktop-line(href="#{ login_url }") Join
+
+              p.bold.mobile-line
+                a(href="#{ add_car_form }") List Your Car
                 span |
-                a.underline(href="#{ add_car_form }") List Your Car
-                span |
-                a.underline(href="#{ login_url }") Join
+                a(href="#{ login_url }") Join
 
               p
-                a.underline(href="#{ faq }") Help
+                a(href="#{ faq }") Help
                 span |
-                a.underline(href="#{ terms_of_service }") Terms & Privacy
+                a(href="#{ terms_of_service }") Terms & Privacy
 
             .text.mobile
               p.bold #[a(href="/") Home]
