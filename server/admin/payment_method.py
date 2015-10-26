@@ -4,11 +4,28 @@ from __future__ import unicode_literals
 from django.contrib import admin
 
 from idlecars.admin_helpers import link
+from server import models
 from server.admin import BraintreeRequestInline
 from server.services import payment as payment_service
 
 
-class PaymentMethodAdmin(admin.ModelAdmin):
+class PaymentMethodMixin(object):
+    def detail_link(self, instance):
+        return link(instance, '{}: **** **** **** {}'.format(instance.card_type, instance.suffix))
+
+    def gateway_link(self, instance):
+        return payment_service.payment_method_link(instance)
+    gateway_link.short_description = "Token"
+
+    def driver_link(self, instance):
+        if instance.driver:
+            return link(instance.driver, instance.driver.admin_display())
+        else:
+            return None
+    driver_link.short_description = 'Driver'
+
+
+class PaymentMethodAdmin(admin.ModelAdmin, PaymentMethodMixin):
     fieldsets = (
         (None, {
             'fields': (
@@ -24,12 +41,12 @@ class PaymentMethodAdmin(admin.ModelAdmin):
     inlines = [BraintreeRequestInline]
 
     list_display = [
-        'link_name',
+        'detail_link',
         'gateway_link',
         'driver_link',
     ]
     readonly_fields = [
-        'link_name',
+        'detail_link',
         'gateway_link',
         'driver_link',
         'expiration_date',
@@ -37,18 +54,15 @@ class PaymentMethodAdmin(admin.ModelAdmin):
         'card_type',
     ]
 
-    def gateway_link(self, instance):
-        return payment_service.payment_method_link(instance)
-    gateway_link.short_description = "Token"
 
-    def driver_link(self, instance):
-        if instance.driver:
-            return link(instance.driver, instance.driver.admin_display())
-        else:
-            return None
-    driver_link.short_description = 'Driver'
-
-
-    def link_name(self, instance):
-        return instance.__unicode__()
-    link_name.short_description = "Card"
+class PaymentMethodInline(admin.TabularInline, PaymentMethodMixin):
+    model = models.PaymentMethod
+    verbose_name = "Payment Method"
+    can_delete = False
+    extra = 0
+    fields = [
+        'detail_link', 'gateway_link',
+    ]
+    readonly_fields = [
+        'gateway_link', 'detail_link',
+    ]

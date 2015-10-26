@@ -9,24 +9,7 @@ from idlecars.reverse_admin import ReverseModelAdmin
 
 from server import models
 from server.admin.booking import BookingForDriverInline
-
-
-class PaymentMethodInline(admin.TabularInline):
-    model = models.PaymentMethod
-    verbose_name = "Payment Method"
-    can_delete = False
-    extra = 0
-    fields = [
-        'detail_link', 'gateway_token',
-    ]
-    readonly_fields = [
-        'description', 'gateway_token', 'detail_link',
-    ]
-    def description(self, instance):
-        return '{} **** **** **** {}'.format(instance.card_type, instance.suffix)
-
-    def detail_link(self, instance):
-        return link(instance, '{} **** **** **** {}'.format(instance.card_type, instance.suffix))
+from server.admin.payment_method import PaymentMethodInline
 
 
 class DriverAdmin(ReverseModelAdmin):
