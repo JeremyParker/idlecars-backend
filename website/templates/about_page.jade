@@ -27,10 +27,20 @@ extends ./base.jade
 
     section.our-team
       .section-container(ng-init="selection='team'", ng-switch='selection')
-        .topics
-          h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team
-          h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities
-          h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers
+        .desktop
+          .topics
+            h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team
+            h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities
+            h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers
+
+        .mobile
+          .topics
+            h3(ng-show="selection=='team'", ng-click="selection='cities'") Our Team
+              span >
+            h3(ng-show="selection=='cities'", ng-click="selection='careers'") Cities
+              span >
+            h3(ng-show="selection=='careers'", ng-click="selection='team'") Careers
+              span >
 
         .content(ng-switch-default)
           .title
@@ -92,6 +102,6 @@ extends ./base.jade
             input(type='email', name='email')
           .input
             p Message:
-            textarea(rows='10', cols='50')
+            textarea(rows='10', cols='10')
 
           input.bold(type='submit', value='Say Hello!')

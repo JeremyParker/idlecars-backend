@@ -1,17 +1,19 @@
 .about-page
-  color: black
+  color: $black
 
   .section-container
     padding: 76px 48px 100px
     margin: 0 auto
     max-width: 1058px
 
+
   .header-photo
-    background: url(../img/team_photo.jpg) no-repeat white
+    background: url(../img/team_photo.jpg) no-repeat $white
     background-size: cover
     background-position: center
     height: 594px
     margin-top: 48px
+
 
   .about-us, .get-in-touch
     background: $light_gray
@@ -19,23 +21,20 @@
   .about-us h2
     margin-bottom: 36px
 
+
   .our-team
     background: $white
 
     .pane
-      display: flex
-      display: -webkit-flex
+      @extend .flex
 
     .topics
-      display: flex
-      display: -webkit-flex
+      @extend .flex
       margin-bottom: 100px
       color: $ic_blue
 
       h3
-        flex: 1
-        -ms-flex: 1
-        -webkit-flex: 1
+        @extend %flex_cell
         text-align: center
         &:hover
           cursor: pointer
@@ -51,6 +50,7 @@
 
     .description p:first-child
       margin-bottom: 18px
+
 
   .get-in-touch
     p
@@ -68,9 +68,73 @@
         width: 300px
 
     textarea
+      width: 470px
       border: none
 
     input[type="submit"]
       background: $ic_blue
       padding: 10px 50px
-      color: white
+      color: $white
+
+
+
+@media (max-width: $mobile_width_threshold)
+  .about-page
+    .section-container
+      padding: 48px 20px 60px
+
+
+    .header-photo
+      height: 300px
+
+
+    .about-us h2
+      margin-bottom: 20px
+
+
+    .our-team
+      .topics
+        margin-bottom: 48px
+
+        h3
+          text-align: left
+
+          span
+            float: right
+
+      .pane
+        flex-direction: column
+        -webkit-flex-direction: column
+
+        margin-top: 60px
+
+      .profile-image, .description, h2
+        text-align: center
+
+      .profile-image
+        margin-right: 0
+        margin-bottom: 32px
+
+
+    .get-in-touch
+      .section-container
+        padding-bottom: 76px
+
+      .input
+        margin-top: 20px
+
+      input
+        &[type="submit"]
+          margin-top: 48px
+
+        &[type="text"], &[type="email"]
+          width: 100%
+
+      textarea
+        width: 100%
+
+
+
+
+
+
