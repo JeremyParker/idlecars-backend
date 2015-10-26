@@ -139,6 +139,9 @@
         max-height: 100px
         max-width: 96px
 
+  .select, .select-content, .phone-content
+    p:last-of-type
+      margin-bottom: 0
 
   .select
     background: url(../img/selectthebest.jpg) no-repeat $dark_black
@@ -147,9 +150,6 @@
 
     .content
       max-width: 480px
-
-      p:last-of-type
-        margin-bottom: 0
 
   .select-content
     p:first-of-type
@@ -186,6 +186,7 @@
     .phone .phone-image img
       width: 300px
 
+
     .select
       background-size: auto 300px
       background-position: center
@@ -203,11 +204,21 @@
         flex-wrap: wrap
         -webkit-flex-wrap: wrap
 
-        margin-top: 64px
+        margin-top: 36px
+
+        p:first-of-type
+          margin: 0
+
+        .image
+          height: 120px
+
+          img
+            max-height: 120px
+            max-width: 120px
 
       .segment
         min-width: 241.5px
-        margin-bottom: 80px
+        margin-bottom: 50px
 
         &:last-of-type
           margin-bottom: 0
