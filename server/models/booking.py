@@ -123,7 +123,7 @@ class Booking(models.Model):
                 if not self.incomplete_reason:
                     raise ValidationError('To set a booking to incomplete, also select a reason')
                 if not orig.incomplete_time:
-                    booking_service.on_incomplete(self, self.incomplete_reason)
+                    booking_service.on_incomplete(self, orig.get_state())
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),

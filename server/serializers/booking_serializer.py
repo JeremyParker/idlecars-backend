@@ -157,7 +157,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return ret
 
     def get_next_payment(self,obj):
-        fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(obj)
+        if obj.get_state() == Booking.ACTIVE:
+            fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(obj)
+        else:
+            fee, amount, start_time, end_time = booking_service.estimate_next_rent_payment(obj)
         if start_time:
             start_time = start_time.strftime('%b %d')
         return {'amount':amount, 'start_time': start_time}
@@ -169,12 +172,13 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return not obj.approval_time
 
     def get_first_valid_end_time(self, obj):
-        first_end = booking_service.first_valid_end_time(obj)
-        return fields.format_date_array(first_end)
+        first_valid_end, _ = booking_service.first_valid_end_time(obj)
+        return fields.format_date_array(first_valid_end)
 
     def get_end_time_limit_display(self, obj):
         ''' determine if we should show the min rental period, or the one week notice limit '''
-        if booking_service.min_rental_still_limiting(obj):
+        _, min_rental_still_limiting = booking_service.first_valid_end_time(obj)
+        if min_rental_still_limiting:
             return '{} minimum'.format(Car.MIN_LEASE_CHOICES[obj.car.min_lease])
         else:
             return '7 days notice'
@@ -186,4 +190,4 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         if booking.end_time:
             return _format_date(booking.end_time)
         else:
-            return _format_date(booking_service.calculate_end_time(booking))
+            return _format_date(booking_service.estimate_end_time(booking))

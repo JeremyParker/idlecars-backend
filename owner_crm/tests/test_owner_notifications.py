@@ -17,6 +17,7 @@ from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 
 from server.services import owner_service
+from server.services import booking as booking_service
 
 from freezegun import freeze_time
 
@@ -30,7 +31,7 @@ class TestOwnerNotifications(TestCase):
 
     def _update_time_about_to_go_stale(self):
         # TODO - get the stale_threshold from config
-        return timezone.now() - datetime.timedelta(days=3, hours=23, minutes=50)
+        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
 
     def test_whole_enchilada(self):
         last_update = self._update_time_about_to_go_stale()
@@ -154,6 +155,13 @@ class TestOwnerNotifications(TestCase):
             call_command('owner_notifications')
             call_command('cron_job')
 
+        # the final cancelation of the booking happens through the Admin, which triggers this:
+        original_state = self.booking.get_state()
+        self.booking.incomplete_time = timezone.now()
+        self.booking.incomplete_reason = server.models.Booking.REASON_OWNER_TOO_SLOW
+        booking_service.on_incomplete(self.booking, original_state)
+        self.booking.save()
+
         '''
             - message to owner: first morning reminder
             - message to owner: first afternoon reminder
@@ -184,6 +192,13 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 13, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
+        # the final cancelation of the booking happens through the Admin, which triggers this:
+        original_state = self.booking.get_state()
+        self.booking.incomplete_time = timezone.now()
+        self.booking.incomplete_reason = server.models.Booking.REASON_OWNER_TOO_SLOW
+        booking_service.on_incomplete(self.booking, original_state)
+        self.booking.save()
 
         '''
             - message to owner: first morning reminder

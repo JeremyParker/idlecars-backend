@@ -5,7 +5,7 @@ import datetime
 from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils import timezone
 from django.conf import settings
 
@@ -86,11 +86,7 @@ def on_base_letter_approved(driver):
 
 
 def someone_else_booked(booking):
-    booking.incomplete_time = timezone.now()
-    booking.incomplete_reason = Booking.REASON_ANOTHER_BOOKED
-    booking.save()
-    driver_emails.someone_else_booked(booking)
-    return booking
+    return _make_booking_incomplete(booking, Booking.REASON_ANOTHER_BOOKED)
 
 
 def request_insurance(booking):
@@ -108,19 +104,6 @@ def on_insurance_approved(booking):
 def on_returned(booking):
     # TODO - issue a refund and email all parties
     pass
-
-
-def on_incomplete(booking, reason):
-    ''' Called when an admin sets a booking to incomplete'''
-    if reason == Booking.REASON_OWNER_REJECTED:
-        driver_emails.insurance_rejected(booking)
-    elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_emails.driver_rejected(booking)
-    elif reason == Booking.REASON_MISSED:
-        driver_emails.car_rented_elsewhere(booking)
-    # NOTE: elsewhere we handle:
-    # Booking.REASON_ANOTHER_BOOKED
-    # Booking.REASON_CANCELED
 
 
 def create_booking(car, driver):
@@ -148,14 +131,19 @@ def cancel(booking):
 
 def _make_booking_incomplete(booking, reason):
     original_booking_state = booking.get_state()
-
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = reason
     booking.save()
+    on_incomplete(booking, original_booking_state)
+    return booking
 
+
+def on_incomplete(booking, original_booking_state):
+    ''' Called any time a booking is set to incomplete'''
     _void_all_payments(booking)
 
     # let our customers know what happened
+    reason = booking.incomplete_reason
     if reason == Booking.REASON_CANCELED:
         driver_emails.booking_canceled(booking)
         if Booking.REQUESTED == original_booking_state:
@@ -165,8 +153,14 @@ def _make_booking_incomplete(booking, reason):
         driver_emails.insurance_failed(booking)
     elif reason == Booking.REASON_DRIVER_TOO_SLOW:
         driver_emails.flake_reminder(booking.driver)
-
-    return booking
+    elif reason == Booking.REASON_ANOTHER_BOOKED:
+        driver_emails.someone_else_booked(booking)
+    elif reason == Booking.REASON_OWNER_REJECTED:
+        driver_emails.insurance_rejected(booking)
+    elif reason == Booking.REASON_DRIVER_REJECTED:
+        owner_emails.driver_rejected(booking)
+    elif reason == Booking.REASON_MISSED:
+        driver_emails.car_rented_elsewhere(booking)
 
 
 def _make_deposit_payment(booking):
@@ -200,37 +194,60 @@ def find_deposit_payment(booking):
     return deposit_payment
 
 
-def calculate_next_rent_payment(booking):
-    ''' Returns a tuple of (service_fee, rent_amount, start_time, end_time).'''
+def estimate_next_rent_payment(booking):
+    '''
+    Returns a tuple of (service_fee, rent_amount, start_time, end_time), based on
+    an estimated pickup time
+    '''
+    assert not booking.pickup_time
     if not booking.checkout_time:
         return (None, None, None, None)
+
+    estimated_pickup_time = estimate_pickup_time(booking)
+    estimated_end_time = calculate_end_time(booking, estimated_pickup_time)
+    return calculate_next_rent_payment(booking, estimated_pickup_time, estimated_end_time)
+
+
+def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_time=None):
+    '''
+    Returns a tuple of (service_fee, rent_amount, start_time, end_time).
+    pickup_time and end_time may be used to override the booking's values, or
+    for estimation if booking's values aren't set yet.
+    '''
+    assert booking_pickup_time or booking.pickup_time
+    assert booking_end_time or booking.end_time
 
     previous_payments = booking.payment_set.filter(
         invoice_start_time__isnull=False,
         invoice_end_time__isnull=False,
+        status=Payment.SETTLED,
     ).order_by('invoice_end_time')
 
-    if not previous_payments:  # first rent payment
-        start_time = timezone.now().replace(microsecond=0)
+    if previous_payments:
+        invoice_start_time = previous_payments.last().invoice_end_time
     else:
-        start_time = previous_payments.last().invoice_end_time
+        invoice_start_time = booking_pickup_time or booking.pickup_time
 
-    end_time = start_time + datetime.timedelta(days=7)
+    invoice_end_time = min(
+        invoice_start_time + datetime.timedelta(days=7),
+        booking_end_time or booking.end_time,
+    )
 
-    amount = booking.weekly_rent
-    take_rate = booking.service_percentage
+    week_portion = Decimal((invoice_end_time - invoice_start_time).days) / Decimal(7.00)
+    amount = (
+        week_portion * booking.weekly_rent).quantize(Decimal('.01'),
+        rounding=ROUND_UP
+    )
+    service_fee = Decimal(
+        amount * booking.service_percentage).quantize(Decimal('.01'),
+        rounding=ROUND_UP
+    )
 
-    booking_end_time = booking.end_time or calculate_end_time(booking)
-
-    if booking_end_time < end_time:
-        end_time = booking_end_time
-        parital_week = amount * Decimal((booking_end_time - start_time).days) / Decimal(7.00)
-        amount = parital_week.quantize(Decimal('.01'), rounding=ROUND_UP)
     return (
-        Decimal(amount * take_rate).quantize(Decimal('.01'), rounding=ROUND_UP),
+        service_fee,
         amount,
-        start_time,
-        end_time
+        invoice_start_time,
+        invoice_end_time
     )
 
 
@@ -302,9 +319,8 @@ def pickup(booking):
         raise BookingError(PICKUP_ERROR)
 
     # NB: we don't save() the booking unless successful...
-    booking.pickup_time = timezone.now()
-    if not booking.end_time:
-        booking.end_time = calculate_end_time(booking)
+    booking.pickup_time = timezone.now().replace(microsecond=0)
+    booking.end_time = calculate_end_time(booking, booking.pickup_time)
 
     deposit_payment = find_deposit_payment(booking) or _make_deposit_payment(booking)
     if deposit_payment.error_message:
@@ -327,13 +343,6 @@ def pickup(booking):
     if rent_payment.status != Payment.SETTLED:
         raise BookingError(rent_payment.error_message)
 
-    # copy the time of day from the pickup time to the booking end time. Until now it had none.
-    booking.end_time = booking.end_time.replace(
-        hour=booking.pickup_time.hour,
-        minute=booking.pickup_time.minute,
-        second=booking.pickup_time.second,
-    )
-
     booking.save()
 
     driver_emails.pickup_confirmation(booking)
@@ -345,16 +354,17 @@ def pickup(booking):
 def _cron_payments():
     payment_lead_time_hours = 2  # TODO - get this out of a config system
     pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
-    payable_bookings = filter_booked(Booking.objects.all()).exclude(
-        payment__invoice_end_time__isnull=False,
-        payment__invoice_end_time__gt=pay_time,
-        # payment_status=Payment.SETTLED,
-    ).exclude(
-        payment__invoice_end_time__isnull=False,
-        payment__invoice_end_time__gte=F('end_time'),
-        # payment_status=Payment.SETTLED,
-    )
-    for booking in payable_bookings:
+    active_bookings = filter_booked(Booking.objects.all()).prefetch_related('payment_set')
+    for booking in active_bookings:
+        relevant_end_time = min(booking.end_time, pay_time)
+        existing_payments = booking.payment_set.filter(
+            invoice_end_time__isnull=False,
+            invoice_end_time__gte=relevant_end_time,
+            status=Payment.SETTLED,
+        )
+        if existing_payments.exists():
+            continue
+
         try:
             payment = _create_next_rent_payment(booking)
             payment = payment_service.settle(payment)
@@ -380,16 +390,17 @@ def _booking_updates():
             if not booking.driver.all_docs_uploaded():
                 _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW)
         except BookingError:
-            pass  # ops will get an email about the payment failure, and
+            pass  # TODO: ops will get an email about the payment failure, and
 
-    expired_bookings = filter_requested(Booking.objects.all()).filter(
-        requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
-    )
-    for booking in expired_bookings:
-        try:
-            _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
-        except BookingError:
-            pass  # ops will get an email about the payment failure, and
+    # TEMPORARILY REMOVING THIS FUNCTIONALITY. WE CAN SET OWNER TOO SLOW IN THE ADMIN NOW.
+    # expired_bookings = filter_requested(Booking.objects.all()).filter(
+    #     requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
+    # )
+    # for booking in expired_bookings:
+    #     try:
+    #         _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
+    #     except BookingError:
+    #         pass  # ops will get an email about the payment failure, and
 
 
 def cron_job():
@@ -405,50 +416,54 @@ def start_time_display(booking):
         return _format_date(booking.pickup_time)
     elif booking.approval_time:
         return 'on pickup'
-    elif booking.checkout_time:
-        return _format_date(booking.checkout_time + datetime.timedelta(days=2))
     else:
-        return _format_date(timezone.now() + datetime.timedelta(days=2))
-
-
-def min_rental_still_limiting(booking):
-    '''
-    Is the minimum rental time still limiting the first first_valid_end_time, or is
-    it the 7 days' notice?
-    '''
-    min_rental = booking.car.minimum_rental_days()
-    if not min_rental:
-        return False
-
-    min_notice = timezone.now() + datetime.timedelta(days=7)
-    if not booking.pickup_time or booking.pickup_time + datetime.timedelta(min_rental) > min_notice:
-        return True
-    return False
+        return _format_date(estimate_pickup_time(booking))
 
 
 def first_valid_end_time(booking):
     '''
-    Returns the earliest legal end time of the booking, so the user can't end the booking prematurely.
+    Returns a typle (ealiest legal end time, if the min_rental was limiting the 1st value)
     '''
-    if min_rental_still_limiting(booking):
-        min_rental_days = booking.car.minimum_rental_days()
-        return timezone.now() + datetime.timedelta(days=min_rental_days)
-    return timezone.now() + datetime.timedelta(days=7)
+    notice = timezone.now() + datetime.timedelta(days=7)
+    min_rental = datetime.timedelta(days=booking.car.minimum_rental_days())
+    min_rental_end = booking.pickup_time or estimate_pickup_time(booking) + min_rental
+    return max(notice, min_rental_end), min_rental_end > notice
 
 
-def calculate_end_time(booking):
-    assert not booking.end_time
-    min_duration = booking.car.minimum_rental_days() or 1
-    if booking.pickup_time:
-        return booking.pickup_time + datetime.timedelta(days=min_duration)
+def estimate_pickup_time(booking):
+    assert not booking.pickup_time  # if there's a pickup_time, then start_time is known.
     if booking.approval_time:
-        return booking.approval_time + datetime.timedelta(days=min_duration + 1)
+        pickup_date = booking.approval_time + datetime.timedelta(days=1)
     elif booking.checkout_time:
-        return booking.checkout_time + datetime.timedelta(days=min_duration + 2)
+        pickup_date = booking.checkout_time + datetime.timedelta(days=2)
     else:
-        return timezone.now() + datetime.timedelta(days=min_duration + 2)
+        pickup_date = timezone.now() + datetime.timedelta(days=2)
+
+    now = timezone.now()
+    pickup_time = pickup_date.replace(hour=now.hour, minute=now.minute, second=now.second)
+    return pickup_time
 
 
+def estimate_end_time(booking):
+    assert not booking.pickup_time
+    return calculate_end_time(booking, estimate_pickup_time(booking))
+
+
+def calculate_end_time(booking, pickup_time):
+    ''' calculate the end_time based on pickup_time. '''
+    if booking.end_time:
+        # booking.end_time may have been set through the API. If so, it had no time of day.
+        return booking.end_time.replace(
+            hour=pickup_time.hour,
+            minute=pickup_time.minute,
+            second=pickup_time.second,
+        )
+    else:
+        min_duration = booking.car.minimum_rental_days() or 1
+        return pickup_time + datetime.timedelta(days=min_duration)
+
+
+# TODO: move this up to the API
 def set_end_time(booking, end_time):
     if booking.end_time:
         booking.end_time = booking.end_time.replace(

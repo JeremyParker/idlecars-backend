@@ -19,11 +19,16 @@ class Booking(Factory):
 
     car = SubFactory(BookableCar)
     driver = SubFactory(BaseLetterDriver)
+    end_time = LazyAttribute(lambda o: (timezone.now() + datetime.timedelta(days=7 * 6)).replace(
+        hour = 0,
+        minute = 0,
+        second = 0,
+        microsecond = 0,
+    ))
 
 
 class ReservedBooking(Booking):
     checkout_time = LazyAttribute(lambda o: timezone.now())
-    end_time = LazyAttribute(lambda o: (timezone.now() + datetime.timedelta(days=7 * 6)))
     driver = SubFactory(PaymentMethodDriver)
 
     # checkout locks in the price and service_percentage
@@ -58,6 +63,14 @@ class BookedBooking(AcceptedBooking):
             amount=self.car.solo_deposit,
             invoice_start_time=LazyAttribute(lambda o: timezone.now()),
             invoice_end_time=LazyAttribute(lambda o: (timezone.now()+ datetime.timedelta(days=7)))
+        )
+
+    @post_generation
+    def update_end_time(self, create, count, **kwargs):
+        self.end_time = self.end_time.replace(
+            hour=self.pickup_time.hour,
+            minute=self.pickup_time.minute,
+            second=self.pickup_time.second,
         )
 
 

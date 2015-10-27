@@ -71,10 +71,21 @@ def escrow(payment):
     return _execute('escrow', payment)
 
 
+# TODO - this function and the one for payment_method should probably be moved to wherever the
+# Braintree abstaction is.
 def details_link(payment):
-    link = '<a href="https://{base_url}/merchants/{account}/transactions/{token}">{token}</a>'.format(
+    l = '<a href="https://{base_url}/merchants/{account}/transactions/{token}">{token}</a>'.format(
         base_url=settings.BRAINTREE_BASE_URL,
         account=settings.BRAINTREE["merchant_id"],
         token=payment.transaction_id,
+    )
+    return mark_safe(l)
+
+
+def payment_method_link(payment_method):
+    link =  '<a href="https://{base}/merchants/{account}/payment_methods/any/{t}">{t}</a>'.format(
+        base=settings.BRAINTREE_BASE_URL,
+        account=settings.BRAINTREE["merchant_id"],
+        t=payment_method.gateway_token,
     )
     return mark_safe(link)

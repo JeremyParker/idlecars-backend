@@ -328,7 +328,7 @@ def checkout_receipt(booking):
             '''.format(
                 booking.car.solo_deposit,
                 booking.car.display_name(),
-                booking_service.calculate_next_rent_payment(booking)[1],
+                booking_service.estimate_next_rent_payment(booking)[1],
             ),
         }
     }
