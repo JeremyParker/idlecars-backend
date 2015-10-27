@@ -56,7 +56,8 @@ class BookingPickupTest(APITestCase):
         self.assertIsNotNone(response.data['_app_notifications'])  # it showed us an error.
 
     def test_checkout_payment_error(self):
-        payment_gateways.get_gateway('fake').push_next_payment_response((False, 'Some fake error',))
+        fake_gateway = payment_gateways.get_gateway('fake')
+        fake_gateway.push_next_payment_response((Payment.DECLINED, 'Some fake error',))
         response = self.client.post(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIsNotNone(response.data['_app_notifications'])  # it showed us an error.
