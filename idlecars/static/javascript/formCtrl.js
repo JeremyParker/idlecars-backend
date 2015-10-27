@@ -1,36 +1,49 @@
 var app = angular.module('app',[]);
 
-app.controller('formCtrl', function($scope){
+app.controller('formCtrl', function ($scope) {
 
-  $scope.zipLabel = 'Zip Code:';
+  $scope.nameLabel = 'First name:';
   $scope.emailLabel = 'Email:';
+  $scope.messageLabel = 'Message:';
 
   $scope.validation = function(event){
     var emailIsValid = validateEmail();
-    var zipcodeIsValid = validateZipcode();
-    if (!(emailIsValid && zipcodeIsValid)) {
-        event.preventDefault();
+    var nameIsValid = validateName();
+    var messageIsValid = validateMessage();
+
+    if (!(emailIsValid && nameIsValid && messageIsValid)) {
+      event.preventDefault();
     }
   }
 
-  var validateZipcode = function(){
-    var zipcodeIsEmpty = $scope.myForm.zipcode.$error.required;
-    var zipcodeIsInvalid = $scope.myForm.zipcode.$error.pattern;
+  var validateMessage = function () {
+    var messageIsEmpty= $scope.myForm.message.$error.required;
 
-    if (zipcodeIsEmpty) {
-      $scope.zipLabel = 'Zipcode is required';
-      $scope.zipRed = true;
+    if (messageIsEmpty) {
+      $scope.messageLabel = 'Message is required';
+      $scope.messageRed = true;
     }
-    else if (zipcodeIsInvalid) {
-      $scope.zipLabel = 'Please enter a valid zip code';
-      $scope.zipRed = true;
-    }
-    else{
-      $scope.zipLabel = 'Zipcode:';
-      $scope.zipRed = false;
+    else {
+      $scope.messageLabel = 'Message:';
+      $scope.messageRed = false;
     }
 
-    return !zipcodeIsEmpty && !zipcodeIsInvalid;
+    return !messageIsEmpty;
+  };
+
+  var validateName = function () {
+    var nameIsEmpty= $scope.myForm.first_name.$error.required;
+
+    if (nameIsEmpty) {
+      $scope.nameLabel = 'First name is required';
+      $scope.nameRed = true;
+    }
+    else {
+      $scope.nameLabel = 'First name:';
+      $scope.nameRed = false;
+    }
+
+    return !nameIsEmpty;
   };
 
   var validateEmail = function(){
@@ -40,12 +53,10 @@ app.controller('formCtrl', function($scope){
     if (emailIsEmpty) {
       $scope.emailLabel = 'Email is required';
       $scope.emailRed = true;
-      event.preventDefault();
     }
     else if (emailIsInvalid) {
       $scope.emailLabel = 'Please enter a valid email';
       $scope.emailRed = true;
-      event.preventDefault();
     }
     else{
       $scope.emailLabel = 'Email:';

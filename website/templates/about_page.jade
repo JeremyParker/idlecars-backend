@@ -112,15 +112,16 @@ extends ./base.jade
     section.get-in-touch
       .section-container
         h2 Get In Touch
-        form
+        form(action="#{ action }", method="post", ng-controller="formCtrl", novalidate='', name="myForm")
+          - csrf_token
           .input
-            p First name:
-            input(type='text', name='first_name')
+            p(ng-bind='nameLabel', ng-class="{'red': nameRed}")
+            input(type='text', name='first_name', ng-model='first_name', required='')
           .input
-            p Email:
-            input(type='email', name='email')
+            p(ng-bind='emailLabel', ng-class="{'red': emailRed}")
+            input(maxlength='254', type='email', name='email', ng-model='email', placeholder='you@example.com', required='')
           .input
-            p Message:
-            textarea(rows='10', cols='10')
+            p(ng-bind='messageLabel', ng-class="{'red': messageRed}")
+            textarea(name='message', rows='10', cols='10', ng-model='message', required='')
 
-          input.bold(type='submit', value='Say Hello!')
+          input.bold(type='submit', value='Say Hello!', ng-click='validation($event)')

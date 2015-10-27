@@ -32,11 +32,17 @@ def index(request):
 View that presents the about page
 '''
 def about(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+
     context = {
         'login_url': client_side_routes.driver_account(),
         'terms_of_service': client_side_routes.terms_of_service(),
         'faq': client_side_routes.faq(),
         'add_car_form': client_side_routes.add_car_form(),
+        'action': urlresolvers.reverse('website:about'),
     }
     return render(request, 'about_page.jade', context)
 
