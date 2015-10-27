@@ -319,7 +319,14 @@ def escrow(payment):
 
     _configure_braintree()
     if payment.transaction_id:
+        assert payment.status == models.Payment.PRE_AUTHORIZED
         response = _execute_transaction_request(payment, 'hold_in_escrow', payment.transaction_id)
+        if getattr(response, 'is_success', False):
+            response = _execute_transaction_request(
+                payment,
+                'submit_for_settlement',
+                payment.transaction_id
+            )
     else:
         request = _transaction_request(payment)
         request.update({
