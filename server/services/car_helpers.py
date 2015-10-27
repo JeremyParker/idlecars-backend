@@ -10,7 +10,7 @@ from server.models import Booking, Car, Owner
 
 
 next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
-staleness_threshold = timezone.now() - datetime.timedelta(days=4)
+staleness_threshold = timezone.now() - datetime.timedelta(days=3)
 
 # TODO - this belongs in booking_service
 def _filter_booking_in_progress(booking_queryset):
