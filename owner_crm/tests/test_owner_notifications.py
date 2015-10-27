@@ -31,7 +31,7 @@ class TestOwnerNotifications(TestCase):
 
     def _update_time_about_to_go_stale(self):
         # TODO - get the stale_threshold from config
-        return timezone.now() - datetime.timedelta(days=3, hours=23, minutes=50)
+        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
 
     def test_whole_enchilada(self):
         last_update = self._update_time_about_to_go_stale()
