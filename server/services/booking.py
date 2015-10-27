@@ -161,7 +161,6 @@ def on_incomplete(booking, original_booking_state):
         owner_emails.driver_rejected(booking)
     elif reason == Booking.REASON_MISSED:
         driver_emails.car_rented_elsewhere(booking)
-    # TODO: REASON_MISSED - when the owner found a driver elsewhere.
 
 
 def _make_deposit_payment(booking):
