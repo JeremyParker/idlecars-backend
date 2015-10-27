@@ -91,3 +91,24 @@ def owner_account_declined(owner, errors):
         subject='{}\'s bank account was declined'.format(owner.name()),
         merge_vars=merge_vars,
     )
+
+
+def new_user_message(message):
+    merge_vars = {
+        settings.OPS_EMAIL: {
+            'FNAME': 'New user message',
+            'HEADLINE': 'A new message from user {}'.format(message.first_name),
+            'TEXT': '''
+                User first name is: {}
+                <br />
+                User email is: {}
+                <br />
+                Message is: <br /> {}
+            '''.format(message.first_name, message.email, message.message),
+        }
+    }
+    email.send_async(
+        template_name='no_button_no_image',
+        subject='A new message from user {}'.format(message.first_name),
+        merge_vars=merge_vars,
+    )

@@ -32,17 +32,34 @@ def index(request):
 View that presents the about page
 '''
 def about(request):
+
+    def show_thanks():
+        return 'thanks' in request.GET
+
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         email = request.POST.get('email')
         message = request.POST.get('message')
+
+        new_message = models.UserMessage.objects.create(
+            first_name=first_name,
+            email=email,
+            message=message,
+        )
+
+        from owner_crm.services import ops_emails
+        ops_emails.new_user_message(new_message)
+
+        url = '{}?thanks='.format(urlresolvers.reverse('website:about'))
+        return HttpResponseRedirect(url)
 
     context = {
         'login_url': client_side_routes.driver_account(),
         'terms_of_service': client_side_routes.terms_of_service(),
         'faq': client_side_routes.faq(),
         'add_car_form': client_side_routes.add_car_form(),
-        'action': urlresolvers.reverse('website:about'),
+        'action': urlresolvers.reverse('website:about') + '#thanks',
+        'show_thanks': show_thanks(),
     }
     return render(request, 'about_page.jade', context)
 
