@@ -86,11 +86,7 @@ def on_base_letter_approved(driver):
 
 
 def someone_else_booked(booking):
-    booking.incomplete_time = timezone.now()
-    booking.incomplete_reason = Booking.REASON_ANOTHER_BOOKED
-    booking.save()
-    driver_emails.someone_else_booked(booking)
-    return booking
+    return _make_booking_incomplete(booking, Booking.REASON_ANOTHER_BOOKED)
 
 
 def request_insurance(booking):
@@ -108,19 +104,6 @@ def on_insurance_approved(booking):
 def on_returned(booking):
     # TODO - issue a refund and email all parties
     pass
-
-
-def on_incomplete(booking, reason):
-    ''' Called when an admin sets a booking to incomplete'''
-    if reason == Booking.REASON_OWNER_REJECTED:
-        driver_emails.insurance_rejected(booking)
-    elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_emails.driver_rejected(booking)
-    elif reason == Booking.REASON_MISSED:
-        driver_emails.car_rented_elsewhere(booking)
-    # NOTE: elsewhere we handle:
-    # Booking.REASON_ANOTHER_BOOKED
-    # Booking.REASON_CANCELED
 
 
 def create_booking(car, driver):
@@ -148,14 +131,19 @@ def cancel(booking):
 
 def _make_booking_incomplete(booking, reason):
     original_booking_state = booking.get_state()
-
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = reason
     booking.save()
+    on_incomplete(booking, original_booking_state)
+    return booking
 
+
+def on_incomplete(booking, original_booking_state):
+    ''' Called any time a booking is set to incomplete'''
     _void_all_payments(booking)
 
     # let our customers know what happened
+    reason = booking.incomplete_reason
     if reason == Booking.REASON_CANCELED:
         driver_emails.booking_canceled(booking)
         if Booking.REQUESTED == original_booking_state:
@@ -165,8 +153,14 @@ def _make_booking_incomplete(booking, reason):
         driver_emails.insurance_failed(booking)
     elif reason == Booking.REASON_DRIVER_TOO_SLOW:
         driver_emails.flake_reminder(booking.driver)
-
-    return booking
+    elif reason == Booking.REASON_ANOTHER_BOOKED:
+        driver_emails.someone_else_booked(booking)
+    elif reason == Booking.REASON_OWNER_REJECTED:
+        driver_emails.insurance_rejected(booking)
+    elif reason == Booking.REASON_DRIVER_REJECTED:
+        owner_emails.driver_rejected(booking)
+    elif reason == Booking.REASON_MISSED:
+        driver_emails.car_rented_elsewhere(booking)
 
 
 def _make_deposit_payment(booking):
@@ -396,16 +390,17 @@ def _booking_updates():
             if not booking.driver.all_docs_uploaded():
                 _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW)
         except BookingError:
-            pass  # ops will get an email about the payment failure, and
+            pass  # TODO: ops will get an email about the payment failure, and
 
-    expired_bookings = filter_requested(Booking.objects.all()).filter(
-        requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
-    )
-    for booking in expired_bookings:
-        try:
-            _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
-        except BookingError:
-            pass  # ops will get an email about the payment failure, and
+    # TEMPORARILY REMOVING THIS FUNCTIONALITY. WE CAN SET OWNER TOO SLOW IN THE ADMIN NOW.
+    # expired_bookings = filter_requested(Booking.objects.all()).filter(
+    #     requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
+    # )
+    # for booking in expired_bookings:
+    #     try:
+    #         _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
+    #     except BookingError:
+    #         pass  # ops will get an email about the payment failure, and
 
 
 def cron_job():
