@@ -61,7 +61,6 @@ class Booking(models.Model):
     )
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 
-    STATE_UNKNOWN = 0
     PENDING = 1
     RESERVED = 2
     REQUESTED = 3
