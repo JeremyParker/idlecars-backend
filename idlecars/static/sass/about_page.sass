@@ -1,6 +1,10 @@
 .about-page
   color: $black
 
+  .button
+    padding: 12px 50px
+    min-width: 200px
+
   .section-container
     padding: 76px 48px 100px
     margin: 0 auto
@@ -22,7 +26,7 @@
     margin-bottom: 36px
 
 
-  .our-team
+  .team-cities-careers
     background: $white
 
     .pane
@@ -56,11 +60,21 @@
     .description p:first-child
       margin-bottom: 18px
 
-    .cities
-      img
-        width: 100%
-        margin-top: 48px
+    .cities img
+      width: 100%
+      margin-top: 48px
+      margin-bottom: 36px
+
+    .careers
+      h2
+        margin-top: 100px
         margin-bottom: 36px
+
+        &:first-of-type
+          margin-top: 0
+
+      .button
+        margin-top: 48px
 
 
   .get-in-touch
@@ -85,11 +99,6 @@
       width: 470px
       border: none
 
-    input[type="submit"]
-      background: $ic_blue
-      padding: 10px 50px
-      color: $white
-
 
   .thanks
     background: $ic_blue
@@ -111,7 +120,7 @@
       margin-bottom: 20px
 
 
-    .our-team
+    .team-cities-careers
       .topics
         margin-bottom: 48px
 
@@ -128,13 +137,20 @@
 
         margin-top: 60px
 
-      .profile-image, .description, h2
+      .profile-image, .description, .title h2
         text-align: center
 
       .profile-image
         margin-right: 0
         margin-bottom: 32px
 
+      .careers
+        h2
+          margin-top: 50px
+          margin-bottom: 24px
+
+        .button
+          margin-top: 24px
 
     .get-in-touch
       .section-container

@@ -25,8 +25,8 @@ extends ./base.jade
         br
         p Idle Cars provides the tools to participate in the on-demand revolution.
 
-    section.our-team
-      .section-container(ng-init="selection='cities'", ng-switch='selection')
+    section.team-cities-careers
+      .section-container(ng-init="selection='careers'", ng-switch='selection')
         .desktop
           .topics
             div #[h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team]
@@ -42,7 +42,7 @@ extends ./base.jade
             h3(ng-show="selection=='careers'", ng-click="selection='team'") Careers
               span >
 
-        .content(ng-switch-default)
+        .content.our-team(ng-switch-default)
           .title
             h2 Our Team
 
@@ -105,9 +105,61 @@ extends ./base.jade
             |  Kindly sign up to be notified when we launch in your hometown.
 
 
-        .content(ng-switch-when='careers')
-          .title
-            h2 Careers
+        .content.careers(ng-switch-when='careers')
+          h2 Operations Leader – New York
+          p
+            | Idle Cars Ops team creates a community to connect vehicle owners and drivers safely and efficiently
+            |  by leveraging our technology platform. To handle the processes of renting for-hire vehicles at the scale the world requires,
+            |  our operations team is focused on improving our driver and owner onboarding processes, our customer service processes,
+            |  and our customer retention strategy.
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in technical field (engineering, finance or computer science).
+          p Must have 2-5 years experience in a startup environment managing operations, customer service, or a related field.
+          p Excellent management skills (communication, leadership, execution).
+          br
+          p.bold Preferred qualifications
+          p Experience working with data scientists to assess and evaluate customer experience.
+          p Experience using customer relationship management tools (Zendesk, Salesforce, etc.)
+          a.button(href="mailto:support@idlecars.com") Apply now
+
+          h2 Data Scientist
+          p
+            | Idle Cars Data scientists drives initiatives to improve the monetization of our website and mobile experience
+            |  while delivering consumer analytics efforts to better understand how users engage with our digital products.
+            |  We need savvy data scientists to improve application efficiency, evaluation our customer acquisition strategies,
+            |  and provide consumer and engagement insights.
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in technical field (data science, engineering, computer science).
+          p Must have 2-5 years experience performing data science projects
+          p Excellent capabilities in analyzing relationships between values/numbers that should be related in a predictable way, such as ratios over time
+          br
+          p.bold Preferred qualifications
+          p The ability to come up with solutions to loosely defined business problems by leveraging pattern detection over potentially large datasets.
+          p Strong programming skills (such as Hadoop MapReduce or other big data frameworks, Java), and statistical modeling (like SAS or R).
+          p Experience using machine learning algorithms.
+          p Proficiency in the use of statistical packages.
+          a.button(href="mailto:support@idlecars.com") Apply now
+
+          h2 Software Engineer
+          p
+            | Idle Cars software engineers develop the next-generation technologies that change how thousands of drivers search,
+            |  locate, rent, return and pay for vehicles to rent on-demand. To handle the information and processes of renting
+            |  for-hire vehicles at the scale the world requires, our team is focused on computer science,
+            |  processing, distributed computing, large-scale system design, networking, security, data compression and user
+            |  interface design; our list continues to grow every day!
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in Computer Science or related technical field.
+          p Must have 2-5 years experience in computer programming, software engineering or a related field.
+          p Excellent implementation skills (AngularJS, Python, Django).
+          br
+          p.bold Preferred qualifications
+          p Experience in systems software and algorithms.
+          p Knowledge of Unix/Linux and APIs.
+          p Familiarity with TCP/IP and network programming.
+          a.button(href="mailto:support@idlecars.com") Apply now
 
     - if show_thanks
       a.invisible(id="thanks")
@@ -133,4 +185,4 @@ extends ./base.jade
             p(ng-bind='messageLabel', ng-class="{'red': messageRed}")
             textarea(name='message', rows='10', cols='10', ng-model='message', required='')
 
-          input.bold(type='submit', value='Say Hello!', ng-click='validation($event)')
+          input.button.bold(type='submit', value='Say Hello!', ng-click='validation($event)')
