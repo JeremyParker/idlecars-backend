@@ -259,8 +259,12 @@ class ReservedBookingDetailsTest(APITestCase):
 
     def test_next_rent_payment(self):
         response = self.client.get(self.url, format='json')
-        start_time = self.booking.checkout_time
+        start_time = self.booking.checkout_time + datetime.timedelta(days=2)
         self.assertEqual(
             response.data['next_payment'],
             {'amount': self.booking.car.solo_cost, 'start_time': start_time.strftime('%b %d')}
         )
+
+    def test_next_rent_payment_partial_week(self):
+        pass
+        # TODO

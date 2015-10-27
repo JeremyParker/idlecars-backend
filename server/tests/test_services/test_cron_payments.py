@@ -65,6 +65,24 @@ class TestCronPayments(TestCase):
             self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
             self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
 
+    def test_make_payment_after_failure(self):
+        with freeze_time("2014-10-10 9:55:00"):
+            fake_gateway = payment_gateways.get_gateway('fake')
+            fake_gateway.push_next_payment_response((Payment.DECLINED, 'Some fake error',))
+            call_command('cron_job')
+            self.assertEqual(self.booking.payment_set.count(), 3)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
+
+        with freeze_time("2014-10-10 10:05:00"):
+            # we should try again the next time we run the cron job
+            call_command('cron_job')
+            self.assertEqual(self.booking.payment_set.count(), 4)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
+
     def test_correct_time_range_with_many_past_payments(self):
         # make another payment from the previous week
         previous_rent_payment = factories.Payment.create(

@@ -184,9 +184,31 @@ class BookingServiceTest(TestCase):
             '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
         )
 
-    def test_pickup_after_failure(self):
+
+    def test_pickup_six_sevenths_bug(self):
+        self.car.min_lease = '_02_one_week'
+        self.car.save()
+
         driver = factories.PaymentMethodDriver.create()
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
+        new_booking = factories.AcceptedBooking.create(
+            car=self.car,
+            driver=driver,
+        )
+
+        # simulate using the app to set the end time to the min rental period
+        today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        new_booking.end_time = today + timezone.timedelta(days=new_booking.car.minimum_rental_days())
+        new_booking = booking_service.pickup(new_booking)
+
+        self._check_payments_after_pickup(new_booking)
+
+
+    def test_pickup_after_failure(self):
+        self.car.min_lease = '_02_one_week'
+        self.car.save()
+        driver = factories.PaymentMethodDriver.create()
+
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver, end_time=None)
         self.assertEqual(new_booking.get_state(), models.Booking.ACCEPTED)
         self.assertEqual(len(new_booking.payment_set.all()), 1)
         self.assertEqual(new_booking.payment_set.first().status, models.Payment.PRE_AUTHORIZED)
@@ -204,6 +226,7 @@ class BookingServiceTest(TestCase):
         # successfully pick up the car
         new_booking = booking_service.pickup(new_booking)
         self._check_payments_after_pickup(new_booking)
+
 
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()
