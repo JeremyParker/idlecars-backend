@@ -1,7 +1,5 @@
 .about-page {
   color: #000; }
-  .about-page .button, .about-page input {
-    border: none; }
   .about-page .button {
     padding: 12px 50px;
     min-width: 200px; }
@@ -81,7 +79,8 @@
       width: 100%;
       text-align: left; }
       .about-page .team-cities-careers .topics h3 span {
-        float: right; }
+        float: right;
+        font-size: 40px; }
   .about-page .team-cities-careers .pane {
     flex-direction: column;
     -webkit-flex-direction: column;
@@ -146,6 +145,9 @@ section {
   cursor: pointer; }
   .button:hover {
     opacity: 0.9; }
+
+.button, input {
+  border-radius: 0; }
 
 .mobile, #mobile {
   display: none; }
