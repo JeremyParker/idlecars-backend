@@ -42,8 +42,8 @@ def _filter_data_complete(queryset):
 
 def _filter_bookable(queryset):
     '''
-    return cars whose status is known, aren't busy through elsewhere, and don't have a booking
-    in progress.
+    return cars whose status is known, aren't busy through elsewhere, don't have a booking
+    in progress, and the owner's bank account details are approved.
     '''
     # TODO - we probably need to optimize this, or at least cache it
     active_bookings = _filter_booking_in_progress(Booking.objects.all())
