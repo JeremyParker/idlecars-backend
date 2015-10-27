@@ -1,5 +1,7 @@
 .about-page {
   color: #000; }
+  .about-page .button, .about-page input {
+    border: none; }
   .about-page .button {
     padding: 12px 50px;
     min-width: 200px; }

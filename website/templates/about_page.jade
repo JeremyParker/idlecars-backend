@@ -36,11 +36,11 @@ extends ./base.jade
         .mobile
           .topics
             h3(ng-show="selection=='team'", ng-click="selection='cities'") Our Team
-              span >
+              span ›
             h3(ng-show="selection=='cities'", ng-click="selection='careers'") Cities
-              span >
+              span ›
             h3(ng-show="selection=='careers'", ng-click="selection='team'") Careers
-              span >
+              span ›
 
         .content.our-team(ng-switch-default)
           .title
