@@ -16,7 +16,7 @@ from server import factories, models, services
 
 class CreateBookingTest(APITestCase):
     def setUp(self):
-        self.car = factories.Car.create()
+        self.car = factories.BookableCar.create()
         self.driver = factories.Driver.create()
 
         self.client = APIClient()
@@ -24,7 +24,7 @@ class CreateBookingTest(APITestCase):
         token = Token.objects.get(user__username=self.driver.auth_user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:bookings-list')
-        self.data = {'car': self.car.pk}
+        self.data = {'car': str(self.car.pk)}
 
     def test_create_booking_success(self):
         """ Ensure we can create a new booking object. """
@@ -38,6 +38,13 @@ class CreateBookingTest(APITestCase):
         self.client.credentials()
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_fail_when_car_is_booked(self):
+        other_driver = factories.BaseLetterDriver.create()
+        existing_booking = factories.ReservedBooking.create(car=self.car, driver=other_driver)
+        response = self.client.post(self.url, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['_app_notifications'], [services.booking.UNAVAILABLE_CAR_ERROR])
 
     def test_fail_when_driver_has_pending_booking(self):
         """ Ensure we can't book if the driver already has an oustanding PENDING booking"""
