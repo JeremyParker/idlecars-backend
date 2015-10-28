@@ -23,7 +23,7 @@ class BookingError(Exception):
 CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
-UNAVAILABLE_CAR_ERROR = 'Sorry, this car is unavailable for rental right now'
+UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are other cars you can rent.'
 
 
 def filter_pending(booking_queryset):
