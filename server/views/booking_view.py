@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
+from idlecars import rest_helpers
 from server import models
 from server.services import booking as booking_service
 from server.services.booking import BookingError
@@ -16,7 +17,7 @@ from server.permissions import OwnsBooking
 
 
 class BookingViewSet(
-        mixins.CreateModelMixin,
+        rest_helpers.ICCreateModelMixin,
         mixins.ListModelMixin,
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,

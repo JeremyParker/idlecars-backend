@@ -29,15 +29,20 @@ class BookingSerializer(serializers.ModelSerializer):
         if not valid:
             return valid
 
-        # TODO(JP): make this booking-check aware of end-times, so we can book after booking ends.
         if self.context['request'].method == 'POST':
+            car_pk = self.initial_data['car']
+            live_car_pks = [c.pk for c in car_service.filter_live(Car.objects.all())]
+            if not car_pk in live_car_pks:
+                self._errors.update({
+                    '_app_notifications': [booking_service.UNAVAILABLE_CAR_ERROR],
+                })
+
+            # TODO(JP): make this aware of end-times, so we can book after a booking ends
             driver = Driver.objects.get(auth_user=self.context['request'].user)
             if booking_service.filter_visible(Booking.objects.filter(driver=driver)):
                 self._errors.update({
                     '_app_notifications': ['You have a conflicting rental.'],
                 })
-
-        # TODO(JP): double-check the car is available
 
         if self._errors and raise_exception:
             raise ValidationError(self._errors)
