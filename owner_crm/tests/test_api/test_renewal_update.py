@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 import server.factories
+from server.models import Car
 import server.services.car
 import owner_crm.factories
 from owner_crm import models
@@ -34,4 +35,4 @@ class RenewalUpdateTest(APITestCase):
         self.assertEqual(renewal.state, models.ConsumableToken.STATE_CONSUMED)
 
     def _listed_cars_count(self):
-        return server.services.car.get_listing_queryset().count()
+        return server.services.car.filter_live(Car.objects.all()).count()

@@ -111,11 +111,28 @@ class CarTest(APITestCase):
             self.assertTrue(int(car['cost']) >= previous_car_cost)
             previous_car_cost = int(car['cost'])
 
-    def test_get_car(self):
-        url = reverse('server:cars-detail', args=(self.car.pk,))
-        response = self.client.get(url, format='json')
+    def _assert_car_details(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._get_expected_representation(self.car))
+
+    def test_get_live_car(self):
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        self._assert_car_details(self.client.get(url, format='json'))
+
+    def test_get_unlisted_car(self):
+        # make it so the car is unlisted (all info complete, but not live)
+        self.car.owner.merchant_account_state = models.Owner.BANK_ACCOUNT_DECLINED
+        self.car.owner.save()
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        self._assert_car_details(self.client.get(url, format='json'))
+
+    def test_get_unlistable_car(self):
+        # make it so this car has incomplete information, so it can't be shown at all
+        self.car.plate = ''
+        self.car.save()
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_car_with_all_fields(self):
         self.car = factories.CompleteCar.create(
