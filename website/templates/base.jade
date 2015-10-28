@@ -10,16 +10,95 @@ html(lang="en", ng-app="app")
 
     link(rel="icon" href="#{ settings.STATIC_URL }img/favicon_32.ico")
     link(rel="stylesheet", type="text/css", href="//cloud.typography.com/6263754/658526/css/fonts.css")
-    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }normalize.css")
-    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }landing_page.css")
+    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }css/normalize.css")
+    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }css/main.css")
 
     script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js")
-    script(src='/static/formCtrl.js')
+    script(src='/static/javascript/formCtrl.js')
+
 
     script(type="text/javascript").
       window.heap=window.heap||[],heap.load=function(t,e){window.heap.appid=t,window.heap.config=e;var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap-"+t+".js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n);for(var o=function(t){return function(){heap.push([t].concat(Array.prototype.slice.call(arguments,0)))}},p=["clearEventProperties","identify","setEventProperties","track","unsetEventProperty"],c=0;c<p.length;c++)heap[p[c]]=o(p[c])};
       heap.load("#{ settings.HEAP_APP_ID }");
 
   body
+    - block navbar
+      section.navbar
+        .logo
+          a(href="/")
+            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+        .links
+          .content
+            a(href="/#tutorial") #[p.bold How it works]
+            a(href='/about') #[p.bold About Us]
+            a(href="#{ add_car_form }") #[p.bold List your car]
+            a(href="#{ login_url }") #[p.bold Join]
+
+        .menu-button(ng-click='showMenu = !showMenu')
+          .burger-button(ng-class='{active: showMenu}')
+
+        .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+          a(href="/#tutorial") #[p How it works]
+          a(href='/about') #[p About Us]
+          a(href="#{ add_car_form }") #[p List your car]
+          a(href="#{ login_url }") #[p Join]
+
     - block content
     - endblock
+
+    - block footer
+      footer
+        .container
+          .content
+            .text.desktop
+              p.bold
+                a(href="/") Home
+                span |
+                a(href="/about") About Us
+                span |
+                a(href="/#tutorial") How it Works
+                span.desktop-line |
+                a.desktop-line(href="#{ add_car_form }") List Your Car
+                span.desktop-line |
+                a.desktop-line(href="#{ login_url }") Join
+
+              p.bold.mobile-line
+                a(href="#{ add_car_form }") List Your Car
+                span |
+                a(href="#{ login_url }") Join
+
+              p
+                a(href="#{ faq }") Help
+                span |
+                a(href="#{ terms_of_service }") Terms & Privacy
+
+            .text.mobile
+              p.bold #[a(href="/") Home]
+              p.bold #[a(href="/about") About Us]
+              p.bold #[a(href="/#tutorial") How it Works]
+              p.bold #[a(href="#{ add_car_form }") List Your Car]
+              p.bold #[a(href="#{ login_url }") Join]
+
+            .social
+              p.bold Follow us on
+
+              .apps
+                .app
+                  a(href="https://twitter.com/idlecars" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/twitter.svg")
+                .app
+                  a(href="https://www.facebook.com/idlecars" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/facebook.svg")
+                .app
+                  a(href="https://www.linkedin.com/company/10117035" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/linkedin.svg")
+
+              .mobile
+                p #[a(href="#{ faq }") Help]
+                p #[a(href="#{ terms_of_service }") Terms & Privacy]
+
+
+          .copyright
+            p.bold Copyright © {% now 'Y' %} idlecars. #[br.mobile] All Rights Reserved
+            p 95 Morton St, New York, 10014
+

@@ -1,0 +1,62 @@
+.navbar
+  position: fixed
+  top: 0
+  background: black
+  z-index: 9999
+
+  .logo
+    height: $navbar_height
+    max-width: 1160px
+    padding: 0.5rem $desktop_page_gutter
+    margin: 0 auto
+
+  img
+    height: 2rem
+
+  .links
+    @extend .flex-center-verticle
+    position: absolute
+    top: 0
+    right: $desktop_page_gutter
+    height: $navbar_height
+
+    a
+      display: inline-block
+      margin: 0 25px
+
+      &:first-of-type
+        margin-left: 0
+
+      &:last-of-type
+        margin-right: 0
+
+  .menu-button
+    display: none
+    cursor: pointer
+    position: relative
+    left: calc(100% - 2.75rem)
+    width: 2.75rem
+    height: $navbar_height
+
+  .menu-container
+    background-color: black
+    width: 100%
+    padding: 0 1.5rem 1rem
+
+    a
+      display: block
+      text-align: right
+      padding: 0.5rem 0
+
+@media (max-width: $navbar_collapse_threshold)
+  .navbar
+    display: block
+
+    .logo
+      position: absolute
+
+    .links
+      display: none
+
+    .menu-button
+      display: block

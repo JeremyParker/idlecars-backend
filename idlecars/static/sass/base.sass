@@ -1,0 +1,59 @@
+.invisible
+  display: block
+  visibility: hidden
+  margin-top: -3rem
+  height: 3rem
+
+a
+  color: white
+  text-decoration: none
+
+  &:hover
+    cursor: pointer
+
+strong
+  font-weight: 500
+
+input
+  border: 0
+  padding: 0.5rem
+
+section
+  width: 100%
+  overflow: hidden
+
+.underline
+  border-bottom: 3px solid $ic_blue
+
+.bold
+  font-weight: 500
+
+.button
+  display: inline-block
+  font-weight: 500
+
+  padding: 16px
+  border: 0
+
+  background: $ic_blue
+  color: white
+
+  text-align: center
+
+  cursor: pointer
+
+  &:hover
+    opacity: 0.9
+
+.button, input, textarea
+  border-radius: 0
+
+.mobile, #mobile
+  display: none
+
+@media (max-width: $mobile_width_threshold)
+  .desktop, #desktop
+    display: none
+
+  .mobile, #mobile
+    display: block

@@ -1,5 +1,8 @@
 extends ./base.jade
 
+- block navbar
+- endblock
+
 - block content
   section
     .container
@@ -12,3 +15,6 @@ extends ./base.jade
             - csrf_token
             #{ survey_form.as_p }
             input(type="submit", value="Submit")
+
+- block footer
+- endblock

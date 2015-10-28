@@ -1,0 +1,188 @@
+extends ./base.jade
+
+- block content
+  .about-page
+    section.header-photo
+
+    section.about-us
+      .section-container
+        h2 About Us
+        p Two friends, encountering a problem faced by millions of people, daily, founded Idle Cars in September 2014.
+        br
+        p
+          | Upon returning from a business trip to London Brian and Jeremy met a kind,
+          |  single mother living in New York City trying to make ends meet.
+          |  She was inspired by the prospect of bringing in some desperately needed income by becoming a professional rideshare driver,
+          |  but was struggling to find a vehicle to rent and drive. Unfortunately,
+          |  this agonizing process of renting for-hire vehicles is stuck in the 1930s when it first began.
+          |  It has yet to adapt with improvements in safety and efficiency that technology has brought to other parts of our lives.
+        br
+        p
+          | Idle Cars is improving the efficiency, safety, and access of renting for-hire vehicles to millions of people, globally.
+          |  With the ongoing “reversal of the suburban exodus”, the world’s population will be faced with the
+          |  problem of utilize idle assets more efficiently. We will be forced to leverage the idle cars,
+          |  which remain parked for long blocks of time when other drivers are not on the clock.
+        br
+        p Idle Cars provides the tools to participate in the on-demand revolution.
+
+    section.team-cities-careers
+      .section-container(ng-init="selection='team'", ng-switch='selection')
+        .desktop
+          .topics
+            div #[h3(ng-class="{'underline': selection=='team'}" ng-click="selection='team'") Our Team]
+            div #[h3(ng-class="{'underline': selection=='cities'}", ng-click="selection='cities'") Cities]
+            div #[h3(ng-class="{'underline': selection=='careers'}", ng-click="selection='careers'") Careers]
+
+        .mobile
+          .topics
+            h3(ng-show="selection=='team'", ng-click="selection='cities'") Our Team
+              span ›
+            h3(ng-show="selection=='cities'", ng-click="selection='careers'") Cities
+              span ›
+            h3(ng-show="selection=='careers'", ng-click="selection='team'") Careers
+              span ›
+
+        .content.our-team(ng-switch-default)
+          .title
+            h2 Our Team
+
+          .panes
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_brian.png")
+              .description
+                p.bold Brian Claypool –CEO & Co-Founder
+                p
+                  | After spending nearly a decade with GE,  becoming skilled in sales, finance,
+                  |  logistics and supply chain, he determined that today’s problems with renting
+                  |  for-hire vehicles was to large of an issue to let someone else tackle it.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_jeremy.png")
+              .description
+                p.bold Jeremy Parker –CTO & Co-Founder
+                p
+                  | Jeremy is a software engineer with a love of creativity, efficiency and great user experiences.
+                  |  He helped build startups and has worked with top tech companies.
+                  |  He obsesses with solving the problem of making more efficient use of for-hire vehicles.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_craig.png")
+              .description
+                p.bold Chengxing (Craig) Zhang – Lead Software Engineer
+                p
+                  | Craig, a Chinese engineer, came to study at one of the finest institutions in the US - NYU.
+                  |  He has a strong background in Software and Mechanical Engineering.
+                  |  He is focused on simplifying the process of for-hire vehicle rentals by leveraging software.
+            .pane
+              .profile-image
+                img(src="#{ settings.STATIC_URL }img/headshot_will.png")
+              .description
+                p.bold Will Brennan – Head of Product Marketing
+                p
+                  | Will, a Civil Engineer undergrad from Bucknell, has a passion for entrepreneurship.
+                  |  After finishing undergrad, he completed Lehigh’s advanced entrepreneurship program.
+                  |  He leads marketing to our underserved customers of for-hire rentals.
+
+        .content.cities(ng-switch-when='cities')
+          h2 Cities
+
+          img(src="#{ settings.STATIC_URL }img/cities_nyc.jpg")
+          p
+            | According to the 2014 census, carried out by U. S. Census Bureau, New York City had a population of over 8 million people.
+            |  Carrying the local and tourist population daily is a network of over 130,000 licensed for-hire vehicle drivers -
+            |  and 75% of them rent their cars. So, how does a city with a ever expanding population and growing need of for-hire drivers,
+            |  ensure that it functions efficiently?
+          br
+          p
+            | That is where Idle Cars comes in. We decided to launch Idles Cars in New York City first,
+            |  to ensure that drivers who are willing, but are unable to own a car,
+            |  are able to easily access a pool of idle cars leveraging an online marketplace.
+            |  We hope to provide an opportunity to generate income, on-demand, to anyone who lives New York City.
+          br
+          p
+            | If you do not see your city here, don’t worry. We are quickly expanding to other cities in North America.
+            |  Kindly sign up to be notified when we launch in your hometown.
+
+
+        .content.careers(ng-switch-when='careers')
+          h2 Operations Leader – New York
+          p
+            | Idle Cars Ops team creates a community to connect vehicle owners and drivers safely and efficiently
+            |  by leveraging our technology platform. To handle the processes of renting for-hire vehicles at the scale the world requires,
+            |  our operations team is focused on improving our driver and owner onboarding processes, our customer service processes,
+            |  and our customer retention strategy.
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in technical field (engineering, finance or computer science).
+          p Must have 2-5 years experience in a startup environment managing operations, customer service, or a related field.
+          p Excellent management skills (communication, leadership, execution).
+          br
+          p.bold Preferred qualifications
+          p Experience working with data scientists to assess and evaluate customer experience.
+          p Experience using customer relationship management tools (Zendesk, Salesforce, etc.)
+          a.button(href="mailto:support@idlecars.com") Apply now
+
+          h2 Data Scientist
+          p
+            | Idle Cars Data scientists drives initiatives to improve the monetization of our website and mobile experience
+            |  while delivering consumer analytics efforts to better understand how users engage with our digital products.
+            |  We need savvy data scientists to improve application efficiency, evaluation our customer acquisition strategies,
+            |  and provide consumer and engagement insights.
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in technical field (data science, engineering, computer science).
+          p Must have 2-5 years experience performing data science projects
+          p Excellent capabilities in analyzing relationships between values/numbers that should be related in a predictable way, such as ratios over time
+          br
+          p.bold Preferred qualifications
+          p The ability to come up with solutions to loosely defined business problems by leveraging pattern detection over potentially large datasets.
+          p Strong programming skills (such as Hadoop MapReduce or other big data frameworks, Java), and statistical modeling (like SAS or R).
+          p Experience using machine learning algorithms.
+          p Proficiency in the use of statistical packages.
+          a.button(href="mailto:support@idlecars.com") Apply now
+
+          h2 Software Engineer
+          p
+            | Idle Cars software engineers develop the next-generation technologies that change how thousands of drivers search,
+            |  locate, rent, return and pay for vehicles to rent on-demand. To handle the information and processes of renting
+            |  for-hire vehicles at the scale the world requires, our team is focused on computer science,
+            |  processing, distributed computing, large-scale system design, networking, security, data compression and user
+            |  interface design; our list continues to grow every day!
+          br
+          p.bold Minimum qualifications
+          p A Bachelor's degree in Computer Science or related technical field.
+          p Must have 2-5 years experience in computer programming, software engineering or a related field.
+          p Excellent implementation skills (AngularJS, Python, Django).
+          br
+          p.bold Preferred qualifications
+          p Experience in systems software and algorithms.
+          p Knowledge of Unix/Linux and APIs.
+          p Familiarity with TCP/IP and network programming.
+          a.button(href="mailto:support@idlecars.com") Apply now
+
+    - if show_thanks
+      a.invisible(id="thanks")
+      section.thanks
+        .container
+          .content
+            h2 Thanks!
+            p Expect an email from us shortly.
+            p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
+
+    section.get-in-touch
+      .section-container
+        h2 Get In Touch
+        form(action="#{ action }", method="post", ng-controller="formCtrl", novalidate='', name="myForm")
+          - csrf_token
+          .input
+            p(ng-bind='nameLabel', ng-class="{'red': nameRed}")
+            input(type='text', name='first_name', ng-model='first_name', required='')
+          .input
+            p(ng-bind='emailLabel', ng-class="{'red': emailRed}")
+            input(maxlength='254', type='email', name='email', ng-model='email', placeholder='you@example.com', required='')
+          .input
+            p(ng-bind='messageLabel', ng-class="{'red': messageRed}")
+            textarea(name='message', rows='10', cols='10', ng-model='message', required='')
+
+          input.button.bold(type='submit', value='Say Hello!', ng-click='validation($event)')

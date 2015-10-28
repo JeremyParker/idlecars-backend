@@ -46,6 +46,20 @@ SHIFT_CHOICES = model_helpers.Choices(
 )
 
 '''
+Class for users' message from about page
+'''
+class UserMessage(models.Model):
+    first_name = models.CharField(max_length=40, blank=True)
+    email = models.CharField(max_length=40, blank=True, verbose_name='Email Address')
+    message = models.TextField(blank=True)
+
+    created_time = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.first_name
+
+
+'''
 Class for contacts.
 People who provide their email address through the landing page.
 '''
