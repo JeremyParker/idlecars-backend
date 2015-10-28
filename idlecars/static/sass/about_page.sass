@@ -6,7 +6,7 @@
     min-width: 200px
 
   .section-container
-    padding: 76px 48px 100px
+    padding: 76px $desktop_page_gutter 100px
     margin: 0 auto
     max-width: 1058px
 
@@ -57,8 +57,11 @@
       img
         height: 125px
 
-    .description p:first-child
-      margin-bottom: 18px
+    .description
+      @extend .flex-cell
+
+      .bold
+        margin-bottom: 18px
 
     .cities img
       width: 100%
@@ -127,10 +130,12 @@
         h3
           width: 100%
           text-align: left
+          padding-bottom: 0
 
           span
             float: right
             font-size: 40px
+            font-family: inherit
 
       .pane
         flex-direction: column

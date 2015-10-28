@@ -5,9 +5,9 @@
   z-index: 9999
 
   .logo
-    height: 3rem
+    height: $navbar_height
     max-width: 65rem
-    padding: 0.5rem 2rem
+    padding: 0.5rem $desktop_page_gutter
     margin: 0 auto
 
   img
@@ -15,20 +15,20 @@
 
   .links
     @extend .flex-center-verticle
-    @extend .flex-cell
     position: absolute
     top: 0
-    right: 2rem
-    height: 3rem
-    width: 35rem
-    padding: 0.5rem 0
+    right: $desktop_page_gutter
+    height: $navbar_height
 
-  a
-    @extend .flex-cell
-    text-align: center
+    a
+      display: inline-block
+      margin: 0 25px
 
-  h5
-    font-weight: 500
+      &:first-of-type
+        margin-left: 0
+
+      &:last-of-type
+        margin-right: 0
 
   .menu-button
     display: none
@@ -36,7 +36,7 @@
     position: relative
     left: calc(100% - 2.75rem)
     width: 2.75rem
-    height: 3rem
+    height: $navbar_height
 
   .menu-container
     background-color: black
@@ -47,7 +47,6 @@
       display: block
       text-align: right
       padding: 0.5rem 0
-      font-weight: 300
 
 @media (max-width: $navbar_collapse_threshold)
   .navbar

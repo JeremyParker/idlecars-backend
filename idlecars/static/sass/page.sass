@@ -10,7 +10,7 @@ body
   @extend .flex-center-horizontal
   @extend %flex_direction_column
 
-  padding: 48px 48px 64px
+  padding: 48px $desktop_page_gutter 64px
   margin: 0 auto
 
   max-width: 950px
@@ -18,4 +18,4 @@ body
 
 @media (max-width: $mobile_width_threshold)
   .container
-    padding: 36px 28px 64px
+    padding: 36px $mobile_page_gutter 64px
