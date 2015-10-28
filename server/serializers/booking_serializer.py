@@ -30,7 +30,7 @@ class BookingSerializer(serializers.ModelSerializer):
             return valid
 
         if self.context['request'].method == 'POST':
-            car_pk = self.initial_data['car']
+            car_pk = int(self.initial_data['car'])
             live_car_pks = [c.pk for c in car_service.filter_live(Car.objects.all())]
             if not car_pk in live_car_pks:
                 self._errors.update({

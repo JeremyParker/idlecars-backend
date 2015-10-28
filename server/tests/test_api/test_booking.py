@@ -24,7 +24,7 @@ class CreateBookingTest(APITestCase):
         token = Token.objects.get(user__username=self.driver.auth_user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:bookings-list')
-        self.data = {'car': self.car.pk}
+        self.data = {'car': str(self.car.pk)}
 
     def test_create_booking_success(self):
         """ Ensure we can create a new booking object. """
