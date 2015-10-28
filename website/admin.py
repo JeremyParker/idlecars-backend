@@ -30,6 +30,13 @@ class ContactAdmin(admin.ModelAdmin):
 
 
 class UserMessageAdmin(admin.ModelAdmin):
+    fields = [
+        'first_name',
+        'email',
+        'message',
+        'created_time',
+        'notes',
+    ]
     readonly_fields = [
         'first_name',
         'email',
