@@ -52,6 +52,7 @@ class UserMessage(models.Model):
     first_name = models.CharField(max_length=40, blank=True)
     email = models.CharField(max_length=40, blank=True, verbose_name='Email Address')
     message = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
 
     created_time = models.DateTimeField(auto_now_add=True)
 
