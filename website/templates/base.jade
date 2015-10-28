@@ -25,7 +25,8 @@ html(lang="en", ng-app="app")
     - block navbar
       section.navbar
         .logo
-          img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+          a(href="/")
+            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
         .links
           .content
             a(href="/#tutorial") #[p.bold How it works]

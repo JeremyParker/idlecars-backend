@@ -185,7 +185,7 @@ section {
   .burger-button:after {
     bottom: -6px; }
 
-.flex, .about-page .team-cities-careers .pane, .about-page .team-cities-careers .topics, footer .content, footer .apps, .flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .phone .content-wrapper, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .flex-center-horizontal, .container, .flex-space-between, .landing-page .tutorial .segments {
+.flex, .about-page .team-cities-careers .pane, .about-page .team-cities-careers .topics, footer .content, footer .apps, .flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .flex-center-horizontal, .container, .flex-space-between, .landing-page .tutorial .segments {
   display: flex;
   display: -webkit-flex; }
 
@@ -203,15 +203,15 @@ section {
   flex-direction: column;
   -webkit-flex-direction: column; }
 
-.landing-page .phone .container {
+.landing-page .phone .container, .landing-page .select .container {
   flex-direction: row;
   -webkit-flex-direction: row; }
 
-.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .phone .content-wrapper, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .landing-page .manhattan .container {
+.flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .landing-page .manhattan .container {
   align-items: center;
   -webkit-align-items: center; }
 
-.flex-center, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .phone .content-wrapper, .landing-page .tutorial p:first-of-type, .flex-center-horizontal, .container {
+.flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-horizontal, .container {
   justify-content: center;
   -webkit-justify-content: center; }
 
@@ -271,7 +271,7 @@ footer {
     .landing-page .hero-asset .content .button, .landing-page .hero-content .content .button {
       width: 200px; }
   .landing-page .hero-asset {
-    background: url(../img/hero_bottom.png) no-repeat #fff;
+    background: url(../img/hero_bottom.jpg) no-repeat #fff;
     background-position: center;
     height: 600px; }
     .landing-page .hero-asset .content p:first-of-type {
@@ -296,7 +296,8 @@ footer {
     background: #f2f2f2;
     height: 100%; }
     .landing-page .phone .container {
-      padding: 0; }
+      padding: 0;
+      max-width: 750px; }
     .landing-page .phone .phone-image {
       flex: 2; }
       .landing-page .phone .phone-image img {
@@ -306,11 +307,12 @@ footer {
       flex: 3; }
     .landing-page .phone .content {
       color: #000;
-      max-width: 380px; }
+      max-width: 380px;
+      margin-right: 20px; }
+      .landing-page .phone .content p {
+        margin-bottom: 0; }
       .landing-page .phone .content a {
         color: #008aff; }
-        .landing-page .phone .content a p {
-          margin: 0; }
   .landing-page .phone-content .container {
     background: #f2f2f2;
     color: #000; }
@@ -322,13 +324,13 @@ footer {
     color: #000; }
     .landing-page .tutorial .container {
       padding-top: 72px;
-      padding-bottom: 140px; }
+      padding-bottom: 80px; }
     .landing-page .tutorial p:first-of-type {
       min-height: 54px;
       margin: 16px 0; }
     .landing-page .tutorial .segments {
       width: 100%;
-      margin-top: 100px; }
+      margin-top: 48px; }
     .landing-page .tutorial .segment {
       max-width: 200px; }
     .landing-page .tutorial .pane {
@@ -347,11 +349,16 @@ footer {
   .landing-page .select p:last-of-type, .landing-page .select-content p:last-of-type, .landing-page .phone-content p:last-of-type {
     margin-bottom: 0; }
   .landing-page .select {
-    background: url(../img/selectthebest.jpg) no-repeat #070707;
-    background-position: calc(50% + 336px) center;
-    height: 522px; }
+    background-position: calc(50% + 336px) center; }
+    .landing-page .select .container {
+      padding: 0 0 0 48px;
+      min-width: 680px; }
     .landing-page .select .content {
       max-width: 480px; }
+    .landing-page .select img {
+      display: block;
+      width: 100%;
+      margin-left: 36px; }
   .landing-page .select-content p:first-of-type {
     margin: 20px 0; }
   .landing-page .manhattan {
@@ -361,9 +368,30 @@ footer {
     height: 507px;
     color: #000;
     text-align: center; }
+    .landing-page .manhattan .content p:last-of-type {
+      margin-bottom: 64px; }
     .landing-page .manhattan img {
       max-width: 400px; }
 
+@media (max-width: 748px) {
+  .landing-page .tutorial .segments {
+    justify-content: center;
+    -webkit-justify-content: center;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap; }
+    .landing-page .tutorial .segments .bold {
+      margin: 0; }
+  .landing-page .tutorial .segment {
+    width: 217.5px;
+    max-width: none;
+    margin-top: 48px; }
+    .landing-page .tutorial .segment:nth-of-type(1), .landing-page .tutorial .segment:nth-of-type(2) {
+      margin-top: 0; }
+  .landing-page .tutorial .image {
+    height: 120px; }
+    .landing-page .tutorial .image img {
+      max-height: 120px;
+      max-width: 120px; } }
 @media (max-width: 600px) {
   .landing-page .phone .content h2 {
     font-size: 32px; }
@@ -373,30 +401,20 @@ footer {
   .landing-page .phone .phone-image img {
     width: 300px; }
   .landing-page .select {
-    background-size: auto 300px;
-    background-position: center;
     height: 300px; }
+    .landing-page .select .container {
+      padding-right: 48px;
+      min-width: 320px; }
+    .landing-page .select img {
+      width: auto;
+      height: 300px; }
   .landing-page .tutorial .container {
     padding-top: 48px;
     padding-bottom: 64px; }
   .landing-page .tutorial .segments {
-    justify-content: center;
-    -webkit-justify-content: center;
-    flex-wrap: wrap;
-    -webkit-flex-wrap: wrap;
     margin-top: 36px; }
-    .landing-page .tutorial .segments p:first-of-type {
-      margin: 0; }
-    .landing-page .tutorial .segments .image {
-      height: 120px; }
-      .landing-page .tutorial .segments .image img {
-        max-height: 120px;
-        max-width: 120px; }
   .landing-page .tutorial .segment {
-    min-width: 241.5px;
-    margin-bottom: 50px; }
-    .landing-page .tutorial .segment:last-of-type {
-      margin-bottom: 0; }
+    min-width: 241.5px; }
   .landing-page .manhattan {
     height: 100%; }
     .landing-page .manhattan img {
@@ -408,7 +426,7 @@ footer {
   z-index: 9999; }
   .navbar .logo {
     height: 48px;
-    max-width: 65rem;
+    max-width: 1160px;
     padding: 0.5rem 48px;
     margin: 0 auto; }
   .navbar img {
@@ -479,7 +497,7 @@ h1 {
   font-size: 44px; }
 
 h2 {
-  font-size: 36px; }
+  font-size: 32px; }
 
 h3 {
   font-size: 24px; }
@@ -490,7 +508,7 @@ p {
 
 @media (max-width: 530px) {
   h1 {
-    font-size: 30px; }
+    font-size: 40px; }
 
   h2 {
     font-size: 28px; }

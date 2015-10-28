@@ -1,6 +1,9 @@
 .landing-page
   margin-top: 3rem
 
+  .content-wrapper
+    @extend .flex-center
+
   .content
     p
       margin: 20px 0
@@ -18,7 +21,7 @@
         width: 200px
 
   .hero-asset
-    background: url(../img/hero_bottom.png) no-repeat #fff
+    background: url(../img/hero_bottom.jpg) no-repeat #fff
     background-position: center
     height: 600px
 
@@ -61,6 +64,7 @@
     .container
       @extend %flex_direction_row
       padding: 0
+      max-width: 750px
 
     .phone-image
       flex: 2
@@ -70,19 +74,19 @@
         width: 100%
 
     .content-wrapper
-      @extend .flex-center
       flex: 3
 
 
     .content
       color: $black
       max-width: 380px
+      margin-right: 20px
+
+      p
+        margin-bottom: 0
 
       a
         color: $ic_blue
-
-        p
-          margin: 0
 
   .phone-content
     .container
@@ -101,7 +105,7 @@
     .container
       @extend .flex-center-verticle
       padding-top: 72px
-      padding-bottom: 140px
+      padding-bottom: 80px
 
     p:first-of-type
       @extend .flex-center
@@ -111,7 +115,7 @@
     .segments
       @extend .flex-space-between
       width: 100%
-      margin-top: 100px
+      margin-top: 48px
 
     .segment
       @extend %flex_cell_auto
@@ -140,12 +144,20 @@
       margin-bottom: 0
 
   .select
-    background: url(../img/selectthebest.jpg) no-repeat $dark_black
     background-position: calc(50% + 336px) center
-    height: 522px
+
+    .container
+      @extend %flex_direction_row
+      padding: 0 0 0 $desktop_page_gutter
+      min-width: 680px
 
     .content
       max-width: 480px
+
+    img
+      display: block
+      width: 100%
+      margin-left: 36px
 
   .select-content
     p:first-of-type
@@ -164,8 +176,39 @@
     .container
       @extend %flex_align_items_center
 
+    .content p:last-of-type
+      margin-bottom: 64px
+
     img
       max-width: 400px
+
+
+
+@media (max-width: $tutorial_wrap_threshold)
+  .landing-page .tutorial
+    .segments
+      justify-content: center
+      -webkit-justify-content: center
+      flex-wrap: wrap
+      -webkit-flex-wrap: wrap
+
+      .bold
+        margin: 0
+
+    .segment
+      width: 217.5px
+      max-width: none
+      margin-top: 48px
+
+      &:nth-of-type(1), &:nth-of-type(2)
+        margin-top: 0
+
+    .image
+      height: 120px
+
+      img
+        max-height: 120px
+        max-width: 120px
 
 
 
@@ -184,10 +227,14 @@
 
 
     .select
-      background-size: auto 300px
-      background-position: center
       height: 300px
+      .container
+        padding-right: 48px
+        min-width: 320px
 
+      img
+        width: auto
+        height: 300px
 
     .tutorial
       .container
@@ -195,29 +242,10 @@
         padding-bottom: 64px
 
       .segments
-        justify-content: center
-        -webkit-justify-content: center
-        flex-wrap: wrap
-        -webkit-flex-wrap: wrap
-
         margin-top: 36px
-
-        p:first-of-type
-          margin: 0
-
-        .image
-          height: 120px
-
-          img
-            max-height: 120px
-            max-width: 120px
 
       .segment
         min-width: 241.5px
-        margin-bottom: 50px
-
-        &:last-of-type
-          margin-bottom: 0
 
 
     .manhattan

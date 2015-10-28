@@ -6,17 +6,17 @@ extends ./base.jade
     section.hero-asset.desktop
       .hero-top
         .content
-          h1 Keep More of #[br] What You Earn
+          h1 Keep more of what you earn
           p NYC's widest selection of TLC registered for-hire rentals, at the best price.
           p No leases, loans or long-term commitments. Insurance and maintenance included.
-          a.button(href="#{ settings.WEBAPP_URL }") Find your car
+          a.button(href="#{ settings.WEBAPP_URL }") FIND YOUR CAR
 
     section.hero-asset-mobile(id="mobile")
 
     section.hero-content.mobile
       .container
         .content
-          h1 Keep More of #[br] What You Earn
+          h1 Keep more of what you earn
           p NYC's widest selection of TLC registered for-hire rentals, at the best price.
           p No leases, loans or long-term commitments. Insurance and maintenance included.
           a.button(href="#{ settings.WEBAPP_URL }") FIND YOUR CAR
@@ -29,14 +29,12 @@ extends ./base.jade
           .content
             h2 Renting a car has #[br] never been easier
             p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-            a #[p.bold Learn more]
 
     section.phone-content.mobile
       .container
         .content
           h2 Renting a car has never been easier
           p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
-          a #[p.bold Learn more]
 
     a.invisible(id="tutorial")
     section.tutorial
@@ -65,15 +63,18 @@ extends ./base.jade
             .pane
               .image
                 img(src="#{ settings.STATIC_URL }img/tutorial4.svg")
-              p.single-line.bold DRIVE
+              p.single-line.bold Drive.
               p Once you’re added to the insurance, you’re ready to go!
 
     section.select
-      .container(id='desktop')
-        .content
-          h2 Join now and start driving in less than a day
-          p Choose your car, get insured, and start driving in less than 24 hours.
-          p It's that easy.
+      .container
+        .content-wrapper(id='desktop')
+          .content
+            h2 Join now and start driving in less than a day
+            p Choose your car, get insured, and start driving in less than 24 hours.
+            p It's that easy.
+        .car-image
+          img(src="#{ settings.STATIC_URL }img/selectthebest.jpg")
 
     section.select-content.mobile
       .container
