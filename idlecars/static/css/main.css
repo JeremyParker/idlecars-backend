@@ -11,7 +11,7 @@
     background: url(../img/team_photo.jpg) no-repeat #fff;
     background-size: cover;
     background-position: center;
-    height: 594px;
+    height: 500px;
     margin-top: 48px; }
   .about-page .about-us, .about-page .get-in-touch {
     background: #f2f2f2; }
@@ -400,14 +400,13 @@ footer {
 @media (max-width: 530px) {
   .landing-page .phone .phone-image img {
     width: 300px; }
-  .landing-page .select {
-    height: 300px; }
-    .landing-page .select .container {
-      padding-right: 48px;
-      min-width: 320px; }
-    .landing-page .select img {
-      width: auto;
-      height: 300px; }
+  .landing-page .select .container {
+    padding-right: 48px;
+    min-width: 320px; }
+  .landing-page .select img {
+    width: auto;
+    height: 300px;
+    margin: 0; }
   .landing-page .tutorial .container {
     padding-top: 48px;
     padding-bottom: 64px; }
@@ -415,6 +414,8 @@ footer {
     margin-top: 36px; }
   .landing-page .tutorial .segment {
     min-width: 241.5px; }
+    .landing-page .tutorial .segment:nth-of-type(2) {
+      margin-top: 48px; }
   .landing-page .manhattan {
     height: 100%; }
     .landing-page .manhattan img {
