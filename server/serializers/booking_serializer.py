@@ -9,10 +9,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from idlecars import fields
-from server.models import Car, Booking, Driver
+from server.models import Car, Booking, Driver, Payment
 from server.services import booking as booking_service
 from server.services import car as car_service
-from server.serializers import car_serializer
+from server.serializers import car_serializer, payment_serializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -67,6 +67,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     step = serializers.SerializerMethodField()
     step_display_count = serializers.SerializerMethodField()
     step_details = serializers.SerializerMethodField()
+    paid_payments = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -83,6 +84,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'end_time',
             'first_valid_end_time',
             'end_time_limit_display',
+            'paid_payments',
         )
         read_only_fields = (
             'id',
@@ -96,6 +98,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             'end_time_display',
             'first_valid_end_time',
             'end_time_limit_display',
+            'paid_payments',
         )
 
     def update(self, instance, validated_data):
@@ -196,3 +199,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
             return _format_date(booking.end_time)
         else:
             return _format_date(booking_service.estimate_end_time(booking))
+
+    def get_paid_payments(self, booking):
+        paid_payments = booking.payment_set.filter(status=Payment.SETTLED)
+        return [payment_serializer.PaymentSerializer(p).data for p in paid_payments]
