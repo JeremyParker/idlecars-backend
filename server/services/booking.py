@@ -9,7 +9,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_emails, driver_emails, owner_emails, street_team_emails
+from owner_crm.services import ops_messages, driver_messages, owner_messages, street_team_messages
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -70,9 +70,9 @@ def on_docs_approved(driver):
 
         if bookings:
             latest_booking = bookings.order_by('created_time').last()
-            street_team_emails.request_base_letter(latest_booking)
+            street_team_messages.request_base_letter(latest_booking)
         else:
-            driver_emails.docs_approved_no_booking(driver)
+            driver_messages.docs_approved_no_booking(driver)
 
 
 def on_base_letter_approved(driver):
@@ -80,7 +80,7 @@ def on_base_letter_approved(driver):
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
 
     for booking in pending_bookings:
-        driver_emails.base_letter_approved_no_checkout(booking)
+        driver_messages.base_letter_approved_no_checkout(booking)
 
     for booking in reserved_bookings:
         request_insurance(booking)
@@ -91,15 +91,15 @@ def someone_else_booked(booking):
 
 
 def request_insurance(booking):
-    owner_emails.new_booking_email(booking)
-    driver_emails.awaiting_insurance_email(booking)
+    owner_messages.new_booking_email(booking)
+    driver_messages.awaiting_insurance_email(booking)
     booking.requested_time = timezone.now()
     booking.save()
     return booking
 
 
 def on_insurance_approved(booking):
-    driver_emails.insurance_approved(booking)
+    driver_messages.insurance_approved(booking)
 
 
 def on_returned(booking):
@@ -116,7 +116,7 @@ def create_booking(car, driver):
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
     if booking.driver.documentation_approved and not booking.driver.base_letter:
-        street_team_emails.request_base_letter(booking)
+        street_team_messages.request_base_letter(booking)
     return booking
 
 
@@ -146,22 +146,22 @@ def on_incomplete(booking, original_booking_state):
     # let our customers know what happened
     reason = booking.incomplete_reason
     if reason == Booking.REASON_CANCELED:
-        driver_emails.booking_canceled(booking)
+        driver_messages.booking_canceled(booking)
         if Booking.REQUESTED == original_booking_state:
-            owner_emails.booking_canceled(booking)
+            owner_messages.booking_canceled(booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
-        owner_emails.insurance_too_slow(booking)
-        driver_emails.insurance_failed(booking)
+        owner_messages.insurance_too_slow(booking)
+        driver_messages.insurance_failed(booking)
     elif reason == Booking.REASON_DRIVER_TOO_SLOW:
-        driver_emails.flake_reminder(booking.driver)
+        driver_messages.flake_reminder(booking.driver)
     elif reason == Booking.REASON_ANOTHER_BOOKED:
-        driver_emails.someone_else_booked(booking)
+        driver_messages.someone_else_booked(booking)
     elif reason == Booking.REASON_OWNER_REJECTED:
-        driver_emails.insurance_rejected(booking)
+        driver_messages.insurance_rejected(booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_emails.driver_rejected(booking)
+        owner_messages.driver_rejected(booking)
     elif reason == Booking.REASON_MISSED:
-        driver_emails.car_rented_elsewhere(booking)
+        driver_messages.car_rented_elsewhere(booking)
 
 
 def _make_deposit_payment(booking):
@@ -302,7 +302,7 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
-        driver_emails.checkout_receipt(booking)
+        driver_messages.checkout_receipt(booking)
 
     return booking
 
@@ -346,8 +346,8 @@ def pickup(booking):
 
     booking.save()
 
-    driver_emails.pickup_confirmation(booking)
-    owner_emails.pickup_confirmation(booking)
+    driver_messages.pickup_confirmation(booking)
+    owner_messages.pickup_confirmation(booking)
 
     return booking
 
@@ -373,11 +373,11 @@ def _cron_payments():
                 print payment.error_message
                 print payment.notes
                 continue
-            driver_emails.payment_receipt(payment)
-            owner_emails.payment_receipt(payment)
+            driver_messages.payment_receipt(payment)
+            owner_messages.payment_receipt(payment)
         except Exception as e:
             print e
-            ops_emails.payment_job_failed(booking, e)
+            ops_messages.payment_job_failed(booking, e)
 
 
 def _booking_updates():

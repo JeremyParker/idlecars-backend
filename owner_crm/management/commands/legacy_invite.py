@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.core.management.base import BaseCommand
 
 from idlecars import email
-from owner_crm.services import password_reset_service, driver_emails
+from owner_crm.services import password_reset_service, driver_messages
 
 class Command(BaseCommand):
     help = '''
@@ -21,7 +21,7 @@ class Command(BaseCommand):
         for phone_number in phone_numbers:
             password_reset = password_reset_service.create(phone_number)
             if password_reset:
-                driver_emails.account_created(password_reset)
+                driver_messages.account_created(password_reset)
                 self.stdout.write('Invite sent for {}'.format(phone_number))
             else:
                 self.stdout.write('ERROR inviting {}'.format(phone_number))
