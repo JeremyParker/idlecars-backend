@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import auth
 
 from owner_crm import models
-from owner_crm.services import owner_emails
+from owner_crm.services import owner_messages
 
 
 def create(phone_number):
@@ -26,4 +26,4 @@ def create(phone_number):
 def invite_owner(auth_user):
     password_reset = create(auth_user.username)
     if password_reset:
-        owner_emails.account_created(password_reset)
+        owner_messages.account_created(password_reset)
