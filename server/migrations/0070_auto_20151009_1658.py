@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0069_crm_throttle_backfill'),
+        ('server', '0068_merge'),
     ]
 
     operations = [
