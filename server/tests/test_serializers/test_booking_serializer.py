@@ -25,4 +25,4 @@ class TestBookingSerializer(APITestCase):
         self.assertIsNotNone(response.data[0]['paid_payments'][0])
         payment = response.data[0]['paid_payments'][0]
         self.assertEqual(decimal.Decimal(payment['amount']),  booking.weekly_rent)
-        self.assertEqual(payment['status'],  'paid')
+        self.assertEqual(payment['status'],  'Paid')
