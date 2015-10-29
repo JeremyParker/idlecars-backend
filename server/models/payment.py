@@ -18,14 +18,14 @@ class Payment(models.Model):
     REJECTED = 7
 
     STATUS = (
-        (PENDING, 'Pending'),
+        (PENDING, 'Unpaid'),
         (PRE_AUTHORIZED, 'Pre-authorized'),
-        (SETTLED, 'Settled'),
-        (HELD_IN_ESCROW, 'In Escrow'),
-        (REFUNDED, 'Payment refunded'),
-        (VOIDED, 'Voided'),
-        (DECLINED, 'Payment declined'),
-        (REJECTED, 'Card rejected'),
+        (SETTLED, 'Paid'),
+        (HELD_IN_ESCROW, 'In escrow'),
+        (REFUNDED, 'Refunded'),
+        (VOIDED, 'Canceled'),
+        (DECLINED, 'Declined'),
+        (REJECTED, 'Rejected'),
     )
 
     created_time = models.DateTimeField(auto_now_add=True)
@@ -57,3 +57,6 @@ class Payment(models.Model):
                 self.invoice_end_time.strftime("%b %d, %Y"),
             )
         return 'Deposit'
+
+    def status_string(self):
+        return dict(Payment.STATUS)[self.status]
