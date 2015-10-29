@@ -17,6 +17,8 @@ class Driver(models.Model):
         db_column='documentation_complete'
     )
 
+    sms_enabled = models.BooleanField(default=True)
+
     driver_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
     address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)

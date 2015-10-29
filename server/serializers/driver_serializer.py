@@ -38,6 +38,7 @@ class DriverSerializer(ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'sms_enabled',
             'client_display',
             'payment_method',
         )

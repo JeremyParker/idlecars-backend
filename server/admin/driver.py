@@ -58,12 +58,14 @@ class DriverAdmin(ReverseModelAdmin):
         }),
         ('None', {
             'fields': (
+                ('sms_enabled'),
                 ('date_joined', 'braintree_customer_id'),
                 ('notes'),
             ),
         }),
     )
     readonly_fields = [
+        'sms_enabled',
         'date_joined',
         'full_name',
         'dmv_link',

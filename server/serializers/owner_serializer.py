@@ -20,6 +20,7 @@ class OwnerContactSerializer(serializers.ModelSerializer):
             'address',
             'phone_number',
             'name',
+            'sms_enabled',
         )
         read_only_fields = (
             'address',
