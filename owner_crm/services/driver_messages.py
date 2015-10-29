@@ -15,7 +15,6 @@ def docs_approved_no_booking(driver):
     if not driver.email():
         return
     merge_vars = {
-
         driver.email(): {
             'FNAME': driver.first_name(),
             'HEADLINE': 'Your documents have been reviewed and approved.',
