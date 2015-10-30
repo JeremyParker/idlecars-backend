@@ -302,7 +302,7 @@ def settle(payment):
             print 'WARNING: settled transaction {} had a non-settled status'.format(
                 payment.transaction_id,
             )
-
+        payment.transaction_id = response.transaction.id
         payment.status = models.Payment.SETTLED
         payment.error_message = ''
     else:
