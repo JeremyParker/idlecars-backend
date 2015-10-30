@@ -9,7 +9,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_messages, driver_messages, owner_messages, street_team_messages
+from owner_crm.services import ops_messages, driver_messages, owner_messages, street_team_messages, message_helper
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -72,7 +72,7 @@ def on_docs_approved(driver):
             latest_booking = bookings.order_by('created_time').last()
             street_team_messages.request_base_letter(latest_booking)
         else:
-            driver_messages.docs_approved_no_booking(driver)
+            message_helper.send('driver', 'docs_approved_no_booking', driver, driver)
 
 
 def on_base_letter_approved(driver):

@@ -7,12 +7,12 @@ from django.contrib import admin
 class Campaign(admin.ModelAdmin):
     fields = [
         'name',
-        'preferred_method',
+        'preferred_medium',
         'notes',
     ]
     readonly_fields = ['name']
 
     list_display = [
         'name',
-        'preferred_method',
+        'preferred_medium',
     ]
