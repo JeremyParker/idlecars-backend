@@ -366,6 +366,15 @@ def _cron_payments():
         if existing_payments.exists():
             continue
 
+        # check if we failed wihtin that past 4 hours. If so, skip for now.
+        if booking.payment_set.filter(
+            invoice_end_time__isnull=False,
+            invoice_end_time__gte=relevant_end_time,
+            status=Payment.DECLINED,
+            created_time__gte=timezone.now() - datetime.timedelta(hours=4)
+        ):
+            continue
+
         try:
             payment = _create_next_rent_payment(booking)
             payment = payment_service.settle(payment)
