@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'bt_hooks',
     'django_nose',
     'djrill',
-    # 'django_twilio',
     'django_extensions',
 )
 
