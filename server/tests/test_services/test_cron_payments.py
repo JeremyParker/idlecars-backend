@@ -76,7 +76,7 @@ class TestCronPayments(TestCase):
             self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
 
         with freeze_time("2014-10-10 10:05:00"):
-            # we should try again the next time we run the cron job
+            # we should NOT try again the next time we run the cron job (we wait 8 hours)
             call_command('cron_job')
             self.assertEqual(self.booking.payment_set.count(), 3)
 
