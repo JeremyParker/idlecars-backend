@@ -20,7 +20,7 @@ class Campaign(models.Model):
 
     preferred_medium = models.IntegerField(
         choices=MEDIUM_CHOICES,
-        default=0,
+        default=SMS_MEDIUM,
     )
 
     notes = models.TextField(blank=True)
