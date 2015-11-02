@@ -76,6 +76,7 @@ class OwnerAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                ('sms_enabled'),
                 ('split_shift', 'rating'),
                 ('merchant_id', 'merchant_account_state',),
                 ('service_percentage', 'effective_service_percentage',),
@@ -88,7 +89,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
         }),
     )
-    readonly_fields = ['merchant_id', 'merchant_account_state', 'effective_service_percentage',]
+    readonly_fields = ['sms_enabled', 'merchant_id', 'merchant_account_state', 'effective_service_percentage',]
     if settings.DEBUG:
         readonly_fields = ['merchant_id', 'effective_service_percentage',]
 

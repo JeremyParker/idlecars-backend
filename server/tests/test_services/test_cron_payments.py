@@ -76,12 +76,19 @@ class TestCronPayments(TestCase):
             self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
 
         with freeze_time("2014-10-10 10:05:00"):
-            # we should try again the next time we run the cron job
+            # we should NOT try again the next time we run the cron job (we wait 8 hours)
+            call_command('cron_job')
+            self.assertEqual(self.booking.payment_set.count(), 3)
+
+        # TODO: this 8 hrs should come from config
+        with freeze_time("2014-10-10 18:05:00"):
+            # we should try again after 8 hrs
             call_command('cron_job')
             self.assertEqual(self.booking.payment_set.count(), 4)
             self.assertEqual(self.booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).count(), 1)
-            self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
             self.assertEqual(self.booking.payment_set.filter(status=Payment.SETTLED).count(), 2)
+            self.assertEqual(self.booking.payment_set.filter(status=Payment.DECLINED).count(), 1)
+
 
     def test_correct_time_range_with_many_past_payments(self):
         # make another payment from the previous week

@@ -38,6 +38,7 @@ class DriverSerializer(ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'sms_enabled',
             'client_display',
             'payment_method',
         )
@@ -72,6 +73,7 @@ class DriverSerializer(ModelSerializer):
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)
         instance.address_proof_image = validated_data.get('address_proof_image', instance.address_proof_image)
         instance.defensive_cert_image = validated_data.get('defensive_cert_image', instance.defensive_cert_image)
+        instance.sms_enabled = validated_data.get('sms_enabled', instance.sms_enabled)
         instance.save()
 
         return instance

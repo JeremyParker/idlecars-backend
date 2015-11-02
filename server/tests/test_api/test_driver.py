@@ -59,6 +59,12 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
         response = self.client.get(self.url, {'pk': self.driver.pk})
         self.assertEqual(response.data['payment_method']['suffix'], '1234')
 
+    def test_sms_method(self):
+        get_response = self.client.get(self.url, {'pk': self.driver.pk})
+        self.assertTrue(get_response.data['sms_enabled'])
+        patch_response = self.client.patch(self.url, {'sms_enabled': False})
+        self.assertFalse(patch_response.data['sms_enabled'])
+
 
 class DriverUpdateTest(AuthenticatedDriverTest):
     def test_update_incomplete_model(self):

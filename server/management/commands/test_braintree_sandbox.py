@@ -248,6 +248,8 @@ class Command(BaseCommand):
         payment = gateway.settle(payment)
         if not payment.status == models.Payment.SETTLED:
             print 'test_settle_fresh failed to settle for {}'.format(gateway)
+        if not payment.transaction_id:
+            print 'test_settle_fresh failed to get a transaction_id for {}'.format(gateway)
         if not _is_fake_gateway(gateway):
             if len(payment.braintreerequest_set.all()) != 1:
                 print 'test_settle_fresh failed to create a request record for {}'.format(gateway)

@@ -62,6 +62,8 @@ class Owner(models.Model):
     )
     notes = models.TextField(blank=True)
 
+    sms_enabled = models.BooleanField(default=True)
+
     def name(self):
         if self.company_name:
             return self.company_name
