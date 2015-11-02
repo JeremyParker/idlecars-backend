@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-from owner_crm.services import ops_messages
+from owner_crm.services import ops_notifications
 from server import payment_gateways
 from server import models
 
@@ -51,7 +51,7 @@ def _execute(function, payment):
     payment = func(payment)
     payment.save()
     if payment.error_message:
-        ops_messages.payment_failed(payment)
+        ops_notifications.payment_failed(payment)
     return payment
 
 
