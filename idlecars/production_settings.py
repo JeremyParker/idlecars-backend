@@ -25,7 +25,7 @@ QUEUE_IMPLEMENTATION = 'RealQueue'
 CSRF_COOKIE_SECURE = True  # if True, only sends the CSRF token over HTTPS
 SESSION_COOKIE_SECURE = True  # if True, only sends session cookie over HTTPS
 
-DEFAULT_FROM_EMAIL = 'support@idlecars.com'
+DEFAULT_FROM_EMAIL = 'bookings@idlecars.com'
 OPS_EMAIL = 'support@idlecars.zendesk.com'
 STREET_TEAM_EMAIL = 'streetteam@idlecars.com'
 
