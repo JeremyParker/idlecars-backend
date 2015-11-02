@@ -39,9 +39,9 @@ def _renewal_email():
         owner_messages.renewal_email(car=car, renewal=renewal)
 
 
-def _in_time(threshold):
-    timedelta = datetime.timedelta(minutes=POKE_FREQUENCY)
-    return threshold - timedelta/2 < timezone.now() < threshold + timedelta/2
+def _within_minutes_of_local_time(minutes, target_time):
+    timedelta = datetime.timedelta(minutes=minutes)
+    return target_time - timedelta < timezone.now() < target_time + timedelta
 
 
 def _get_remindable_bookings(delay_hours):
@@ -59,11 +59,11 @@ def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
 
 def _reminder_email():
     # TODO: hour, minute and delay_hours should be from settings
-    morning_threshold = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
-    afternoon_threshold = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
+    morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
+    afternoon_target = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
     delay_hours = 12
 
-    if _in_time(morning_threshold):
+    if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
             reminder_name='first_morning_insurance_reminder'
@@ -73,7 +73,7 @@ def _reminder_email():
             reminder_name='second_morning_insurance_reminder'
         )
 
-    elif _in_time(afternoon_threshold):
+    elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
             reminder_name='first_afternoon_insurance_reminder'
