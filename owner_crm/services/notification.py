@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import inspect
 
 from owner_crm.models import Campaign
-from . import ops_messages, driver_messages, owner_messages, street_team_messages
+from . import ops_notifications, driver_notifications, owner_notifications, street_team_notifications
 
 
 def send(function_name, argument, receiver):

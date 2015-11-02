@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from owner_crm.services import password_reset_service, driver_messages, owner_messages, ops_messages, throttle_service
+from owner_crm.services import password_reset_service, driver_notifications, owner_notifications, ops_notifications, throttle_service
 from owner_crm.models import Renewal
 
 from server.models import Booking, Owner
@@ -36,7 +36,7 @@ def _renewable_cars():
 def _renewal_email():
     for car in _renewable_cars():
         renewal = Renewal.objects.create(car=car)
-        owner_messages.renewal_email(car=car, renewal=renewal)
+        owner_notifications.renewal_email(car=car, renewal=renewal)
 
 
 def _in_time(threshold):
@@ -54,7 +54,7 @@ def _get_remindable_bookings(delay_hours):
 
 def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
     remindable_bookings = _get_remindable_bookings(insurance_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_bookings, eval('owner_messages.' + reminder_name))
+    throttle_service.send_to_queryset(remindable_bookings, eval('owner_notifications.' + reminder_name))
 
 
 def _reminder_email():
@@ -101,9 +101,9 @@ def update_account_state(merchant_account_id, state, errors=None):
     owner.save()
 
     if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
-        owner_messages.bank_account_approved(owner)
+        owner_notifications.bank_account_approved(owner)
     else:
-        ops_messages.owner_account_declined(owner, errors)
+        ops_notifications.owner_account_declined(owner, errors)
 
 def link_bank_account(owner, params):
     #translate client params into the format Braintree expects.
