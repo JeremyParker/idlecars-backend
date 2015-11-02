@@ -252,8 +252,9 @@ def payment_receipt(payment):
         }
         email.send_async(
             template_name='no_button_no_image',
-            subject='Payment receipt from idlecars rental license plate {}'.format(
-                payment.booking.car.plate
+            subject='Payment receipt from idlecars rental: {} license plate {}'.format(
+                payment.booking.car.display_name(),
+                payment.booking.car.plate,
             ),
             merge_vars=merge_vars,
         )
