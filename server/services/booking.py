@@ -371,7 +371,7 @@ def _cron_payments():
             invoice_end_time__isnull=False,
             invoice_end_time__gte=relevant_end_time,
             status=Payment.DECLINED,
-            created_time__gte=timezone.now() - datetime.timedelta(hours=4)
+            created_time__gte=timezone.now() - datetime.timedelta(hours=8)
         ):
             continue
 
