@@ -115,6 +115,7 @@ class TestOwnerNotifications(TestCase):
         call_command('owner_notifications')
         call_command('owner_notifications')
 
+        # we should have sent only one reminder about getting the driver on the insurance.
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
