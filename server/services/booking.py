@@ -72,7 +72,7 @@ def on_docs_approved(driver):
             latest_booking = bookings.order_by('created_time').last()
             street_team_messages.request_base_letter(latest_booking)
         else:
-            message_helper.send('driver', 'docs_approved_no_booking', driver, driver)
+            message_helper.send('driver_messages.docs_approved_no_booking', driver, driver)
 
 
 def on_base_letter_approved(driver):

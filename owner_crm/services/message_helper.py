@@ -7,15 +7,12 @@ from owner_crm.models import Campaign
 from . import ops_messages, driver_messages, owner_messages, street_team_messages
 
 
-def send(receiver_type, function_name, argument, receiver):
-    function = '{}_messages.{}'.format(receiver_type, function_name)
-    func = eval(function)
+def send(function_name, argument, receiver):
+    func = eval(function_name)
 
-    campaign_name = '{}.{}'.format(receiver_type, function_name)
-
-    campaign = Campaign.objects.filter(name=campaign_name).last()
+    campaign = Campaign.objects.filter(name=function_name).last()
     if not campaign:
-        campaign = Campaign.objects.create(name=campaign_name)
+        campaign = Campaign.objects.create(name=function_name)
 
     if not campaign:
         raise Exception('Campaign creation failed!!!')
