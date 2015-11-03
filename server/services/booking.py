@@ -72,7 +72,7 @@ def on_docs_approved(driver):
             latest_booking = bookings.order_by('created_time').last()
             street_team_notifications.request_base_letter(latest_booking)
         else:
-            notification.send('driver_notifications.docs_approved_no_booking', driver, driver)
+            notification.send('driver_notifications.DocsApprovedNoBooking', driver)
 
 
 def on_base_letter_approved(driver):

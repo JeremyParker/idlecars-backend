@@ -12,7 +12,7 @@ from server import factories
 class MessageServiceTest(TestCase):
     def setUp(self):
         self.driver = factories.BaseLetterDriver.create()
-        self.campaign_name = 'driver_notifications.docs_approved_no_booking'
+        self.campaign_name = 'driver_notifications.DocsApprovedNoBooking'
 
     def test_message_create_campaign(self):
         self.assertEqual(len(Campaign.objects.all()), 0)
