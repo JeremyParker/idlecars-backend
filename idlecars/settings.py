@@ -175,8 +175,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # default to the FakeSmsClient. Replace with TwilioRestClient to use Twilio
 SMS_IMPLEMENTATION = 'FakeSmsClient'
 TWILIO_PHONE_NUMBER = '+16466933874'
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC31585943b0528238d47a79207cefee43')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', 'AC0f99e71e116ef18f0e8b2e67dcc28e97')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC0f99e71e116ef18f0e8b2e67dcc28e97')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '19f726892e44c923f6c1c67f62d360cc')
 
 MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ') # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
