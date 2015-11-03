@@ -46,12 +46,37 @@ def filter_requested(booking_queryset):
         incomplete_time__isnull=True,
     )
 
-def filter_booked(booking_queryset):
+def filter_accepted(booking_queryset):
+    return booking_queryset.filter(
+        approval_time__isnull=False,
+        pickup_time__isnull=True,
+        incomplete_time__isnull=True,
+    )
+
+def filter_active(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=True,
         refund_time__isnull=True,
         return_time__isnull=True,
         pickup_time__isnull=False,
+    )
+
+def filter_returned(booking_queryset):
+    return booking_queryset.filter(
+        incomplete_time__isnull=True,
+        refund_time__isnull=True,
+        return_time__isnull=False,
+    )
+
+def filter_refunded(booking_queryset):
+    return booking_queryset.filter(
+        incomplete_time__isnull=True,
+        refund_time__isnull=False,
+    )
+
+def filter_incomplete(booking_queryset):
+    return booking_queryset.filter(
+        incomplete_time__isnull=False,
     )
 
 def is_visible(booking):
@@ -355,7 +380,7 @@ def pickup(booking):
 def _cron_payments():
     payment_lead_time_hours = 2  # TODO - get this out of a config system
     pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
-    active_bookings = filter_booked(Booking.objects.all()).prefetch_related('payment_set')
+    active_bookings = filter_active(Booking.objects.all()).prefetch_related('payment_set')
     for booking in active_bookings:
         relevant_end_time = min(booking.end_time, pay_time)
         existing_payments = booking.payment_set.filter(
