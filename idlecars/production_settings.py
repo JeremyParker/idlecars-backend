@@ -21,6 +21,7 @@ CORS_ORIGIN_WHITELIST = (
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 QUEUE_IMPLEMENTATION = 'RealQueue'
+SMS_IMPLEMENTATION = 'TwilioRestClient'
 
 CSRF_COOKIE_SECURE = True  # if True, only sends the CSRF token over HTTPS
 SESSION_COOKIE_SECURE = True  # if True, only sends session cookie over HTTPS
