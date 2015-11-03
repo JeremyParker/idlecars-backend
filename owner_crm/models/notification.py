@@ -27,16 +27,15 @@ class Notification(object):
     def send(self):
         def _get_merge_vars():
             return {
-                'FNAME': context['FNAME'],
-                'HEADLINE': context['HEADLINE'],
-                'TEXT': context['TEXT'],
-                'CTA_LABEL': context['CTA_LABEL'],
-                'CTA_URL': context['CTA_URL'],
+                'FNAME': context.get('FNAME'),
+                'HEADLINE': context.get('HEADLINE'),
+                'TEXT': context.get('TEXT'),
+                'CTA_LABEL': context.get('CTA_LABEL'),
+                'CTA_URL': context.get('CTA_URL'),
+                'CAR_IMAGE_URL': context.get('CAR_IMAGE_URL'),
             }
 
         context = self.get_context()
-
-        import pdb; pdb.set_trace()
 
         for receiver in self.get_all_receivers():
             if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
@@ -48,8 +47,8 @@ class Notification(object):
                 merge_vars = {receiver['email_address']: _get_merge_vars()}
 
                 email.send_async(
-                    template_name=context['template_name'],
-                    subject=context['subject'],
+                    template_name=context.get('template_name'),
+                    subject=context.get('subject'),
                     merge_vars=merge_vars,
                 )
 

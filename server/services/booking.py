@@ -70,7 +70,7 @@ def on_docs_approved(driver):
 
         if bookings:
             latest_booking = bookings.order_by('created_time').last()
-            street_team_notifications.request_base_letter(latest_booking)
+            notification.send('street_team_notifications.RequestBaseLetter', latest_booking)
         else:
             notification.send('driver_notifications.DocsApprovedNoBooking', driver)
 
@@ -116,7 +116,7 @@ def create_booking(car, driver):
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
     if booking.driver.documentation_approved and not booking.driver.base_letter:
-        street_team_notifications.request_base_letter(booking)
+        notification.send('street_team_notifications.RequestBaseLetter', booking)
     return booking
 
 

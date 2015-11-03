@@ -17,7 +17,7 @@ class MessageServiceTest(TestCase):
     def test_message_create_campaign(self):
         self.assertEqual(len(Campaign.objects.all()), 0)
 
-        notification.send(self.campaign_name, self.driver, self.driver)
+        notification.send(self.campaign_name, self.driver)
         self.assertEqual(len(Campaign.objects.all()), 1)
 
     def test_message_campaign_already_exists(self):
@@ -25,7 +25,7 @@ class MessageServiceTest(TestCase):
         self.assertEqual(len(Campaign.objects.all()), 1)
 
         # make sure this do not create another campaign
-        notification.send(self.campaign_name, self.driver, self.driver)
+        notification.send(self.campaign_name, self.driver)
         self.assertEqual(len(Campaign.objects.all()), 1)
 
 

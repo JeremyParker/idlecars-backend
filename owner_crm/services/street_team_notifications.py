@@ -5,12 +5,14 @@ from django.conf import settings
 
 from idlecars import email
 
+from owner_crm.models import notification
 
-def request_base_letter(booking):
-    merge_vars = {
-        settings.STREET_TEAM_EMAIL: {
+
+class RequestBaseLetter(notification.StreetTeamNotification):
+    def get_context(self):
+        context = {
             'FNAME': 'Street Team',
-            'HEADLINE': 'Base letter request for {}'.format(booking.driver.full_name()),
+            'HEADLINE': 'Base letter request for {}'.format(self.argument.driver.full_name()),
             'TEXT': '''
                 We have a new driver that needs a base letter. Please reply with a photo of the letter.
                 <br />
@@ -19,18 +21,15 @@ def request_base_letter(booking):
                 Phone number: {} <br />
                 TLC plate number: {}
             '''.format(
-                booking.driver.full_name(),
-                booking.driver.email(),
-                booking.driver.phone_number(),
-                booking.car.plate
+                self.argument.driver.full_name(),
+                self.argument.driver.email(),
+                self.argument.driver.phone_number(),
+                self.argument.car.plate
             ),
             'CTA_LABEL': 'Call (844) 435-3227',
             'CTA_URL': 'tel:1-844-4353227',
-            'CAR_IMAGE_URL': booking.driver.fhv_license_image,
+            'CAR_IMAGE_URL': self.argument.driver.fhv_license_image,
+            'subject': 'Base letter request for {}'.format(self.argument.driver.full_name()),
+            'template_name': 'one_button_one_image',
         }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject='Base letter request for {}'.format(booking.driver.full_name()),
-        merge_vars=merge_vars,
-    )
+        return context
