@@ -49,12 +49,8 @@ _client = vars()[settings.SMS_IMPLEMENTATION](
 )
 
 
-def _send_now(kwargs):
-    return _client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, **kwargs)
-
-
 def send_sync(**kwargs):
-    return _send_now(kwargs)
+    return _client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, **kwargs)
 
 
 def send_async(**kwargs):
@@ -64,4 +60,4 @@ def send_async(**kwargs):
     body - the body of the text messages
     media_urls - (optional) a list of urls for media to attach to the MMS
     '''
-    return job_queue.enqueue(_send_now, kwargs)
+    return job_queue.enqueue(send_sync, **kwargs)
