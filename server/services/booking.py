@@ -46,6 +46,7 @@ def filter_requested(booking_queryset):
         incomplete_time__isnull=True,
     )
 
+# TODO: unit test this
 def filter_accepted(booking_queryset):
     return booking_queryset.filter(
         approval_time__isnull=False,
@@ -61,6 +62,7 @@ def filter_active(booking_queryset):
         pickup_time__isnull=False,
     )
 
+# TODO: unit test this
 def filter_returned(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=True,
@@ -68,12 +70,14 @@ def filter_returned(booking_queryset):
         return_time__isnull=False,
     )
 
+# TODO: unit test this
 def filter_refunded(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=True,
         refund_time__isnull=False,
     )
 
+# TODO: unit test this
 def filter_incomplete(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=False,
