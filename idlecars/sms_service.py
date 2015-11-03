@@ -7,20 +7,50 @@ from django.conf import settings
 from idlecars.job_queue import job_queue
 
 
-_client = None
+'''
+FakeSmsClient for testing.
+'''
+class FakeSmsClient(object):
+    def __init__(self, ignored_sid, ignored_token):
+        self.outbox = []
 
-def _get_client():
-    global _client
-    if not _client:
-        _client = TwilioRestClient(
-            settings.TWILIO_ACCOUNT_SID,
-            settings.TWILIO_AUTH_TOKEN,
-        )
-    return _client
+    class FakeResult(object):
+        pass
+
+    @property
+    def messages(self):
+        return self  # hack to avoid making a second fake class
+
+    def create(self, from_=None, **kwargs):
+        self.outbox.append(dict(kwargs))
+        result = self.FakeResult()
+        result.error_message = None
+        return result
+
+    def reset(self):
+        self.outbox = []
+
+
+def test_reset():
+    if 'FakeSmsClient' == settings.SMS_IMPLEMENTATION:
+        _client.reset()
+
+def test_get_outbox():
+    if 'FakeSmsClient' == settings.SMS_IMPLEMENTATION:
+        return _client.outbox
+
+
+'''
+Real sms service stuff
+'''
+_client = vars()[settings.SMS_IMPLEMENTATION](
+    settings.TWILIO_ACCOUNT_SID,
+    settings.TWILIO_AUTH_TOKEN,
+)
 
 
 def _send_now(kwargs):
-    return _get_client().messages.create(from_=settings.TWILIO_PHONE_NUMBER, **kwargs)
+    return _client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, **kwargs)
 
 
 def send_sync(**kwargs):
@@ -34,4 +64,4 @@ def send_async(**kwargs):
     body - the body of the text messages
     media_urls - (optional) a list of urls for media to attach to the MMS
     '''
-    job_queue.enqueue(_send_now, kwargs)
+    return job_queue.enqueue(_send_now, kwargs)
