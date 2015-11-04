@@ -12,11 +12,17 @@ from owner_crm.models import Campaign
 
 def _get_payment_params(payment):
     return {
+        'payment': payment,
         'payment_amount': payment.amount,
+        'payment_invoice_description': payment.invoice_description(),
         'payment_invoice_start_time': payment.invoice_start_time,
         'payment_invoice_end_time': payment.invoice_end_time,
         'payment_service_fee': payment.service_fee,
         'payment_status': payment.status,
+        'payment_notes': payment.notes,
+        'payment_admin_link': 'https://www.idlecars.com{}'.format(
+            reverse('admin:server_payment_change', args=(payment.pk,))
+        )
     }
 
 def _get_booking_params(booking):
@@ -35,6 +41,7 @@ def _get_booking_params(booking):
 
 def _get_car_params(car):
     return {
+        'car': car,
         'car_name': car.display_name(),
         'car_daily_cost': car.quantized_cost(),
         'car_status': car.effective_status(),
@@ -118,7 +125,7 @@ class Notification(object):
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
         }
 
-    def params_match_lists(self):
+    def params_match_list(self):
         return {
             'Driver': {
                 '_get_driver_params': 'self.argument',
@@ -142,7 +149,7 @@ class Notification(object):
         }
 
     def get_params(self, sets):
-        match_list = self.params_match_lists().get(self.argument_class(), {})
+        match_list = self.params_match_list().get(self.argument_class(), {})
 
         for params_set in sets:
             function_name = '_get_{}_params'.format(params_set)

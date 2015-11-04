@@ -26,27 +26,21 @@ class DocumentsUploaded(notification.OpsNotification):
         }
 
 
-def payment_failed(payment):
-    merge_vars = {
-        settings.OPS_EMAIL: {
+class PaymentFailed(notification.OpsNotification):
+    def get_context(self, **kwargs):
+        return {
             'FNAME': 'peeps',
             'HEADLINE': 'A payment failed',
             'TEXT': 'the driver with phone {} had a payment fail for {}. The server response was:<br>{}'.format(
-                payment.booking.driver.phone_number(),
-                payment.invoice_description(),
-                payment.notes,
+                kwargs['driver_phone_number'],
+                kwargs['payment_invoice_description'],
+                kwargs['payment_notes'],
             ),
             'CTA_LABEL': 'Payment details',
-            'CTA_URL': 'https://www.idlecars.com{}'.format(
-                reverse('admin:server_payment_change', args=(payment.pk,))
-            ),
+            'CTA_URL': kwargs['payment_admin_link'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Payment {} for a {} failed.'.format(kwargs['payment'], kwargs['car']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Payment {} for a {} failed.'.format(payment, payment.booking.car),
-        merge_vars=merge_vars,
-    )
 
 
 def payment_job_failed(booking, message):
