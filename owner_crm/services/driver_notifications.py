@@ -14,14 +14,20 @@ from owner_crm.models import notification
 
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
+        subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)
+        headline = 'Your documents have been reviewed and approved.'
+        text = 'You are now ready to rent any car on idlecars with one tap!'
+        cta_url = client_side_routes.car_listing_url()
+
         context = {
             'FNAME': kwargs['driver_email'],
-            'HEADLINE': 'Your documents have been reviewed and approved.',
-            'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
+            'HEADLINE': headline,
+            'TEXT': text,
             'CTA_LABEL': 'Rent a car now',
-            'CTA_URL': client_side_routes.car_listing_url(),
-            'subject': 'Welcome to idlecars, {}!'.format(kwargs['driver_full_name']),
+            'CTA_URL': cta_url,
+            'subject': subject,
             'template_name': 'one_button_no_image',
+            'sms_body': subject + ' ' + headline + ' ' + text + ' Click here to rent a car now: ' + cta_url
         }
         return context
 
