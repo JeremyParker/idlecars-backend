@@ -8,6 +8,8 @@ from django.conf import settings
 from idlecars import email, client_side_routes
 from server.services import car as car_service
 
+from owner_crm.models import notification
+
 
 def _get_car_listing_links(owner):
     links = ''
@@ -51,57 +53,51 @@ def renewal_email(car, renewal):
         )
 
 
-def new_booking_email(booking):
-    headline = '{} has booked your {}, with license plate {}'.format(
-        booking.driver.full_name(),
-        booking.car.display_name(),
-        booking.car.plate,
-    )
-
-    # TODO(JP) track gender of driver and customize this email text
-    text = '''
-        {} has booked your car and has paid the ${} deposit.
-        Please have them added to the insurance policy today to ensure that they can start driving tomorrow.
-        All of their documents are included in this email.
-    '''.format(booking.driver.first_name(), booking.car.solo_deposit)
-
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'PREVIEW': headline,
-                'FNAME': user.first_name,
-                'HEADLINE': headline,
-                'TEXT0': text,
-                'IMAGE_1_URL': booking.driver.driver_license_image,
-                'TEXT1': 'DMV License <a href="{}">(click here to download)</a>'.format(
-                    booking.driver.driver_license_image
-                ),
-                'IMAGE_2_URL': booking.driver.fhv_license_image,
-                'TEXT2': 'FHV/Hack License <a href="{}">(click here to download)</a>'.format(
-                    booking.driver.fhv_license_image
-                ),
-                'IMAGE_3_URL': booking.driver.defensive_cert_image,
-                'TEXT3': 'Defensive Driving Certificate <a href="{}">(click here to download)</a>'.format(
-                    booking.driver.defensive_cert_image
-                ),
-                'IMAGE_4_URL': booking.driver.address_proof_image,
-                'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
-                    booking.driver.address_proof_image
-                ),
-                'IMAGE_5_URL': booking.driver.base_letter,
-                'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
-                    booking.driver.base_letter
-                ),
-                'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
-            }
-        }
-        email.send_async(
-            template_name='no_button_five_images',
-            subject='A driver has booked your {}.'.format(booking.car.display_name()),
-            merge_vars=merge_vars,
+class NewBookingEmail(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        headline = '{} has booked your {}, with license plate {}'.format(
+            kwargs['drive_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
         )
+
+        # TODO(JP) track gender of driver and customize this email text
+        text = '''
+            {} has booked your car and has paid the ${} deposit.
+            Please have them added to the insurance policy today to ensure that they can start driving tomorrow.
+            All of their documents are included in this email.
+        '''.format(kwargs['driver_first_name'], kwargs['car_deposit'])
+
+        context = {
+            'PREVIEW': headline,
+            'FNAME': kwargs['owner_first_name'],
+            'HEADLINE': headline,
+            'TEXT0': text,
+            'IMAGE_1_URL': kwargs['driver_license_image'],
+            'TEXT1': 'DMV License <a href="{}">(click here to download)</a>'.format(
+                kwargs['driver_license_image']
+            ),
+            'IMAGE_2_URL': kwargs['fhv_license_image'],
+            'TEXT2': 'FHV/Hack License <a href="{}">(click here to download)</a>'.format(
+                kwargs['fhv_license_image']
+            ),
+            'IMAGE_3_URL': kwargs['defensive_cert_image'],
+            'TEXT3': 'Defensive Driving Certificate <a href="{}">(click here to download)</a>'.format(
+                kwargs['defensive_cert_image']
+            ),
+            'IMAGE_4_URL': kwargs['address_proof_image'],
+            'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
+                kwargs['address_proof_image']
+            ),
+            'IMAGE_5_URL': kwargs['base_letter'],
+            'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
+                kwargs['base_letter']
+            ),
+            'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
+            'subject': 'A driver has booked your {}.'.format(kwargs['car_name'],
+            'template_name': 'no_button_five_images',
+        }
+        return context
 
 
 def first_morning_insurance_reminder(booking):

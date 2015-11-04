@@ -13,18 +13,18 @@ from owner_crm.models import notification
 
 
 class DocsApprovedNoBooking(notification.DriverNotification):
-    def get_context(self):
+    def get_context(self, **kwargs):
+        import pdb; pdb.set_trace()
         context = {
-            'FNAME': self.argument.first_name(),
+            'FNAME': kwargs['driver_email'],
             'HEADLINE': 'Your documents have been reviewed and approved.',
             'TEXT': 'You are now ready to rent any car on idlecars with one tap!',
             'CTA_LABEL': 'Rent a car now',
             'CTA_URL': client_side_routes.car_listing_url(),
-            'subject': 'Welcome to idlecars, {}!'.format(self.argument.full_name()),
+            'subject': 'Welcome to idlecars, {}!'.format(kwargs['driver_full_name']),
             'template_name': 'one_button_no_image',
         }
         return context
-
 
 
 def base_letter_approved_no_checkout(booking):
