@@ -8,26 +8,22 @@ from idlecars import email
 
 from server import models
 
+from owner_crm.models import notification
 
-def documents_uploaded(driver):
-    merge_vars = {
-        settings.OPS_EMAIL: {
+
+class DocumentsUploaded(notification.OpsNotification):
+    def get_context(self, **kwargs):
+        return {
             'FNAME': 'dudes',
             'HEADLINE': 'Driver Docs uploaded!',
             'TEXT': 'Someone with the number {} uploaded all thier docs. Please see if they\'re legit'.format(
-                driver.phone_number()
+                kwargs['driver_phone_number']
             ),
             'CTA_LABEL': 'Check \'em out',
-            'CTA_URL': 'https://www.idlecars.com{}'.format(
-                reverse('admin:server_driver_change', args=(driver.pk,))
-            ),
+            'CTA_URL': kwargs['driver_admin_link'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Uploaded documents from {}'.format(kwargs['driver_phone_number']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Uploaded documents from {}'.format(driver.phone_number()),
-        merge_vars=merge_vars,
-    )
 
 
 def payment_failed(payment):

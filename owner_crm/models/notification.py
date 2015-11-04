@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 
+from django.core.urlresolvers import reverse
+
 from idlecars import email, client_side_routes
 
 from owner_crm.models import Campaign
@@ -51,6 +53,9 @@ def _get_driver_params(driver):
         'address_proof_image': driver.address_proof_image,
         'defensive_cert_image': driver.defensive_cert_image,
         'base_letter': driver.base_letter,
+        'driver_admin_link': 'https://www.idlecars.com{}'.format(
+            reverse('admin:server_driver_change', args=(driver.pk,))
+        ),
     }
 
 def _get_owner_params(owner):

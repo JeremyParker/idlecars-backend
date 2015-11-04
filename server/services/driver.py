@@ -5,7 +5,7 @@ import datetime
 
 from django.utils import timezone
 
-from owner_crm.services import ops_notifications, driver_notifications
+from owner_crm.services import ops_notifications, driver_notifications, notification
 from owner_crm.services import throttle_service
 
 import server.models
@@ -36,7 +36,7 @@ def pre_save(modified_driver, orig):
     if documents_changed(orig, modified_driver):
         modified_driver.documentation_approved = False
         if modified_driver.all_docs_uploaded():
-            ops_notifications.documents_uploaded(modified_driver)
+            notification.send('ops_notifications.DocumentsUploaded', modified_driver)
 
     if modified_driver.documentation_approved and not orig.documentation_approved:
         server.services.booking.on_docs_approved(modified_driver)
