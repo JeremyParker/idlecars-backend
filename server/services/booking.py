@@ -9,7 +9,8 @@ from django.db.models import F, Q
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_notifications, driver_notifications, owner_notifications, street_team_notifications, notification
+from owner_crm.models import ops_notifications, driver_notifications, owner_notifications, street_team_notifications
+from owner_crm.services import notification
 
 from server.models import Booking, Payment
 from . import payment as payment_service

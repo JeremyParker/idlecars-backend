@@ -47,7 +47,7 @@ def about(request):
             message=message,
         )
 
-        from owner_crm.services import ops_notifications
+        from owner_crm.models import ops_notifications
         ops_notifications.new_user_message(new_message)
 
         url = '{}?thanks='.format(urlresolvers.reverse('website:about'))

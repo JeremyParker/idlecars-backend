@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-from owner_crm.services import ops_notifications, notification
+from owner_crm.services import notification
+from owner_crm.models import ops_notifications
 from server import payment_gateways
 from server import models
 

@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from owner_crm.services import password_reset_service, driver_notifications, owner_notifications, ops_notifications, throttle_service
-from owner_crm.models import Renewal
+from owner_crm.services import password_reset_service, throttle_service
+from owner_crm.models import Renewal, driver_notifications, owner_notifications, ops_notifications
 
 from server.models import Booking, Owner
 from server.services import auth_user as auth_user_service

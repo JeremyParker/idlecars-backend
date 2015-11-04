@@ -235,7 +235,7 @@ class OwnerNotification(Notification):
         self.update_params(receiver_params)
 
     def get_all_receivers(self):
-        clas = type(self.argument).__name__
+        clas = self.argument_class()
 
         if clas == 'Owner':
             users = self.argument.auth_users.all()

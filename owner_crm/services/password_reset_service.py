@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import auth
 
 from owner_crm import models
-from owner_crm.services import owner_notifications
+from owner_crm.models import owner_notifications
 
 
 def create(phone_number):
