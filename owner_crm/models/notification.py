@@ -105,41 +105,43 @@ class Notification(object):
         self.params = {}
         self.params_sets = []
 
-    def get_params(self, sets):
-        clas = self.argument_class()
+    def default_params_sets_list(self):
+        return {
+            'Driver': ['driver'],
+            'Owner': ['owner'],
+            'Booking': ['booking', 'driver', 'car', 'owner'],
+            'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
+        }
 
-        if clas == 'Driver':
-            path = {
+    def params_match_lists(self):
+        return {
+            'Driver': {
                 '_get_driver_params': 'self.argument',
-            }
-
-        elif clas == 'Owner':
-            path = {
+            },
+            'Owner': {
                 '_get_owner_params': 'self.argument',
-            }
-
-        elif clas == 'Booking':
-            path = {
+            },
+            'Booking': {
                 '_get_booking_params': 'self.argument',
                 '_get_driver_params': 'self.argument.driver',
                 '_get_car_params': 'self.argument.car',
                 '_get_owner_params': 'self.argument.car.owner',
-            }
-
-        elif clas == 'Payment':
-            path = {
+            },
+            'Payment': {
                 '_get_payment_params': 'self.argument',
                 '_get_booking_params': 'self.argument.booking',
                 '_get_driver_params': 'self.argument.booking.driver',
                 '_get_car_params': 'self.argument.booking.car',
                 '_get_owner_params': 'self.argument.booking.car.owner',
-            }
-        else:
-            path = {}
+            },
+        }
+
+    def get_params(self, sets):
+        match_list = self.params_match_lists().get(self.argument_class(), {})
 
         for params_set in sets:
             function_name = '_get_{}_params'.format(params_set)
-            argument_name = path.get(function_name)
+            argument_name = match_list.get(function_name)
             function = eval(function_name)
             argument = eval(argument_name)
             self.update_params(function(argument))
@@ -148,22 +150,7 @@ class Notification(object):
         return type(self.argument).__name__ or None
 
     def default_params_sets(self):
-        clas = self.argument_class()
-
-        if clas == 'Driver':
-            return ['driver']
-
-        elif clas == 'Owner':
-            return ['owner']
-
-        elif clas == 'Booking':
-            return ['booking', 'driver', 'car', 'owner']
-
-        elif clas == 'Payment':
-            return ['booking', 'driver', 'car', 'owner', 'payment']
-
-        else:
-            return []
+        return self.default_params_sets_list().get(self.argument_class(), [])
 
     def custom_params_sets(self):
         return []
@@ -190,10 +177,9 @@ class Notification(object):
             return Campaign.EMAIL_MEDIUM
 
     def send(self):
-        receivers = self.get_all_receivers()
         self.get_argument_params()
 
-        for receiver in receivers:
+        for receiver in self.get_all_receivers():
             if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
                 pass
             else:
