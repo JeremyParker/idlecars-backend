@@ -27,6 +27,7 @@ def _get_payment_params(payment):
 
 def _get_booking_params(booking):
     return {
+        'booking': booking,
         'booking_state': booking.get_state(),
         'weekly_rent': booking.weekly_rent,
         'end_time': booking.end_time,
@@ -37,6 +38,9 @@ def _get_booking_params(booking):
         'return_time': booking.return_time,
         'refund_time': booking.refund_time,
         'incomplete_time': booking.incomplete_time,
+        'booking_admin_link': 'https://www.idlecars.com{}'.format(
+            reverse('admin:server_booking_change', args=(booking.pk,))
+        )
     }
 
 def _get_car_params(car):

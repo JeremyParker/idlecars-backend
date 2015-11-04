@@ -43,25 +43,23 @@ class PaymentFailed(notification.OpsNotification):
         }
 
 
-def payment_job_failed(booking, message):
-    merge_vars = {
-        settings.OPS_EMAIL: {
+class PaymentJobFailed(notification.OpsNotification):
+    def __init__(self, campaign_name, argument, *args):
+        super(PaymentJobFailed, self).__init__(campaign_name, argument)
+        self.message = args[0]
+
+    def get_context(self, **kwargs):
+        return {
             'FNAME': 'people',
-            'HEADLINE': 'The payment job threw a {}'.format(message),
+            'HEADLINE': 'The payment job threw a {}'.format(self.message),
             'TEXT': 'the auto-payment job ran into a problem while processing payment for the booking {}'.format(
-                booking,
+                kwargs['booking'],
             ),
             'CTA_LABEL': 'Booking details',
-            'CTA_URL': 'https://www.idlecars.com{}'.format(
-                reverse('admin:server_booking_change', args=(booking.pk,))
-            ),
+            'CTA_URL': kwargs['booking_admin_link'],
+            'template_name': 'one_button_no_image',
+            'subject': 'The payment job failed.',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='The payment job failed.',
-        merge_vars=merge_vars,
-    )
 
 
 def owner_account_declined(owner, errors):

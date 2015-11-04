@@ -416,7 +416,7 @@ def _cron_payments():
             owner_notifications.payment_receipt(payment)
         except Exception as e:
             print e
-            ops_notifications.payment_job_failed(booking, e)
+            notification.send('ops_notifications.PaymentJobFailed', booking, e)
 
 
 def _booking_updates():
