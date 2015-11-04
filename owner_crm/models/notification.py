@@ -55,57 +55,11 @@ def _get_driver_params(driver):
 
 def _get_owner_params(owner):
     return {
-        'owner_email': owner.email,
-        'owner_first_name': owner.first_name,
-        'owner_last_name': owner.last_name,
-        'owner_full_name': ' '.join(owner.first_name, owner.last_name),
+        'owner_email': owner.email(),
+        'owner_first_name': owner.first_name(),
+        'owner_full_name': owner.name(),
+        'owner_phone_number': owner.phone_number(),
     }
-
-def argument_class(argument):
-    return type(argument).__name__
-
-def get_argument_params(argument):
-
-    context = {}
-
-
-
-    if clas == 'Driver':
-        driver_context = _get_driver_params(argument)
-        context.update(driver_context)
-
-    elif clas == 'Owner':
-        owner_context = _get_owner_params(argument)
-        context.update(owner_context)
-
-    elif clas == 'Booking':
-        booking_context = _get_booking_params(argument)
-        driver_context = _get_driver_params(argument.driver)
-        car_context = _get_car_params(argument.car)
-
-        context.update(booking_context)
-        context.update(driver_context)
-        context.update(car_context)
-
-    elif clas == 'Payment':
-        payment_context = _get_payment_params(argument)
-        booking_context = _get_booking_params(argument.booking)
-        driver_context = _get_driver_params(argument.booking.driver)
-        car_context = _get_car_params(argument.car)
-
-        context.update(payment_context)
-        context.update(booking_context)
-        context.update(driver_context)
-        context.update(car_context)
-
-    else:
-        pass
-
-    return context
-
-def get_receiver_params(receiver):
-
-
 
 def get_merge_vars(context):
     return {
@@ -135,6 +89,50 @@ class Notification(object):
     def __init__(self, campaign_name, argument):
         self.campaign_name = campaign_name
         self.argument = argument
+        self.params = {}
+
+    def argument_class(self):
+        return type(self.argument).__name__
+
+    def params_sets(self):
+        clas = self.argument_class()
+
+        if clas == 'Driver':
+            return [_get_driver_params(self.argument)]
+
+        elif clas == 'Owner':
+            return [_get_owner_params(argument)]
+
+        elif clas == 'Booking':
+            return [
+                _get_booking_params(argument),
+                _get_driver_params(argument.driver),
+                _get_car_params(argument.car),
+                _get_owner_params(argument.car.owner)
+            ]
+
+        elif clas == 'Payment':
+            return [
+                _get_payment_params(argument),
+                _get_booking_params(argument.booking),
+                _get_driver_params(argument.booking.driver),
+                _get_car_params(argument.booking.car),
+                _get_owner_params(argument.booking.car.owner)
+            ]
+
+    def custom_params_sets(self):
+        return []
+
+    def update_params(self, params_sets):
+        for params_set in params_sets:
+            self.params.update(params_set)
+
+    def get_params(self):
+        defaulf_params_sets = self.params_sets()
+        customize_params_sets = self.custom_params_sets()
+
+        self.update_params(defaulf_params_sets)
+        self.update_params(customize_params_sets)
 
     def get_channel(self, receiver):
         try:
@@ -148,14 +146,9 @@ class Notification(object):
             return Campaign.EMAIL_MEDIUM
 
     def send(self):
-        self.context = get_argument_params(self.argument)
-
         receiver = self.get_receiver()
         if receiver is None:
             return
-
-        self.context.update(get_receiver_params(self.argument))
-        context = self.get_context(**get_context_params(self.argument))
 
         if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
             pass
@@ -163,6 +156,9 @@ class Notification(object):
             if not receiver['email_address']:
                 return
 
+            self.get_params()
+
+            context = self.get_context(**self.params)
             merge_vars = {receiver['email_address']: get_merge_vars(context)}
 
             email.send_async(
@@ -174,7 +170,7 @@ class Notification(object):
 
 class DriverNotification(Notification):
     def get_receiver(self):
-        clas = type(self.argument).__name__
+        clas = self.argument_class()
 
         if clas == 'Driver':
             driver = self.argument

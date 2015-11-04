@@ -14,7 +14,6 @@ from owner_crm.models import notification
 
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
-        import pdb; pdb.set_trace()
         context = {
             'FNAME': kwargs['driver_email'],
             'HEADLINE': 'Your documents have been reviewed and approved.',
