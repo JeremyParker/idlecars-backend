@@ -5,6 +5,10 @@ import os
 
 from settings import *
 
+'''
+For details on the settings see settings.py
+'''
+
 # heap analytics tracking for staging
 HEAP_APP_ID = '1900221263'
 
@@ -20,6 +24,8 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+SMS_IMPLEMENTATION = 'TwilioRestClient'  # we're rockin' the real client with test creds.
 
 QUEUE_IMPLEMENTATION = 'RealQueue'
 
