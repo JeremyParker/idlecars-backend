@@ -56,7 +56,7 @@ def renewal_email(car, renewal):
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
         headline = '{} has booked your {}, with license plate {}'.format(
-            kwargs['drive_full_name'],
+            kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_plate'],
         )
@@ -70,7 +70,7 @@ class NewBookingEmail(notification.OwnerNotification):
 
         context = {
             'PREVIEW': headline,
-            'FNAME': kwargs['owner_first_name'],
+            'FNAME': kwargs['user_first_name'],
             'HEADLINE': headline,
             'TEXT0': text,
             'IMAGE_1_URL': kwargs['driver_license_image'],

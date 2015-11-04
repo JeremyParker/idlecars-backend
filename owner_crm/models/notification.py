@@ -61,8 +61,15 @@ def _get_owner_params(owner):
         'owner_phone_number': owner.phone_number(),
     }
 
-def get_merge_vars(context):
+def _get_user_params(user):
     return {
+        'user_first_name': user.first_name,
+        'user_phone_number': user.username,
+        'user_email': user.email,
+    }
+
+def get_merge_vars(context):
+    merge_vars_origin = {
         'PREVIEW': context.get('PREVIEW'),
         'FNAME': context.get('FNAME'),
         'HEADLINE': context.get('HEADLINE'),
@@ -84,55 +91,92 @@ def get_merge_vars(context):
         'CAR_IMAGE_URL': context.get('CAR_IMAGE_URL'),
     }
 
+    merge_vars = {}
+    merge_vars.update((key, val) for key, val in merge_vars_origin.iteritems() if val is not None)
+
+    return merge_vars
+
+
 
 class Notification(object):
     def __init__(self, campaign_name, argument):
         self.campaign_name = campaign_name
         self.argument = argument
         self.params = {}
+        self.params_sets = []
 
-    def argument_class(self):
-        return type(self.argument).__name__
-
-    def params_sets(self):
+    def get_params(self, sets):
         clas = self.argument_class()
 
         if clas == 'Driver':
-            return [_get_driver_params(self.argument)]
+            path = {
+                '_get_driver_params': 'self.argument',
+            }
 
         elif clas == 'Owner':
-            return [_get_owner_params(argument)]
+            path = {
+                '_get_owner_params': 'self.argument',
+            }
 
         elif clas == 'Booking':
-            return [
-                _get_booking_params(argument),
-                _get_driver_params(argument.driver),
-                _get_car_params(argument.car),
-                _get_owner_params(argument.car.owner)
-            ]
+            path = {
+                '_get_booking_params': 'self.argument',
+                '_get_driver_params': 'self.argument.driver',
+                '_get_car_params': 'self.argument.car',
+                '_get_owner_params': 'self.argument.car.owner',
+            }
 
         elif clas == 'Payment':
-            return [
-                _get_payment_params(argument),
-                _get_booking_params(argument.booking),
-                _get_driver_params(argument.booking.driver),
-                _get_car_params(argument.booking.car),
-                _get_owner_params(argument.booking.car.owner)
-            ]
+            path = {
+                '_get_payment_params': 'self.argument',
+                '_get_booking_params': 'self.argument.booking',
+                '_get_driver_params': 'self.argument.booking.driver',
+                '_get_car_params': 'self.argument.booking.car',
+                '_get_owner_params': 'self.argument.booking.car.owner',
+            }
+        else:
+            path = {}
+
+        for params_set in sets:
+            function_name = '_get_{}_params'.format(params_set)
+            argument_name = path.get(function_name)
+            function = eval(function_name)
+            argument = eval(argument_name)
+            self.update_params(function(argument))
+
+    def argument_class(self):
+        return type(self.argument).__name__ or None
+
+    def default_params_sets(self):
+        clas = self.argument_class()
+
+        if clas == 'Driver':
+            return ['driver']
+
+        elif clas == 'Owner':
+            return ['owner']
+
+        elif clas == 'Booking':
+            return ['booking', 'driver', 'car', 'owner']
+
+        elif clas == 'Payment':
+            return ['booking', 'driver', 'car', 'owner', 'payment']
+
+        else:
+            return []
 
     def custom_params_sets(self):
         return []
 
-    def update_params(self, params_sets):
-        for params_set in params_sets:
-            self.params.update(params_set)
+    def update_params(self, params_set):
+        self.params.update(params_set)
 
-    def get_params(self):
-        defaulf_params_sets = self.params_sets()
-        customize_params_sets = self.custom_params_sets()
+    def get_argument_params(self):
+        self.params_sets = self.default_params_sets() + self.custom_params_sets()
+        self.get_params(self.params_sets)
 
-        self.update_params(defaulf_params_sets)
-        self.update_params(customize_params_sets)
+    def get_receiver_params(self, receiver):
+        pass
 
     def get_channel(self, receiver):
         try:
@@ -146,30 +190,31 @@ class Notification(object):
             return Campaign.EMAIL_MEDIUM
 
     def send(self):
-        receiver = self.get_receiver()
-        if receiver is None:
-            return
+        receivers = self.get_all_receivers()
+        self.get_argument_params()
 
-        if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
-            pass
-        else:
-            if not receiver['email_address']:
-                return
+        for receiver in receivers:
+            if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
+                pass
+            else:
+                if not receiver['email_address']:
+                    return
 
-            self.get_params()
+                self.get_receiver_params(receiver)
 
-            context = self.get_context(**self.params)
-            merge_vars = {receiver['email_address']: get_merge_vars(context)}
+                context = self.get_context(**self.params)
+                merge_vars = {receiver['email_address']: get_merge_vars(context)}
 
-            email.send_async(
-                template_name=context.get('template_name'),
-                subject=context.get('subject'),
-                merge_vars=merge_vars,
-            )
+                email.send_async(
+                    template_name=context.get('template_name'),
+                    subject=context.get('subject'),
+                    merge_vars=merge_vars,
+                )
+
 
 
 class DriverNotification(Notification):
-    def get_receiver(self):
+    def get_all_receivers(self):
         clas = self.argument_class()
 
         if clas == 'Driver':
@@ -179,13 +224,18 @@ class DriverNotification(Notification):
         elif clas == 'Payment':
             driver = self.argument.booking.driver
         else:
-            return None
+            return []
 
-        return {'email_address': driver.email(), 'sms_enabled': driver.sms_enabled}
+        return [{'email_address': driver.email(), 'sms_enabled': driver.sms_enabled}]
 
 
 
 class OwnerNotification(Notification):
+    def get_receiver_params(self, receiver):
+        receiver = receiver['user']
+        receiver_params = _get_user_params(receiver)
+        self.update_params(receiver_params)
+
     def get_all_receivers(self):
         clas = type(self.argument).__name__
 
@@ -199,18 +249,18 @@ class OwnerNotification(Notification):
             return []
 
         # TODO:
-        return [{'email_address': user.email, 'sms_enabled': False} for user in users]
+        return [{'email_address': user.email, 'sms_enabled': False, 'user': user} for user in users]
+
 
 
 class OpsNotification(Notification):
-    def get_receiver(self):
+    def get_all_receivers(self):
         # TODO: get sms_enabled from settings
-        return {'email_address': settings.OPS_EMAIL, 'sms_enabled': False}
+        return [{'email_address': settings.OPS_EMAIL, 'sms_enabled': False}]
+
 
 
 class StreetTeamNotification(Notification):
-    def get_receiver(self):
+    def get_all_receivers(self):
         # TODO: get sms_enabled from settings
-        return {'email_address': settings.STREET_TEAM_EMAIL, 'sms_enabled': False}
-
-
+        return [{'email_address': settings.STREET_TEAM_EMAIL, 'sms_enabled': False}]
