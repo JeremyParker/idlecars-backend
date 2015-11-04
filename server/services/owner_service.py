@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from owner_crm.services import password_reset_service, throttle_service
+from owner_crm.services import password_reset_service, throttle_service, notification
 from owner_crm.models import Renewal, driver_notifications, owner_notifications, ops_notifications
 
 from server.models import Booking, Owner
@@ -103,7 +103,7 @@ def update_account_state(merchant_account_id, state, errors=None):
     if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
         owner_notifications.bank_account_approved(owner)
     else:
-        ops_notifications.owner_account_declined(owner, errors)
+        notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 
 def link_bank_account(owner, params):
     #translate client params into the format Braintree expects.

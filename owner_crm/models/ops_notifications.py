@@ -62,41 +62,37 @@ class PaymentJobFailed(notification.OpsNotification):
         }
 
 
-def owner_account_declined(owner, errors):
-    merge_vars = {
-        settings.OPS_EMAIL: {
+class OwnerAccountDeclined(notification.OpsNotification):
+    def __init__(self, campaign_name, argument, *args):
+        super(OwnerAccountDeclined, self).__init__(campaign_name, argument)
+        self.errors = args[0]
+
+    def get_context(self, **kwargs):
+        return {
             'FNAME': 'Dearest Admin',
             'HEADLINE': 'An owner\'s bank account was declined',
             'TEXT': '''
                 {}'s bank account details were declined by the Braintree gateway.<br>
                 Braintree returned the following error(s):<br>
                 <ul>{}</ul>
-            '''.format(owner.name(), ''.join(['<li>{}'.format(e) for e in errors])),
+            '''.format(kwargs['owner_name'], ''.join(['<li>{}'.format(e) for e in self.errors])),
+            'template_name': 'no_button_no_image',
+            'subject': '{}\'s bank account was declined'.format(kwargs['owner_name']),
         }
-    }
-    email.send_sync(
-        template_name='no_button_no_image',
-        subject='{}\'s bank account was declined'.format(owner.name()),
-        merge_vars=merge_vars,
-    )
 
 
-def new_user_message(message):
-    merge_vars = {
-        settings.OPS_EMAIL: {
+class NewUserMessage(notification.OpsNotification):
+    def get_context(self, **kwargs):
+        return {
             'FNAME': 'New user message',
-            'HEADLINE': 'A new message from user {}'.format(message.first_name),
+            'HEADLINE': 'A new message from user {}'.format(kwargs['message_first_name']),
             'TEXT': '''
                 User first name is: {}
                 <br />
                 User email is: {}
                 <br />
                 Message is: <br /> {}
-            '''.format(message.first_name, message.email, message.message),
+            '''.format(kwargs['message_first_name'], kwargs['message_email'], kwargs['message_body']),
+            'template_name': 'no_button_no_image',
+            'subject': 'A new message from user {}'.format(kwargs['message_first_name']),
         }
-    }
-    email.send_async(
-        template_name='no_button_no_image',
-        subject='A new message from user {}'.format(message.first_name),
-        merge_vars=merge_vars,
-    )

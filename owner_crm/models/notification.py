@@ -72,8 +72,8 @@ def _get_driver_params(driver):
 def _get_owner_params(owner):
     return {
         'owner_email': owner.email(),
+        'owner_name': owner.name(),
         'owner_first_name': owner.first_name(),
-        'owner_full_name': owner.name(),
         'owner_phone_number': owner.phone_number(),
     }
 
@@ -82,6 +82,13 @@ def _get_user_params(user):
         'user_first_name': user.first_name,
         'user_phone_number': user.username,
         'user_email': user.email,
+    }
+
+def _get_message_params(message):
+    return {
+        'message_first_name': message.first_name,
+        'message_body': message.message,
+        'message_email': message.email,
     }
 
 def get_merge_vars(context):
@@ -127,6 +134,7 @@ class Notification(object):
             'Owner': ['owner'],
             'Booking': ['booking', 'driver', 'car', 'owner'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
+            'UserMessage': ['message'],
         }
 
     def params_match_list(self):
@@ -150,6 +158,9 @@ class Notification(object):
                 '_get_car_params': 'self.argument.booking.car',
                 '_get_owner_params': 'self.argument.booking.car.owner',
             },
+            'UserMessage': {
+                '_get_message_params': 'self.argument',
+            }
         }
 
     def get_params(self, sets):
