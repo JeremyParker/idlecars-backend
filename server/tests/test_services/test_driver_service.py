@@ -67,7 +67,6 @@ class DriverServiceTest(TestCase):
 
         # we should have sent an email about the completed docs to ops
         from django.core.mail import outbox
-        import pdb; pdb.set_trace()
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
