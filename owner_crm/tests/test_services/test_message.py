@@ -9,18 +9,18 @@ from owner_crm.services import notification
 from server import factories
 
 
-class MessageServiceTest(TestCase):
+class NotificationServiceTest(TestCase):
     def setUp(self):
         self.driver = factories.BaseLetterDriver.create()
         self.campaign_name = 'driver_notifications.DocsApprovedNoBooking'
 
-    def test_message_create_campaign(self):
+    def test_notification_create_campaign(self):
         self.assertEqual(len(Campaign.objects.all()), 0)
 
         notification.send(self.campaign_name, self.driver)
         self.assertEqual(len(Campaign.objects.all()), 1)
 
-    def test_message_campaign_already_exists(self):
+    def test_notification_campaign_already_exists(self):
         Campaign.objects.create(name=self.campaign_name)
         self.assertEqual(len(Campaign.objects.all()), 1)
 
