@@ -3,8 +3,13 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 
+<<<<<<< HEAD
 from idlecars import email, client_side_routes, sms_service
+=======
 from django.core.urlresolvers import reverse
+
+from idlecars import email, client_side_routes
+>>>>>>> notification
 
 from owner_crm.models import Campaign
 
