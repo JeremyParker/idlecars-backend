@@ -116,7 +116,10 @@ def on_base_letter_approved(driver):
 
 
 def someone_else_booked(booking):
-    return _make_booking_incomplete(booking, Booking.REASON_ANOTHER_BOOKED)
+    if booking.driver.all_docs_uploaded():
+        return _make_booking_incomplete(booking, Booking.REASON_ANOTHER_BOOKED_CC)
+    else:
+        return _make_booking_incomplete(booking, Booking.REASON_ANOTHER_BOOKED_DOCS)
 
 
 def request_insurance(booking):
@@ -163,8 +166,8 @@ def _make_booking_incomplete(booking, reason):
     original_booking_state = booking.get_state()
     booking.incomplete_time = timezone.now()
     booking.incomplete_reason = reason
-    booking.save()
     on_incomplete(booking, original_booking_state)
+    booking.save()
     return booking
 
 
@@ -181,9 +184,9 @@ def on_incomplete(booking, original_booking_state):
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
         owner_notifications.insurance_too_slow(booking)
         driver_notifications.insurance_failed(booking)
-    elif reason == Booking.REASON_DRIVER_TOO_SLOW:
-        driver_notifications.flake_reminder(booking.driver)
-    elif reason == Booking.REASON_ANOTHER_BOOKED:
+    elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
+        driver_notifications.booking_timed_out(booking)
+    elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
         driver_notifications.someone_else_booked(booking)
     elif reason == Booking.REASON_OWNER_REJECTED:
         driver_notifications.insurance_rejected(booking)
@@ -420,14 +423,19 @@ def _cron_payments():
 
 def _booking_updates():
     ''' Update the state of bookings based on the passing of time '''
-    expired_bookings = filter_pending(Booking.objects.all()).filter(
-        created_time__lte=timezone.now() - datetime.timedelta(hours=48), # TODO: from config
-        driver__documentation_approved=False,  # TODO: filter out all the completed docs here
+    checkout_age_limit = timezone.now() - datetime.timedelta(hours=72) # TODO: from config
+    docs_age_limit = timezone.now() - datetime.timedelta(hours=48) # TODO: from config
+    old_pending_bookings = filter_pending(Booking.objects.all()).filter(
+        created_time__lte=docs_age_limit,
     )
-    for booking in expired_bookings:
+    for booking in old_pending_bookings:
         try:
-            if not booking.driver.all_docs_uploaded():
-                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW)
+            # if they're still pending after 72 hours they must have uploaded their docs
+            if booking.created_time < checkout_age_limit:
+                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW_CC)
+            elif not booking.driver.all_docs_uploaded():
+                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW_DOCS)
+
         except BookingError:
             pass  # TODO: ops will get an email about the payment failure, and
 

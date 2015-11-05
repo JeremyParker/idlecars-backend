@@ -108,6 +108,7 @@ class BookingAdmin(admin.ModelAdmin):
         'owner_link',
         'car_cost',
         'car_insurance',
+        'service_percentage'
     ]
     list_filter = [
         BookingStateFilter,
