@@ -9,7 +9,8 @@ from django.db.models import F, Q
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_notifications, driver_notifications, owner_notifications, street_team_notifications, notification
+from owner_crm.models import ops_notifications, driver_notifications, owner_notifications, street_team_notifications
+from owner_crm.services import notification
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -415,7 +416,7 @@ def _cron_payments():
             owner_notifications.payment_receipt(payment)
         except Exception as e:
             print e
-            ops_notifications.payment_job_failed(booking, e)
+            notification.send('ops_notifications.PaymentJobFailed', booking, e)
 
 
 def _booking_updates():

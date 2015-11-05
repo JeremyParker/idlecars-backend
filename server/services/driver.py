@@ -5,8 +5,8 @@ import datetime
 
 from django.utils import timezone
 
-from owner_crm.services import ops_notifications, driver_notifications, notification
-from owner_crm.services import throttle_service
+from owner_crm.models import ops_notifications, driver_notifications
+from owner_crm.services import throttle_service, notification
 
 import server.models
 import server.services.booking

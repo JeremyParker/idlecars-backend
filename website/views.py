@@ -47,8 +47,8 @@ def about(request):
             message=message,
         )
 
-        from owner_crm.services import ops_notifications
-        ops_notifications.new_user_message(new_message)
+        from owner_crm.services import notification
+        notification.send('ops_notifications.NewUserMessage', new_message)
 
         url = '{}?thanks='.format(urlresolvers.reverse('website:about'))
         return HttpResponseRedirect(url)

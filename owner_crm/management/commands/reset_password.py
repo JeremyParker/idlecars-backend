@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from django.core.management.base import BaseCommand
 
 from idlecars import email
-from owner_crm.services import password_reset_service, driver_notifications
+from owner_crm.services import password_reset_service
+from owner_crm.models import driver_notifications
 
 class Command(BaseCommand):
     help = '''
