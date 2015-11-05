@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 
+from idlecars import email, client_side_routes, sms_service
 from django.core.urlresolvers import reverse
-
-from idlecars import email, client_side_routes
 
 from owner_crm.models import Campaign
 
@@ -207,15 +206,19 @@ class Notification(object):
         self.get_argument_params()
 
         for receiver in self.get_all_receivers():
+            self.get_receiver_params(receiver)
+            context = self.get_context(**self.params)
+
             if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
-                pass
-            else:
+                if not receiver['phone_number']:
+                    continue
+                phone_number = '+1{}'.format(receiver['phone_number'])
+                body = context['sms_body']
+                sms_service.send_async(to=phone_number, body=body)
+            elif self.get_channel(receiver) is Campaign.EMAIL_MEDIUM:
                 if not receiver['email_address']:
-                    return
+                    continue
 
-                self.get_receiver_params(receiver)
-
-                context = self.get_context(**self.params)
                 merge_vars = {receiver['email_address']: get_merge_vars(context)}
 
                 email.send_async(
@@ -223,7 +226,8 @@ class Notification(object):
                     subject=context.get('subject'),
                     merge_vars=merge_vars,
                 )
-
+            else:
+                assert(False)  # programming error. Medium should be SMS or EMAIL
 
 
 class DriverNotification(Notification):
@@ -239,7 +243,11 @@ class DriverNotification(Notification):
         else:
             return []
 
-        return [{'email_address': driver.email(), 'sms_enabled': driver.sms_enabled}]
+        return [{
+            'email_address': driver.email(),
+            'phone_number': driver.phone_number(),
+            'sms_enabled': driver.sms_enabled,
+        }]
 
 
 
@@ -261,15 +269,24 @@ class OwnerNotification(Notification):
         else:
             return []
 
-        # TODO:
-        return [{'email_address': user.email, 'sms_enabled': False, 'user': user} for user in users]
+        # TODO: consider having a "primary contact" or something.
+        return [{
+                'email_address': user.email,
+                'phone_number': user.username,
+                'sms_enabled': False,
+                'user': user
+            } for user in users]
 
 
 
 class OpsNotification(Notification):
     def get_all_receivers(self):
         # TODO: get sms_enabled from settings
-        return [{'email_address': settings.OPS_EMAIL, 'sms_enabled': False}]
+        return [{
+            'email_address': settings.OPS_EMAIL,
+            'phone_number': settings.OPS_PHONE_NUMBER,
+            'sms_enabled': True
+        }]
 
 
 
