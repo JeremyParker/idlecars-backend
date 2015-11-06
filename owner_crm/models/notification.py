@@ -77,6 +77,13 @@ def _get_owner_params(owner):
         'owner_phone_number': owner.phone_number(),
     }
 
+def _get_user_params(user):
+    return {
+        'user_first_name': user.first_name,
+        'user_phone_number': user.username,
+        'user_email': user.email,
+    }
+
 def _get_message_params(message):
     return {
         'message_first_name': message.first_name,
@@ -247,10 +254,10 @@ class DriverNotification(Notification):
 
 class OwnerNotification(Notification):
     def get_receiver_params(self, receiver):
-        self.update_params({
-            'user_first_name': receiver['user'].first_name,
-            'user_phone_number': receiver['user'].username,
-        })
+
+        receiver = receiver['user']
+        receiver_params = _get_user_params(receiver)
+        self.update_params(receiver_params)
 
     def get_all_receivers(self):
         clas = self.argument_class()
