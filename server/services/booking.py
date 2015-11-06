@@ -179,7 +179,7 @@ def on_incomplete(booking, original_booking_state):
     # let our customers know what happened
     reason = booking.incomplete_reason
     if reason == Booking.REASON_CANCELED:
-        driver_notifications.booking_canceled(booking)
+        notification.send('driver_notifications.BookingCanceled', booking)
         if Booking.REQUESTED == original_booking_state:
             owner_notifications.booking_canceled(booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:

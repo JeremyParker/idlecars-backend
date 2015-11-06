@@ -445,66 +445,53 @@ def someone_else_booked(booking):
     )
 
 
-def booking_canceled(booking):
-    if not booking.driver.email():
-        return
-    body = '''
-    Your {} rental has been canceled. Now you can go back to idlecars and rent another car!
-    '''
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
-            'TEXT': body.format(booking.car.display_name()),
+class BookingCanceled(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        body = '''
+            Your {} rental has been canceled. Now you can go back to idlecars and rent another car!
+        '''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': body.format(kwargs['car_name']),
             'CTA_LABEL': 'Find another car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
             'HEADLINE': 'Your rental has been canceled',
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Confirmation: Your rental has been canceled.',
         }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject='Confirmation: Your rental has been canceled.',
-        merge_vars=merge_vars,
-    )
 
 
-def password_reset(password_reset):
-    merge_vars = {
-        password_reset.auth_user.email: {
-            'FNAME': password_reset.auth_user.first_name or None,
+class PasswordReset(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'Reset your password',
             'TEXT': '''
             We've received a request to reset your password.
             If you didn't make the request, just ignore this email.
             Otherwise, you can reset your password using this link:''',
             'CTA_LABEL': 'Reset password',
-            'CTA_URL': client_side_routes.password_reset(password_reset),
+            'CTA_URL': kwargs['password_reset_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Reset your password on idlecars.',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Reset your password on idlecars.',
-        merge_vars=merge_vars,
-    )
 
 
-def password_reset_confirmation(password_reset):
-    merge_vars = {
-        password_reset.auth_user.email: {
-            'FNAME': password_reset.auth_user.first_name or None,
+class PasswordResetConfirmation(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'Your account password has been set',
             'TEXT': '''
                 If you didn't set your password, or if you think something funny is going
                 on, please call us any time at ''' + settings.IDLECARS_PHONE_NUMBER + '.',
             'CTA_LABEL': 'Find your car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your idlecars password has been set.',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Your idlecars password has been set.',
-        merge_vars=merge_vars,
-    )
 
 
 # email for the one-time mailer we send out to legacy users

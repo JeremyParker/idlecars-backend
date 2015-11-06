@@ -102,6 +102,17 @@ def _get_password_reset_params(password_reset):
         'password_reset_url': client_side_routes.password_reset(password_reset)
     }
 
+def _get_urls_params(pseudo_argument):
+    return {
+        'car_listing_url': client_side_routes.car_listing_url(),
+        'doc_upload_url': client_side_routes.doc_upload_url(),
+        'bookings_url': client_side_routes.bookings(),
+        'driver_account_url': client_side_routes.driver_account(),
+        'terms_of_service_url': client_side_routes.terms_of_service(),
+        'faq_url': client_side_routes.faq(),
+        'add_car_form_url': client_side_routes.add_car_form(),
+    }
+
 
 def get_merge_vars(context):
     merge_vars_origin = {
@@ -151,6 +162,7 @@ class Notification(object):
                 '_get_driver_params': 'self.argument.driver',
                 '_get_car_params': 'self.argument.car',
                 '_get_owner_params': 'self.argument.car.owner',
+                '_get_urls_params': 'None',
             },
             'Payment': {
                 '_get_payment_params': 'self.argument',
@@ -169,6 +181,7 @@ class Notification(object):
             },
             'PasswordReset': {
                 '_get_password_reset_params': 'self.argument',
+                '_get_urls_params': 'None',
             }
         }.get(self.argument_class(), {})
 
@@ -186,11 +199,11 @@ class Notification(object):
         return {
             'Driver': ['driver'],
             'Owner': ['owner'],
-            'Booking': ['booking', 'driver', 'car', 'owner'],
+            'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],
             'Renewal': ['renewal', 'car', 'owner'],
-            'PasswordReset': ['password_reset'],
+            'PasswordReset': ['password_reset', 'urls'],
         }.get(self.argument_class(), [])
 
     def custom_params_sets(self):
