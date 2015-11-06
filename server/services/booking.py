@@ -335,7 +335,7 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
-        driver_notifications.checkout_receipt(booking)
+        notification.send('driver_notifications.CheckoutReceipt', booking)
 
     return booking
 
@@ -379,7 +379,7 @@ def pickup(booking):
 
     booking.save()
 
-    driver_notifications.pickup_confirmation(booking)
+    notification.send('driver_notifications.PickupConfirmation', booking)
     owner_notifications.pickup_confirmation(booking)
 
     return booking

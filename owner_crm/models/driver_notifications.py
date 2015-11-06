@@ -331,52 +331,42 @@ def car_rented_elsewhere(booking):
     )
 
 
-def checkout_receipt(booking):
-    from server.services import booking as booking_service
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
-            'HEADLINE': 'Your {} was successfully reserved'.format(booking.car.display_name()),
+class CheckoutReceipt(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        from server.services import booking as booking_service
+        first_rental_payment = booking_service.estimate_next_rent_payment(kwargs['booking'])[1]
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your {} was successfully reserved'.format(kwargs['car_name']),
             'TEXT': '''
             We put a hold of ${} on your credit card for the {} you booked. You will not be charged until
             you inspect, approve, and pick up your car. Once you approve the car in the app, the hold on
             your card will be processed, and your card will be charged for the first rental payment of ${}.
             '''.format(
-                booking.car.solo_deposit,
-                booking.car.display_name(),
-                booking_service.estimate_next_rent_payment(booking)[1],
+                kwargs['car_deposit'],
+                kwargs['car_name'],
+                first_rental_payment,
             ),
+            'template_name': 'no_button_no_image',
+            'subject': 'Your {} was successfully reserved'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='no_button_no_image',
-        subject='Your {} was successfully reserved'.format(booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
-def pickup_confirmation(booking):
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+class PickupConfirmation(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'You are ready to drive!',
             'TEXT': '''
                 Success! Your card has been charged {} for the {} booking.
                 The owner should receive an email that the payment was processed and should give you the keys to start driving.
                 <br />
                 Please contact us if there are any issues.
-            '''.format(booking.weekly_rent, booking.car.display_name()),
+            '''.format(kwargs['booking_weekly_rent'], kwargs['car_name']),
+            'template_name': 'no_button_no_image',
+            'subject': 'You are ready to drive!',
         }
-    }
-    email.send_async(
-        template_name='no_button_no_image',
-        subject='You are ready to drive!',
-        merge_vars=merge_vars,
-    )
 
 
 class PaymentReceipt(notification.DriverNotification):
