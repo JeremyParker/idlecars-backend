@@ -2,16 +2,16 @@
 from __future__ import unicode_literals
 
 import datetime
+from freezegun import freeze_time
 
 from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
 
 import server.factories
-
+from server.models import Booking
 from owner_crm.tests import sample_merge_vars
 
-from freezegun import freeze_time
 
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
@@ -73,6 +73,10 @@ class TestDriverNotifications(TestCase):
         self.assertEqual(len(outbox), 0)
 
     def test_reminder_until_flake(self):
+        with freeze_time("2014-10-10 9:55:00"):
+            other_driver = server.factories.CompletedDriver.create()
+            other_booking = server.factories.Booking.create(driver=other_driver)
+
         #TODO: time should be from settings
         with freeze_time("2014-10-10 11:00:00"):
             call_command('driver_notifications')
@@ -86,11 +90,23 @@ class TestDriverNotifications(TestCase):
         with freeze_time("2014-10-12 10:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
+        with freeze_time("2014-10-13 10:00:00"):
+            call_command('driver_notifications')
+            call_command('cron_job')
 
         from django.core.mail import outbox
         '''
         We should have sent:
-        - 3 Timed driver reminders based on sign-up time
-        - 1 Driver notification when the driver's booking expired
+        - 3 Timed document reminders based on sign-up time for driver without docs
+        - 2 Driver notification when the drivers' bookings expired
         '''
-        self.assertEqual(len(outbox), 4)
+        self.assertEqual(len(outbox), 5)
+
+        # each booking should have been set to the correct INCOMPLETE reason
+        self.booking.refresh_from_db()
+        self.assertEqual(self.booking.get_state(), Booking.INCOMPLETE)
+        self.assertEqual(self.booking.incomplete_reason, Booking.REASON_DRIVER_TOO_SLOW_DOCS)
+
+        other_booking.refresh_from_db()
+        self.assertEqual(other_booking.get_state(), Booking.INCOMPLETE)
+        self.assertEqual(other_booking.incomplete_reason, Booking.REASON_DRIVER_TOO_SLOW_CC)

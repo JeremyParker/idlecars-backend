@@ -124,6 +124,8 @@ def documents_reminder(driver, subject, body_template):
     if not driver.email() or driver.all_docs_uploaded():
         return
 
+    # TODO: We should pass the booking that we're notifying about in with
+    # the function call. This logic can exist upstream for reminder emails.
     from server.services import booking as booking_service
     pending_bookings = booking_service.filter_pending(driver.booking_set)
 
@@ -174,17 +176,37 @@ def third_documents_reminder(driver):
     documents_reminder(driver, subject, body_template)
 
 
-def flake_reminder(driver):
-    subject = [
-        'Your booking has been cancelled because we don\'t have your driver documents',
-        'Are you ready to drive?'
-    ]
-    body_template = [
-        'flake_reminder_booking.jade',
-        'second_docs_reminder_driver.jade'
-    ]
+def booking_timed_out(booking):
+    if not booking.driver.email():
+        return
 
-    documents_reminder(driver, subject, body_template)
+    if booking.driver.all_docs_uploaded():
+        template = 'booking_timed_out_cc.jade'
+        subject = 'Your {} booking has been cancelled because you never checked out.'.format(
+            booking.car.display_name()
+        )
+    else:
+        template = 'booking_timed_out.jade'
+        subject = 'Your booking has been cancelled because we don\'t have your driver documents.'
+
+    template_data = {
+        'CAR_NAME': booking.car.display_name(),
+    }
+    merge_vars = {
+        booking.driver.email(): {
+            'FNAME': booking.driver.first_name() or None,
+            'TEXT': render_to_string(template, template_data, Context(autoescape=False)),
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': client_side_routes.car_listing_url(),
+            'HEADLINE': 'Your {} rental was canceled'.format(booking.car.display_name()),
+            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+        }
+    }
+    email.send_async(
+        template_name='one_button_one_image',
+        subject=subject,
+        merge_vars=merge_vars,
+    )
 
 
 def awaiting_insurance_email(booking):

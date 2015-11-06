@@ -30,29 +30,33 @@ class Booking(models.Model):
     refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
     incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
 
-    REASON_ANOTHER_BOOKED = 1
+    REASON_ANOTHER_BOOKED_DOCS = 1
     REASON_OWNER_REJECTED = 2
     REASON_DRIVER_REJECTED = 3
     REASON_MISSED = 4
     REASON_TEST_BOOKING = 5
     REASON_CANCELED = 6
-    REASON_DRIVER_TOO_SLOW = 7
+    REASON_DRIVER_TOO_SLOW_DOCS = 7
     REASON_OWNER_TOO_SLOW = 8
     REASON_INSURANCE_REJECTED_AGE = 9
     REASON_INSURANCE_REJECTED_EXP = 10
     REASON_INSURANCE_REJECTED_PTS = 11
     REASON_BASE_LETTER = 12
     REASON_OTHER = 13
+    REASON_ANOTHER_BOOKED_CC = 14
+    REASON_DRIVER_TOO_SLOW_CC = 15
 
     REASON = (
-        (REASON_ANOTHER_BOOKED, 'Too Slow'),
-        (REASON_OWNER_REJECTED, 'Rejected by Owner'),
+        (REASON_ANOTHER_BOOKED_DOCS, 'Missed (Docs)'),
+        (REASON_ANOTHER_BOOKED_CC, 'Missed (CC)'),
+        (REASON_OWNER_REJECTED, 'Rejected by Owner'), # TODO - remove
         (REASON_DRIVER_REJECTED, 'Rejected by Driver'),
-        (REASON_MISSED, 'Missed'),
+        (REASON_MISSED, 'Rented Elsewhere'),
         (REASON_TEST_BOOKING, 'Test'),
-        (REASON_CANCELED, 'Canceled'),
-        (REASON_DRIVER_TOO_SLOW, 'Driver Too Slow'),
-        (REASON_OWNER_TOO_SLOW, 'Owner Too Slow'),
+        (REASON_CANCELED, 'Driver Canceled'),
+        (REASON_DRIVER_TOO_SLOW_DOCS, 'Timed out (Docs)'),
+        (REASON_DRIVER_TOO_SLOW_CC, 'Timed out (CC)'),
+        (REASON_OWNER_TOO_SLOW, 'Timed out Owner/Ins'),
         (REASON_INSURANCE_REJECTED_AGE, 'Insurance rejected: age'),
         (REASON_INSURANCE_REJECTED_EXP, 'Insurance rejected: exp'),
         (REASON_INSURANCE_REJECTED_PTS, 'Insurance rejected: pts'),
