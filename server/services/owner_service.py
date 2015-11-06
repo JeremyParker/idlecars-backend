@@ -37,7 +37,6 @@ def _renewal_email():
     for car in _renewable_cars():
         renewal = Renewal.objects.create(car=car)
         notification.send('owner_notifications.RenewalEmail', renewal)
-        # owner_notifications.renewal_email(car=car, renewal=renewal)
 
 
 def _within_minutes_of_local_time(minutes, target_time):

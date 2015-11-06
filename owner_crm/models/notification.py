@@ -125,7 +125,6 @@ def get_merge_vars(context):
     return merge_vars
 
 
-
 class Notification(object):
     def __init__(self, campaign_name, argument):
         self.campaign_name = campaign_name
@@ -251,7 +250,6 @@ class DriverNotification(Notification):
         }]
 
 
-
 class OwnerNotification(Notification):
     def get_receiver_params(self, receiver):
 
@@ -282,7 +280,6 @@ class OwnerNotification(Notification):
             } for user in users]
 
 
-
 class OpsNotification(Notification):
     def get_all_receivers(self):
         return [{
@@ -290,7 +287,6 @@ class OpsNotification(Notification):
             'phone_number': settings.OPS_PHONE_NUMBER,
             'sms_enabled': True
         }]
-
 
 
 class StreetTeamNotification(Notification):
