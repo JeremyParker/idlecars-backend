@@ -236,82 +236,61 @@ def base_letter_rejected(driver):
     #TODO: send something to driver
 
 
-def insurance_approved(booking):
-    if not booking.driver.email():
-        return
+class InsuranceApproved(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        template_data = {
+            'CAR_NAME': kwargs['car_name'],
+        }
+        body = render_to_string("driver_insurance_approved.jade", template_data, Context(autoescape=False))
 
-    template_data = {
-        'CAR_NAME': booking.car.display_name(),
-    }
-    body = render_to_string("driver_insurance_approved.jade", template_data, Context(autoescape=False))
-
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'You have been added to your car\'s insurance',
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
             'TEXT': body,
             'CTA_LABEL': 'Pick up your car',
-            'CTA_URL': client_side_routes.bookings(),
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Alright! Your {} is ready to pick up!'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject='Alright! Your {} is ready to pick up!'.format(booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
-def insurance_rejected(booking):
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+class InsuranceRejected(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, we couldn\'t get you on the insurance.',
             'TEXT': '''
             We didn't manage to get you on the insurance for the car you wanted, but now that your
             account is complete, you can pick another car, and we'll add you to the insurance on that one.
             ''',
             'CTA_LABEL': 'Find a new car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'You couldn\'t be added to the insurance on the car you wanted',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='You couldn\'t be added to the insurance on the car you wanted',
-        merge_vars=merge_vars,
-    )
 
 
-def insurance_failed(booking):
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+class InsuranceFailed(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, We were unable to complete your booking.',
             'TEXT': '''
             We are sorry to inform you, but we were unable to get you in the {} due to an issue with the owner.
             We ask that you go back to our site and choose another car. We sincerely apologize for any inconvenience.
-            '''.format(booking.car.display_name()),
+            '''.format(kwargs['car_name']),
             'CTA_LABEL': 'Find a new car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'We were unable to complete your {} booking'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='We were unable to complete your {} booking'.format(booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
-def car_rented_elsewhere(booking):
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+class CarRentedElsewhere(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, the car you wanted was rented out by someone else.',
             'TEXT': '''
             Sorry, someone else has already rented out the car you wanted. Sometimes that
@@ -321,14 +300,10 @@ def car_rented_elsewhere(booking):
             <p>support@idlecars.com </p>
             <p>''' + settings.IDLECARS_PHONE_NUMBER + '</p>',
             'CTA_LABEL': 'Find a new car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Sorry, someone else rented out the car you wanted.',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Sorry, someone else rented out the car you wanted.',
-        merge_vars=merge_vars,
-    )
 
 
 class CheckoutReceipt(notification.DriverNotification):

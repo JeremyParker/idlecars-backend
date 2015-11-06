@@ -132,7 +132,7 @@ def request_insurance(booking):
 
 
 def on_insurance_approved(booking):
-    driver_notifications.insurance_approved(booking)
+    notification.send('driver_notifications.InsuranceApproved', booking)
 
 
 def on_returned(booking):
@@ -184,17 +184,17 @@ def on_incomplete(booking, original_booking_state):
             owner_notifications.booking_canceled(booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
         owner_notifications.insurance_too_slow(booking)
-        driver_notifications.insurance_failed(booking)
+        notification.send('driver_notifications.InsuranceFailed', booking)
     elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
         driver_notifications.booking_timed_out(booking)
     elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
         notification.send('driver_notifications.SomeoneElseBooked', booking)
     elif reason == Booking.REASON_OWNER_REJECTED:
-        driver_notifications.insurance_rejected(booking)
+        notification.send('driver_notifications.InsuranceRejected', booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
         owner_notifications.driver_rejected(booking)
     elif reason == Booking.REASON_MISSED:
-        driver_notifications.car_rented_elsewhere(booking)
+        notification.send('driver_notifications.CarRentedElsewhere', booking)
 
 
 def _make_deposit_payment(booking):
