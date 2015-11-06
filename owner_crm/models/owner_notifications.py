@@ -19,38 +19,30 @@ def _get_car_listing_links(owner):
     return links
 
 
-def _render_renewal_body(car):
+def _render_renewal_body(**kwargs):
     template_data = {
-        'CAR_NAME': car.display_name(),
-        'CAR_PLATE': car.plate,
+        'CAR_NAME': kwargs['car_name'],
+        'CAR_PLATE': kwargs['car_plate'],
     }
     context = Context(autoescape=False)
     return render_to_string("car_expiring.jade", template_data, context)
 
 
-def renewal_email(car, renewal):
-    renewal_url = client_side_routes.renewal_url(renewal)
-    body = _render_renewal_body(car)
-    car_desc = car.display_name()
+class RenewalEmail(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        body = _render_renewal_body(**kwargs)
 
-    for user in car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name or None,
-                'HEADLINE': 'Your {} listing is about to expire'.format(car_desc),
-                'TEXT': body,
-                'CTA_LABEL': 'Renew Listing Now',
-                'CTA_URL': renewal_url,
-                'CAR_IMAGE_URL': car_service.get_image_url(car),
-            }
+        context = {
+            'FNAME': kwargs.get('user_first_name', None),
+            'HEADLINE': 'Your {} listing is about to expire'.format(kwargs['car_name']),
+            'TEXT': body,
+            'CTA_LABEL': 'Renew Listing Now',
+            'CTA_URL': kwargs['renewal_url'],
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Your {} listing is about to expire.'.format(kwargs['car_name']),
         }
-        email.send_async(
-            template_name='one_button_one_image',
-            subject='Your {} listing is about to expire.'.format(car_desc),
-            merge_vars=merge_vars,
-        )
+        return context
 
 
 class NewBookingEmail(notification.OwnerNotification):

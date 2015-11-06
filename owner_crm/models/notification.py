@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-
-from idlecars import email, client_side_routes, sms_service
 from django.core.urlresolvers import reverse
 
+from idlecars import email, client_side_routes, sms_service
+from server.services import car as car_service
 from owner_crm.models import Campaign
 
 
@@ -50,6 +50,7 @@ def _get_car_params(car):
         'car_status': car.effective_status(),
         'car_plate': car.plate,
         'car_deposit': car.solo_deposit,
+        'car_image_url': car_service.get_image_url(car),
     }
 
 def _get_driver_params(driver):
@@ -90,6 +91,11 @@ def _get_message_params(message):
         'message_email': message.email,
     }
 
+def _get_renewal_params(renewal):
+    return {
+        'renewal_url': client_side_routes.renewal_url(renewal)
+    }
+
 def get_merge_vars(context):
     merge_vars_origin = {
         'PREVIEW': context.get('PREVIEW'),
@@ -119,25 +125,14 @@ def get_merge_vars(context):
     return merge_vars
 
 
-
 class Notification(object):
     def __init__(self, campaign_name, argument):
         self.campaign_name = campaign_name
         self.argument = argument
         self.params = {}
-        self.params_sets = []
 
-    def default_params_sets_list(self):
-        return {
-            'Driver': ['driver'],
-            'Owner': ['owner'],
-            'Booking': ['booking', 'driver', 'car', 'owner'],
-            'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
-            'UserMessage': ['message'],
-        }
-
-    def params_match_list(self):
-        return {
+    def get_params(self, sets):
+        match_list = {
             'Driver': {
                 '_get_driver_params': 'self.argument',
             },
@@ -159,11 +154,13 @@ class Notification(object):
             },
             'UserMessage': {
                 '_get_message_params': 'self.argument',
+            },
+            'Renewal': {
+                '_get_renewal_params': 'self.argument',
+                '_get_car_params': 'self.argument.car',
+                '_get_owner_params': 'self.argument.car.owner',
             }
-        }
-
-    def get_params(self, sets):
-        match_list = self.params_match_list().get(self.argument_class(), {})
+        }.get(self.argument_class(), {})
 
         for params_set in sets:
             function_name = '_get_{}_params'.format(params_set)
@@ -176,17 +173,20 @@ class Notification(object):
         return type(self.argument).__name__ or None
 
     def default_params_sets(self):
-        return self.default_params_sets_list().get(self.argument_class(), [])
+        return {
+            'Driver': ['driver'],
+            'Owner': ['owner'],
+            'Booking': ['booking', 'driver', 'car', 'owner'],
+            'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
+            'UserMessage': ['message'],
+            'Renewal': ['renewal', 'car', 'owner'],
+        }.get(self.argument_class(), [])
 
     def custom_params_sets(self):
         return []
 
     def update_params(self, params_set):
         self.params.update(params_set)
-
-    def get_argument_params(self):
-        self.params_sets = self.default_params_sets() + self.custom_params_sets()
-        self.get_params(self.params_sets)
 
     def get_receiver_params(self, receiver):
         pass
@@ -203,7 +203,7 @@ class Notification(object):
             return Campaign.EMAIL_MEDIUM
 
     def send(self):
-        self.get_argument_params()
+        self.get_params(self.default_params_sets() + self.custom_params_sets())
 
         for receiver in self.get_all_receivers():
             self.get_receiver_params(receiver)
@@ -250,9 +250,9 @@ class DriverNotification(Notification):
         }]
 
 
-
 class OwnerNotification(Notification):
     def get_receiver_params(self, receiver):
+
         receiver = receiver['user']
         receiver_params = _get_user_params(receiver)
         self.update_params(receiver_params)
@@ -266,6 +266,8 @@ class OwnerNotification(Notification):
             users = self.argument.car.owner.auth_users.all()
         elif clas == 'Payment':
             users = self.argument.booking.car.owner.auth_users.all()
+        elif clas == 'Renewal':
+            users = self.argument.car.owner.auth_users.all()
         else:
             return []
 
@@ -278,10 +280,8 @@ class OwnerNotification(Notification):
             } for user in users]
 
 
-
 class OpsNotification(Notification):
     def get_all_receivers(self):
-        # TODO: get sms_enabled from settings
         return [{
             'email_address': settings.OPS_EMAIL,
             'phone_number': settings.OPS_PHONE_NUMBER,
@@ -289,8 +289,6 @@ class OpsNotification(Notification):
         }]
 
 
-
 class StreetTeamNotification(Notification):
     def get_all_receivers(self):
-        # TODO: get sms_enabled from settings
         return [{'email_address': settings.STREET_TEAM_EMAIL, 'sms_enabled': False}]
