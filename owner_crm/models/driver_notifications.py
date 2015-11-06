@@ -379,70 +379,55 @@ def pickup_confirmation(booking):
     )
 
 
-def _payment_receipt_text(payment):
-    text = '''
-        Your weekly rental fee has been paid. <br />
-        Driver: {} <br />
-        Car: {} <br /><br />
+class PaymentReceipt(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = '''
+            Your weekly rental fee has been paid. <br />
+            Driver: {} <br />
+            Car: {} <br /><br />
 
-        Invoice Period: {} - {} <br />
-        Payment Amount: {} <br /><br />
-    '''
-    from server.services import booking as booking_service
-    fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
-    if amount > 0:
-        text += 'Your next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
-    else:
-        text += 'This is your last payment. <br />'
+            Invoice Period: {} - {} <br />
+            Payment Amount: {} <br /><br />
+        '''
+        from server.services import booking as booking_service
+        fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(kwargs['booking'])
+        if amount > 0:
+            text += 'Your next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+        else:
+            text += 'This is your last payment. <br />'
 
-    text += 'Your booking will end on {}. <br /><br />Thank you for using idlecars.'
-    return text.format(
-        payment.booking.driver.full_name(),
-        payment.booking.car.display_name(),
-        payment.invoice_start_time.strftime('%b %d'),
-        payment.invoice_end_time.strftime('%b %d'),
-        payment.amount,
-        payment.booking.end_time.strftime('%b %d')
-    )
+        text += 'Your booking will end on {}. <br /><br />Thank you for using idlecars.'
+        text = text.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+            kwargs['payment_invoice_start_time'].strftime('%b %d'),
+            kwargs['payment_invoice_end_time'].strftime('%b %d'),
+            kwargs['payment_amount'],
+            kwargs['booking_end_time'].strftime('%b %d'),
+        )
 
-
-def payment_receipt(payment):
-    if not payment.booking.driver.email():
-        return
-
-    merge_vars = {
-        payment.booking.driver.email(): {
-            'FNAME': payment.booking.driver.first_name() or None,
-            'HEADLINE': 'Payment Received: {} Booking'.format(payment.booking.car.display_name()),
-            'TEXT': _payment_receipt_text(payment)
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Payment Received: {} Booking'.format(kwargs['car_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Payment Received: {} Booking'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='no_button_no_image',
-        subject='Payment Received: {} Booking'.format(payment.booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
-def someone_else_booked(booking):
-    if not booking.driver.email():
-        return
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+class SomeoneElseBooked(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Someone else rented your car!',
             'TEXT': '''While we were waiting for you to finish uploading your documents,
                 another driver rented your car. But don't worry,
-                there are plenty more cars available.'''.format(booking.car.display_name()),
+                there are plenty more cars available.'''.format(kwargs['car_name']),
             'CTA_LABEL': 'Find a new car',
-            'CTA_URL': client_side_routes.car_listing_url(),
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Someone else rented your {}.'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Someone else rented your {}.'.format(booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
 class BookingCanceled(notification.DriverNotification):

@@ -28,15 +28,15 @@ def _get_booking_params(booking):
     return {
         'booking': booking,
         'booking_state': booking.get_state(),
-        'weekly_rent': booking.weekly_rent,
-        'end_time': booking.end_time,
-        'checkout_time': booking.checkout_time,
-        'requested_time': booking.requested_time,
-        'approval_time': booking.approval_time,
-        'pickup_time': booking.pickup_time,
-        'return_time': booking.return_time,
-        'refund_time': booking.refund_time,
-        'incomplete_time': booking.incomplete_time,
+        'booking_weekly_rent': booking.weekly_rent,
+        'booking_end_time': booking.end_time,
+        'booking_checkout_time': booking.checkout_time,
+        'booking_requested_time': booking.requested_time,
+        'booking_approval_time': booking.approval_time,
+        'booking_pickup_time': booking.pickup_time,
+        'booking_return_time': booking.return_time,
+        'booking_refund_time': booking.refund_time,
+        'booking_incomplete_time': booking.incomplete_time,
         'booking_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
         )

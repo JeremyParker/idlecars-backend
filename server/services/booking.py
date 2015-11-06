@@ -188,7 +188,7 @@ def on_incomplete(booking, original_booking_state):
     elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
         driver_notifications.booking_timed_out(booking)
     elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
-        driver_notifications.someone_else_booked(booking)
+        notification.send('driver_notifications.SomeoneElseBooked', booking)
     elif reason == Booking.REASON_OWNER_REJECTED:
         driver_notifications.insurance_rejected(booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
@@ -415,7 +415,7 @@ def _cron_payments():
                 print payment.error_message
                 print payment.notes
                 continue
-            driver_notifications.payment_receipt(payment)
+            notification.send('driver_notifications.PaymentReceipt', payment)
             owner_notifications.payment_receipt(payment)
         except Exception as e:
             print e
