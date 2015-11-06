@@ -19,7 +19,7 @@ class DocsApprovedNoBooking(notification.DriverNotification):
         text = 'You are now ready to rent any car on idlecars with one tap!'
         cta_url = client_side_routes.car_listing_url()
 
-        context = {
+        return {
             'FNAME': kwargs['driver_email'],
             'HEADLINE': headline,
             'TEXT': text,
@@ -29,31 +29,25 @@ class DocsApprovedNoBooking(notification.DriverNotification):
             'template_name': 'one_button_no_image',
             'sms_body': subject + ' ' + headline + ' ' + text + ' Click here to rent a car now: ' + cta_url
         }
-        return context
 
 
-def base_letter_approved_no_checkout(booking):
-    if not booking.driver.email():
-        return
 
-    template_data = {'CAR_NAME': booking.car.display_name()}
-    body = render_to_string("base_letter_approved_no_checkout.jade", template_data, Context(autoescape=False))
+class BaseLetterApprovedNoCheckout(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        template_data = {'CAR_NAME': kwargs['car_name']}
+        body = render_to_string("base_letter_approved_no_checkout.jade", template_data, Context(autoescape=False))
 
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+        return {
+            # TODO: I think we don't need `or None` because it return '', and '' looks the same as None to drivers
+            'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': body,
             'CTA_LABEL': 'Reserve now',
             'CTA_URL': client_side_routes.bookings(),
-            'HEADLINE': 'Your {} is waiting'.format(booking.car.display_name()),
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
+            'CAR_IMAGE_URL': car_service.get_image_url(kwargs['car']),
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} is waiting on your payment information!'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='Your {} is waiting on your payment information!'.format(booking.car.display_name()),
-        merge_vars=merge_vars,
-    )
 
 
 def _missing_documents_text(driver):
@@ -514,10 +508,10 @@ def password_reset_confirmation(password_reset):
 
 
 # email for the one-time mailer we send out to legacy users
-def account_created(password_reset):
-    merge_vars = {
-        password_reset.auth_user.email: {
-            'FNAME': password_reset.auth_user.first_name or None,
+class AccountCreated(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'An account has been created for you at idlecars.',
             'TEXT': '''
                 Your documents and details have been stored in your idlecars account. To claim your
@@ -525,11 +519,7 @@ def account_created(password_reset):
                 Then you can rent any car you need, any time you need it.
             ''',
             'CTA_LABEL': 'Claim your account',
-            'CTA_URL': client_side_routes.password_reset(password_reset),
+            'CTA_URL': kwargs['password_reset_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'An account has been created for you at idlecars',
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject='An account has been created for you at idlecars',
-        merge_vars=merge_vars,
-    )

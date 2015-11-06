@@ -96,6 +96,13 @@ def _get_renewal_params(renewal):
         'renewal_url': client_side_routes.renewal_url(renewal)
     }
 
+def _get_password_reset_params(password_reset):
+    return {
+        'password_reset_user_first_name': password_reset.auth_user.first_name,
+        'password_reset_url': client_side_routes.password_reset(password_reset)
+    }
+
+
 def get_merge_vars(context):
     merge_vars_origin = {
         'PREVIEW': context.get('PREVIEW'),
@@ -159,6 +166,9 @@ class Notification(object):
                 '_get_renewal_params': 'self.argument',
                 '_get_car_params': 'self.argument.car',
                 '_get_owner_params': 'self.argument.car.owner',
+            },
+            'PasswordReset': {
+                '_get_password_reset_params': 'self.argument',
             }
         }.get(self.argument_class(), {})
 
@@ -180,6 +190,7 @@ class Notification(object):
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],
             'Renewal': ['renewal', 'car', 'owner'],
+            'PasswordReset': ['password_reset'],
         }.get(self.argument_class(), [])
 
     def custom_params_sets(self):
@@ -240,13 +251,20 @@ class DriverNotification(Notification):
             driver = self.argument.driver
         elif clas == 'Payment':
             driver = self.argument.booking.driver
+        elif clas == 'PasswordReset':
+            driver = self.argument.auth_user
+            return [{
+                'email_address': driver.email,
+                'phone_number': driver.username,
+                'sms_enabled': False,
+            }]
         else:
             return []
 
         return [{
-            'email_address': driver.email(),
+            'email_address': driver.email() ,
             'phone_number': driver.phone_number(),
-            'sms_enabled': driver.sms_enabled,
+            'sms_enabled': driver.sms_enabled or False,
         }]
 
 

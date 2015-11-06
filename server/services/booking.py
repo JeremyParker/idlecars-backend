@@ -110,7 +110,7 @@ def on_base_letter_approved(driver):
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
 
     for booking in pending_bookings:
-        driver_notifications.base_letter_approved_no_checkout(booking)
+        notification.send('driver_notifications.BaseLetterApprovedNoCheckout', booking)
 
     for booking in reserved_bookings:
         request_insurance(booking)
