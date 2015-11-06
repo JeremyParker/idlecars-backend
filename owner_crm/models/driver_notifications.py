@@ -171,63 +171,50 @@ def third_documents_reminder(driver):
     documents_reminder(driver, subject, body_template)
 
 
-def booking_timed_out(booking):
-    if not booking.driver.email():
-        return
+class BookingTimedOut(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        if kwargs['driver_all_docs_uploaded']:
+            template = 'booking_timed_out_cc.jade'
+            subject = 'Your {} booking has been cancelled because you never checked out.'.format(
+                kwargs['car_name']
+            )
+        else:
+            template = 'booking_timed_out.jade'
+            subject = 'Your booking has been cancelled because we don\'t have your driver documents.'
 
-    if booking.driver.all_docs_uploaded():
-        template = 'booking_timed_out_cc.jade'
-        subject = 'Your {} booking has been cancelled because you never checked out.'.format(
-            booking.car.display_name()
-        )
-    else:
-        template = 'booking_timed_out.jade'
-        subject = 'Your booking has been cancelled because we don\'t have your driver documents.'
+        template_data = {
+            'CAR_NAME': kwargs['car_name'],
+        }
 
-    template_data = {
-        'CAR_NAME': booking.car.display_name(),
-    }
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': render_to_string(template, template_data, Context(autoescape=False)),
             'CTA_LABEL': 'Find your car',
-            'CTA_URL': client_side_routes.car_listing_url(),
-            'HEADLINE': 'Your {} rental was canceled'.format(booking.car.display_name()),
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'CTA_URL': kwargs['car_listing_url'],
+            'HEADLINE': 'Your {} rental was canceled'.format(kwargs['car_name']),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': subject,
         }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject=subject,
-        merge_vars=merge_vars,
-    )
 
 
-def awaiting_insurance_email(booking):
-    if not booking.driver.email():
-        return
-    template_data = {
-        'CAR_NAME': booking.car.display_name(),
-    }
-    context = Context(autoescape=False)
-    body = render_to_string("driver_docs_approved.jade", template_data, context)
+class AwaitingInsuranceEmail(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        template_data = {
+            'CAR_NAME': kwargs['car_name']
+        }
+        body = render_to_string("driver_docs_approved.jade", template_data, Context(autoescape=False))
 
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': body,
             'CTA_LABEL': 'See your rental',
-            'CTA_URL': client_side_routes.bookings(),
+            'CTA_URL': kwargs['bookings_url'],
             'HEADLINE': 'Your documents have been reviewed and approved',
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Congratulations! Your documents have been submitted!',
         }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject='Congratulations! Your documents have been submitted!',
-        merge_vars=merge_vars,
-    )
 
 
 def base_letter_rejected(driver):
