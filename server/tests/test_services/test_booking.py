@@ -120,12 +120,16 @@ class BookingServiceTest(TestCase):
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
-    def test_checkout_with_others_too_slow(self):
+    def test_checkout_before_other_checks_out(self):
         # set up the other driver, and create a booking for them
-        other_driver = factories.Driver.create()
-        factories.Booking.create(car=self.car, driver=other_driver)
+        other_driver = factories.CompletedDriver.create()
+        other_booking = factories.Booking.create(car=self.car, driver=other_driver)
 
         new_booking = self._checkout_approved_driver()
+
+        other_booking.refresh_from_db()
+        self.assertEqual(other_booking.get_state(), models.Booking.INCOMPLETE)
+        self.assertEqual(other_booking.incomplete_reason, models.Booking.REASON_ANOTHER_BOOKED_CC)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 3)
@@ -134,7 +138,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(outbox[0].merge_vars.keys()[0], other_driver.email())
         self.assertEqual(
             outbox[0].subject,
-            'Someone else rented your {}.'.format(new_booking.car.display_name())
+            'Someone else rented your {}.'.format(other_booking.car.display_name())
         )
 
         # an email to the owner to get the driver on insurance
@@ -152,6 +156,41 @@ class BookingServiceTest(TestCase):
         )
 
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+    def test_checkout_before_other_uploads_docs(self):
+        # set up the other driver, and create a booking for them
+        other_driver = factories.Driver.create()
+        other_booking = factories.Booking.create(car=self.car, driver=other_driver)
+
+        new_booking = self._checkout_approved_driver()
+
+        other_booking.refresh_from_db()
+        self.assertEqual(other_booking.get_state(), models.Booking.INCOMPLETE)
+        self.assertEqual(other_booking.incomplete_reason, models.Booking.REASON_ANOTHER_BOOKED_DOCS)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 3)
+
+        # an email to the other driver to know their car is no longer available
+        self.assertEqual(outbox[0].merge_vars.keys()[0], other_driver.email())
+        self.assertEqual(
+            outbox[0].subject,
+            'Someone else rented your {}.'.format(other_booking.car.display_name())
+        )
+
+        # an email to the owner to get the driver on insurance
+        self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.car.owner.email())
+        self.assertEqual(
+            outbox[1].subject,
+            'A driver has booked your {}.'.format(new_booking.car.display_name())
+        )
+
+        # an email to the driver that insurance is in progress
+        self.assertEqual(outbox[2].merge_vars.keys()[0], new_booking.driver.email())
+        self.assertEqual(
+            outbox[2].subject,
+            'Congratulations! Your documents have been submitted!'
+        )
 
     def _check_payments_after_pickup(self, new_booking):
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
