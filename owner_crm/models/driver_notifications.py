@@ -71,25 +71,6 @@ def _render_booking_reminder_body(booking, body_template):
     return render_to_string(body_template, template_data, Context(autoescape=False))
 
 
-def _docs_reminder_for_booking(booking, subject, body_template):
-    cta_url = client_side_routes.doc_upload_url()
-    merge_vars = {
-        booking.driver.email(): {
-            'FNAME': booking.driver.first_name() or None,
-            'TEXT': _render_booking_reminder_body(booking, body_template),
-            'CTA_LABEL': 'Upload Documents Now',
-            'CTA_URL': cta_url,
-            'HEADLINE': 'Your {} is waiting'.format(booking.car.display_name()),
-            'CAR_IMAGE_URL': car_service.get_image_url(booking.car),
-        }
-    }
-    email.send_async(
-        template_name='one_button_one_image',
-        subject=subject,
-        merge_vars=merge_vars,
-    )
-
-
 def _render_driver_reminder_body(driver, body_template):
     docs = _missing_documents_text(driver)
     template_data = {
@@ -98,77 +79,85 @@ def _render_driver_reminder_body(driver, body_template):
     return render_to_string(body_template, template_data, Context(autoescape=False))
 
 
-def _docs_reminder_for_driver(driver, subject, body_template):
-    merge_vars = {
-        driver.email(): {
-            'FNAME': driver.first_name() or None,
-            'TEXT': _render_driver_reminder_body(driver, body_template),
+class FirstDocumentsReminderBooking(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'first_docs_reminder_booking.jade'),
             'CTA_LABEL': 'Upload Documents Now',
-            'CTA_URL': client_side_routes.doc_upload_url(),
-            'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Your {} is waiting on your driver documents'.format(kwargs['car_name']),
         }
-    }
-    email.send_async(
-        template_name='one_button_no_image',
-        subject=subject,
-        merge_vars=merge_vars,
-    )
 
 
-def documents_reminder(driver, subject, body_template):
-    if not driver.email() or driver.all_docs_uploaded():
-        return
-
-    # TODO: We should pass the booking that we're notifying about in with
-    # the function call. This logic can exist upstream for reminder emails.
-    from server.services import booking as booking_service
-    pending_bookings = booking_service.filter_pending(driver.booking_set)
-
-    if pending_bookings:
-        booking = pending_bookings.order_by('created_time').last()
-        subject[0] = subject[0].format(booking.car.display_name())
-        _docs_reminder_for_booking(booking, subject[0], body_template[0])
-    else:
-        _docs_reminder_for_driver(driver, subject[1], body_template[1])
+class FirstDocumentsReminderDriver(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'first_docs_reminder_driver.jade'),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
+            'template_name': 'one_button_no_image',
+            'subject': 'Submit your documents now so you are ready to drive later.',
+        }
 
 
-def first_documents_reminder(driver):
-    subject = [
-        'Your {} is waiting on your driver documents',
-        'Submit your documents now so you are ready to drive later.'
-    ]
-    body_template = [
-        'first_docs_reminder_booking.jade',
-        'first_docs_reminder_driver.jade'
-    ]
-
-    documents_reminder(driver, subject, body_template)
-
-
-def second_documents_reminder(driver):
-    subject = [
-        'Your {} is still waiting on your driver documents',
-        'Are you ready to drive?'
-    ]
-    body_template = [
-        'second_docs_reminder_booking.jade',
-        'second_docs_reminder_driver.jade'
-    ]
-
-    documents_reminder(driver, subject, body_template)
+class SecondDocumentsReminderBooking(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'second_docs_reminder_booking.jade'),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Your {} is still waiting on your driver documents'.format(kwargs['car_name']),
+        }
 
 
-def third_documents_reminder(driver):
-    subject = [
-        'Don’t miss your booking, submit your driver documents',
-        'Are you ready to drive?'
-    ]
-    body_template = [
-        'third_docs_reminder_booking.jade',
-        'second_docs_reminder_driver.jade'
-    ]
+class SecondDocumentsReminderDriver(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'second_docs_reminder_driver.jade'),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
+            'template_name': 'one_button_no_image',
+            'subject': 'Are you ready to drive?',
+        }
 
-    documents_reminder(driver, subject, body_template)
+
+class ThirdDocumentsReminderBooking(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'third_docs_reminder_booking.jade'),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
+            'template_name': 'one_button_one_image',
+            'subject': 'Don’t miss your booking, submit your driver documents',
+        }
+
+
+class ThirdDocumentsReminderDriver(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'second_docs_reminder_driver.jade'),
+            'CTA_LABEL': 'Upload Documents Now',
+            'CTA_URL': kwargs['docs_upload_url'],
+            'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
+            'template_name': 'one_button_no_image',
+            'subject': 'Are you ready to drive?',
+        }
 
 
 class BookingTimedOut(notification.DriverNotification):

@@ -55,6 +55,7 @@ def _get_car_params(car):
 
 def _get_driver_params(driver):
     return {
+        'driver': driver,
         'driver_email': driver.email(),
         'driver_first_name': driver.first_name(),
         'driver_full_name': driver.full_name(),
@@ -106,7 +107,7 @@ def _get_password_reset_params(password_reset):
 def _get_urls_params(pseudo_argument):
     return {
         'car_listing_url': client_side_routes.car_listing_url(),
-        'doc_upload_url': client_side_routes.doc_upload_url(),
+        'docs_upload_url': client_side_routes.doc_upload_url(),
         'bookings_url': client_side_routes.bookings(),
         'driver_account_url': client_side_routes.driver_account(),
         'terms_of_service_url': client_side_routes.terms_of_service(),
@@ -154,6 +155,7 @@ class Notification(object):
         match_list = {
             'Driver': {
                 '_get_driver_params': 'self.argument',
+                '_get_urls_params': 'None',
             },
             'Owner': {
                 '_get_owner_params': 'self.argument',
@@ -198,7 +200,7 @@ class Notification(object):
 
     def default_params_sets(self):
         return {
-            'Driver': ['driver'],
+            'Driver': ['driver', 'urls'],
             'Owner': ['owner'],
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],

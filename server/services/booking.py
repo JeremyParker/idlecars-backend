@@ -5,7 +5,7 @@ import datetime
 from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
-from django.db.models import F, Q
+from django.db.models import F
 from django.utils import timezone
 from django.conf import settings
 
