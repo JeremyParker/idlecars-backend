@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from freezegun import freeze_time
 
 from django.utils import timezone
 from django.test import TestCase
@@ -10,16 +11,14 @@ from django.contrib.auth.models import User
 
 import idlecars.client_side_routes
 import server.models
-import owner_crm.models
 import server.factories
-import owner_crm.factories
-from owner_crm.management.commands import owner_notifications
-from owner_crm.tests import sample_merge_vars
-
 from server.services import owner_service
 from server.services import booking as booking_service
 
-from freezegun import freeze_time
+import owner_crm.models
+import owner_crm.factories
+from owner_crm.management.commands import owner_notifications
+from owner_crm.tests import sample_merge_vars
 
 
 class TestOwnerNotifications(TestCase):
@@ -87,6 +86,13 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
         call_command('owner_notifications')
+
+        # there should be a record of this message being sent for future throttling
+        throttle_messages = owner_crm.models.Message.objects.filter(
+            booking=self.booking,
+            campaign='first_morning_insurance_reminder'
+        )
+        self.assertEqual(len(throttle_messages), 1)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
