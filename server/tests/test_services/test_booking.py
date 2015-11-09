@@ -205,6 +205,34 @@ class BookingServiceTest(TestCase):
             'Alright! Your {} is ready to pick up!'.format(booking.car.display_name())
         )
 
+    def _create_incomplete_booking(self, reason):
+        booking = factories.RequestedBooking.create()
+        booking.incomplete_time = timezone.now()
+        booking.incomplete_reason = reason
+        booking.clean()
+        booking.save()
+        return booking
+
+    def test_insurance_rejected(self):
+        booking = self._create_incomplete_booking(models.Booking.REASON_OWNER_REJECTED)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'You couldn\'t be added to the insurance on the car you wanted'
+        )
+
+    def test_insurance_failed(self):
+        booking = self._create_incomplete_booking(models.Booking.REASON_OWNER_TOO_SLOW)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+        self.assertEqual(
+            outbox[1].subject,
+            'We were unable to complete your {} booking'.format(booking.car.display_name())
+        )
+
     def _check_payments_after_pickup(self, new_booking):
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)
