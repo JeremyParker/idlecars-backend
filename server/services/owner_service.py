@@ -101,7 +101,7 @@ def update_account_state(merchant_account_id, state, errors=None):
     owner.save()
 
     if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
-        owner_notifications.bank_account_approved(owner)
+        notification.send('owner_notifications.BankAccountApproved', owner)
     else:
         notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 

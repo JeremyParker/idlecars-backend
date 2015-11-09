@@ -336,36 +336,30 @@ def account_created(password_reset):
     )
 
 
-def bank_account_approved(owner):
-    links = _get_car_listing_links(owner)
-    if links:
-        text = '''
-                Congrats! Your bank information has been approved and your cars have been listed!
-                You can view your live cars from the links below!
-                <ul>{}</ul>
-                If you have any other cars you would like to list, please go to the submission form here:
-            '''.format(links)
-    else:
-        text = '''
-                Congrats! Your bank information has been approved! Now when you rent cars through idlecars, you will
-                receive payment directly from the driver into your bank account.<br>
-                If you have any cars you would like to list, please go to the submission form here:
-            '''.format(links)
+class BankAccountApproved(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        links = _get_car_listing_links(kwargs['owner'])
+        if links:
+            text = '''
+                    Congrats! Your bank information has been approved and your cars have been listed!
+                    You can view your live cars from the links below!
+                    <ul>{}</ul>
+                    If you have any other cars you would like to list, please go to the submission form here:
+                '''.format(links)
+        else:
+            text = '''
+                    Congrats! Your bank information has been approved! Now when you rent cars through idlecars, you will
+                    receive payment directly from the driver into your bank account.<br>
+                    If you have any cars you would like to list, please go to the submission form here:
+                '''
 
-    for auth_user in owner.auth_users.all():
-        if not auth_user.email:
-            continue
-        merge_vars = {
-            auth_user.email: {
-                'FNAME': auth_user.first_name,
-                'HEADLINE': 'Your bank account has been approved',
-                'TEXT': text,
+        return {
+
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'Your bank account has been approved',
+            'TEXT': text,
             'CTA_LABEL': 'List more cars',
             'CTA_URL': client_side_routes.add_car_form(),
-            }
+            'template_name': 'one_button_no_image',
+            'subject': 'Your bank account has been approved.',
         }
-        email.send_async(
-            template_name='one_button_no_image',
-            subject='Your bank account has been approved.',
-            merge_vars=merge_vars,
-        )
