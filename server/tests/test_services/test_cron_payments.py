@@ -135,6 +135,7 @@ class TestCronPayments(TestCase):
         # check what emails got sent
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'The payment job failed.')
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_no_payment_for_ended_booking(self):

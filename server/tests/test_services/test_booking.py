@@ -259,6 +259,13 @@ class BookingServiceTest(TestCase):
             new_booking = booking_service.pickup(new_booking)
         new_booking.refresh_from_db()  # make sure our local copy is fresh. pickup() changed it.
 
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Payment {} for a {} failed.'.format(new_booking.payment_set.last(), new_booking.car)
+        )
+
         # make sure there's a declined payment in there
         self.assertTrue(models.Payment.DECLINED in [p.status for p in new_booking.payment_set.all()])
 
