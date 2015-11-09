@@ -102,7 +102,8 @@ def _get_renewal_params(renewal):
 def _get_password_reset_params(password_reset):
     return {
         'password_reset_user_first_name': password_reset.auth_user.first_name,
-        'password_reset_url': client_side_routes.password_reset(password_reset)
+        'password_reset_url': client_side_routes.password_reset(password_reset),
+        'password_owner_reset_url': client_side_routes.owner_password_reset(password_reset),
     }
 
 def _get_urls_params(pseudo_argument):
@@ -287,7 +288,6 @@ class DriverNotification(Notification):
 
 class OwnerNotification(Notification):
     def get_receiver_params(self, receiver):
-
         receiver = receiver['user']
         receiver_params = _get_user_params(receiver)
         self.update_params(receiver_params)
@@ -303,6 +303,8 @@ class OwnerNotification(Notification):
             users = self.argument.booking.car.owner.auth_users.all()
         elif clas == 'Renewal':
             users = self.argument.car.owner.auth_users.all()
+        elif clas == 'PasswordReset':
+            users = [self.argument.auth_user]
         else:
             return []
 
