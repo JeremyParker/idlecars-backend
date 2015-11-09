@@ -92,97 +92,107 @@ class NewBookingEmail(notification.OwnerNotification):
         return context
 
 
-def first_morning_insurance_reminder(booking):
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name,
-                'HEADLINE': 'Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
-                'TEXT': '''
-                    We are just checking in on {} {} booking with plate
-                    {} to see if they have been accepted on the insurance.
-                    You can click below to let us know where they are in the process.
-                    Once they are approved, they will contact you to schedule a pickup.
-                '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
-                'CTA_LABEL': 'Call (844) 435-3227',
-                'CTA_URL': 'tel:1-844-4353227'
-            }
+class FirstMorningInsuranceReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'TEXT': '''
+                We are just checking in on {} {} booking with plate
+                {} to see if they have been accepted on the insurance.
+                You can click below to let us know where they are in the process.
+                Once they are approved, they will contact you to schedule a pickup.
+            '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
+            'CTA_LABEL': 'Call (844) 435-3227',
+            'CTA_URL': 'tel:1-844-4353227',
+            'template_name': 'one_button_no_image',
+            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
         }
-        email.send_async(
-            template_name='one_button_no_image',
-            subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
-            merge_vars=merge_vars,
-        )
 
 
-def second_morning_insurance_reminder(booking):
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name,
-                'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(booking.car.display_name(), booking.driver.full_name()),
-                'TEXT': '''
-                    We are doing a final checks on {} {} booking with plate
-                    {} to see if they have been accepted on the insurance.
-                    You can click below to let us know where they are in the process.
-                    Once they are approved, they will contact you to schedule a pickup.
-                    <br />
-                    We promise drivers that they will get into a car within 24-48 hours,
-                    so if we don’t hear back we will have to cancel the booking.
-                    We don’t want to do that so please let us know if there are any problems.
-                '''.format(booking.driver.full_name(), booking.car.display_name(), booking.car.plate),
-                'CTA_LABEL': 'Call (844) 435-3227',
-                'CTA_URL': 'tel:1-844-4353227'
-            }
+class SecondMorningInsuranceReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
+            'TEXT': '''
+                We are doing a final checks on {} {} booking with plate
+                {} to see if they have been accepted on the insurance.
+                You can click below to let us know where they are in the process.
+                Once they are approved, they will contact you to schedule a pickup.
+                <br />
+                We promise drivers that they will get into a car within 24-48 hours,
+                so if we don’t hear back we will have to cancel the booking.
+                We don’t want to do that so please let us know if there are any problems.
+            '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
+            'CTA_LABEL': 'Call (844) 435-3227',
+            'CTA_URL': 'tel:1-844-4353227',
+            'template_name': 'one_button_no_image',
+            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
         }
-        email.send_async(
-            template_name='one_button_no_image',
-            subject='Has {} been accepted on the {}?'.format(booking.driver.full_name(), booking.car.display_name()),
-            merge_vars=merge_vars,
-        )
 
 
-def first_afternoon_insurance_reminder(booking):
-    first_morning_insurance_reminder(booking)
-
-
-def second_afternoon_insurance_reminder(booking):
-    second_morning_insurance_reminder(booking)
-
-
-def pickup_confirmation(booking):
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name or None,
-                'HEADLINE': '{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
-                'TEXT': '''
-                    You have received a payment of ${} from {} for the {}
-                    You can now give them the keys to drive.
-                    <br />
-                    Their credit card has been charged and you will receive the payment within 48 hours. The security
-                    deposit of ${} has also been placed in escrow for you.
-                '''.format(
-                    # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
-                    booking.weekly_rent,
-                    booking.driver.full_name(),
-                    booking.car.display_name(),
-                    booking.car.solo_deposit
-                ),
-            }
+class FirstAfternoonInsuranceReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'TEXT': '''
+                We are just checking in on {} {} booking with plate
+                {} to see if they have been accepted on the insurance.
+                You can click below to let us know where they are in the process.
+                Once they are approved, they will contact you to schedule a pickup.
+            '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
+            'CTA_LABEL': 'Call (844) 435-3227',
+            'CTA_URL': 'tel:1-844-4353227',
+            'template_name': 'one_button_no_image',
+            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
         }
-        email.send_async(
-            template_name='no_button_no_image',
-            subject='{} has paid you for the {}'.format(booking.driver.full_name(), booking.car.display_name()),
-            merge_vars=merge_vars,
-        )
+
+
+class SecondAfternoonInsuranceReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
+            'TEXT': '''
+                We are doing a final checks on {} {} booking with plate
+                {} to see if they have been accepted on the insurance.
+                You can click below to let us know where they are in the process.
+                Once they are approved, they will contact you to schedule a pickup.
+                <br />
+                We promise drivers that they will get into a car within 24-48 hours,
+                so if we don’t hear back we will have to cancel the booking.
+                We don’t want to do that so please let us know if there are any problems.
+            '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
+            'CTA_LABEL': 'Call (844) 435-3227',
+            'CTA_URL': 'tel:1-844-4353227',
+            'template_name': 'one_button_no_image',
+            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+        }
+
+
+class PickupConfirmation(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'TEXT': '''
+                You have received a payment of ${} from {} for the {}
+                You can now give them the keys to drive.
+                <br />
+                Their credit card has been charged and you will receive the payment within 48 hours. The security
+                deposit of ${} has also been placed in escrow for you.
+            '''.format(
+                # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
+                kwargs['booking_weekly_rent'],
+                kwargs['driver_full_name'],
+                kwargs['car_name'],
+                kwargs['car_deposit']
+            ),
+            'template_name': 'no_button_no_image',
+            'subject': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
+        }
 
 
 class PaymentReceipt(notification.OwnerNotification):

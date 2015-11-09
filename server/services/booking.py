@@ -380,7 +380,7 @@ def pickup(booking):
     booking.save()
 
     driver_notifications.pickup_confirmation(booking)
-    owner_notifications.pickup_confirmation(booking)
+    notification.send('owner_notifications.PickupConfirmation', booking)
 
     return booking
 
