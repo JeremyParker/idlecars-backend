@@ -192,6 +192,19 @@ class BookingServiceTest(TestCase):
             'Congratulations! Your documents have been submitted!'
         )
 
+    def test_on_insurance_approved(self):
+        booking = factories.RequestedBooking.create()
+        booking.approval_time = timezone.now()
+        booking.clean()
+        booking.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Alright! Your {} is ready to pick up!'.format(booking.car.display_name())
+        )
+
     def _check_payments_after_pickup(self, new_booking):
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)

@@ -102,6 +102,17 @@ class TestDriverNotifications(TestCase):
         '''
         self.assertEqual(len(outbox), 5)
 
+        self.assertEqual(
+            outbox[3].subject,
+            'Your booking has been cancelled because we don\'t have your driver documents.'
+        )
+        self.assertEqual(
+            outbox[4].subject,
+            'Your {} booking has been cancelled because you never checked out.'.format(
+                other_booking.car.display_name()
+            )
+        )
+
         # each booking should have been set to the correct INCOMPLETE reason
         self.booking.refresh_from_db()
         self.assertEqual(self.booking.get_state(), Booking.INCOMPLETE)
