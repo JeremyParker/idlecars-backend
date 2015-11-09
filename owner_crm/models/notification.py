@@ -29,7 +29,7 @@ def _get_booking_params(booking):
         'booking': booking,
         'booking_state': booking.get_state(),
         'weekly_rent': booking.weekly_rent,
-        'end_time': booking.end_time,
+        'booking_end_time': booking.end_time,
         'checkout_time': booking.checkout_time,
         'requested_time': booking.requested_time,
         'approval_time': booking.approval_time,

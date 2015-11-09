@@ -185,115 +185,109 @@ def pickup_confirmation(booking):
         )
 
 
-def _payment_receipt_text(payment):
-    text = '''
-        You have received a payment through idlecars. <br /><br />
-        Car: {} with license plate {} <br />
-        Driver: {} <br /><br />
+class PaymentReceipt(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        text = '''
+            You have received a payment through idlecars. <br /><br />
+            Car: {} with license plate {} <br />
+            Driver: {} <br /><br />
 
-        Invoice Period: {} - {} <br />
-        Payment Amount: ${} <br />
-        Service Fee: ${} <br />
-        ---------------------------------- <br />
-        Total disbursement: ${} <br />
-        <br /><br />
-    '''.format(
-            payment.booking.car.display_name(),
-            payment.booking.car.plate,
-            payment.booking.driver.full_name(),
+            Invoice Period: {} - {} <br />
+            Payment Amount: ${} <br />
+            Service Fee: ${} <br />
+            ---------------------------------- <br />
+            Total disbursement: ${} <br />
+            <br /><br />
+        '''.format(
+                kwargs['car_name'],
+                kwargs['car_plate'],
+                kwargs['driver_full_name'],
 
-            payment.invoice_start_time.strftime('%b %d'),
-            payment.invoice_end_time.strftime('%b %d'),
-            payment.amount,
-            payment.service_fee,
-            payment.amount - payment.service_fee,
+                kwargs['payment_invoice_start_time'].strftime('%b %d'),
+                kwargs['payment_invoice_end_time'].strftime('%b %d'),
+                kwargs['payment_amount'],
+                kwargs['payment_service_fee'],
+                kwargs['payment_amount'] - kwargs['payment_service_fee'],
+            )
+
+        from server.services import booking as booking_service
+        fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(kwargs['booking'])
+        if amount > 0:
+            text += 'The next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+        else:
+            text += 'This is the last payment. The driver should contact you to arrange dropoff.<br />'
+
+        text += '''
+            This booking will end on: {} <br /><br />
+            As always, if you have any questions, please call us at {}.<br />
+            Thank you.
+        '''.format(
+            kwargs['booking_end_time'].strftime('%b %d'),
+            settings.IDLECARS_PHONE_NUMBER,
         )
 
-    from server.services import booking as booking_service
-    fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(payment.booking)
-    if amount > 0:
-        text += 'The next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
-    else:
-        text += 'This is the last payment. The driver should contact you to arrange dropoff.<br />'
-
-    text += '''
-        This booking will end on: {} <br /><br />
-        As always, if you have any questions, please call us at {}.<br />
-        Thank you.
-    '''.format(
-        payment.booking.end_time.strftime('%b %d'),
-        settings.IDLECARS_PHONE_NUMBER,
-    )
-    return text
-
-
-def payment_receipt(payment):
-    for user in payment.booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name or None,
-                'HEADLINE': 'Payment received for your {}'.format(payment.booking.car.display_name()),
-                'TEXT': _payment_receipt_text(payment)
-            }
-        }
-        email.send_async(
-            template_name='no_button_no_image',
-            subject='Payment receipt from idlecars rental: {} license plate {}'.format(
-                payment.booking.car.display_name(),
-                payment.booking.car.plate,
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Payment received for your {}'.format(kwargs['car_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Payment receipt from idlecars rental: {} license plate {}'.format(
+                kwargs['car_name'],
+                kwargs['car_plate'],
             ),
-            merge_vars=merge_vars,
-        )
-
-
-def _booking_incomplete_email(booking, body_text):
-    headline = '{} has decided not to rent your {}, with license plate {}'.format(
-        booking.driver.full_name(),
-        booking.car.display_name(),
-        booking.car.plate,
-    )
-    subject = 'Your {} booking has canceled.'.format(booking.car.display_name())
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name or None,
-                'HEADLINE': subject,
-                'TEXT': body_text,
-                'CTA_LABEL': 'See your listing',
-                'CTA_URL': client_side_routes.car_details_url(booking.car)
-            }
         }
-        email.send_async(
-            template_name='one_button_no_image',
-            subject=subject,
-            merge_vars=merge_vars,
+
+
+class BookingCanceled(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        headline = '{} has decided not to rent your {}, with license plate {}'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
         )
 
+        text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
+        broker not to add them to the insurance policy? We apologise for any inconvenience. We've
+        already re-listed your car on the site so we can find you another driver as soon as possible.
+        '''.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        # TODO(JP) track gender of driver and customize this email text
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': headline,
+            'TEXT': text,
+            'CTA_LABEL': 'See your listing',
+            'CTA_URL': client_side_routes.car_details_url(kwargs['car']),
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
+        }
 
-def booking_canceled(booking):
-    # TODO(JP) track gender of driver and customize this email text
-    text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
-    broker not to add them to the insurance policy? We apologise for any inconvenience. We've
-    already re-listed your car on the site so we can find you another driver as soon as possible.
-    '''.format(
-        booking.driver.first_name(),
-        booking.car.display_name(),
-    )
-    _booking_incomplete_email(booking, text)
 
+class DriverRejected(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        headline = '{} has decided not to rent your {}, with license plate {}'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
 
-def driver_rejected(booking):
-    text = '''We're sorry. {} has decided not to rent your {}. We apologise for any inconvenience.
-    We've already re-listed your car on the site so we can find you another driver as soon as possible.
-    '''.format(
-        booking.driver.first_name(),
-        booking.car.display_name(),
-    )
-    _booking_incomplete_email(booking, text)
+        text = '''We're sorry. {} has decided not to rent your {}. We apologise for any inconvenience.
+        We've already re-listed your car on the site so we can find you another driver as soon as possible.
+        '''.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': headline,
+            'TEXT': text,
+            'CTA_LABEL': 'See your listing',
+            'CTA_URL': client_side_routes.car_details_url(kwargs['car']),
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
+        }
 
 
 class InsuranceTooSlow(notification.OwnerNotification):

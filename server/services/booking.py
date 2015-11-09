@@ -181,7 +181,7 @@ def on_incomplete(booking, original_booking_state):
     if reason == Booking.REASON_CANCELED:
         driver_notifications.booking_canceled(booking)
         if Booking.REQUESTED == original_booking_state:
-            owner_notifications.booking_canceled(booking)
+            notification.send('owner_notifications.BookingCanceled', booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
         notification.send('owner_notifications.InsuranceTooSlow', booking)
         driver_notifications.insurance_failed(booking)
@@ -192,7 +192,7 @@ def on_incomplete(booking, original_booking_state):
     elif reason == Booking.REASON_OWNER_REJECTED:
         driver_notifications.insurance_rejected(booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_notifications.driver_rejected(booking)
+        notification.send('owner_notifications.DriverRejected', booking)
     elif reason == Booking.REASON_MISSED:
         driver_notifications.car_rented_elsewhere(booking)
 
@@ -416,7 +416,7 @@ def _cron_payments():
                 print payment.notes
                 continue
             driver_notifications.payment_receipt(payment)
-            owner_notifications.payment_receipt(payment)
+            notification.send('owner_notifications.PaymentReceipt', payment)
         except Exception as e:
             print e
             notification.send('ops_notifications.PaymentJobFailed', booking, e)
