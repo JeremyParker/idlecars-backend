@@ -30,13 +30,13 @@ def _get_booking_params(booking):
         'booking_state': booking.get_state(),
         'booking_weekly_rent': booking.weekly_rent,
         'booking_end_time': booking.end_time,
-        'checkout_time': booking.checkout_time,
-        'requested_time': booking.requested_time,
-        'approval_time': booking.approval_time,
-        'pickup_time': booking.pickup_time,
-        'return_time': booking.return_time,
-        'refund_time': booking.refund_time,
-        'incomplete_time': booking.incomplete_time,
+        'booking_checkout_time': booking.checkout_time,
+        'booking_requested_time': booking.requested_time,
+        'booking_approval_time': booking.approval_time,
+        'booking_pickup_time': booking.pickup_time,
+        'booking_return_time': booking.return_time,
+        'booking_refund_time': booking.refund_time,
+        'booking_incomplete_time': booking.incomplete_time,
         'booking_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
         )
@@ -55,10 +55,12 @@ def _get_car_params(car):
 
 def _get_driver_params(driver):
     return {
+        'driver': driver,
         'driver_email': driver.email(),
         'driver_first_name': driver.first_name(),
         'driver_full_name': driver.full_name(),
         'driver_phone_number': driver.phone_number(),
+        'driver_all_docs_uploaded': driver.all_docs_uploaded(),
         'driver_license_image': driver.driver_license_image,
         'fhv_license_image': driver.fhv_license_image,
         'address_proof_image': driver.address_proof_image,
@@ -96,6 +98,24 @@ def _get_renewal_params(renewal):
     return {
         'renewal_url': client_side_routes.renewal_url(renewal)
     }
+
+def _get_password_reset_params(password_reset):
+    return {
+        'password_reset_user_first_name': password_reset.auth_user.first_name,
+        'password_reset_url': client_side_routes.password_reset(password_reset)
+    }
+
+def _get_urls_params(pseudo_argument):
+    return {
+        'car_listing_url': client_side_routes.car_listing_url(),
+        'docs_upload_url': client_side_routes.doc_upload_url(),
+        'bookings_url': client_side_routes.bookings(),
+        'driver_account_url': client_side_routes.driver_account(),
+        'terms_of_service_url': client_side_routes.terms_of_service(),
+        'faq_url': client_side_routes.faq(),
+        'add_car_form_url': client_side_routes.add_car_form(),
+    }
+
 
 def get_merge_vars(context):
     merge_vars_origin = {
@@ -136,6 +156,7 @@ class Notification(object):
         match_list = {
             'Driver': {
                 '_get_driver_params': 'self.argument',
+                '_get_urls_params': 'None',
             },
             'Owner': {
                 '_get_owner_params': 'self.argument',
@@ -145,6 +166,7 @@ class Notification(object):
                 '_get_driver_params': 'self.argument.driver',
                 '_get_car_params': 'self.argument.car',
                 '_get_owner_params': 'self.argument.car.owner',
+                '_get_urls_params': 'None',
             },
             'Payment': {
                 '_get_payment_params': 'self.argument',
@@ -160,6 +182,10 @@ class Notification(object):
                 '_get_renewal_params': 'self.argument',
                 '_get_car_params': 'self.argument.car',
                 '_get_owner_params': 'self.argument.car.owner',
+            },
+            'PasswordReset': {
+                '_get_password_reset_params': 'self.argument',
+                '_get_urls_params': 'None',
             }
         }.get(self.argument_class(), {})
 
@@ -175,12 +201,13 @@ class Notification(object):
 
     def default_params_sets(self):
         return {
-            'Driver': ['driver'],
+            'Driver': ['driver', 'urls'],
             'Owner': ['owner'],
-            'Booking': ['booking', 'driver', 'car', 'owner'],
+            'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],
             'Renewal': ['renewal', 'car', 'owner'],
+            'PasswordReset': ['password_reset', 'urls'],
         }.get(self.argument_class(), [])
 
     def custom_params_sets(self):
@@ -241,6 +268,13 @@ class DriverNotification(Notification):
             driver = self.argument.driver
         elif clas == 'Payment':
             driver = self.argument.booking.driver
+        elif clas == 'PasswordReset':
+            driver = self.argument.auth_user
+            return [{
+                'email_address': driver.email,
+                'phone_number': driver.username,
+                'sms_enabled': False,
+            }]
         else:
             return []
 
