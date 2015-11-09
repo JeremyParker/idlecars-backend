@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.utils import timezone
+from django.db.models import Q
 
 from owner_crm.models import ops_notifications, driver_notifications
 from owner_crm.services import throttle_service, notification
@@ -68,28 +69,34 @@ def get_default_payment_method(driver):
 
 def _get_remindable_drivers(delay_hours):
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+
     return server.models.Driver.objects.filter(
         documentation_approved=False,
         auth_user__date_joined__lte=reminder_threshold,
+    ).filter(
+        Q(driver_license_image__exact='') |
+        Q(fhv_license_image__exact='') |
+        Q(address_proof_image__exact='') |
+        Q(defensive_cert_image__exact='')
     )
 
 
 def _send_document_reminders(docs_reminder_delay_hours, reminder_name):
     # send reminders to drivers who started an account, and never submitted docs
     remindable_drivers = _get_remindable_drivers(docs_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_drivers, eval('driver_notifications.' + reminder_name))
+    throttle_service.send_to_driver(remindable_drivers, 'driver_notifications.' + reminder_name)
 
 
 def process_driver_emails():
     _send_document_reminders(
       docs_reminder_delay_hours=1,
-      reminder_name='first_documents_reminder'
+      reminder_name='FirstDocumentsReminder'
     )
     _send_document_reminders(
       docs_reminder_delay_hours=24,
-      reminder_name='second_documents_reminder'
+      reminder_name='SecondDocumentsReminder'
     )
     _send_document_reminders(
       docs_reminder_delay_hours=36,
-      reminder_name='third_documents_reminder'
+      reminder_name='ThirdDocumentsReminder'
     )
