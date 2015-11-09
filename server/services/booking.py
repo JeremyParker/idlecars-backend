@@ -181,9 +181,9 @@ def on_incomplete(booking, original_booking_state):
     if reason == Booking.REASON_CANCELED:
         notification.send('driver_notifications.BookingCanceled', booking)
         if Booking.REQUESTED == original_booking_state:
-            owner_notifications.booking_canceled(booking)
+            notification.send('owner_notifications.BookingCanceled', booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
-        owner_notifications.insurance_too_slow(booking)
+        notification.send('owner_notifications.InsuranceTooSlow', booking)
         notification.send('driver_notifications.InsuranceFailed', booking)
     elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
         notification.send('driver_notifications.BookingTimedOut', booking)
@@ -192,7 +192,7 @@ def on_incomplete(booking, original_booking_state):
     elif reason == Booking.REASON_OWNER_REJECTED:
         notification.send('driver_notifications.InsuranceRejected', booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_notifications.driver_rejected(booking)
+        notification.send('owner_notifications.DriverRejected', booking)
     elif reason == Booking.REASON_MISSED:
         notification.send('driver_notifications.CarRentedElsewhere', booking)
 
@@ -380,7 +380,7 @@ def pickup(booking):
     booking.save()
 
     notification.send('driver_notifications.PickupConfirmation', booking)
-    owner_notifications.pickup_confirmation(booking)
+    notification.send('owner_notifications.PickupConfirmation', booking)
 
     return booking
 
@@ -416,7 +416,7 @@ def _cron_payments():
                 print payment.notes
                 continue
             notification.send('driver_notifications.PaymentReceipt', payment)
-            owner_notifications.payment_receipt(payment)
+            notification.send('owner_notifications.PaymentReceipt', payment)
         except Exception as e:
             print e
             notification.send('ops_notifications.PaymentJobFailed', booking, e)

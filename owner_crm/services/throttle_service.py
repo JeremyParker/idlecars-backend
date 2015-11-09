@@ -12,6 +12,12 @@ def send_to_queryset(queryset, func):
         func(obj)
         message_service.log_message(campaign_name, obj)
 
+def send_to_owner(queryset, campaign_name):
+    campaign_name = campaign_name
+    for obj in queryset.exclude(message__campaign=campaign_name,):
+        notification.send(campaign_name, obj)
+        message_service.log_message(campaign_name, obj)
+
 def send_to_driver(queryset, campaign_name):
     for driver in queryset.exclude(message__campaign=campaign_name,):
 

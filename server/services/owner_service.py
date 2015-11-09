@@ -54,7 +54,7 @@ def _get_remindable_bookings(delay_hours):
 
 def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
     remindable_bookings = _get_remindable_bookings(insurance_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_bookings, eval('owner_notifications.' + reminder_name))
+    throttle_service.send_to_owner(remindable_bookings, 'owner_notifications.' + reminder_name)
 
 
 def _reminder_email():
@@ -66,21 +66,21 @@ def _reminder_email():
     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='first_morning_insurance_reminder'
+            reminder_name='FirstMorningInsuranceReminder'
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='second_morning_insurance_reminder'
+            reminder_name='SecondMorningInsuranceReminder'
         )
 
     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='first_afternoon_insurance_reminder'
+            reminder_name='FirstAfternoonInsuranceReminder'
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='second_afternoon_insurance_reminder'
+            reminder_name='SecondAfternoonInsuranceReminder'
         )
 
 
@@ -101,7 +101,7 @@ def update_account_state(merchant_account_id, state, errors=None):
     owner.save()
 
     if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
-        owner_notifications.bank_account_approved(owner)
+        notification.send('owner_notifications.BankAccountApproved', owner)
     else:
         notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 

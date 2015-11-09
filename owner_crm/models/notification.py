@@ -73,6 +73,7 @@ def _get_driver_params(driver):
 
 def _get_owner_params(owner):
     return {
+        'owner': owner,
         'owner_email': owner.email(),
         'owner_name': owner.name(),
         'owner_first_name': owner.first_name(),
