@@ -183,7 +183,7 @@ def on_incomplete(booking, original_booking_state):
         if Booking.REQUESTED == original_booking_state:
             owner_notifications.booking_canceled(booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
-        owner_notifications.insurance_too_slow(booking)
+        notification.send('owner_notifications.InsuranceTooSlow', booking)
         driver_notifications.insurance_failed(booking)
     elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
         driver_notifications.booking_timed_out(booking)

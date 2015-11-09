@@ -296,28 +296,21 @@ def driver_rejected(booking):
     _booking_incomplete_email(booking, text)
 
 
-def insurance_too_slow(booking):
-    for user in booking.car.owner.auth_users.all():
-        if not user.email:
-            continue
-        merge_vars = {
-            user.email: {
-                'FNAME': user.first_name,
-                'HEADLINE': 'Your {} booking has been canceled'.format(booking.car.display_name()),
-                'TEXT': '''
-                    We are sorry to inform you, but we cancelled the {} booking for {}
-                    We require drivers get on the insurance and into cars within 24 to 48 hours,
-                    so we hope that we will be able to do this next time.
-                    <br />
-                    If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
-                '''.format(booking.car.display_name(), booking.driver.full_name()),
-            }
+class InsuranceTooSlow(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': 'Your {} booking has been canceled'.format(kwargs['car_name']),
+            'TEXT': '''
+                We are sorry to inform you, but we cancelled the {} booking for {}
+                We require drivers get on the insurance and into cars within 24 to 48 hours,
+                so we hope that we will be able to do this next time.
+                <br />
+                If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
+            '''.format(kwargs['car_name'], kwargs['driver_full_name']),
+            'template_name': 'no_button_no_image',
+            'subject': 'Your {} booking has been canceled'.format(kwargs['car_name']),
         }
-        email.send_async(
-            template_name='no_button_no_image',
-            subject='Your {} booking has been canceled'.format(booking.car.display_name()),
-            merge_vars=merge_vars,
-        )
 
 
 def account_created(password_reset):
