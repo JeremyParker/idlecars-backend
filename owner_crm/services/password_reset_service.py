@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import auth
 
 from owner_crm import models
-from owner_crm.models import owner_notifications
+from owner_crm.services import notification
 
 
 def create(phone_number):
@@ -26,4 +26,4 @@ def create(phone_number):
 def invite_owner(auth_user):
     password_reset = create(auth_user.username)
     if password_reset:
-        owner_notifications.account_created(password_reset)
+        notification.send('owner_notifications.AccountCreated', password_reset)

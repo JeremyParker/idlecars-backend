@@ -317,20 +317,14 @@ class InsuranceTooSlow(notification.OwnerNotification):
         }
 
 
-def account_created(password_reset):
-    if not password_reset.auth_user.email:
-        return  # TODO - send some sort of error email, or at least log the error.
-    merge_vars = {
-        password_reset.auth_user.email: {
-            'FNAME': password_reset.auth_user.first_name or None,
-            'CTA_URL': client_side_routes.owner_password_reset(password_reset),
+class AccountCreated(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        return {
+            'FNAME': kwargs['password_reset_user_first_name'] or None,
+            'CTA_URL': kwargs['password_owner_reset_url'],
+            'template_name': 'owner_account_invite',
+            'subject': 'Complete your account today - sign up with your bank account and start getting paid',
         }
-    }
-    email.send_async(
-        template_name='owner_account_invite',
-        subject='Complete your account today - sign up with your bank account and start getting paid',
-        merge_vars=merge_vars,
-    )
 
 
 class BankAccountApproved(notification.OwnerNotification):
