@@ -98,6 +98,10 @@ class BookingServiceTest(TestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Your {} was successfully reserved'.format(new_booking.car.display_name()),
+        )
 
     def test_checkout_docs_approved(self):
         new_booking = self._checkout_approved_driver()
@@ -229,8 +233,22 @@ class BookingServiceTest(TestCase):
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
         self.assertEqual(
+             outbox[0].subject,
+            'Your {} booking has been canceled'.format(booking.car.display_name())
+        )
+        self.assertEqual(
             outbox[1].subject,
             'We were unable to complete your {} booking'.format(booking.car.display_name())
+        )
+
+    def test_car_rented_elsewhere(self):
+        booking = self._create_incomplete_booking(models.Booking.REASON_MISSED)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+             outbox[0].subject,
+            'Sorry, someone else rented out the car you wanted.'
         )
 
     def _check_payments_after_pickup(self, new_booking):
