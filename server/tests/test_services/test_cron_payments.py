@@ -168,6 +168,13 @@ class TestCronPayments(TestCase):
             outbox[0].subject,
             'Payment Received: {} Booking'.format(self.booking.car.display_name())
         )
+        self.assertEqual(
+            outbox[1].subject,
+            'Payment receipt from idlecars rental: {} license plate {}'.format(
+                self.booking.car.display_name(),
+                self.booking.car.plate,
+            )
+        )
         self.assertTrue('This is your last payment' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT'])
         owner_email = self.booking.car.owner.auth_users.first().email
         self.assertTrue('This is the last payment' in outbox[1].merge_vars[owner_email]['TEXT'])

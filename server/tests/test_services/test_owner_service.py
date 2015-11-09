@@ -34,6 +34,10 @@ class OwnerInvitationTest(TestCase):
             client_side_routes.owner_password_reset(password_reset),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Complete your account today - sign up with your bank account and start getting paid'
+        )
 
     def test_invitation_no_owner(self):
         self.user = factories.AuthUser.create() # Note: no owner

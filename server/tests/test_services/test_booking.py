@@ -232,13 +232,25 @@ class BookingServiceTest(TestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
+        # we should have sent an email to owner because owner too slow
         self.assertEqual(
              outbox[0].subject,
             'Your {} booking has been canceled'.format(booking.car.display_name())
         )
+        # we should have sent an email to driver because owner too slow
         self.assertEqual(
             outbox[1].subject,
             'We were unable to complete your {} booking'.format(booking.car.display_name())
+        )
+
+    def test_driver_rejected(self):
+        booking = self._create_incomplete_booking(models.Booking.REASON_DRIVER_REJECTED)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+             outbox[0].subject,
+            'Your {} booking has canceled.'.format(booking.car.display_name())
         )
 
     def test_car_rented_elsewhere(self):
@@ -270,13 +282,13 @@ class BookingServiceTest(TestCase):
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
 
-        # a pickup confirmation to owner
+        # a pickup confirmation to driver
         self.assertEqual(
             outbox[0].subject,
             'You are ready to drive!'
         )
 
-        # a pickup confirmation to driver
+        # a pickup confirmation to owner
         self.assertEqual(
             outbox[1].subject,
             '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
@@ -369,6 +381,15 @@ class BookingServiceTest(TestCase):
         if not len(outbox) == expected_email_count:
             print [o.subject for o in outbox]
         self.assertEqual(len(outbox), expected_email_count)
+
+        self.assertEqual(
+            outbox[2].subject,
+            'Confirmation: Your rental has been canceled.'
+        )
+        self.assertEqual(
+            outbox[3].subject,
+            'Your {} booking has canceled.'.format(new_booking.car.display_name())
+        )
 
     def test_correct_start_time(self):
         driver = factories.Driver.create()
