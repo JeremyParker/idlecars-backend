@@ -11,7 +11,7 @@ from django.core.management import call_command
 import server.factories
 from server.models import Booking
 from owner_crm.tests import sample_merge_vars
-
+from owner_crm.tests.test_services import test_message
 
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
@@ -28,6 +28,11 @@ class TestDriverNotifications(TestCase):
     def test_docs_reminder(self):
         call_command('driver_notifications')
 
+        test_message.verify_throttled_on_driver(
+            self.booking.driver,
+            'driver_notifications.FirstDocumentsReminder'
+        )
+
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
@@ -38,8 +43,13 @@ class TestDriverNotifications(TestCase):
 
     @freeze_time("2014-10-10 11:00:00")
     def test_driver_no_booking(self):
+        driver = self.booking.driver
         self.booking.delete()
         call_command('driver_notifications')
+        test_message.verify_throttled_on_driver(
+            driver,
+            'driver_notifications.FirstDocumentsReminder',
+        )
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
@@ -48,7 +58,13 @@ class TestDriverNotifications(TestCase):
     @freeze_time("2014-10-10 11:00:00")
     def test_no_email_twice(self):
         call_command('driver_notifications')
+        test_message.verify_throttled_on_driver(
+            self.booking.driver,
+            'driver_notifications.FirstDocumentsReminder'
+        )
+
         call_command('driver_notifications')
+
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
