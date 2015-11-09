@@ -89,7 +89,10 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
         call_command('owner_notifications')
-        test_message.verify_throttled_on_owner(self.booking.car.owner, 'owner_notifications.FirstMorningInsuranceReminder')
+        test_message.verify_throttled_on_owner(
+            self.booking.car.owner,
+            'first_morning_insurance_reminder'
+        )
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
@@ -118,7 +121,7 @@ class TestOwnerNotifications(TestCase):
         call_command('owner_notifications')
         test_message.verify_throttled_on_owner(
             self.booking.car.owner,
-            'owner_notifications.FirstMorningInsuranceReminder',
+            'first_morning_insurance_reminder',
         )
         call_command('owner_notifications')
 
@@ -150,15 +153,27 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'first_morning_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'second_morning_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
@@ -188,7 +203,10 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-            test_message.verify_throttled_on_owner(self.booking.car.owner, 'owner_notifications.FirstAfternoonInsuranceReminder')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'first_afternoon_insurance_reminder'
+            )
 
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
@@ -197,7 +215,10 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
-            test_message.verify_throttled_on_owner(self.booking.car.owner, 'owner_notifications.SecondAfternoonInsuranceReminder')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'second_afternoon_insurance_reminder'
+            )
 
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')

@@ -30,7 +30,7 @@ class TestDriverNotifications(TestCase):
 
         test_message.verify_throttled_on_driver(
             self.booking.driver,
-            'driver_notifications.FirstDocumentsReminder'
+            'first_documents_reminder'
         )
 
         from django.core.mail import outbox
@@ -48,7 +48,7 @@ class TestDriverNotifications(TestCase):
         call_command('driver_notifications')
         test_message.verify_throttled_on_driver(
             driver,
-            'driver_notifications.FirstDocumentsReminder',
+            'first_documents_reminder',
         )
 
         from django.core.mail import outbox
@@ -60,7 +60,7 @@ class TestDriverNotifications(TestCase):
         call_command('driver_notifications')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
-            'driver_notifications.FirstDocumentsReminder'
+            'first_documents_reminder'
         )
 
         call_command('driver_notifications')
@@ -97,15 +97,27 @@ class TestDriverNotifications(TestCase):
         with freeze_time("2014-10-10 11:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
+        test_message.verify_throttled_on_driver(
+            self.booking.driver,
+            'first_documents_reminder'
+        )
         with freeze_time("2014-10-11 10:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
+        test_message.verify_throttled_on_driver(
+            self.booking.driver,
+            'second_documents_reminder'
+        )
         with freeze_time("2014-10-11 22:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
         with freeze_time("2014-10-12 10:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
+        test_message.verify_throttled_on_driver(
+            self.booking.driver,
+            'third_documents_reminder'
+        )
         with freeze_time("2014-10-13 10:00:00"):
             call_command('driver_notifications')
             call_command('cron_job')
