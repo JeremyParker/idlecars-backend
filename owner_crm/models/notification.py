@@ -278,9 +278,9 @@ class DriverNotification(Notification):
             return []
 
         return [{
-            'email_address': driver.email() ,
+            'email_address': driver.email(),
             'phone_number': driver.phone_number(),
-            'sms_enabled': driver.sms_enabled or False,
+            'sms_enabled': driver.sms_enabled,
         }]
 
 
