@@ -135,6 +135,7 @@ class TestCronPayments(TestCase):
         # check what emails got sent
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'The payment job failed.')
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_no_payment_for_ended_booking(self):
@@ -166,6 +167,13 @@ class TestCronPayments(TestCase):
         self.assertEqual(
             outbox[0].subject,
             'Payment Received: {} Booking'.format(self.booking.car.display_name())
+        )
+        self.assertEqual(
+            outbox[1].subject,
+            'Payment receipt from idlecars rental: {} license plate {}'.format(
+                self.booking.car.display_name(),
+                self.booking.car.plate,
+            )
         )
         self.assertTrue('This is your last payment' in outbox[0].merge_vars[self.booking.driver.email()]['TEXT'])
         owner_email = self.booking.car.owner.auth_users.first().email

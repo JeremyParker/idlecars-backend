@@ -38,6 +38,7 @@ class PasswordResetTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Your idlecars password has been set.')
 
         self.auth_user = auth_models.User.objects.get(id=self.auth_user.id)
         new_password = self.auth_user.password

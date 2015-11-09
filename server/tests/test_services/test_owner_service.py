@@ -34,6 +34,10 @@ class OwnerInvitationTest(TestCase):
             client_side_routes.owner_password_reset(password_reset),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Complete your account today - sign up with your bank account and start getting paid'
+        )
 
     def test_invitation_no_owner(self):
         self.user = factories.AuthUser.create() # Note: no owner
@@ -43,3 +47,22 @@ class OwnerInvitationTest(TestCase):
     def test_invitation_no_user(self):
         with self.assertRaises(Owner.DoesNotExist):
             auth_user = owner_service.invite_legacy_owner('0000') # Note - bad phone number
+
+
+class OwnerAccountTest(TestCase):
+    def setUp(self):
+        self.owner = factories.BankAccountOwner.create()
+
+    def test_owner_account_declined(self):
+        owner_service.update_account_state(
+            self.owner.merchant_id,
+            Owner.BANK_ACCOUNT_DECLINED,
+            ['test fake errors'],
+        )
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            '{}\'s bank account was declined'.format(self.owner.name())
+        )

@@ -30,6 +30,7 @@ class PasswordResetSetupTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Reset your password on idlecars.')
 
     def test_revokes_other_tokens(self):
         auth_user = server.factories.AuthUser.create()

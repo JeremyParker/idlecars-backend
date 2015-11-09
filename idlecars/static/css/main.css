@@ -41,6 +41,10 @@
       width: 100%;
       margin-top: 48px;
       margin-bottom: 36px; }
+    .about-page .team-cities-careers .cities a {
+      color: #008aff; }
+    .about-page .team-cities-careers .cities .underline {
+      border-width: 1px; }
     .about-page .team-cities-careers .careers h2 {
       margin-top: 100px;
       margin-bottom: 36px; }
