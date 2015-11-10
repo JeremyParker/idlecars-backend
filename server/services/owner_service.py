@@ -57,8 +57,8 @@ def _send_reminder_email(insurance_reminder_delay_hours, reminder_name, throttle
     throttled_bookings = throttle_service.throttle(remindable_bookings, throttle_key)
 
     campaign_name = 'owner_notifications.' + reminder_name
-    for obj in throttled_bookings:
-        notification.send(campaign_name, obj)
+    for booking in throttled_bookings:
+        notification.send(campaign_name, booking)
 
     throttle_service.mark_sent(throttled_bookings, throttle_key)
 
