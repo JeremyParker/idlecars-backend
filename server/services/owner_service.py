@@ -52,9 +52,15 @@ def _get_remindable_bookings(delay_hours):
     )
 
 
-def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
+def _send_reminder_email(insurance_reminder_delay_hours, reminder_name, throttle_key):
     remindable_bookings = _get_remindable_bookings(insurance_reminder_delay_hours)
-    throttle_service.send_to_owner(remindable_bookings, 'owner_notifications.' + reminder_name)
+    throttled_bookings = throttle_service.throttle(remindable_bookings, throttle_key)
+
+    campaign_name = 'owner_notifications.' + reminder_name
+    for booking in throttled_bookings:
+        notification.send(campaign_name, booking)
+
+    throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
 def _reminder_email():
@@ -64,23 +70,28 @@ def _reminder_email():
     delay_hours = 12
 
     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
+
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='FirstMorningInsuranceReminder'
+            reminder_name='FirstMorningInsuranceReminder',
+            throttle_key='first_morning_insurance_reminder',
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='SecondMorningInsuranceReminder'
+            reminder_name='SecondMorningInsuranceReminder',
+            throttle_key='second_morning_insurance_reminder',
         )
 
     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='FirstAfternoonInsuranceReminder'
+            reminder_name='FirstAfternoonInsuranceReminder',
+            throttle_key='first_afternoon_insurance_reminder',
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='SecondAfternoonInsuranceReminder'
+            reminder_name='SecondAfternoonInsuranceReminder',
+            throttle_key='second_afternoon_insurance_reminder',
         )
 
 

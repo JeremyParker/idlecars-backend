@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 import datetime
+from freezegun import freeze_time
+
 
 from django.utils import timezone
 from django.test import TestCase
@@ -10,16 +12,16 @@ from django.contrib.auth.models import User
 
 import idlecars.client_side_routes
 import server.models
-import owner_crm.models
 import server.factories
-import owner_crm.factories
-from owner_crm.management.commands import owner_notifications
-from owner_crm.tests import sample_merge_vars
-
 from server.services import owner_service
 from server.services import booking as booking_service
 
-from freezegun import freeze_time
+import owner_crm.models
+import owner_crm.factories
+from owner_crm.management.commands import owner_notifications
+from owner_crm.tests import sample_merge_vars
+from owner_crm.tests.test_services import test_message
+
 
 
 class TestOwnerNotifications(TestCase):
@@ -87,6 +89,10 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
         call_command('owner_notifications')
+        test_message.verify_throttled_on_owner(
+            self.booking.car.owner,
+            'first_morning_insurance_reminder'
+        )
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
@@ -113,6 +119,10 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking(booking_time)
 
         call_command('owner_notifications')
+        test_message.verify_throttled_on_owner(
+            self.booking.car.owner,
+            'first_morning_insurance_reminder',
+        )
         call_command('owner_notifications')
 
         # we should have sent only one reminder about getting the driver on the insurance.
@@ -143,15 +153,27 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'first_morning_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'second_morning_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
@@ -181,15 +203,27 @@ class TestOwnerNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'first_afternoon_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+            test_message.verify_throttled_on_owner(
+                self.booking.car.owner,
+                'second_afternoon_insurance_reminder'
+            )
+
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')
+
         with freeze_time(timezone.datetime(2014, 10, 13, 17, tzinfo=tz)):
             call_command('owner_notifications')
             call_command('cron_job')

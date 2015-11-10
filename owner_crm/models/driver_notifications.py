@@ -31,7 +31,6 @@ class DocsApprovedNoBooking(notification.DriverNotification):
         }
 
 
-
 class BaseLetterApprovedNoCheckout(notification.DriverNotification):
     def get_context(self, **kwargs):
         template_data = {'CAR_NAME': kwargs['car_name']}

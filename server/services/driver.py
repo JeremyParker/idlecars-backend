@@ -81,22 +81,35 @@ def _get_remindable_drivers(delay_hours):
     )
 
 
-def _send_document_reminders(docs_reminder_delay_hours, reminder_name):
+def _send_document_reminders(docs_reminder_delay_hours, reminder_name, throttle_key):
     # send reminders to drivers who started an account, and never submitted docs
     remindable_drivers = _get_remindable_drivers(docs_reminder_delay_hours)
-    throttle_service.send_to_driver(remindable_drivers, 'driver_notifications.' + reminder_name)
+    throttled_drivers = throttle_service.throttle(remindable_drivers, throttle_key)
+    for driver in throttled_drivers:
+        # check each driver's pending bookings
+        pending_bookings = server.services.booking.filter_pending(driver.booking_set)
+        if pending_bookings:
+            booking = pending_bookings.order_by('created_time').last()
+            notification.send('driver_notifications.' + reminder_name + 'Booking', booking)
+        else:
+            notification.send('driver_notifications.' + reminder_name + 'Driver', driver)
+
+    throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
 def process_driver_emails():
     _send_document_reminders(
       docs_reminder_delay_hours=1,
-      reminder_name='FirstDocumentsReminder'
+      reminder_name='FirstDocumentsReminder',
+      throttle_key='first_documents_reminder',
     )
     _send_document_reminders(
       docs_reminder_delay_hours=24,
-      reminder_name='SecondDocumentsReminder'
+      reminder_name='SecondDocumentsReminder',
+      throttle_key='second_documents_reminder',
     )
     _send_document_reminders(
       docs_reminder_delay_hours=36,
-      reminder_name='ThirdDocumentsReminder'
+      reminder_name='ThirdDocumentsReminder',
+      throttle_key='third_documents_reminder',
     )

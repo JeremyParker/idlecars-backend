@@ -4,10 +4,25 @@ from __future__ import unicode_literals
 from django.test import TestCase
 
 from idlecars import sms_service
-from owner_crm.models import Campaign
+from server import factories
+
+from owner_crm.models import Campaign, Message
 from owner_crm.services import notification as notification_service
 
-from server import factories
+
+def verify_throttled_on_booking(booking, campaign):
+    throttle_messages = Message.objects.filter(booking=booking, campaign=campaign)
+    assert(len(throttle_messages) == 1)
+
+
+def verify_throttled_on_driver(driver, campaign):
+    throttle_messages = Message.objects.filter(driver=driver, campaign=campaign)
+    assert(len(throttle_messages) == 1)
+
+
+def verify_throttled_on_owner(owner, campaign):
+    throttle_messages = Message.objects.filter(owner=owner, campaign=campaign)
+    assert(len(throttle_messages) == 1)
 
 
 class NotificationServiceTest(TestCase):
