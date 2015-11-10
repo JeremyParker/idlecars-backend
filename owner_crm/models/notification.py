@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 
 from idlecars import email, client_side_routes, sms_service
 from server.services import car as car_service
+from server.models import Driver
+
 from owner_crm.models import Campaign
 
 
@@ -308,12 +310,7 @@ class DriverNotification(Notification):
         elif clas == 'Payment':
             driver = self.argument.booking.driver
         elif clas == 'PasswordReset':
-            driver = self.argument.auth_user
-            return [{
-                'email_address': driver.email,
-                'phone_number': driver.username,
-                'sms_enabled': False,
-            }]
+            driver = self.argument.auth_user.driver
         else:
             return []
 

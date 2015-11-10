@@ -34,6 +34,7 @@ class PasswordResetSetupTest(APITestCase):
 
     def test_revokes_other_tokens(self):
         auth_user = server.factories.AuthUser.create()
+        driver = server.factories.Driver.create(auth_user=auth_user)
         reset = owner_crm.factories.PasswordReset.create(auth_user=auth_user)
         data = {'phone_number': auth_user.username}
         url = reverse('owner_crm:password_reset_setups')

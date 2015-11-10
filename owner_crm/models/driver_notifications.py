@@ -5,7 +5,7 @@ from django.template import Context
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from idlecars import email, client_side_routes
+from idlecars import email
 
 from owner_crm.models import notification
 
@@ -15,7 +15,7 @@ class DocsApprovedNoBooking(notification.DriverNotification):
         subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)
         headline = 'Your documents have been reviewed and approved.'
         text = 'You are now ready to rent any car on idlecars with one tap!'
-        cta_url = client_side_routes.car_listing_url()
+        cta_url = kwargs['car_listing_url']
 
         return {
             'FNAME': kwargs['driver_email'],
@@ -39,7 +39,7 @@ class BaseLetterApprovedNoCheckout(notification.DriverNotification):
             'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': body,
             'CTA_LABEL': 'Reserve now',
-            'CTA_URL': client_side_routes.bookings(),
+            'CTA_URL': kwargs['bookings_url'],
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_no_image',
@@ -47,7 +47,10 @@ class BaseLetterApprovedNoCheckout(notification.DriverNotification):
             'sms_body': 'We are ready to submit all documents to get you on the insurance for your \
 {}. We\'re just waiting on your credit card. Don’t worry, your card won\'t be charged until \
 you pick up your car. We just need to put a hold on the card to verify that the card is valid and the \
-funds are available. Tap here to enter your card information and reserve your car: {}'.format(kwargs['car_name'], client_side_routes.bookings()),
+funds are available. Tap here to enter your card information and reserve your car: {}'.format(
+                kwargs['car_name'],
+                kwargs['bookings_url']
+            ),
         }
 
 
