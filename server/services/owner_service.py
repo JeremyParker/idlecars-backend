@@ -52,8 +52,7 @@ def _get_remindable_bookings(delay_hours):
     )
 
 
-def _send_reminder_email(insurance_reminder_delay_hours, reminder_name, throttle_key):
-    remindable_bookings = _get_remindable_bookings(insurance_reminder_delay_hours)
+def _send_reminder_email(remindable_bookings, reminder_name, throttle_key):
     throttled_bookings = throttle_service.throttle(remindable_bookings, throttle_key)
 
     campaign_name = 'owner_notifications.' + reminder_name
@@ -72,24 +71,24 @@ def _reminder_email():
     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
 
         _send_reminder_email(
-            insurance_reminder_delay_hours=delay_hours,
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
             reminder_name='FirstMorningInsuranceReminder',
             throttle_key='first_morning_insurance_reminder',
         )
         _send_reminder_email(
-            insurance_reminder_delay_hours=delay_hours+24,
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
             reminder_name='SecondMorningInsuranceReminder',
             throttle_key='second_morning_insurance_reminder',
         )
 
     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
-            insurance_reminder_delay_hours=delay_hours,
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
             reminder_name='FirstAfternoonInsuranceReminder',
             throttle_key='first_afternoon_insurance_reminder',
         )
         _send_reminder_email(
-            insurance_reminder_delay_hours=delay_hours+24,
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
             reminder_name='SecondAfternoonInsuranceReminder',
             throttle_key='second_afternoon_insurance_reminder',
         )
