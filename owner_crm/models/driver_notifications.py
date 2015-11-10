@@ -1,7 +1,7 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.template import Context
+from django import template as django_template
 from django.template.loader import render_to_string
 from django.conf import settings
 
@@ -32,7 +32,7 @@ class DocsApprovedNoBooking(notification.DriverNotification):
 class BaseLetterApprovedNoCheckout(notification.DriverNotification):
     def get_context(self, **kwargs):
         template_data = {'CAR_NAME': kwargs['car_name']}
-        body = render_to_string("base_letter_approved_no_checkout.jade", template_data, Context(autoescape=False))
+        body = render_to_string("base_letter_approved_no_checkout.jade", template_data, django_template.Context(autoescape=False))
 
         return {
             # TODO: I think we don't need `or None` because it return '', and '' looks the same as None to drivers
@@ -59,14 +59,14 @@ def _render_booking_reminder_body(body_template, car_name, missing_docs_html):
         'CAR_NAME': car_name,
         'DOCS_LIST': missing_docs_html,
     }
-    return render_to_string(body_template, template_data, Context(autoescape=False))
+    return render_to_string(body_template, template_data, django_template.Context(autoescape=False))
 
 
 def _render_driver_reminder_body(body_template, missing_docs_html):
     template_data = {
         'DOCS_LIST': missing_docs_html,
     }
-    return render_to_string(body_template, template_data, Context(autoescape=False))
+    return render_to_string(body_template, template_data, django_template.Context(autoescape=False))
 
 
 class FirstDocumentsReminderBooking(notification.DriverNotification):
@@ -209,7 +209,7 @@ class BookingTimedOut(notification.DriverNotification):
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': render_to_string(template, template_data, Context(autoescape=False)),
+            'TEXT': render_to_string(template, template_data, django_template.Context(autoescape=False)),
             'CTA_LABEL': 'Find your car',
             'CTA_URL': kwargs['car_listing_url'],
             'HEADLINE': 'Your {} rental was canceled'.format(kwargs['car_name']),
@@ -226,7 +226,7 @@ class AwaitingInsuranceEmail(notification.DriverNotification):
         template_data = {
             'CAR_NAME': kwargs['car_name']
         }
-        body = render_to_string("driver_docs_approved.jade", template_data, Context(autoescape=False))
+        body = render_to_string("driver_docs_approved.jade", template_data, django_template.Context(autoescape=False))
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
@@ -254,7 +254,7 @@ class InsuranceApproved(notification.DriverNotification):
         template_data = {
             'CAR_NAME': kwargs['car_name'],
         }
-        body = render_to_string("driver_insurance_approved.jade", template_data, Context(autoescape=False))
+        body = render_to_string("driver_insurance_approved.jade", template_data, django_template.Context(autoescape=False))
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
