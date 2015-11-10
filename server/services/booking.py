@@ -5,11 +5,12 @@ import datetime
 from decimal import Decimal, ROUND_UP
 
 from django.core.urlresolvers import reverse
-from django.db.models import F, Q
+from django.db.models import F
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.services import ops_notifications, driver_notifications, owner_notifications, street_team_notifications, notification
+from owner_crm.models import ops_notifications, driver_notifications, owner_notifications, street_team_notifications
+from owner_crm.services import notification
 
 from server.models import Booking, Payment
 from . import payment as payment_service
@@ -99,9 +100,9 @@ def on_docs_approved(driver):
 
         if bookings:
             latest_booking = bookings.order_by('created_time').last()
-            street_team_notifications.request_base_letter(latest_booking)
+            notification.send('street_team_notifications.RequestBaseLetter', latest_booking)
         else:
-            notification.send('driver_notifications.docs_approved_no_booking', driver, driver)
+            notification.send('driver_notifications.DocsApprovedNoBooking', driver)
 
 
 def on_base_letter_approved(driver):
@@ -109,7 +110,7 @@ def on_base_letter_approved(driver):
     pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
 
     for booking in pending_bookings:
-        driver_notifications.base_letter_approved_no_checkout(booking)
+        notification.send('driver_notifications.BaseLetterApprovedNoCheckout', booking)
 
     for booking in reserved_bookings:
         request_insurance(booking)
@@ -123,15 +124,15 @@ def someone_else_booked(booking):
 
 
 def request_insurance(booking):
-    owner_notifications.new_booking_email(booking)
-    driver_notifications.awaiting_insurance_email(booking)
+    notification.send('owner_notifications.NewBookingEmail', booking)
+    notification.send('driver_notifications.AwaitingInsuranceEmail', booking)
     booking.requested_time = timezone.now()
     booking.save()
     return booking
 
 
 def on_insurance_approved(booking):
-    driver_notifications.insurance_approved(booking)
+    notification.send('driver_notifications.InsuranceApproved', booking)
 
 
 def on_returned(booking):
@@ -148,7 +149,7 @@ def create_booking(car, driver):
     '''
     booking = Booking.objects.create(car=car, driver=driver,)
     if booking.driver.documentation_approved and not booking.driver.base_letter:
-        street_team_notifications.request_base_letter(booking)
+        notification.send('street_team_notifications.RequestBaseLetter', booking)
     return booking
 
 
@@ -178,22 +179,22 @@ def on_incomplete(booking, original_booking_state):
     # let our customers know what happened
     reason = booking.incomplete_reason
     if reason == Booking.REASON_CANCELED:
-        driver_notifications.booking_canceled(booking)
+        notification.send('driver_notifications.BookingCanceled', booking)
         if Booking.REQUESTED == original_booking_state:
-            owner_notifications.booking_canceled(booking)
+            notification.send('owner_notifications.BookingCanceled', booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
-        owner_notifications.insurance_too_slow(booking)
-        driver_notifications.insurance_failed(booking)
+        notification.send('owner_notifications.InsuranceTooSlow', booking)
+        notification.send('driver_notifications.InsuranceFailed', booking)
     elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
-        driver_notifications.booking_timed_out(booking)
+        notification.send('driver_notifications.BookingTimedOut', booking)
     elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
-        driver_notifications.someone_else_booked(booking)
+        notification.send('driver_notifications.SomeoneElseBooked', booking)
     elif reason == Booking.REASON_OWNER_REJECTED:
-        driver_notifications.insurance_rejected(booking)
+        notification.send('driver_notifications.InsuranceRejected', booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
-        owner_notifications.driver_rejected(booking)
+        notification.send('owner_notifications.DriverRejected', booking)
     elif reason == Booking.REASON_MISSED:
-        driver_notifications.car_rented_elsewhere(booking)
+        notification.send('driver_notifications.CarRentedElsewhere', booking)
 
 
 def _make_deposit_payment(booking):
@@ -334,7 +335,7 @@ def checkout(booking):
         if booking.driver.documentation_approved and booking.driver.base_letter:
             return request_insurance(booking)
 
-        driver_notifications.checkout_receipt(booking)
+        notification.send('driver_notifications.CheckoutReceipt', booking)
 
     return booking
 
@@ -378,8 +379,8 @@ def pickup(booking):
 
     booking.save()
 
-    driver_notifications.pickup_confirmation(booking)
-    owner_notifications.pickup_confirmation(booking)
+    notification.send('driver_notifications.PickupConfirmation', booking)
+    notification.send('owner_notifications.PickupConfirmation', booking)
 
     return booking
 
@@ -414,11 +415,11 @@ def _cron_payments():
                 print payment.error_message
                 print payment.notes
                 continue
-            driver_notifications.payment_receipt(payment)
-            owner_notifications.payment_receipt(payment)
+            notification.send('driver_notifications.PaymentReceipt', payment)
+            notification.send('owner_notifications.PaymentReceipt', payment)
         except Exception as e:
             print e
-            ops_notifications.payment_job_failed(booking, e)
+            notification.send('ops_notifications.PaymentJobFailed', booking, e)
 
 
 def _booking_updates():

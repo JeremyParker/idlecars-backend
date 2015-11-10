@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from services import driver_notifications, password_reset_service
+from services import password_reset_service, notification
 from tests import sample_merge_vars
 import serializers, models
 
@@ -28,7 +28,7 @@ class PasswordResetSetupView(views.APIView):
         phone_number = serializer.validated_data['phone_number']
         password_reset = password_reset_service.create(phone_number)
         if password_reset:
-            driver_notifications.password_reset(password_reset)
+            notification.send('driver_notifications.PasswordReset', password_reset)
             content = {'phone_number': phone_number}
             return Response(content, status=status.HTTP_201_CREATED)
 
@@ -70,7 +70,7 @@ class PasswordResetView(views.APIView):
 
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
-            driver_notifications.password_reset_confirmation(password_reset)
+            notification.send('driver_notifications.PasswordResetConfirmation', password_reset)
 
             content = {'_app_notifications': [{'success': 'Your password has been set.'}], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)

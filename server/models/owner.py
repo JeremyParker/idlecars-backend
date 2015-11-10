@@ -64,6 +64,14 @@ class Owner(models.Model):
 
     sms_enabled = models.BooleanField(default=True)
 
+    def default_user(self):
+        users = self.auth_users.all()
+        if users.count() == 1:
+            return users[0]
+        if users.count() > 1:
+            return users.order_by('first_name').first()
+        return None
+
     def name(self):
         if self.company_name:
             return self.company_name
@@ -71,19 +79,21 @@ class Owner(models.Model):
         return ', '.join([u.get_full_name() for u in sorted_users])
 
     def get_user_attr(self, attrib):
-        # get a value from the associated User, or return '', or 'multiple values'
-        users = self.auth_users.all()
-        if users.count() == 1:
-            return getattr(users.first(), attrib)
-        elif users.count() > 1:
-            return 'multiple values'
-        return ''
+        # get a value from the associated User, or return ''
+        user = self.default_user()
+        if user:
+            return getattr(user, attrib)
+        else:
+            return ''
 
     def phone_number(self):
         return self.get_user_attr('username')
 
     def email(self):
         return self.get_user_attr('email')
+
+    def first_name(self):
+        return self.get_user_attr('first_name')
 
     @property
     def effective_service_percentage(self):

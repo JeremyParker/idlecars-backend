@@ -4,10 +4,13 @@ from __future__ import unicode_literals
 from idlecars import email
 
 from owner_crm.services import message as message_service
+from owner_crm.services import notification
 
 
-def send_to_queryset(queryset, func):
-    campaign_name = func.__name__
-    for obj in queryset.exclude(message__campaign=campaign_name,):
-        func(obj)
+def throttle(queryset, campaign_name):
+    return queryset.exclude(message__campaign=campaign_name,)
+
+
+def mark_sent(throttled_queryset, campaign_name):
+    for obj in throttled_queryset:
         message_service.log_message(campaign_name, obj)

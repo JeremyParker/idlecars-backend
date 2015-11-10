@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from owner_crm.services import password_reset_service, driver_notifications, owner_notifications, ops_notifications, throttle_service
-from owner_crm.models import Renewal
+from owner_crm.services import password_reset_service, throttle_service, notification
+from owner_crm.models import Renewal, driver_notifications, owner_notifications, ops_notifications
 
 from server.models import Booking, Owner
 from server.services import auth_user as auth_user_service
@@ -36,7 +36,7 @@ def _renewable_cars():
 def _renewal_email():
     for car in _renewable_cars():
         renewal = Renewal.objects.create(car=car)
-        owner_notifications.renewal_email(car=car, renewal=renewal)
+        notification.send('owner_notifications.RenewalEmail', renewal)
 
 
 def _within_minutes_of_local_time(minutes, target_time):
@@ -52,9 +52,15 @@ def _get_remindable_bookings(delay_hours):
     )
 
 
-def _send_reminder_email(insurance_reminder_delay_hours, reminder_name):
+def _send_reminder_email(insurance_reminder_delay_hours, reminder_name, throttle_key):
     remindable_bookings = _get_remindable_bookings(insurance_reminder_delay_hours)
-    throttle_service.send_to_queryset(remindable_bookings, eval('owner_notifications.' + reminder_name))
+    throttled_bookings = throttle_service.throttle(remindable_bookings, throttle_key)
+
+    campaign_name = 'owner_notifications.' + reminder_name
+    for booking in throttled_bookings:
+        notification.send(campaign_name, booking)
+
+    throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
 def _reminder_email():
@@ -64,23 +70,28 @@ def _reminder_email():
     delay_hours = 12
 
     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
+
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='first_morning_insurance_reminder'
+            reminder_name='FirstMorningInsuranceReminder',
+            throttle_key='first_morning_insurance_reminder',
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='second_morning_insurance_reminder'
+            reminder_name='SecondMorningInsuranceReminder',
+            throttle_key='second_morning_insurance_reminder',
         )
 
     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours,
-            reminder_name='first_afternoon_insurance_reminder'
+            reminder_name='FirstAfternoonInsuranceReminder',
+            throttle_key='first_afternoon_insurance_reminder',
         )
         _send_reminder_email(
             insurance_reminder_delay_hours=delay_hours+24,
-            reminder_name='second_afternoon_insurance_reminder'
+            reminder_name='SecondAfternoonInsuranceReminder',
+            throttle_key='second_afternoon_insurance_reminder',
         )
 
 
@@ -101,9 +112,9 @@ def update_account_state(merchant_account_id, state, errors=None):
     owner.save()
 
     if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
-        owner_notifications.bank_account_approved(owner)
+        notification.send('owner_notifications.BankAccountApproved', owner)
     else:
-        ops_notifications.owner_account_declined(owner, errors)
+        notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 
 def link_bank_account(owner, params):
     #translate client params into the format Braintree expects.
