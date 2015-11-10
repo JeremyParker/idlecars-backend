@@ -39,7 +39,11 @@ class PaymentFailed(notification.OpsNotification):
             'CTA_LABEL': 'Payment details',
             'CTA_URL': kwargs['payment_admin_link'],
             'template_name': 'one_button_no_image',
-            'subject': 'Payment {} for a {} failed.'.format(kwargs['payment'], kwargs['car']),
+            'subject': 'Payment {} for a {} ({}) failed.'.format(
+                kwargs['payment'],
+                kwargs['car_name'],
+                kwargs['car_plate'],
+            ),
         }
 
 
@@ -52,9 +56,7 @@ class PaymentJobFailed(notification.OpsNotification):
         return {
             'FNAME': 'people',
             'HEADLINE': 'The payment job threw a {}'.format(self.message),
-            'TEXT': 'the auto-payment job ran into a problem while processing payment for the booking {}'.format(
-                kwargs['booking'],
-            ),
+            'TEXT': 'the auto-payment job ran into a problem while processing payment for a booking.',
             'CTA_LABEL': 'Booking details',
             'CTA_URL': kwargs['booking_admin_link'],
             'template_name': 'one_button_no_image',

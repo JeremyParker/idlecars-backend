@@ -21,12 +21,27 @@ def _get_payment_params(payment):
         'payment_notes': payment.notes,
         'payment_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_payment_change', args=(payment.pk,))
-        )
+        ),
     }
 
 def _get_booking_params(booking):
+    from server.services import booking as booking_service
+    if booking.pickup_time:
+        (
+            booking_payment_fee,
+            next_payment_amount,
+            invoice_start_time,
+            invoice_end_time
+        ) = booking_service.calculate_next_rent_payment(booking)
+    else:
+        (
+            booking_payment_fee,
+            next_payment_amount,
+            invoice_start_time,
+            invoice_end_time
+        ) = booking_service.estimate_next_rent_payment(booking)
+
     return {
-        'booking': booking,
         'booking_state': booking.get_state(),
         'booking_weekly_rent': booking.weekly_rent,
         'booking_end_time': booking.end_time,
@@ -39,21 +54,43 @@ def _get_booking_params(booking):
         'booking_incomplete_time': booking.incomplete_time,
         'booking_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
-        )
+        ),
+        'booking_next_payment_amount': next_payment_amount,
+        'booking_payment_fee': booking_payment_fee,
+        'booking_invoice_start_time': invoice_start_time,
+        'booking_invoice_end_time': invoice_end_time,
     }
 
 def _get_car_params(car):
     return {
-        'car': car,
         'car_name': car.display_name(),
         'car_daily_cost': car.quantized_cost(),
         'car_status': car.effective_status(),
         'car_plate': car.plate,
         'car_deposit': car.solo_deposit,
         'car_image_url': car_service.get_image_url(car),
+        'car_details_url': client_side_routes.car_details_url(car)
     }
 
+
+# helper for _get_driver_params
+def _missing_documents_html(driver):
+    from server.services import driver as driver_service
+    doc_names = driver_service.get_missing_docs(driver)
+    if not doc_names:
+        return ''
+
+    docs = ''
+    for name in doc_names[:-1]:
+        docs = docs + '<li>' + name + ', '
+    if docs:
+        docs = docs + 'and'
+    docs = docs + '<li>' + doc_names[-1]
+    return docs
+
+
 def _get_driver_params(driver):
+    from server.services import driver as driver_service
     return {
         'driver': driver,
         'driver_email': driver.email(),
@@ -69,7 +106,10 @@ def _get_driver_params(driver):
         'driver_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_driver_change', args=(driver.pk,))
         ),
+        'missing_docs_list': ', '.join(driver_service.get_missing_docs(driver)),
+        'missing_docs_html': _missing_documents_html(driver),
     }
+
 
 def _get_owner_params(owner):
     return {
@@ -96,7 +136,7 @@ def _get_message_params(message):
 
 def _get_renewal_params(renewal):
     return {
-        'renewal_url': client_side_routes.renewal_url(renewal)
+        'renewal_url': client_side_routes.renewal_url(renewal),
     }
 
 def _get_password_reset_params(password_reset):

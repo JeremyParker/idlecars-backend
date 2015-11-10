@@ -220,10 +220,11 @@ class PaymentReceipt(notification.OwnerNotification):
                 kwargs['payment_amount'] - kwargs['payment_service_fee'],
             )
 
-        from server.services import booking as booking_service
-        fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(kwargs['booking'])
-        if amount > 0:
-            text += 'The next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+        if kwargs['booking_next_payment_amount'] > 0:
+            text += 'The next payment of ${} will occur on {} <br />'.format(
+                kwargs['booking_next_payment_amount'],
+                kwargs['booking_invoice_end_time'].strftime('%b %d')
+            )
         else:
             text += 'This is the last payment. The driver should contact you to arrange dropoff.<br />'
 
@@ -269,7 +270,7 @@ class BookingCanceled(notification.OwnerNotification):
             'HEADLINE': headline,
             'TEXT': text,
             'CTA_LABEL': 'See your listing',
-            'CTA_URL': client_side_routes.car_details_url(kwargs['car']),
+            'CTA_URL': kwargs['car_details_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
         }
@@ -294,7 +295,7 @@ class DriverRejected(notification.OwnerNotification):
             'HEADLINE': headline,
             'TEXT': text,
             'CTA_LABEL': 'See your listing',
-            'CTA_URL': client_side_routes.car_details_url(kwargs['car']),
+            'CTA_URL': kwargs['car_details_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
         }

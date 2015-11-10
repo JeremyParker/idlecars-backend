@@ -7,8 +7,6 @@ from django.conf import settings
 
 from idlecars import email, client_side_routes
 
-from server.services import car as car_service
-
 from owner_crm.models import notification
 
 
@@ -43,35 +41,37 @@ class BaseLetterApprovedNoCheckout(notification.DriverNotification):
             'CTA_LABEL': 'Reserve now',
             'CTA_URL': client_side_routes.bookings(),
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
-            'CAR_IMAGE_URL': car_service.get_image_url(kwargs['car']),
+            'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Your {} is waiting on your payment information!'.format(kwargs['car_name']),
+            'subject': 'Don\'t forget to reserve your {}!'.format(kwargs['car_name']),
+            'sms_body': 'We are ready to submit all documents to get you on the insurance for your \
+{}. We\'re just waiting on your credit card. Don’t worry, your card won\'t be charged until \
+you pick up your car. We just need to put a hold on the card to verify that the card is valid and the \
+funds are available. Tap here to enter your card information and reserve your car: {}'.format(kwargs['car_name'], client_side_routes.bookings()),
         }
 
 
-def _missing_documents_text(driver):
-    from server.services import driver as driver_service
-    doc_names = driver_service.get_missing_docs(driver)
+def _missing_documents_text(missing_docs_list):
     docs = ''
-    for name in doc_names[:-1]:
+    for name in missing_docs_list[:-1]:
         docs = docs + '<li>' + name + ', '
     if docs:
         docs = docs + 'and'
-    docs = docs + '<li>' + doc_names[-1]
+    docs = docs + '<li>' + missing_docs_list[-1]
     return docs
 
 
-def _render_booking_reminder_body(booking, body_template):
-    docs = _missing_documents_text(booking.driver)
+def _render_booking_reminder_body(body_template, car_name, missing_docs_list):
+    docs = _missing_documents_text(missing_docs_list)
     template_data = {
-        'CAR_NAME': booking.car.display_name(),
+        'CAR_NAME': car_name,
         'DOCS_LIST': docs,
     }
     return render_to_string(body_template, template_data, Context(autoescape=False))
 
 
-def _render_driver_reminder_body(driver, body_template):
-    docs = _missing_documents_text(driver)
+def _render_driver_reminder_body(body_template, missing_docs_list):
+    docs = _missing_documents_text(missing_docs_list)
     template_data = {
         'DOCS_LIST': docs,
     }
@@ -82,13 +82,21 @@ class FirstDocumentsReminderBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'first_docs_reminder_booking.jade'),
+            'TEXT': _render_booking_reminder_body(
+                'first_docs_reminder_booking.jade',
+                kwargs['car_name'],
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Your {} is waiting on your driver documents'.format(kwargs['car_name']),
+            'sms_body': 'We noticed that you tried to book a {}, but haven\'t finished \
+            submitting your documents for the insurance. To start driving, you still need to submit these documents: \n{} \
+            Click here to upload them:\
+            {}'.format(kwargs['car_name'], kwargs['missing_docs_list'], kwargs['docs_upload_url'])
         }
 
 
@@ -96,7 +104,10 @@ class FirstDocumentsReminderDriver(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'first_docs_reminder_driver.jade'),
+            'TEXT': _render_driver_reminder_body(
+                'first_docs_reminder_driver.jade',
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
@@ -109,7 +120,11 @@ class SecondDocumentsReminderBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'second_docs_reminder_booking.jade'),
+            'TEXT': _render_booking_reminder_body(
+                'second_docs_reminder_booking.jade',
+                kwargs['car_name'],
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
@@ -123,7 +138,10 @@ class SecondDocumentsReminderDriver(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'second_docs_reminder_driver.jade'),
+            'TEXT': _render_driver_reminder_body(
+                'second_docs_reminder_driver.jade',
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
@@ -136,7 +154,11 @@ class ThirdDocumentsReminderBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_booking_reminder_body(kwargs['booking'], 'third_docs_reminder_booking.jade'),
+            'TEXT': _render_booking_reminder_body(
+                'third_docs_reminder_booking.jade',
+                kwargs['car_name'],
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
@@ -150,7 +172,10 @@ class ThirdDocumentsReminderDriver(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': _render_driver_reminder_body(kwargs['driver'], 'second_docs_reminder_driver.jade'),
+            'TEXT': _render_driver_reminder_body(
+                'third_docs_reminder_driver.jade',
+                kwargs['missing_docs_list'],
+            ),
             'CTA_LABEL': 'Upload Documents Now',
             'CTA_URL': kwargs['docs_upload_url'],
             'HEADLINE': 'Don\'t forget to upload your documents for idlecars',
@@ -283,9 +308,6 @@ class CarRentedElsewhere(notification.DriverNotification):
 
 class CheckoutReceipt(notification.DriverNotification):
     def get_context(self, **kwargs):
-        from server.services import booking as booking_service
-        first_rental_payment = booking_service.estimate_next_rent_payment(kwargs['booking'])[1]
-
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Your {} was successfully reserved'.format(kwargs['car_name']),
@@ -296,7 +318,7 @@ class CheckoutReceipt(notification.DriverNotification):
             '''.format(
                 kwargs['car_deposit'],
                 kwargs['car_name'],
-                first_rental_payment,
+                kwargs['booking_next_payment_amount'],
             ),
             'template_name': 'no_button_no_image',
             'subject': 'Your {} was successfully reserved'.format(kwargs['car_name']),
@@ -329,10 +351,11 @@ class PaymentReceipt(notification.DriverNotification):
             Invoice Period: {} - {} <br />
             Payment Amount: {} <br /><br />
         '''
-        from server.services import booking as booking_service
-        fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(kwargs['booking'])
-        if amount > 0:
-            text += 'Your next payment of ${} will occur on {} <br />'.format(amount, end_time.strftime('%b %d'))
+        if kwargs['booking_next_payment_amount'] > 0:
+            text += 'Your next payment of ${} will occur on {} <br />'.format(
+                kwargs['booking_next_payment_amount'],
+                kwargs['booking_invoice_end_time'].strftime('%b %d'),
+            )
         else:
             text += 'This is your last payment. <br />'
 
@@ -416,22 +439,4 @@ class PasswordResetConfirmation(notification.DriverNotification):
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your idlecars password has been set.',
-        }
-
-
-# email for the one-time mailer we send out to legacy users
-class AccountCreated(notification.DriverNotification):
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': kwargs['password_reset_user_first_name'] or None,
-            'HEADLINE': 'An account has been created for you at idlecars.',
-            'TEXT': '''
-                Your documents and details have been stored in your idlecars account. To claim your
-                account just tap the button below. Add a password, and your account  will be secured.
-                Then you can rent any car you need, any time you need it.
-            ''',
-            'CTA_LABEL': 'Claim your account',
-            'CTA_URL': kwargs['password_reset_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'An account has been created for you at idlecars',
         }
