@@ -18,6 +18,9 @@ class PasswordResetTest(APITestCase):
         self.auth_user = server.factories.AuthUser.create(password='old_password')
         self.password_reset = owner_crm.factories.PasswordReset.create(auth_user=self.auth_user)
 
+        # we need a driver so we know if we can SMS them or not.
+        self.driver = server.factories.Driver.create(auth_user=self.auth_user)
+
     def _make_request(self):
         data = {
             'password': 'new_password',

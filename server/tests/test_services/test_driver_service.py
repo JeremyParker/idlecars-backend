@@ -163,7 +163,7 @@ class DriverServiceTest(TestCase):
         self.assertEqual(outbox[1].merge_vars.keys()[0], new_booking.driver.email())
         self.assertEqual(
             outbox[1].subject,
-            "Your {} is waiting on your payment information!".format(new_booking.car.display_name())
+            "Don't forget to reserve your {}!".format(new_booking.car.display_name())
         )
 
     def test_base_letter_approved_reserved_booking(self):
