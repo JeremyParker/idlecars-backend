@@ -12,7 +12,6 @@ from server.services import car as car_service
 
 def docs_approved_no_booking(driver, medium):
     #TODO: text in this email needs to be updated
-    print medium
     if not driver.email():
         return
     merge_vars = {

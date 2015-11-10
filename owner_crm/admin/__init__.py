@@ -9,3 +9,4 @@ from campaign import Campaign
 
 
 admin.site.register(models.Campaign, Campaign)
+admin.site.register(models.Message)
