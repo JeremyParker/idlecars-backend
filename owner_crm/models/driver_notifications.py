@@ -165,7 +165,7 @@ class ThirdDocumentsReminderBooking(notification.DriverNotification):
             'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
-            'subject': 'Don’t miss your booking, submit your driver documents',
+            'subject': 'Don’t miss your rental, submit your driver documents',
             'sms_body': 'We noticed that you tried to book a {}, but haven\'t finished \
 submitting your documents for the insurance. To start driving, you still need to submit these documents: \n{} \
 Tap here to upload them: \
@@ -196,12 +196,12 @@ class BookingTimedOut(notification.DriverNotification):
     def get_context(self, **kwargs):
         if kwargs['driver_all_docs_uploaded']:
             template = 'booking_timed_out_cc.jade'
-            subject = 'Your {} booking has been cancelled because you never checked out.'.format(
+            subject = 'Your {} rental has been cancelled because you never checked out.'.format(
                 kwargs['car_name']
             )
         else:
             template = 'booking_timed_out.jade'
-            subject = 'Your booking has been cancelled because we don\'t have your driver documents.'
+            subject = 'Your rental has been cancelled because we don\'t have your driver documents.'
 
         template_data = {
             'CAR_NAME': kwargs['car_name'],
@@ -298,7 +298,7 @@ class InsuranceFailed(notification.DriverNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'HEADLINE': 'Sorry, We were unable to complete your booking.',
+            'HEADLINE': 'Sorry, We were unable to complete your rental.',
             'TEXT': '''
             We are sorry to inform you, but we were unable to get you in the {} due to an issue with the owner.
             We ask that you go back to our site and choose another car. We sincerely apologize for any inconvenience.
@@ -387,7 +387,7 @@ class PaymentReceipt(notification.DriverNotification):
         else:
             text += 'This is your last payment. <br />'
 
-        text += 'Your booking will end on {}. <br /><br />Thank you for using idlecars.'
+        text += 'Your rental will end on {}. <br /><br />Thank you for using idlecars.'
         text = text.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],

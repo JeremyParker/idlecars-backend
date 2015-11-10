@@ -235,7 +235,7 @@ class BookingServiceTest(TestCase):
         # we should have sent an email to owner because owner too slow
         self.assertEqual(
              outbox[0].subject,
-            'Your {} booking has been canceled'.format(booking.car.display_name())
+            'Your {} rental has been canceled'.format(booking.car.display_name())
         )
         # we should have sent an email to driver because owner too slow
         self.assertEqual(
@@ -250,7 +250,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
              outbox[0].subject,
-            'Your {} booking has canceled.'.format(booking.car.display_name())
+            'Your {} rental has canceled.'.format(booking.car.display_name())
         )
 
     def test_car_rented_elsewhere(self):
@@ -388,7 +388,7 @@ class BookingServiceTest(TestCase):
         )
         self.assertEqual(
             outbox[3].subject,
-            'Your {} booking has canceled.'.format(new_booking.car.display_name())
+            'Your {} rental has canceled.'.format(new_booking.car.display_name())
         )
 
     def test_correct_start_time(self):
