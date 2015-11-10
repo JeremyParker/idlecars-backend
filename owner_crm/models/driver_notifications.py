@@ -178,7 +178,7 @@ class ThirdDocumentsReminderDriver(notification.DriverNotification):
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': _render_driver_reminder_body(
-                'third_docs_reminder_driver.jade',
+                'second_docs_reminder_driver.jade',
                 kwargs['missing_docs_html'],
             ),
             'CTA_LABEL': 'Upload Documents Now',
@@ -442,10 +442,8 @@ class BookingCanceled(notification.DriverNotification):
 
 class PasswordReset(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = '''
-            We've received a request to reset your password.
-            If you didn't make the request, just ignore this message.
-            Otherwise, you can reset your password using this link: '''
+        text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \
+ignore this message. Otherwise, you can reset your password using this link: '
         return {
             'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'Reset your password',
