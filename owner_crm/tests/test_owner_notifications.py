@@ -87,13 +87,6 @@ class TestOwnerNotifications(TestCase):
 
         call_command('owner_notifications')
 
-        # there should be a record of this message being sent for future throttling
-        throttle_messages = owner_crm.models.Message.objects.filter(
-            booking=self.booking,
-            campaign='first_morning_insurance_reminder'
-        )
-        self.assertEqual(len(throttle_messages), 1)
-
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
