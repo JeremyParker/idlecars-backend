@@ -278,13 +278,13 @@ class Notification(object):
             self.get_receiver_params(receiver)
             context = self.get_context(**self.params)
 
-            if self.get_channel(receiver) is Campaign.SMS_MEDIUM:
+            if self.get_channel(receiver) is Campaign.SMS_MEDIUM and 'sms_body' in context.keys():
                 if not receiver['phone_number']:
                     continue
                 phone_number = '+1{}'.format(receiver['phone_number'])
                 body = context['sms_body']
                 sms_service.send_async(to=phone_number, body=body)
-            elif self.get_channel(receiver) is Campaign.EMAIL_MEDIUM:
+            else:
                 if not receiver['email_address']:
                     continue
 
@@ -295,8 +295,6 @@ class Notification(object):
                     subject=context.get('subject'),
                     merge_vars=merge_vars,
                 )
-            else:
-                assert(False)  # programming error. Medium should be SMS or EMAIL
 
 
 class DriverNotification(Notification):
