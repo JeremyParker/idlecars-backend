@@ -22,8 +22,6 @@ from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
 
-
-
 class TestOwnerNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
         car = server.factories.BookableCar.create(
