@@ -1,6 +1,7 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+# don't import the class or the test will find it and try to test it as a notification.
 from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
