@@ -41,6 +41,8 @@ class RenewalEmail(notification.OwnerNotification):
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Your {} listing is about to expire.'.format(kwargs['car_name']),
+            'sms_body': 'Is your {} with license plate {} still available? If it is, please tap \
+here to let us know: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['renewal_url'])
         }
         return context
 
@@ -94,51 +96,64 @@ class NewBookingEmail(notification.OwnerNotification):
 
 class FirstMorningInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
+        text = 'We are just checking in on {}\'s {} rental with plate \
+{} to see if they have been accepted on the insurance. You can call the number below to let us \
+know where they are in the process. Once they are approved, they will contact you to schedule \
+a pickup. '.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate'])
         return {
             'FNAME': kwargs['user_first_name'],
             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': '''
-                We are just checking in on {} {} booking with plate
-                {} to see if they have been accepted on the insurance.
-                You can click below to let us know where they are in the process.
-                Once they are approved, they will contact you to schedule a pickup.
-            '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
+            'TEXT': text,
             'CTA_LABEL': 'Call (844) 435-3227',
             'CTA_URL': 'tel:1-844-4353227',
             'template_name': 'one_button_no_image',
             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'sms_body': text + '\nCall (844) 435-3227'
         }
 
 
 class SecondMorningInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
+        text = 'We are doing a final checks on {} {} rental with plate {} to see if \
+they have been accepted on the insurance. You can call the number below to let us know where \
+they are in the process. Once they are approved, they will contact you to schedule a pickup. \
+We promise drivers that they will get into a car within 24-48 hours, so if we don’t hear \
+back we will have to cancel the rental. We don’t want to do that so please let us know if \
+there are any problems.'.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate'])
+
         return {
             'FNAME': kwargs['user_first_name'],
-            'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
+            'HEADLINE': 'The {} rental for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
             'TEXT': '''
-                We are doing a final checks on {} {} booking with plate
+                We are doing a final checks on {} {} rental with plate
                 {} to see if they have been accepted on the insurance.
                 You can click below to let us know where they are in the process.
                 Once they are approved, they will contact you to schedule a pickup.
                 <br />
                 We promise drivers that they will get into a car within 24-48 hours,
-                so if we don’t hear back we will have to cancel the booking.
+                so if we don’t hear back we will have to cancel the rental.
                 We don’t want to do that so please let us know if there are any problems.
             '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
             'CTA_LABEL': 'Call (844) 435-3227',
             'CTA_URL': 'tel:1-844-4353227',
             'template_name': 'one_button_no_image',
             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'sms_body': text + '\nCall (844) 435-3227',
         }
 
 
 class FirstAfternoonInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
+        text = 'We\'re just checking in on {}\'s {} rental with plate \
+{} to see if they have been accepted on the insurance. You can click below to \
+let us know where they are in the process. Once they are approved, they will \
+contact you to schedule a pickup.'.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate'])
+
         return {
             'FNAME': kwargs['user_first_name'],
             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
             'TEXT': '''
-                We are just checking in on {} {} booking with plate
+                We are just checking in on {} {} rental with plate
                 {} to see if they have been accepted on the insurance.
                 You can click below to let us know where they are in the process.
                 Once they are approved, they will contact you to schedule a pickup.
@@ -147,28 +162,40 @@ class FirstAfternoonInsuranceReminder(notification.OwnerNotification):
             'CTA_URL': 'tel:1-844-4353227',
             'template_name': 'one_button_no_image',
             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'sms_body': text,
         }
 
 
 class SecondAfternoonInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
+        text = 'We\'re doing a final checks on {}\'s {} rental with plate {} to see if they have \
+been accepted on the insurance. You can click below to let us know where they are in the process. \
+Once they are approved, they will contact you to schedule a pickup. We promise drivers that they \
+will get into a car within 24-48 hours, so if we don’t hear back we will have to cancel the rental. \
+We don’t want to do that so please let us know if there are any problems.'.format(
+    kwargs['driver_full_name'],
+    kwargs['car_name'],
+    kwargs['car_plate']
+)
+
         return {
             'FNAME': kwargs['user_first_name'],
-            'HEADLINE': 'The {} booking for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
+            'HEADLINE': 'The {} rental for {} will be cancelled soon'.format(kwargs['car_name'], kwargs['driver_full_name']),
             'TEXT': '''
-                We are doing a final checks on {} {} booking with plate
+                We are doing a final checks on {} {} rental with plate
                 {} to see if they have been accepted on the insurance.
                 You can click below to let us know where they are in the process.
                 Once they are approved, they will contact you to schedule a pickup.
                 <br />
                 We promise drivers that they will get into a car within 24-48 hours,
-                so if we don’t hear back we will have to cancel the booking.
+                so if we don’t hear back we will have to cancel the rental.
                 We don’t want to do that so please let us know if there are any problems.
             '''.format(kwargs['driver_full_name'], kwargs['car_name'], kwargs['car_plate']),
             'CTA_LABEL': 'Call (844) 435-3227',
             'CTA_URL': 'tel:1-844-4353227',
             'template_name': 'one_button_no_image',
             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'sms_body': text,
         }
 
 
@@ -192,6 +219,15 @@ class PickupConfirmation(notification.OwnerNotification):
             ),
             'template_name': 'no_button_no_image',
             'subject': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
+            'sms_body': 'You have received a payment of ${} from {} for the {} You can now give them \
+the keys to drive. Their credit card has been charged and you will receive the payment within 48 hours. \
+The security deposit of ${} has also been placed in escrow for you.'.format(
+                # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
+                kwargs['booking_weekly_rent'],
+                kwargs['driver_full_name'],
+                kwargs['car_name'],
+                kwargs['car_deposit']
+            )
         }
 
 
@@ -229,7 +265,7 @@ class PaymentReceipt(notification.OwnerNotification):
             text += 'This is the last payment. The driver should contact you to arrange dropoff.<br />'
 
         text += '''
-            This booking will end on: {} <br /><br />
+            This rental will end on: {} <br /><br />
             As always, if you have any questions, please call us at {}.<br />
             Thank you.
         '''.format(
@@ -257,10 +293,9 @@ class BookingCanceled(notification.OwnerNotification):
             kwargs['car_plate'],
         )
 
-        text = '''We're sorry. {} has decided not to rent your {}. Could you ask your insurance
-        broker not to add them to the insurance policy? We apologise for any inconvenience. We've
-        already re-listed your car on the site so we can find you another driver as soon as possible.
-        '''.format(
+        text = 'We\'re sorry. {} has decided not to rent your {}. Could you ask your insurance \
+broker not to add them to the insurance policy? We apologise for any inconvenience. We\'ve \
+already re-listed your car on the site so we can find you another driver as soon as possible.'.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],
         )
@@ -272,7 +307,8 @@ class BookingCanceled(notification.OwnerNotification):
             'CTA_LABEL': 'See your listing',
             'CTA_URL': kwargs['car_details_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
+            'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
+            'sms_body': text,
         }
 
 
@@ -284,9 +320,8 @@ class DriverRejected(notification.OwnerNotification):
             kwargs['car_plate'],
         )
 
-        text = '''We're sorry. {} has decided not to rent your {}. We apologise for any inconvenience.
-        We've already re-listed your car on the site so we can find you another driver as soon as possible.
-        '''.format(
+        text = 'We\'re sorry. {} has decided not to rent your {}. We apologise for any inconvenience. \
+We\'ve already re-listed your car on the site so we can find you another driver as soon as possible.'.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],
         )
@@ -297,7 +332,8 @@ class DriverRejected(notification.OwnerNotification):
             'CTA_LABEL': 'See your listing',
             'CTA_URL': kwargs['car_details_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Your {} booking has canceled.'.format(kwargs['car_name']),
+            'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
+            'sms_body': text,
         }
 
 
@@ -305,16 +341,16 @@ class InsuranceTooSlow(notification.OwnerNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['user_first_name'],
-            'HEADLINE': 'Your {} booking has been canceled'.format(kwargs['car_name']),
+            'HEADLINE': 'Your {} rental has been canceled'.format(kwargs['car_name']),
             'TEXT': '''
-                We are sorry to inform you, but we cancelled the {} booking for {}
+                We are sorry to inform you, but we cancelled the {} rental for {}.
                 We require drivers get on the insurance and into cars within 24 to 48 hours,
                 so we hope that we will be able to do this next time.
                 <br />
                 If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
             '''.format(kwargs['car_name'], kwargs['driver_full_name']),
             'template_name': 'no_button_no_image',
-            'subject': 'Your {} booking has been canceled'.format(kwargs['car_name']),
+            'subject': 'Your {} rental has been canceled'.format(kwargs['car_name']),
         }
 
 
@@ -346,7 +382,6 @@ class BankAccountApproved(notification.OwnerNotification):
                 '''
 
         return {
-
             'FNAME': kwargs['user_first_name'],
             'HEADLINE': 'Your bank account has been approved',
             'TEXT': text,

@@ -132,11 +132,11 @@ class TestDriverNotifications(TestCase):
 
         self.assertEqual(
             outbox[3].subject,
-            'Your booking has been cancelled because we don\'t have your driver documents.'
+            'Your rental has been cancelled because we don\'t have your driver documents.'
         )
         self.assertEqual(
             outbox[4].subject,
-            'Your {} booking has been cancelled because you never checked out.'.format(
+            'Your {} rental has been cancelled because you never checked out.'.format(
                 other_booking.car.display_name()
             )
         )
