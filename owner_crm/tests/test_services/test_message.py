@@ -1,13 +1,17 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.test import TestCase
+from django.utils import timezone
 
 from idlecars import sms_service
-from server import factories
+from server import factories as server_factories
 
 from owner_crm.models import Campaign, Message
 from owner_crm.services import notification as notification_service
+from owner_crm import factories as crm_factories
 
 
 def verify_throttled_on_booking(booking, campaign):
@@ -28,7 +32,7 @@ def verify_throttled_on_owner(owner, campaign):
 class NotificationServiceTest(TestCase):
     def setUp(self):
         sms_service.test_reset() # need to reset the sms outbox between every test
-        self.driver = factories.BaseLetterDriver.create()
+        self.driver = server_factories.BaseLetterDriver.create()
         self.campaign_name = 'driver_notifications.DocsApprovedNoBooking'
 
     def test_notification_create_campaign(self):
@@ -57,3 +61,20 @@ class NotificationServiceTest(TestCase):
         sms = outbox[0]
         self.assertEqual(sms['to'], '+1{}'.format(self.driver.phone_number()))
         self.assertIsNotNone(sms['body'])
+
+    def test_send_sms_with_no_sms_context_sends_email(self):
+        car = server_factories.BookableCar.create(solo_cost=500)
+        self.booked_booking = server_factories.BookedBooking.create(car=car)
+        self.settled_payment = server_factories.SettledPayment.create(
+            booking=self.booked_booking,
+            amount=car.solo_cost,
+            invoice_start_time=timezone.now(),
+            invoice_end_time=timezone.now() + datetime.timedelta(days=7),
+        )
+
+        campaign_name = 'driver_notifications.PaymentReceipt'
+        campaign = crm_factories.SmsCampaign.create(name=campaign_name)
+        notification_service.send(campaign_name, self.settled_payment)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
