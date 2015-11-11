@@ -24,3 +24,4 @@ class Campaign(models.Model):
     )
 
     notes = models.TextField(blank=True)
+    notes.verbose_name = 'Description'
