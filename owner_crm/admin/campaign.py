@@ -10,9 +10,8 @@ class Campaign(admin.ModelAdmin):
         'preferred_medium',
         'notes',
     ]
-    readonly_fields = ['name']
-
     list_display = [
         'name',
+        'notes',
         'preferred_medium',
     ]
