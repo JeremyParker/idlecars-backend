@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from server.models import Driver, Owner
+from server.models import Driver
 from services import password_reset_service, notification
 from tests import sample_merge_vars
 import serializers, models
