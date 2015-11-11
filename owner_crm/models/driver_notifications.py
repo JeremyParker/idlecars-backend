@@ -465,7 +465,7 @@ ignore this message. Otherwise, you can reset your password using this link: '
 
 class PasswordResetConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
-        subject = 'Your idlecars password has been set. '
+        subject = 'Your idlecars password has been set.'
         text = 'If you didn\'t set your password, or if you think something funny is going \
 on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
         return {
@@ -476,5 +476,5 @@ on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': subject,
-            'sms_body': subject + text,
+            'sms_body': subject + ' ' + text,
         }
