@@ -33,7 +33,6 @@ class PasswordResetSetupView(views.APIView):
                 driver = password_reset.auth_user.driver
                 notification.send('driver_notifications.PasswordReset', password_reset)
             except Driver.DoesNotExist:
-                owner = Owner.objects.get(auth_users=password_reset.auth_user)
                 notification.send('owner_notifications.PasswordReset', password_reset)
 
             content = {'phone_number': phone_number}
@@ -76,7 +75,12 @@ class PasswordResetView(views.APIView):
 
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
-            notification.send('driver_notifications.PasswordResetConfirmation', password_reset)
+
+            try:
+                driver = password_reset.auth_user.driver
+                notification.send('driver_notifications.PasswordResetConfirmation', password_reset)
+            except Driver.DoesNotExist:
+                notification.send('owner_notifications.PasswordResetConfirmation', password_reset)
 
             content = {'_app_notifications': [{'success': 'Your password has been set.'}], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)

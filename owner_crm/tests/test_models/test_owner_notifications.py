@@ -26,7 +26,9 @@ class OwnerNotificationTest(TestCase):
         self.booked_booking = server_factories.BookedBooking.create(car=car)
 
         self.renewal = crm_factories.Renewal.create(car=car)
-        self.password_reset = crm_factories.PasswordReset.create(auth_user=auth_user)
+        self.password_reset = crm_factories.PasswordReset.create(
+            auth_user=self.bank_account_owner.auth_users.first()
+        )
 
         self.settled_payment = server_factories.SettledPayment.create(
             booking=self.booked_booking,
@@ -102,6 +104,11 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'password_reset',
                 'email_result': 'Reset your password',
                 'sms_result': self.password_reset.token,
+            },
+            'PasswordResetConfirmation': {
+                'argument': 'password_reset',
+                'email_result': 'password',
+                'sms_result': 'password',
             },
         }
 
