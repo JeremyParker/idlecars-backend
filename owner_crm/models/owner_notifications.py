@@ -1,7 +1,8 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.template import Context
+# don't import the class or the test will find it and try to test it as a notification.
+from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
 
@@ -24,7 +25,7 @@ def _render_renewal_body(**kwargs):
         'CAR_NAME': kwargs['car_name'],
         'CAR_PLATE': kwargs['car_plate'],
     }
-    context = Context(autoescape=False)
+    context = template.Context(autoescape=False)
     return render_to_string("car_expiring.jade", template_data, context)
 
 
