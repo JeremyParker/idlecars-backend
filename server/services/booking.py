@@ -189,7 +189,12 @@ def on_incomplete(booking, original_booking_state):
         notification.send('driver_notifications.BookingTimedOut', booking)
     elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
         notification.send('driver_notifications.SomeoneElseBooked', booking)
-    elif reason == Booking.REASON_OWNER_REJECTED:
+    elif reason in [
+        Booking.REASON_OWNER_REJECTED,
+        Booking.REASON_INSURANCE_REJECTED_AGE,
+        Booking.REASON_INSURANCE_REJECTED_EXP,
+        Booking.REASON_INSURANCE_REJECTED_PTS,
+    ]:
         notification.send('driver_notifications.InsuranceRejected', booking)
     elif reason == Booking.REASON_DRIVER_REJECTED:
         notification.send('owner_notifications.DriverRejected', booking)
