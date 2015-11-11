@@ -13,10 +13,9 @@ from owner_crm import models
 
 class PasswordResetSetupTest(APITestCase):
     def setUp(self):
-        user = server.factories.AuthUser.create()
-        self.driver = server.factories.Driver.create(auth_user=user)
+        self.driver = server.factories.Driver.create()
 
-    def test_setup_success(self):
+    def test_setup_success_driver(self):
         # look ma! No password reset tokens!
         self.assertEqual(models.PasswordReset.objects.count(), 0)
 
@@ -27,6 +26,23 @@ class PasswordResetSetupTest(APITestCase):
 
         self.assertEqual(models.PasswordReset.objects.count(), 1)
         self.assertEqual(models.PasswordReset.objects.first().auth_user, self.driver.auth_user)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Reset your password on idlecars.')
+
+    def test_setup_success_owner(self):
+        # look ma! No password reset tokens!
+        self.assertEqual(models.PasswordReset.objects.count(), 0)
+
+        owner = server.factories.Owner.create()
+        data = {'phone_number': owner.phone_number()}
+        url = reverse('owner_crm:password_reset_setups')
+        response = APIClient().post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(models.PasswordReset.objects.count(), 1)
+        self.assertEqual(models.PasswordReset.objects.first().auth_user, owner.auth_users.first())
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
