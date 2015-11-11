@@ -280,52 +280,56 @@ Need help? Contact us:\n\
 
 class InsuranceRejected(notification.DriverNotification):
     def get_context(self, **kwargs):
+        text = 'We didn\'t manage to get you on the insurance for the car you wanted. But now that your \
+account is complete, you can pick another car, and we\'ll add you to the insurance on that one. '
+
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, we couldn\'t get you on the insurance.',
-            'TEXT': '''
-            We didn't manage to get you on the insurance for the car you wanted, but now that your
-            account is complete, you can pick another car, and we'll add you to the insurance on that one.
-            ''',
+            'TEXT': text,
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'You couldn\'t be added to the insurance on the car you wanted',
+            'sms_body': 'Sorry {}, '.format(kwargs['driver_first_name']) + text + kwargs['car_listing_url']
         }
 
 
 class InsuranceFailed(notification.DriverNotification):
     def get_context(self, **kwargs):
+        text = 'We\'re sorry, but we were unable to get you in your {} due to an issue with \
+the owner. Your deposit has been fully refunded. We sincerely apologize for any inconvenience. \
+Now that your account is complete, you can pick another car and we\'ll start processing your \
+new rental immediately. '.format(kwargs['car_name'])
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, We were unable to complete your booking.',
-            'TEXT': '''
-            We are sorry to inform you, but we were unable to get you in the {} due to an issue with the owner.
-            We ask that you go back to our site and choose another car. We sincerely apologize for any inconvenience.
-            '''.format(kwargs['car_name']),
+            'TEXT': text,
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'We were unable to complete your {} booking'.format(kwargs['car_name']),
+            'sms_body': text + kwargs['car_listing_url']
         }
 
 
 class CarRentedElsewhere(notification.DriverNotification):
     def get_context(self, **kwargs):
+        text = 'Sorry, someone else has rented the car you wanted. Sometimes that happens. Still, \
+there are plenty more great cars available. '
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Sorry, the car you wanted was rented out by someone else.',
-            'TEXT': '''
-            Sorry, someone else has already rented out the car you wanted. Sometimes that
-            happens. Still, there are plenty more great cars available.
+            'TEXT': '''{}
             <br />
             <p>Need help? Contact us:</p>
             <p>support@idlecars.com </p>
-            <p>''' + settings.IDLECARS_PHONE_NUMBER + '</p>',
+            <p>'''.format(text) + settings.IDLECARS_PHONE_NUMBER + '</p>',
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Sorry, someone else rented out the car you wanted.',
+            'sms_body': text + kwargs['car_listing_url']
         }
 
 
@@ -408,16 +412,18 @@ class PaymentReceipt(notification.DriverNotification):
 
 class SomeoneElseBooked(notification.DriverNotification):
     def get_context(self, **kwargs):
+        text = 'While we were waiting for you to finish uploading your documents, \
+another driver rented your {}. But don\'t worry, there are plenty more cars \
+available. '.format(kwargs['car_name'])
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Someone else rented your car!',
-            'TEXT': '''While we were waiting for you to finish uploading your documents,
-                another driver rented your car. But don't worry,
-                there are plenty more cars available.'''.format(kwargs['car_name']),
+            'TEXT': text,
             'CTA_LABEL': 'Find a new car',
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Someone else rented your {}.'.format(kwargs['car_name']),
+            'sms_body': text + kwargs['car_listing_url']
         }
 
 
@@ -458,14 +464,15 @@ ignore this message. Otherwise, you can reset your password using this link: '
 
 class PasswordResetConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
+        text = 'If you didn\'t set your password, or if you think something funny is going \
+on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
         return {
             'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'Your account password has been set',
-            'TEXT': '''
-                If you didn't set your password, or if you think something funny is going
-                on, please call us any time at ''' + settings.IDLECARS_PHONE_NUMBER + '.',
+            'TEXT': text,
             'CTA_LABEL': 'Find your car',
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your idlecars password has been set.',
+            'sms_body': text,
         }
