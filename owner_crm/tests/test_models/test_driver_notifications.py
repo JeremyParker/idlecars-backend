@@ -16,97 +16,92 @@ from server import factories as server_factories
 from idlecars import sms_service
 
 
-def sms_match_list():
-    return {
-        'DocsApprovedNoBooking': {
-            'argument': 'approved_driver',
-            'result': settings.WEBAPP_URL + '/#/cars',
-        },
-        'BaseLetterApprovedNoCheckout': {
-            'argument': 'pending_booking',
-            'result': settings.WEBAPP_URL + '/#/account/bookings',
-        },
-        'FirstDocumentsReminderBooking': {
-            'argument': 'pending_booking',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'FirstDocumentsReminderDriver': {
-            'argument': 'driver',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'SecondDocumentsReminderBooking': {
-            'argument': 'pending_booking',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'SecondDocumentsReminderDriver': {
-            'argument': 'driver',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'ThirdDocumentsReminderBooking': {
-            'argument': 'pending_booking',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'ThirdDocumentsReminderDriver': {
-            'argument': 'driver',
-            'result': settings.WEBAPP_URL + '/#/bookings',
-        },
-        'BookingTimedOut': {
-            'argument': 'pending_booking',
-            'result': settings.WEBAPP_URL + '/#/cars',
-        },
-        'AwaitingInsuranceEmail': {
-            'argument': 'requested_booking',
-            'result': 'pre-approved',
-        },
-        'InsuranceApproved': {
-            'argument': 'requested_booking',
-            'result': 'approved',
-        },
-        'CheckoutReceipt': {
-            'argument': 'reserved_booking',
-            'result': 'hold of $500 on your credit card',
-        },
-        'PickupConfirmation': {
-            'argument': 'booked_booking',
-            'result': 'Success!',
-        },
-        'BookingCanceled': {
-            'argument': 'pending_booking',
-            'result': 'canceled',
-        },
-        'PasswordReset': {
-            'argument': 'password_reset',
-            'result': 'password',
-        },
-    }
-
-def email_match_list():
-    return {
-        'InsuranceRejected': {
-            'argument': 'accepted_booking',
-            'result': 'insurance',
-        },
-        'InsuranceFailed': {
-            'argument': 'accepted_booking',
-            'result': 'unable',
-        },
-        'CarRentedElsewhere': {
-            'argument': 'requested_booking',
-            'result': 'Sorry',
-        },
-        'PaymentReceipt': {
-            'argument': 'settled_payment',
-            'result': 'Received',
-        },
-        'SomeoneElseBooked': {
-            'argument': 'pending_booking',
-            'result': 'Someone else',
-        },
-        'PasswordResetConfirmation': {
-            'argument': 'password_reset',
-            'result': 'password',
-        },
-    }
+notification_spec = {
+    'DocsApprovedNoBooking': {
+        'argument': 'approved_driver',
+        'sms_result': settings.WEBAPP_URL + '/#/cars',
+    },
+    'BaseLetterApprovedNoCheckout': {
+        'argument': 'pending_booking',
+        'sms_result': settings.WEBAPP_URL + '/#/account/bookings',
+    },
+    'FirstDocumentsReminderBooking': {
+        'argument': 'pending_booking',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'FirstDocumentsReminderDriver': {
+        'argument': 'driver',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'SecondDocumentsReminderBooking': {
+        'argument': 'pending_booking',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'SecondDocumentsReminderDriver': {
+        'argument': 'driver',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'ThirdDocumentsReminderBooking': {
+        'argument': 'pending_booking',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'ThirdDocumentsReminderDriver': {
+        'argument': 'driver',
+        'sms_result': settings.WEBAPP_URL + '/#/bookings',
+    },
+    'BookingTimedOut': {
+        'argument': 'pending_booking',
+        'sms_result': settings.WEBAPP_URL + '/#/cars',
+    },
+    'AwaitingInsuranceEmail': {
+        'argument': 'requested_booking',
+        'sms_result': 'pre-approved',
+    },
+    'InsuranceApproved': {
+        'argument': 'requested_booking',
+        'sms_result': 'approved',
+    },
+    'CheckoutReceipt': {
+        'argument': 'reserved_booking',
+        'sms_result': 'hold of $500 on your credit card',
+    },
+    'PickupConfirmation': {
+        'argument': 'booked_booking',
+        'sms_result': 'Success!',
+    },
+    'BookingCanceled': {
+        'argument': 'pending_booking',
+        'sms_result': 'canceled',
+    },
+    'PasswordReset': {
+        'argument': 'password_reset',
+        'sms_result': 'password',
+    },
+    'InsuranceRejected': {
+        'argument': 'accepted_booking',
+        'email_result': 'insurance',
+    },
+    'InsuranceFailed': {
+        'argument': 'accepted_booking',
+        'email_result': 'unable',
+    },
+    'CarRentedElsewhere': {
+        'argument': 'requested_booking',
+        'email_result': 'Sorry',
+    },
+    'PaymentReceipt': {
+        'argument': 'settled_payment',
+        'email_result': 'Received',
+    },
+    'SomeoneElseBooked': {
+        'argument': 'pending_booking',
+        'email_result': 'Someone else',
+    },
+    'PasswordResetConfirmation': {
+        'argument': 'password_reset',
+        'email_result': 'password',
+    },
+}
 
 
 class DriverNotificationTest(TestCase):
@@ -143,29 +138,30 @@ class DriverNotificationTest(TestCase):
 
         for name, obj in inspect.getmembers(driver_notifications):
             if inspect.isclass(obj):
+                # make sure we know about this Notification
+                self.assertTrue(name in notification_spec.keys())
+
+                spec = notification_spec[name]
                 campaign_name = 'driver_notifications.' + name
+                argument = eval('self.' + notification_spec[name]['argument'])
 
-                if sms_match_list().get(name):
-                    argument = eval('self.' + sms_match_list()[name]['argument'])
-
+                # check the sms if this notification is supposed to support sms
+                if 'sms_result' in spec.keys():
                     crm_factories.SmsCampaign.create(name=campaign_name)
                     notification.send(campaign_name, argument)
 
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
-                    self.assertTrue(
-                        sms_match_list()[name]['result'] in sms_service.test_get_outbox()[0]['body'],
-                    )
-
+                    self.assertTrue(spec['sms_result'] in sms_service.test_get_outbox()[0]['body'])
                     sms_service.test_reset()
-                else:
-                    argument = eval('self.' + email_match_list()[name]['argument'])
 
+                # check the email if this notification is supposed to support email
+                if 'email_result' in spec.keys():
                     crm_factories.EmailCampaign.create(name=campaign_name)
                     notification.send(campaign_name, argument)
 
                     self.assertEqual(len(mail.outbox), 1)
                     self.assertTrue(
-                        email_match_list()[name]['result'] in mail.outbox[0].subject,
+                        spec['email_result'] in mail.outbox[0].subject,
                     )
                     # manually reset outbox
                     mail.outbox = []
