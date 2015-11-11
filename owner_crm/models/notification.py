@@ -347,7 +347,7 @@ class OwnerNotification(Notification):
         return [{
                 'email_address': user.email,
                 'phone_number': user.username,
-                'sms_enabled': False,
+                'sms_enabled': True,  # by default owners have their SMS functionality enabled
                 'user': user
             } for user in users]
 

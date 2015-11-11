@@ -365,6 +365,22 @@ class AccountCreated(notification.OwnerNotification):
         }
 
 
+class PasswordReset(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \
+ignore this message. Otherwise, you can reset your password using this link: '
+        return {
+            'FNAME': kwargs['password_reset_user_first_name'] or None,
+            'HEADLINE': 'Reset your password',
+            'TEXT': text,
+            'CTA_LABEL': 'Reset password',
+            'CTA_URL': kwargs['password_reset_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Reset your password on idlecars.',
+            'sms_body': text + kwargs['password_reset_url'],
+        }
+
+
 class BankAccountApproved(notification.OwnerNotification):
     def get_context(self, **kwargs):
         links = _get_car_listing_links(kwargs['owner'])

@@ -40,8 +40,7 @@ class OwnerNotificationTest(TestCase):
         self.notification_spec = {
             'RenewalEmail': {
                 'argument': 'renewal',
-                # TODO: we need to add sms_enabled to owners, now we don't have that in place
-                # 'sms_result': client_side_routes.renewal_url(self.renewal),
+                'sms_result': client_side_routes.renewal_url(self.renewal),
                 'email_result': 'expire',
             },
             'NewBookingEmail': {
@@ -51,22 +50,27 @@ class OwnerNotificationTest(TestCase):
             'FirstMorningInsuranceReminder': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
+                'sms_result': self.requested_booking.driver.full_name(),
             },
             'SecondMorningInsuranceReminder': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
+                'sms_result': self.requested_booking.driver.full_name(),
             },
             'FirstAfternoonInsuranceReminder': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
+                'sms_result': self.requested_booking.driver.full_name(),
             },
             'SecondAfternoonInsuranceReminder': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
+                'sms_result': self.requested_booking.driver.full_name(),
             },
             'PickupConfirmation': {
                 'argument': 'booked_booking',
                 'email_result': 'paid',
+                'sms_result': self.booked_booking.driver.full_name()
             },
             'PaymentReceipt': {
                 'argument': 'settled_payment',
@@ -75,10 +79,12 @@ class OwnerNotificationTest(TestCase):
             'BookingCanceled': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
+                'sms_result': self.requested_booking.driver.first_name(),
             },
             'DriverRejected': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
+                'sms_body': self.requested_booking.driver.first_name(),
             },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',
@@ -91,6 +97,11 @@ class OwnerNotificationTest(TestCase):
             'BankAccountApproved': {
                 'argument': 'bank_account_owner',
                 'email_result': 'approved',
+            },
+            'PasswordReset': {
+                'argument': 'password_reset',
+                'email_result': 'Reset your password',
+                'sms_result': self.password_reset.token,
             },
         }
 
@@ -112,6 +123,7 @@ class OwnerNotificationTest(TestCase):
                     campaign.preferred_medium = Campaign.SMS_MEDIUM
                     campaign.save()
 
+                    # print 'sms: ' + campaign_name
                     notification.send(campaign_name, argument)
 
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
@@ -126,7 +138,7 @@ class OwnerNotificationTest(TestCase):
                     notification.send(campaign_name, argument)
 
                     self.assertEqual(len(mail.outbox), 1)
-                    # print mail.outbox[0].subject + ' --------------- ' + campaign_name
+                    # print mail.outbox[0].subject + ' --------------- Email: ' + campaign_name
                     self.assertTrue(spec['email_result'] in mail.outbox[0].subject)
 
                     # manually reset outbox

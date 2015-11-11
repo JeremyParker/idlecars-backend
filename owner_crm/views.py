@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
+from server.models import Driver, Owner
 from services import password_reset_service, notification
 from tests import sample_merge_vars
 import serializers, models
@@ -28,10 +29,15 @@ class PasswordResetSetupView(views.APIView):
         phone_number = serializer.validated_data['phone_number']
         password_reset = password_reset_service.create(phone_number)
         if password_reset:
-            notification.send('driver_notifications.PasswordReset', password_reset)
+            try:
+                driver = password_reset.auth_user.driver
+                notification.send('driver_notifications.PasswordReset', password_reset)
+            except Driver.DoesNotExist:
+                owner = Owner.objects.get(auth_users=password_reset.auth_user)
+                notification.send('owner_notifications.PasswordReset', password_reset)
+
             content = {'phone_number': phone_number}
             return Response(content, status=status.HTTP_201_CREATED)
-
 
         # Since this is AllowAny, don't give away the error.
         content = {'_app_notifications': [
