@@ -76,5 +76,21 @@ class NotificationServiceTest(TestCase):
         campaign = crm_factories.SmsCampaign.create(name=campaign_name)
         notification_service.send(campaign_name, self.settled_payment)
 
+        self.assertEqual(len(sms_service.test_get_outbox()), 0) # we didn't send an SMS
+
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+
+    def test_send_both_sends_both(self):
+        driver = server_factories.Driver.create()
+        campaign_name = 'driver_notifications.FirstDocumentsReminderDriver'
+        campaign = crm_factories.SmsCampaign.create(
+            name=campaign_name,
+            preferred_medium=Campaign.BOTH_MEDIUM,
+        )
+        notification_service.send(campaign_name, driver)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
