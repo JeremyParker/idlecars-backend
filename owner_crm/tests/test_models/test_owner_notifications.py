@@ -48,6 +48,7 @@ class OwnerNotificationTest(TestCase):
             'NewBookingEmail': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
+                'sms_result': self.requested_booking.car.owner.auth_users.first().email,
             },
             'FirstMorningInsuranceReminder': {
                 'argument': 'requested_booking',
@@ -118,6 +119,8 @@ class OwnerNotificationTest(TestCase):
         for name, obj in inspect.getmembers(owner_notifications):
             if inspect.isclass(obj):
                 # make sure we know about this Notification
+                if not name in self.notification_spec.keys():
+                    continue
                 self.assertTrue(name in self.notification_spec.keys())
 
                 spec = self.notification_spec[name]
