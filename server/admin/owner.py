@@ -7,7 +7,6 @@ from django.conf import settings
 from idlecars.admin_helpers import link
 
 from server import models
-from server.admin.user_account import UserAccountForOwnerInline
 
 
 class CarInline(admin.TabularInline):
@@ -69,7 +68,6 @@ class AuthUserInline(admin.TabularInline):
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
         AuthUserInline,
-        UserAccountForOwnerInline,
         CarInline,
     ]
     filter_horizontal = ('auth_users',)
