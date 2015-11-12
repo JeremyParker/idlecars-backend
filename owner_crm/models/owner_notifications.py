@@ -91,6 +91,9 @@ class NewBookingEmail(notification.OwnerNotification):
             'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
             'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
             'template_name': 'no_button_five_images',
+            'sms_body': headline + ' An email has been sent to {} with more information.'.format(
+                kwargs['user_email']
+            )
         }
         return context
 
