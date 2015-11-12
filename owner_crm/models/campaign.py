@@ -12,10 +12,12 @@ class Campaign(models.Model):
 
     SMS_MEDIUM = 0
     EMAIL_MEDIUM = 1
+    BOTH_MEDIUM = 2
 
     MEDIUM_CHOICES = [
         (SMS_MEDIUM, 'SMS'),
         (EMAIL_MEDIUM, 'Email'),
+        (BOTH_MEDIUM, 'SMS & Email'),
     ]
 
     preferred_medium = models.IntegerField(

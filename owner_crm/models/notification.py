@@ -9,6 +9,7 @@ from server.services import car as car_service
 from server.models import Driver
 
 from owner_crm.models import Campaign
+from owner_crm.services import campaign_service
 
 
 def _get_payment_params(payment):
@@ -262,16 +263,26 @@ class Notification(object):
     def get_receiver_params(self, receiver):
         pass
 
-    def get_channel(self, receiver):
-        try:
-            campaign = Campaign.objects.get(name=self.campaign_name)
-        except Campaign.DoesNotExist:
-            campaign = Campaign.objects.create(name=self.campaign_name)
+    def send_sms(self, receiver, context):
+        ''' Attempts to send an SMS. Return value indicates success. '''
+        if not receiver['phone_number'] or \
+            not 'sms_body' in context.keys() or \
+            not receiver['sms_enabled']:
+            return False
+        phone_number = '+1{}'.format(receiver['phone_number'])
+        body = context['sms_body']
+        sms_service.send_async(to=phone_number, body=body)
+        return True
 
-        if campaign.preferred_medium is Campaign.SMS_MEDIUM and receiver['sms_enabled']:
-            return Campaign.SMS_MEDIUM
-        else:
-            return Campaign.EMAIL_MEDIUM
+    def send_email(self, receiver, context):
+        if not receiver['email_address']:
+            return
+        merge_vars = {receiver['email_address']: get_merge_vars(context)}
+        email.send_async(
+            template_name=context.get('template_name'),
+            subject=context.get('subject'),
+            merge_vars=merge_vars,
+        )
 
     def send(self):
         self.get_params(self.default_params_sets() + self.custom_params_sets())
@@ -279,24 +290,15 @@ class Notification(object):
         for receiver in self.get_all_receivers():
             self.get_receiver_params(receiver)
             context = self.get_context(**self.params)
+            campaign = campaign_service.get_campaign(self.campaign_name)
 
-            if self.get_channel(receiver) is Campaign.SMS_MEDIUM and 'sms_body' in context.keys():
-                if not receiver['phone_number']:
-                    continue
-                phone_number = '+1{}'.format(receiver['phone_number'])
-                body = context['sms_body']
-                sms_service.send_async(to=phone_number, body=body)
-            else:
-                if not receiver['email_address']:
-                    continue
-
-                merge_vars = {receiver['email_address']: get_merge_vars(context)}
-
-                email.send_async(
-                    template_name=context.get('template_name'),
-                    subject=context.get('subject'),
-                    merge_vars=merge_vars,
-                )
+            if campaign.preferred_medium is Campaign.SMS_MEDIUM:
+                self.send_sms(receiver, context) or self.send_email(receiver, context)
+            elif campaign.preferred_medium is Campaign.EMAIL_MEDIUM:
+                self.send_email(receiver, context)
+            elif campaign.preferred_medium is Campaign.BOTH_MEDIUM:
+                self.send_sms(receiver, context)
+                self.send_email(receiver, context)
 
 
 class DriverNotification(Notification):
