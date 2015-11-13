@@ -21,6 +21,8 @@ SSLIFY_DISABLE = True
 CORS_ORIGIN_WHITELIST = (
     'app.staging.idlecars.com.s3-website-us-east-1.amazonaws.com',
     'app.staging.idlecars.com',
+    'owner.staging.idlecars.com.s3-website-us-east-1.amazonaws.com',
+    'owner.staging.idlecars.com',
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
