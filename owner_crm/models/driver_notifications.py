@@ -358,12 +358,10 @@ class CheckoutReceipt(notification.DriverNotification):
 
 class PickupConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = '''
-                Success! Your card has been charged {} for the {} booking.
-                The owner should receive an email that the payment was processed and should give you the keys to start driving.
-                <br />
-                Please contact us if there are any issues.
-            '''.format(kwargs['booking_weekly_rent'], kwargs['car_name'])
+        text = 'Success! Your card has been charged {} for the {} booking. \
+The owner will receive a notification that the payment was processed and should \
+give you the keys to start driving. Please contact us if there are any \
+issues.'.format(kwargs['booking_weekly_rent'], kwargs['car_name'])
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'You are ready to drive!',
