@@ -16,6 +16,8 @@ ALLOWED_HOSTS = ['www.idlecars.com']
 CORS_ORIGIN_WHITELIST = (
     'app.idlecars.com',
     'app.idlecars.com.s3-website-us-east-1.amazonaws.com',
+    'owner.idlecars.com',
+    'owner.idlecars.com.s3-website-us-east-1.amazonaws.com',
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
