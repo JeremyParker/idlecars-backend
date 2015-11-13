@@ -22,7 +22,7 @@ SSLIFY_DISABLE = True
 WEBAPP_URL = 'http://localhost:3000'
 
 # Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = ('localhost:3000',)
+CORS_ORIGIN_WHITELIST = ('localhost:3000','localhost:3001',)
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
