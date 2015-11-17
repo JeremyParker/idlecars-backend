@@ -17,11 +17,5 @@ class UserSerializer(ModelSerializer):
             'phone_number',
             'email',
         )
-        read_only_fields = (
-            'first_name',
-            'last_name',
-            'phone_number',
-            'email',
-        )
 
     phone_number = fields.PhoneNumberField(max_length=30, source='username')

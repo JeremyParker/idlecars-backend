@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -18,10 +19,10 @@ class UserApiTest(APITestCase):
         token = Token.objects.get(user__username=self.user.username)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('server:users-detail', args=(self.user.id,))
+        self.url = reverse('server:users-detail', args=('me',))
 
     def test_get_me(self):
-        response = self.client.get(self.url, {'pk': 'me'})
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         formatted_phone = fields.format_phone_number(self.user.username)
@@ -34,4 +35,22 @@ class UserApiTest(APITestCase):
         other_user = factories.AuthUser.create()
         url = reverse('server:users-detail', args=(other_user.id,))
         response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_email(self):
+        response = self.client.patch(self.url, {'email': 'test@testing.com'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_reloaded = User.objects.get(pk=self.user.pk)
+        self.assertEqual(user_reloaded.email, 'test@testing.com')
+
+    def test_update_first_name(self):
+        response = self.client.patch(self.url, {'first_name': 'Mikey'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_reloaded = User.objects.get(pk=self.user.pk)
+        self.assertEqual(user_reloaded.first_name, 'Mikey')
+
+    def test_cannot_update_someone_else(self):
+        other_user = factories.AuthUser.create()
+        url = reverse('server:users-detail', args=(other_user.id,))
+        response = self.client.patch(url, {'first_name': 'Mikey'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

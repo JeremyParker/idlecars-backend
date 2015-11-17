@@ -8,17 +8,17 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
-from server import models
 from server.serializers import UserSerializer
 from server.permissions import OwnsUser
 
+
+User = auth.get_user_model()
 
 class UserViewSet(
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
         viewsets.GenericViewSet
     ):
-    User = auth.get_user_model()
     model = User
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -29,7 +29,7 @@ class UserViewSet(
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
             try:
-                self.kwargs[lookup_url_kwarg] = User.objects.get(auth_users=self.request.user).pk
+                self.kwargs[lookup_url_kwarg] = self.request.user.pk
             except User.DoesNotExist:
                 raise Http404
         return super(UserViewSet, self).get_object()
