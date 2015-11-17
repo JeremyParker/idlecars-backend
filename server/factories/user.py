@@ -6,6 +6,7 @@ import random
 
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+from django.contrib import auth
 
 from factory import LazyAttribute, PostGenerationMethodCall, post_generation
 from factory.django import DjangoModelFactory
@@ -15,7 +16,7 @@ from idlecars.factory_helpers import Factory, faker, random_phone
 
 class AuthUser(DjangoModelFactory):
     class Meta:
-        model = 'auth.User'
+        model = auth.get_user_model()
         django_get_or_create = ('username',)
 
     first_name = LazyAttribute(lambda o: faker.first_name())
