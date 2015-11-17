@@ -15,6 +15,7 @@ from server.services import owner_service
 
 class OwnerViewSet(
         mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
         viewsets.GenericViewSet
     ):
     model = models.Owner

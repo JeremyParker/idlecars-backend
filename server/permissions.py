@@ -17,3 +17,7 @@ class OwnsBooking(permissions.BasePermission):
 class OwnsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.auth_users.all()
+
+class OwnsUser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj
