@@ -21,8 +21,8 @@ doc_fields_and_names = {
 }
 
 
-def create():
-    return server.models.Driver.objects.create()
+def create(auth_user=None):
+    return server.models.Driver.objects.create(auth_user=auth_user)
 
 
 def documents_changed(original, modified):

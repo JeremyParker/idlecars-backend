@@ -99,6 +99,11 @@ def process_owner_emails():
     _reminder_email()
 
 
+def create(auth_user):
+    new_owner = Owner.objects.create()
+    new_owner.auth_users.add(auth_user)
+
+
 def add_merchant_id_to_owner(merchant_account_id, owner):
     owner.merchant_id = merchant_account_id
     owner.merchant_account_state = Owner.BANK_ACCOUNT_PENDING

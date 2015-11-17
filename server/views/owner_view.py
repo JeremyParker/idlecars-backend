@@ -30,7 +30,8 @@ class OwnerViewSet(
             try:
                 self.kwargs[lookup_url_kwarg] = models.Owner.objects.get(auth_users=self.request.user).pk
             except models.Owner.DoesNotExist:
-                raise Http404
+                return owner_service.create(auth_user=self.request.user)
+
         return super(OwnerViewSet, self).get_object()
 
     @detail_route(methods=['post'], permission_classes=[OwnsOwner])

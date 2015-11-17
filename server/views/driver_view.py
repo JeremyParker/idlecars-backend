@@ -11,6 +11,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from server import models
 from server.services import payment_method as payment_method_service
+from server.services import driver as driver_service
 from server.serializers import DriverSerializer, NonceSerializer
 from server.permissions import OwnsDriver
 
@@ -36,9 +37,12 @@ class DriverViewSet(
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         if self.request.user.is_authenticated() and self.kwargs[lookup_url_kwarg] == 'me':
             try:
-                self.kwargs[lookup_url_kwarg] = models.Driver.objects.get(auth_user=self.request.user).pk
+                me_pk = models.Driver.objects.get(auth_user=self.request.user).pk
+                self.kwargs[lookup_url_kwarg] = me_pk
             except models.Driver.DoesNotExist:
-                raise Http404
+                ''' we're creating a driver here because in the DriverApp client, an owner can
+                log in, but fails when they try to get their Driver object. '''
+                return driver_service.create(auth_user=self.request.user)
         return super(DriverViewSet, self).get_object()
 
     @detail_route(methods=['post'], permission_classes=[OwnsDriver])
