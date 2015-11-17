@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, CharField, ValidationError
 
 from idlecars import fields
 from server import models
@@ -16,6 +16,22 @@ class UserSerializer(ModelSerializer):
             'last_name',
             'phone_number',
             'email',
+            'password',
         )
 
     phone_number = fields.PhoneNumberField(max_length=30, source='username')
+    password = CharField(max_length=128, write_only=True)
+
+
+    def create(self, validated_data):
+        username = validated_data.get('username')
+        try:
+            auth_user = User.objects.get(username=username)
+            raise ValidationError("This phone number already has a user.")
+        except User.DoesNotExist:
+            password = validated_data.get('password')
+            auth_user = User.objects.create_user(
+                username=username,
+                password=password,
+            )
+        return auth_user
