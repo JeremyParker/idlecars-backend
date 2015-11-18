@@ -23,7 +23,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = user_fields
-        read_only_fields = ('id', 'driver')
+        read_only_fields = ('id', 'driver' 'owner',)
 
     phone_number = fields.PhoneNumberField(max_length=30, source='username')
     driver = PrimaryKeyRelatedField(read_only=True)
