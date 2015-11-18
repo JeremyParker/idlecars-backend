@@ -3,29 +3,29 @@ from __future__ import unicode_literals
 
 from django.utils import timezone
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from server.models import Car, CarCompatibility
 from server.services import car as car_service, car_search
 import owner_serializer
 
 
-class CarSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    listing_features = serializers.SerializerMethodField()
-    booked_features = serializers.SerializerMethodField()
-    headline_features = serializers.SerializerMethodField()
-    certifications = serializers.SerializerMethodField()
-    details = serializers.SerializerMethodField()
-    deposit = serializers.SerializerMethodField()
-    cost = serializers.SerializerMethodField()
-    cost_str = serializers.SerializerMethodField()
-    cost_time = serializers.SerializerMethodField()
-    cost_bucket = serializers.SerializerMethodField()
-    image_url = serializers.SerializerMethodField()
-    zipcode = serializers.SerializerMethodField()
-    searchable = serializers.SerializerMethodField()
-    compatibility = serializers.SerializerMethodField()
+class CarSerializer(ModelSerializer):
+    name = SerializerMethodField()
+    listing_features = SerializerMethodField()
+    booked_features = SerializerMethodField()
+    headline_features = SerializerMethodField()
+    certifications = SerializerMethodField()
+    details = SerializerMethodField()
+    deposit = SerializerMethodField()
+    cost = SerializerMethodField()
+    cost_str = SerializerMethodField()
+    cost_time = SerializerMethodField()
+    cost_bucket = SerializerMethodField()
+    image_url = SerializerMethodField()
+    zipcode = SerializerMethodField()
+    searchable = SerializerMethodField()
+    compatibility = SerializerMethodField()
 
     class Meta:
         model = Car

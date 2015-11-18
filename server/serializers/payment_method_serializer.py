@@ -1,12 +1,12 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from server.models import PaymentMethod
 
 
-class PaymentMethodSerializer(serializers.ModelSerializer):
+class PaymentMethodSerializer(ModelSerializer):
     class Meta:
         model = PaymentMethod
         fields = (
