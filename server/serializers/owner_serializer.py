@@ -1,8 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from idlecars import fields
 from server.models import Owner
@@ -10,11 +9,11 @@ from server import models
 from server.serializers import UserSerializer
 
 
-class OwnerContactSerializer(serializers.ModelSerializer):
+class OwnerContactSerializer(ModelSerializer):
     '''
     Used for showing a driver the contact info for an owner
     '''
-    address = serializers.SerializerMethodField()
+    address = SerializerMethodField()
     phone_number = fields.PhoneNumberField(max_length=30)
 
     class Meta:
