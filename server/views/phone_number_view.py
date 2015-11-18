@@ -10,7 +10,6 @@ from rest_framework import status
 
 from idlecars import fields
 
-from server import models
 from server.serializers import PhoneNumberSerializer
 
 

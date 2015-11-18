@@ -14,14 +14,34 @@ from server import factories, models
 class PhoneNumberTest(APITestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
+        self.owner = factories.Owner.create()
+        self.user = factories.AuthUser.create()
 
-    def test_get_phone_number_success(self):
+    def test_get_phone_number_success_driver(self):
         url = reverse('server:phone_numbers', args=(self.driver.phone_number(),))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data['phone_number'],
             fields.format_phone_number(self.driver.phone_number())
+        )
+
+    def test_get_phone_number_success_owner(self):
+        url = reverse('server:phone_numbers', args=(self.owner.phone_number(),))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data['phone_number'],
+            fields.format_phone_number(self.owner.phone_number())
+        )
+
+    def test_get_phone_number_success_user(self):
+        url = reverse('server:phone_numbers', args=(self.user.username,))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data['phone_number'],
+            fields.format_phone_number(self.user.username)
         )
 
     def test_get_phone_number_success_with_random_chars(self):
