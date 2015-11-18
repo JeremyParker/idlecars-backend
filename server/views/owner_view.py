@@ -26,7 +26,7 @@ class OwnerViewSet(
 
     def get_permissions(self):
         # special case for create: you just have to be authenticated.
-        if self.request.method == 'POST' and self.action == 'create':
+        if self.action == 'create':
             return (IsAuthenticated(),)
         return (OwnsOwner()),
 
