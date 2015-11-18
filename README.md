@@ -1,7 +1,7 @@
 # idlecars
-The repo for Idle Cars.
+The repo for the idlecars backend
 
-'server' is the webapp.
+'server' is the main api for the owner and driver apps
 
 ## Local environment setup
 
