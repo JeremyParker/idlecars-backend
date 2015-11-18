@@ -55,6 +55,11 @@ class UserApiTest(APITestCase):
         response = self.client.patch(url, {'first_name': 'Mikey'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_cannot_update_password(self):
+        url = reverse('server:users-detail', args=(self.user.id,))
+        response = self.client.patch(url, {'password': 'other_password'})
+        self.assertTrue(self.user.check_password('password'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # it doesn't update
 
 class UserCreateTest(APITestCase):
     def setUp(self):
