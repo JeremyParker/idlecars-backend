@@ -73,6 +73,23 @@ class UserApiTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['driver'], driver.pk)
 
+    def test_user_with_owner_returns_owner(self):
+        owner = factories.Owner.create()
+        owner.auth_users.add(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['owner'], owner.pk)
+
+    def test_owner_driver_returns_both(self):
+        driver = factories.Driver.create(auth_user=self.user)
+        owner = factories.Owner.create()
+        owner.auth_users.add(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['owner'], owner.pk)
+        self.assertEqual(response.data['driver'], driver.pk)
+
+
 class UserCreateTest(APITestCase):
     def setUp(self):
         self.url = reverse('server:users-list')
