@@ -15,6 +15,29 @@ from server import models
 from server import payment_gateways
 
 
+class GetOwnerNoAuthTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.owner =  factories.Owner.create()
+
+    def test_get_me_unauthenticated(self):
+        response = self.client.get(reverse('server:owners-detail', args=('me',)))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_owner_unauthenticated(self):
+        response = self.client.get(reverse('server:owners-detail', args=(self.owner.pk,)))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_create_unauthenticated(self):
+        response = self.client.post(reverse('server:owners-list'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_unauthenticated(self):
+        url = reverse('server:owners-detail', args=(self.owner.pk,))
+        response = self.client.patch(url, {'company_name': 'bla'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
 class GetOwnerTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
@@ -81,6 +104,38 @@ class OwnerCreateTest(APITestCase):
 
         # make sure our user is among the users
         self.assertTrue(self.user.pk in [u['id'] for u in response.data['auth_users']])
+
+
+class OwnerUpdateTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.owner =  factories.Owner.create()
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=self.owner.auth_users.last().username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.url = reverse('server:owners-detail', args=('me',))
+
+    def test_update_company_name(self):
+        company_name = 'Miguel\'s Cars'
+        response = self.client.patch(self.url, {'company_name': company_name}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['company_name'], company_name)
+
+    def test_cannot_update_another_owner(self):
+        other_owner =  factories.Owner.create()
+        other_url = reverse('server:owners-detail', args=(other_owner.pk,))
+        response = self.client.patch(other_url, {'company_name': 'bla'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_me_with_no_owner_creates_owner(self):
+        '''
+        This is weird behavior, but we always support an authenticated user interacting
+        with their Owner object as if they had always had an Owner object, even if they never did.
+        '''
+        self.owner.delete()
+        response = self.client.patch(self.url, {'company_name': 'bla'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['company_name'], 'bla')
 
 
 class BankLinkTest(APITestCase):
