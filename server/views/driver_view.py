@@ -29,7 +29,7 @@ class DriverViewSet(
     queryset = models.Driver.objects.all()
 
     def get_permissions(self):
-        # allow non-authenticated user to create a Driver
+        # TODO - don't allow non-authenticated user to create a Driver
         return (AllowAny() if self.request.method == 'POST' else OwnsDriver()),
 
     def get_object(self):

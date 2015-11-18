@@ -12,12 +12,14 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'id',
             'first_name',
             'last_name',
             'phone_number',
             'email',
             'password',
         )
+        read_only_fields = ('id', 'password',)
 
     phone_number = fields.PhoneNumberField(max_length=30, source='username')
     password = CharField(max_length=128, write_only=True)
