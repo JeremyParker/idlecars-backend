@@ -5,9 +5,8 @@ from django.http import Http404
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route, permission_classes
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
 
 from server import models
 from server.serializers import OwnerSerializer
@@ -52,7 +51,7 @@ class OwnerViewSet(
             owner = owner_service.create(auth_user=user)
         serializer.instance = owner
 
-    @detail_route(methods=['post'], permission_classes=[OwnsOwner,])
+    @detail_route(methods=['post'])
     def bank_link(self, request, pk=None):
         owner = self.get_object()
         error_fields, error_msg = owner_service.link_bank_account(owner, request.data)
