@@ -15,6 +15,7 @@ from server.permissions import OwnsUser
 User = auth.get_user_model()
 
 class UserViewSet(
+        mixins.CreateModelMixin,
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
         viewsets.GenericViewSet

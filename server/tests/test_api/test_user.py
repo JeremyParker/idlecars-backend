@@ -54,3 +54,41 @@ class UserApiTest(APITestCase):
         url = reverse('server:users-detail', args=(other_user.id,))
         response = self.client.patch(url, {'first_name': 'Mikey'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class UserCreateTest(APITestCase):
+    def setUp(self):
+        self.url = reverse('server:users-list')
+
+    def test_create_user(self):
+        data = {'phone_number': '212 413 1234', 'password': 'test'}
+        response = APIClient().post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['phone_number'], '(212) 413-1234')
+        self.assertFalse('password' in response.data)
+
+        stored_phone_number = ''.join([n for n in response.data['phone_number'] if n.isdigit()])
+
+        # check that it was created in the db
+        new_user = User.objects.get(username=stored_phone_number)
+        self.assertIsNotNone(new_user)
+
+        #check that the password works
+        self.client.logout()
+        self.assertTrue(self.client.login(username=stored_phone_number, password='test'))
+
+    def test_create_fails_with_existing_user(self):
+        existing_user = factories.AuthUser.create()
+        data = {'phone_number': existing_user.username, 'password': 'new_password'}
+        response = APIClient().post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_driver_fails_with_no_password(self):
+        data = {'phone_number': '212-413-1234'}
+        response = APIClient().post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_driver_fails_with_no_phone(self):
+        data = {'password': 'test'}
+        response = APIClient().post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
