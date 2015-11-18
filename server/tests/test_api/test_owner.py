@@ -42,11 +42,45 @@ class GetOwnerTest(APITestCase):
             fields.format_phone_number(self.owner.auth_users.all()[0].username)
         )
 
+    def test_get_me_no_owner(self):
+        user = self.owner.auth_users.first()
+        self.owner.delete()
+        self.url = reverse('server:owners-detail', args=('me',))
+        response = self.client.get(self.url)
+
+        new_owner = models.Owner.objects.get(auth_users=user)
+        self.assertEqual(response.data['id'], new_owner.pk)
+        self.assertEqual(
+            response.data['auth_users'][0]['phone_number'],
+            fields.format_phone_number(user.username),
+        )
+
     def test_get_another_owner(self):
-        other_owner =  factories.Owner.create()
+        other_owner = factories.Owner.create()
         self.url = reverse('server:owners-detail', args=(other_owner.pk,))
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class OwnerCreateTest(APITestCase):
+    def setUp(self):
+        self.user =  factories.AuthUser.create()
+        token = Token.objects.get(user__username=self.user.username)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        self.url = reverse('server:owners-list')
+
+    def test_create_owner(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # check that it was created in the db
+        new_owner = models.Owner.objects.get(auth_users=self.user)
+        self.assertIsNotNone(new_owner)
+
+        # make sure our user is among the users
+        self.assertTrue(self.user.pk in [u['id'] for u in response.data['auth_users']])
 
 
 class BankLinkTest(APITestCase):

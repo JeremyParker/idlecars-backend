@@ -49,12 +49,23 @@ class UserApiTest(APITestCase):
         user_reloaded = User.objects.get(pk=self.user.pk)
         self.assertEqual(user_reloaded.first_name, 'Mikey')
 
+    def test_update_last_name(self):
+        response = self.client.patch(self.url, {'last_name': 'McCarthy'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_reloaded = User.objects.get(pk=self.user.pk)
+        self.assertEqual(user_reloaded.last_name, 'McCarthy')
+
     def test_cannot_update_someone_else(self):
         other_user = factories.AuthUser.create()
         url = reverse('server:users-detail', args=(other_user.id,))
         response = self.client.patch(url, {'first_name': 'Mikey'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_cannot_update_password(self):
+        url = reverse('server:users-detail', args=(self.user.id,))
+        response = self.client.patch(url, {'password': 'other_password'})
+        self.assertTrue(self.user.check_password('password'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # it doesn't update
 
 class UserCreateTest(APITestCase):
     def setUp(self):

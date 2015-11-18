@@ -8,11 +8,12 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
-from server.serializers import UserSerializer
+from server.serializers import UserSerializer, UserCreateSerializer
 from server.permissions import OwnsUser
 
 
 User = auth.get_user_model()
+
 
 class UserViewSet(
         mixins.CreateModelMixin,
@@ -22,8 +23,12 @@ class UserViewSet(
     ):
     model = User
     queryset = User.objects.all()
-    serializer_class = UserSerializer
     permission_classes = (OwnsUser,)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return UserCreateSerializer
+        return UserSerializer
 
     def get_object(self):
         ''' override to map 'me' to the current user's User object '''

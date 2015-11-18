@@ -11,18 +11,23 @@ from server.serializers import UserSerializer
 
 
 class OwnerContactSerializer(serializers.ModelSerializer):
+    '''
+    Used for showing a driver the contact info for an owner
+    '''
     address = serializers.SerializerMethodField()
     phone_number = fields.PhoneNumberField(max_length=30)
 
     class Meta:
         model = Owner
         fields = (
+            'id',
             'address',
             'phone_number',
             'name',
             'sms_enabled',
         )
         read_only_fields = (
+            'id',
             'address',
             'phone_number',
             'name',
@@ -41,9 +46,17 @@ class OwnerContactSerializer(serializers.ModelSerializer):
 class OwnerSerializer(ModelSerializer):
     auth_users = UserSerializer(many=True, read_only=True)
     class Meta:
-        model = models.Driver
+        model = models.Owner
         fields = (
             'id',
             'auth_users',
+            'sms_enabled',
+            'company_name',
+            'address1',
+            'address2',
+            'city',
+            'state_code',
+            'zipcode',
+            # 'bank_account_status', TODO
         )
         read_only_fields = ('id', 'auth_users',)

@@ -7,21 +7,23 @@ from rest_framework.serializers import ModelSerializer, CharField, ValidationErr
 from idlecars import fields
 from server import models
 
-
-class UserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
+user_fields = (
+            'id',
             'first_name',
             'last_name',
             'phone_number',
             'email',
-            'password',
         )
+
+
+class UserCreateSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = user_fields + ('password',)
+        read_only_fields = ('id', 'password',)
 
     phone_number = fields.PhoneNumberField(max_length=30, source='username')
     password = CharField(max_length=128, write_only=True)
-
 
     def create(self, validated_data):
         username = validated_data.get('username')
@@ -35,3 +37,12 @@ class UserSerializer(ModelSerializer):
                 password=password,
             )
         return auth_user
+
+
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = user_fields
+        read_only_fields = ('id',)
+
+    phone_number = fields.PhoneNumberField(max_length=30, source='username')

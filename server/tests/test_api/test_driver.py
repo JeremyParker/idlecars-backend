@@ -176,6 +176,24 @@ class DriverCreateTest(APITestCase):
         response = APIClient().post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_get_me_creates_new_driver(self):
+        user = factories.AuthUser.create()
+        client = APIClient()
+
+        # Include an appropriate `Authorization:` header on all requests.
+        token = Token.objects.get(user__username=user.username)
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        url = reverse('server:drivers-detail', args=('me',))
+        response = client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        new_driver = models.Driver.objects.get(auth_user=user)
+        self.assertEqual(new_driver.phone_number(), user.username)
+        self.assertEqual(new_driver.email(), user.email)
+        self.assertEqual(new_driver.first_name(), user.first_name)
+        self.assertEqual(new_driver.last_name(), user.last_name)
+
 
 class AddPaymentMethodTest(AuthenticatedDriverTest):
     def setUp(self):
