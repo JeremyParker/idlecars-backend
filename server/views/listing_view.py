@@ -12,7 +12,10 @@ class ListingViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = ListingSerializer
 
     def get_queryset(self):
-        return car_service.filter_listable(Car.objects.all())
+        return car_service.filter_listable(Car.objects.all()).prefetch_related(
+            'owner',
+            # TODO - get the other stuff we need
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = car_service.filter_live(

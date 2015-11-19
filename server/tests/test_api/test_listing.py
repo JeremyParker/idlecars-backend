@@ -14,7 +14,7 @@ from rest_framework.test import APITestCase
 from server import factories, models
 
 
-class CarTest(APITestCase):
+class ListingTest(APITestCase):
     def setUp(self):
         self.car = factories.BookableCar.create(
             status='busy',

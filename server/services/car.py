@@ -40,3 +40,7 @@ def get_stale_within(minutes_until_stale):
 
 def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
+
+
+def create_car():
+    return Car.objects.create(status=Car.STATUS_AVAILABLE)
