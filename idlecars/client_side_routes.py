@@ -32,6 +32,13 @@ def driver_account():
     parts = (settings.WEBAPP_URL, '#', 'account')
     return '/'.join(parts)
 
+def driver_login():
+    return bookings()
+
+def driver_signup():
+    parts = (settings.WEBAPP_URL, '#', 'users', 'new', 'phone_number')
+    return '/'.join(parts)
+
 def owner_password_reset(password_reset):
     parts = (settings.WEBAPP_URL, '#', 'owner_reset_password', password_reset.token)
     return '/'.join(parts)

@@ -20,7 +20,8 @@ actions are both handled through this view.
 '''
 def index(request):
     context = {
-        'login_url': client_side_routes.driver_account(),
+        'login_url': client_side_routes.driver_login(),
+        'signup_url': client_side_routes.driver_signup(),
         'terms_of_service': client_side_routes.terms_of_service(),
         'faq': client_side_routes.faq(),
         'add_car_form': client_side_routes.add_car_form(),
