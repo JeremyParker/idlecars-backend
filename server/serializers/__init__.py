@@ -5,6 +5,7 @@ from nonce_serializer import NonceSerializer
 from user_serializer import UserSerializer, UserCreateSerializer
 from owner_serializer import OwnerSerializer, OwnerContactSerializer
 from listing_serializer import ListingSerializer, ListingPickupSerializer
+from car_serializer import CarSerializer
 from booking_serializer import BookingSerializer, BookingDetailsSerializer
 from payment_method_serializer import PaymentMethodSerializer
 from payment_serializer import PaymentSerializer
