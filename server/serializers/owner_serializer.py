@@ -64,9 +64,5 @@ class OwnerSerializer(ModelSerializer):
         read_only_fields = ('id', 'auth_users', 'bank_account_state')
 
     def get_bank_account_state(self, obj):
-        return {
-            Owner.BANK_ACCOUNT_PENDING : 'Pending',
-            Owner.BANK_ACCOUNT_APPROVED : 'Approved',
-            Owner.BANK_ACCOUNT_DECLINED : 'Declined',
-        }.get(obj.merchant_account_state, 'Add now')
+        return dict(Owner.MERCHANT_ACCOUNT_STATE).get(obj.merchant_account_state, 'Add now')
 
