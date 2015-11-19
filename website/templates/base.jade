@@ -32,7 +32,8 @@ html(lang="en", ng-app="app")
             a(href="/#tutorial") #[p.bold How it works]
             a(href='/about') #[p.bold About Us]
             a(href="#{ add_car_form }") #[p.bold List your car]
-            a(href="#{ login_url }") #[p.bold Join/Log in]
+            a(href="#{ signup_url }") #[p.bold Sign up]
+            a(href="#{ login_url }") #[p.bold Log in]
 
         .menu-button(ng-click='showMenu = !showMenu')
           .burger-button(ng-class='{active: showMenu}')
@@ -41,7 +42,8 @@ html(lang="en", ng-app="app")
           a(href="/#tutorial") #[p How it works]
           a(href='/about') #[p About Us]
           a(href="#{ add_car_form }") #[p List your car]
-          a(href="#{ login_url }") #[p Join]
+          a(href="#{ signup_url }") #[p Sign up]
+          a(href="#{ login_url }") #[p Log in]
 
     - block content
     - endblock
