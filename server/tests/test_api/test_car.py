@@ -93,7 +93,7 @@ class CarTest(APITestCase):
         return dict(expected)
 
     def test_get_cars(self):
-        url = reverse('server:cars-list')
+        url = reverse('server:listings-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -103,7 +103,7 @@ class CarTest(APITestCase):
     def test_get_cars_sorted(self):
         for _ in range(20):
             factories.BookableCar.create()
-        url = reverse('server:cars-list')
+        url = reverse('server:listings-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         previous_car_cost = 0
@@ -116,21 +116,21 @@ class CarTest(APITestCase):
         self.assertEqual(response.data, self._get_expected_representation(self.car))
 
     def test_get_live_car(self):
-        url = reverse('server:cars-detail', args=(self.car.pk,))
+        url = reverse('server:listings-detail', args=(self.car.pk,))
         self._assert_car_details(self.client.get(url, format='json'))
 
     def test_get_unlisted_car(self):
         # make it so the car is unlisted (all info complete, but not live)
         self.car.owner.merchant_account_state = models.Owner.BANK_ACCOUNT_DECLINED
         self.car.owner.save()
-        url = reverse('server:cars-detail', args=(self.car.pk,))
+        url = reverse('server:listings-detail', args=(self.car.pk,))
         self._assert_car_details(self.client.get(url, format='json'))
 
     def test_get_unlistable_car(self):
         # make it so this car has incomplete information, so it can't be shown at all
         self.car.plate = ''
         self.car.save()
-        url = reverse('server:cars-detail', args=(self.car.pk,))
+        url = reverse('server:listings-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -142,7 +142,7 @@ class CarTest(APITestCase):
             min_lease='_03_two_weeks',
             solo_cost=100, # make it ridiculously cheap, so it's always in the 'cheap' bucket
         )
-        url = reverse('server:cars-detail', args=(self.car.pk,))
+        url = reverse('server:listings-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

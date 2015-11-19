@@ -33,8 +33,8 @@ merge_vars = {
             'HEADLINE': 'Your bank account has been approved',
             'TEXT': '''Congrats! Your bank information has been approved and your cars have been listed!\nYou can view your live cars from the links below!\n
                 <ul>
-                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/cars/3\n</A>\n
-                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/cars/1\n</A>\n
+                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/listings/3\n</A>\n
+                <li><a href=http://localhost:3000/#/cars/3>\n\thttp://localhost:3000/#/listings/1\n</A>\n
                 </ul>\n
                 If you have any other cars you would like to list, please go to the submission form here:\n'''
         }
