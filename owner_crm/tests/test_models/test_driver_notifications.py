@@ -166,7 +166,7 @@ class DriverNotificationTest(TestCase):
 
                     notification.send(campaign_name, argument)
 
-                    print sms_service.test_get_outbox()[0]['body'] + ' --------------- ' + campaign_name
+                    # print sms_service.test_get_outbox()[0]['body'] + ' --------------- ' + campaign_name
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
                     self.assertTrue(spec['sms_result'] in sms_service.test_get_outbox()[0]['body'])
                     sms_service.test_reset()
