@@ -8,7 +8,11 @@ from server.models import Car
 from server.services import car as car_service
 from server.serializers import ListingSerializer
 
-class ListingViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class CarViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     serializer_class = ListingSerializer
 
     def get_queryset(self):

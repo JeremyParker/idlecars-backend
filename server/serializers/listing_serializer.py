@@ -10,7 +10,7 @@ from server.services import car as car_service, car_search
 import owner_serializer
 
 
-class CarSerializer(ModelSerializer):
+class ListingSerializer(ModelSerializer):
     name = SerializerMethodField()
     listing_features = SerializerMethodField()
     booked_features = SerializerMethodField()
@@ -150,15 +150,15 @@ class CarSerializer(ModelSerializer):
         return "Now"
 
 
-class CarPickupSerializer(CarSerializer):
+class ListingPickupSerializer(ListingSerializer):
     owner = owner_serializer.OwnerContactSerializer()
 
-    class Meta(CarSerializer.Meta):
-        fields = CarSerializer.Meta.fields + (
+    class Meta(ListingSerializer.Meta):
+        fields = ListingSerializer.Meta.fields + (
             'owner',
             'plate',
         )
-        read_only_fields = CarSerializer.Meta.read_only_fields + (
+        read_only_fields = ListingSerializer.Meta.read_only_fields + (
             'owner',
             'plate',
         )

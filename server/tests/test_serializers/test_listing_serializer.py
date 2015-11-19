@@ -5,11 +5,11 @@ from django.test import TestCase
 
 from server import serializers, factories
 
-class TestCarSerializer(TestCase):
+class TestListingSerializer(TestCase):
     def test_car_has_zipcode(self):
         car = factories.Car.create()
-        self.assertIsNotNone(serializers.CarSerializer(car).data['zipcode'])
-        self.assertEqual(car.owner.zipcode, serializers.CarSerializer(car).data['zipcode'])
+        self.assertIsNotNone(serializers.ListingSerializer(car).data['zipcode'])
+        self.assertEqual(car.owner.zipcode, serializers.ListingSerializer(car).data['zipcode'])
 
     def test_car_without_image(self):
         car = factories.Car.create()
@@ -24,4 +24,4 @@ class TestCarSerializer(TestCase):
         self.assertEqual(self._image_url_for(car), expected)
 
     def _image_url_for(self, car):
-        return serializers.CarSerializer(car).data['image_url']
+        return serializers.ListingSerializer(car).data['image_url']
