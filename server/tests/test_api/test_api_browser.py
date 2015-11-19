@@ -21,6 +21,6 @@ class ApiBrowserLocalTest(APITestCase):
         """
         Ensure we can browse another API as a developer working locally
         """
-        url = reverse('server:cars-list')
+        url = reverse('server:listings-list')
         response = self.client.get(url, format='api')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

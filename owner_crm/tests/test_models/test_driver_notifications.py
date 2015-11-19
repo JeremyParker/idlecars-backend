@@ -47,7 +47,7 @@ class DriverNotificationTest(TestCase):
         self.notification_spec = {
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
-                'sms_result': settings.WEBAPP_URL + '/#/cars',
+                'sms_result': settings.WEBAPP_URL + '/#/listing',
                 'email_result': self.approved_driver.full_name(),
             },
             'BaseLetterApprovedNoCheckout': {
@@ -87,7 +87,7 @@ class DriverNotificationTest(TestCase):
             },
             'BookingTimedOut': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/cars',
+                'sms_result': settings.WEBAPP_URL + '/#/listings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'AwaitingInsuranceEmail': {
@@ -166,6 +166,7 @@ class DriverNotificationTest(TestCase):
 
                     notification.send(campaign_name, argument)
 
+                    # print sms_service.test_get_outbox()[0]['body'] + ' --------------- ' + campaign_name
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
                     self.assertTrue(spec['sms_result'] in sms_service.test_get_outbox()[0]['body'])
                     sms_service.test_reset()

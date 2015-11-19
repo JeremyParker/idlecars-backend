@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 def renewal_url(renewal):
-    parts = (settings.WEBAPP_URL, '#', 'cars', unicode(renewal.car.id), 'renewals', renewal.token)
+    parts = (settings.WEBAPP_URL, '#', 'listings', unicode(renewal.car.id), 'renewals', renewal.token)
     return '/'.join(parts)
 
 def doc_upload_url():
@@ -13,7 +13,7 @@ def doc_upload_url():
     return '/'.join(parts)
 
 def car_listing_url():
-    parts = (settings.WEBAPP_URL, '#', 'cars')
+    parts = (settings.WEBAPP_URL, '#', 'listings')
     return '/'.join(parts)
 
 def car_details_url(car):
