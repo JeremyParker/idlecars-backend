@@ -44,6 +44,9 @@ class OwnerContactSerializer(ModelSerializer):
 
 class OwnerSerializer(ModelSerializer):
     auth_users = UserSerializer(many=True, read_only=True)
+
+    bank_account_state = SerializerMethodField()
+
     class Meta:
         model = models.Owner
         fields = (
@@ -56,6 +59,10 @@ class OwnerSerializer(ModelSerializer):
             'city',
             'state_code',
             'zipcode',
-            # 'bank_account_status', TODO
+            'bank_account_state',
         )
-        read_only_fields = ('id', 'auth_users',)
+        read_only_fields = ('id', 'auth_users', 'bank_account_state')
+
+    def get_bank_account_state(self, obj):
+        return dict(Owner.MERCHANT_ACCOUNT_STATE).get(obj.merchant_account_state, 'Add now')
+
