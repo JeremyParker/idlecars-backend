@@ -18,7 +18,6 @@ class ListingSerializer(ModelSerializer):
     certifications = SerializerMethodField()
     details = SerializerMethodField()
     deposit = SerializerMethodField()
-    cost = SerializerMethodField()
     cost_str = SerializerMethodField()
     cost_time = SerializerMethodField()
     cost_bucket = SerializerMethodField()
@@ -38,7 +37,6 @@ class ListingSerializer(ModelSerializer):
             'certifications',
             'details',
             'deposit',
-            'cost',
             'cost_str',
             'cost_time',
             'cost_bucket',
@@ -55,7 +53,6 @@ class ListingSerializer(ModelSerializer):
             'headline_features',
             'certifications',
             'details',
-            'cost',
             'cost_str',
             'cost_time',
             'cost_bucket',
@@ -115,10 +112,6 @@ class ListingSerializer(ModelSerializer):
 
     def get_deposit(self, obj):
         return '${}'.format(obj.solo_deposit)
-
-    # TODO: remove this once the client shows cents in the listing price.
-    def get_cost(self, obj):
-        return unicode(obj.normalized_cost())
 
     def get_cost_str(self, obj):
         return str(obj.quantized_cost()).split('.')
