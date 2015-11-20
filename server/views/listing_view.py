@@ -14,7 +14,8 @@ class ListingViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         return car_service.filter_listable(Car.objects.all()).prefetch_related(
             'owner',
-            # TODO - get the other stuff we need
+            'insurance',
+            'make_model',
         )
 
     def list(self, request, *args, **kwargs):
