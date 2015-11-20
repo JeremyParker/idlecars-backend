@@ -12,7 +12,7 @@ from server import factories, models
 
 class CarAPITest(APITestCase):
     def setUp(self):
-        self.owner =  factories.Owner.create()
+        self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
             owner=self.owner,
         )
@@ -25,20 +25,18 @@ class GetCarListTest(CarAPITest):
     def setUp(self):
         super(GetCarListTest, self).setUp()
         self.url = reverse('server:cars-list')
-        self.other_car = factories.Car.create()
 
-    def test_get_car_list(self):
+    def test_get_car_list_only_has_my_cars(self):
+        other_car = factories.Car.create()
         response = self.client.get(self.url)
-        import pdb; pdb.set_trace()
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['id'], self.car.pk)
-        self.assertEqual(response.data['plate'], self.car.plate)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['plate'], self.car.plate)
 
 
 class GetCarDetailsTest(CarAPITest):
     def setUp(self):
-        super(GetCarListTest, self).setUp()
+        super(GetCarDetailsTest, self).setUp()
         self.url = reverse('server:cars-detail', args=(self.car.pk,))
 
     def test_get_car_details(self):
@@ -47,3 +45,7 @@ class GetCarDetailsTest(CarAPITest):
         self.assertEqual(response.data['id'], self.car.pk)
         self.assertEqual(response.data['plate'], self.car.plate)
 
+    # TODO
+    # test authenticated driver can't create a car
+    # test owner can create a car
+    # test owner can update a car they just created
