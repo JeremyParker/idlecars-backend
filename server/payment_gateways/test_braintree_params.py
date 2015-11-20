@@ -39,6 +39,11 @@ business_data = {
             'first_name': 'Mike',
             'last_name': 'Malone',
             'phone_number': '(123) 123-9987',
+
+            # these are some random-ass keys that might screw things up.
+            'owner': '',
+            'driver': '',
+            'id': 1234,
         },
         'tos_accepted': True,
      },
@@ -88,8 +93,13 @@ individual_data = {
             'first_name': 'Mike',
             'last_name': 'Malone',
             'phone_number': '(123) 123-9987',
+
+            # these are some random-ass keys that might screw things up.
+            'owner': '',
+            'driver': '',
+            'id': 1234,
         },
-        'tos_accepted': True
+        'tos_accepted': True,
     },
     'to_braintree': {
         'funding': {

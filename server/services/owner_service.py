@@ -121,6 +121,20 @@ def update_account_state(merchant_account_id, state, errors=None):
     else:
         notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 
+
+def _strip_dict(dictionary, valid_schema):
+    valid_keys = valid_schema.keys()
+    invalid_keys = []
+    for (k, v) in dictionary.iteritems():
+        if not k in valid_keys:
+            invalid_keys.append(k)
+        elif isinstance(v, dict):
+            dictionary.update({ k: _strip_dict(v, valid_schema[k]) })
+    for k in invalid_keys:
+        del(dictionary[k])
+    return dictionary
+
+
 def link_bank_account(owner, params):
     #translate client params into the format Braintree expects.
     try:
@@ -128,6 +142,34 @@ def link_bank_account(owner, params):
         params['individual'].pop("phone_number", None)
     except KeyError:
         return [], ['Sorry, something went wrong there. Please try again.']
+
+    # This is a superset of all the keys we can pass to braintree
+    valid_schema = {
+        'funding': {
+            'account_number': None,
+            'routing_number': None,
+        },
+        'business': {
+            'legal_name': None,
+            'tax_id': None,
+        },
+        'individual': {
+            'address': {
+                'locality': None,
+                'postal_code': None,
+                'region': None,
+                'street_address': None,
+            },
+            'date_of_birth': None,
+            'email': None,
+            'first_name': None,
+            'last_name': None,
+            'phone': None,
+        },
+        "tos_accepted": None,
+    }
+
+    _strip_dict(params, valid_schema)
 
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
     success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(params)
