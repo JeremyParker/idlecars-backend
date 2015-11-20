@@ -9,7 +9,6 @@ from server import models
 from server import factories
 
 class AdminTest(TestCase):
-
     def setUp(self):
         # Reinitialize the client to turn off CSRF
         self.client = Client()
@@ -30,8 +29,8 @@ class AdminTest(TestCase):
         self.u.delete()
 
     def test_all_admin_pages(self):
-        ''' 
-        Check all the automatically generated admin pages that Django provides for 
+        '''
+        Check all the automatically generated admin pages that Django provides for
         all the models in our app.
         '''
         for model in [
