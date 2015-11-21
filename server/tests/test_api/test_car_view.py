@@ -21,9 +21,9 @@ class CarAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
 
-class GetCarListTest(CarAPITest):
+class CarListTest(CarAPITest):
     def setUp(self):
-        super(GetCarListTest, self).setUp()
+        super(CarListTest, self).setUp()
         self.url = reverse('server:cars-list')
 
     def test_get_car_list_only_has_my_cars(self):
@@ -34,9 +34,9 @@ class GetCarListTest(CarAPITest):
         self.assertEqual(response.data[0]['plate'], self.car.plate)
 
 
-class GetCarDetailsTest(CarAPITest):
+class CarDetailsTest(CarAPITest):
     def setUp(self):
-        super(GetCarDetailsTest, self).setUp()
+        super(CarDetailsTest, self).setUp()
         self.url = reverse('server:cars-detail', args=(self.car.pk,))
 
     def test_get_car_details(self):
@@ -45,7 +45,22 @@ class GetCarDetailsTest(CarAPITest):
         self.assertEqual(response.data['id'], self.car.pk)
         self.assertEqual(response.data['plate'], self.car.plate)
 
+
+class CarCreateTest(CarAPITest):
+    def setUp(self):
+        super(CarCreateTest, self).setUp()
+        self.url = reverse('server:cars-list')
+        self.plate = 'T208340C'
+        # TODO - add a record to the TLC database so we can 'find' it when creating a car.
+
+    def test_create_car_success(self):
+        response = self.client.post(self.url, data={'plate': self.plate})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['plate'], self.plate)
+
+
+    # test owner can update a car they just created
+    # test can't update plate
+
     # TODO
     # test authenticated driver can't create a car
-    # test owner can create a car
-    # test owner can update a car they just created

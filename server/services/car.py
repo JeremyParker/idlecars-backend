@@ -1,9 +1,21 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from idlecars import model_helpers
+
 from server.models import Booking, Car
 from . import car_helpers, make_model_service
 
+# TODO - remove this
+from server.models import MakeModel
+
+
+class CarTLCException(Exception):
+    pass
+
+
+class CarDuplicateException(Exception):
+    pass
 
 def filter_live(queryset):
     return car_helpers._filter_not_stale(
@@ -42,5 +54,30 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
-def create_car():
-    return Car.objects.create(status=Car.STATUS_AVAILABLE)
+def lookup_details(car):
+    '''
+    Looks up the given car in our copy of the TLC database, and fills in details.
+    If the car's plate doesn't exist in the db, we raise a Car.DoesNotExist.
+    '''
+    # TODO: look up the car in the db and get more details
+    car.make_model = MakeModel.objects.last()
+    car.year = 2013
+    car.base = 'SOME_BASE, LLC'
+
+
+def create_car(owner, plate):
+    new_car = Car(plate=plate)
+    try:
+        lookup_details(new_car)
+    except Car.DoesNotExist:
+        raise CarTLCException
+
+    car, is_new = Car.objects.get_or_create(plate=new_car.plate)
+    if not is_new:
+        raise CarDuplicateException()
+
+    model_helpers.copy_fields(new_car, car, ['make_model', 'year', 'base',])
+    car.status = Car.STATUS_AVAILABLE
+    car.owner = owner
+    car.save()
+    return car

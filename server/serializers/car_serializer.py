@@ -43,7 +43,6 @@ class CarSerializer(ModelSerializer):
             'id',
             'name',
             'created_time',
-            'plate',
             'base',
             'state',
             'insurance',

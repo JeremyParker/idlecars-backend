@@ -6,11 +6,41 @@ import datetime
 from django.utils import timezone
 from django.test import TestCase
 
-from server.services import car, car_helpers
+from server.services import car_helpers
+from server.services import car as car_service
 from server import factories, models
 
 def _get_listing_queryset():
-    return car.filter_live(models.Car.objects.all())
+    return car_service.filter_live(models.Car.objects.all())
+
+
+class CarCreateTest(TestCase):
+    def setUp(self):
+        self.owner = factories.BankAccountOwner.create(state_code='NY')
+
+        # TODO: populate our fake TLC database with some cars, so the lookup succeeds
+        self.plate = 'T2974929C'
+        self.base = 'SOME_BASE, LLC'    # this matches the fake implementation in car service
+        self.year = 2013                # this matches the fake implemenation in car service
+        self.make_model = factories.MakeModel.create()
+
+    def test_create_success(self):
+        new_car = car_service.create_car(self.owner, self.plate)
+        self.assertIsNotNone(new_car)
+        self.assertEqual(new_car.plate, self.plate)
+        self.assertEqual(new_car.owner, self.owner)
+        self.assertEqual(new_car.status, models.Car.STATUS_AVAILABLE)
+
+        # check the stuff we looked up in the TLC db:
+        self.assertEqual(new_car.make_model, self.make_model)
+        self.assertEqual(new_car.base, self.base)
+        self.assertEqual(new_car.year, self.year)
+
+    def test_create_existing(self):
+        car = factories.Car.create(plate=self.plate)
+        with self.assertRaises(car_service.CarDuplicateException):
+            new_car = car_service.create_car(self.owner, self.plate)
+
 
 class CarTest(TestCase):
     def setUp(self):
@@ -80,22 +110,22 @@ class CarTest(TestCase):
         ''' verify that a car is not in the stale_soon results if it won't be stale soon. '''
         self.car.last_status_update = timezone.now()
         self.car.save()
-        self.assertEqual(len(car.get_stale_within(120)), 0)
+        self.assertEqual(len(car_service.get_stale_within(120)), 0)
 
     def test_get_stale_soon_exists(self):
         ''' verify that stale_soon includes a car that is about to go stale. '''
         t = car_helpers.staleness_threshold + datetime.timedelta(minutes=5)
         self.car.last_status_update = t
         self.car.save()
-        self.assertEqual(len(car.get_stale_within(120)), 1)
+        self.assertEqual(len(car_service.get_stale_within(120)), 1)
 
     def test_get_stale_soon_exluded_if_stale(self):
         ''' verify that stale_soon doesn't include stale cars. '''
         self.car.last_status_update = timezone.now() - datetime.timedelta(minutes=121)
         self.car.save()
-        self.assertEqual(len(car.get_stale_within(120)), 0)
+        self.assertEqual(len(car_service.get_stale_within(120)), 0)
 
     def test_car_not_renewable_if_no_owner_bank_account(self):
         self.car.owner.merchant_account_state = models.Owner.BANK_ACCOUNT_DECLINED
         self.car.owner.save()
-        self.assertEqual(len(car.get_stale_within(120)), 0)
+        self.assertEqual(len(car_service.get_stale_within(120)), 0)
