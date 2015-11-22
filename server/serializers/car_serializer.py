@@ -10,7 +10,7 @@ from idlecars import client_side_routes
 from server.models import Car
 
 
-class CarSerializer(ModelSerializer):
+class CarCreateSerializer(ModelSerializer):
     name = SerializerMethodField()
     state = SerializerMethodField()
     insurance = SerializerMethodField()
@@ -41,10 +41,14 @@ class CarSerializer(ModelSerializer):
             'id',
             'name',
             'created_time',
-            'base',
             'state',
-            'insurance',
             'listing_link',
+
+            # fields we get from the TLC
+            'make_model',
+            'year',
+            'base',
+            'insurance',
        )
 
     def get_name(self, obj):
@@ -61,3 +65,8 @@ class CarSerializer(ModelSerializer):
 
     def get_listing_link(self, obj):
         return client_side_routes.car_details_url(obj)
+
+
+class CarSerializer(CarCreateSerializer):
+    class Meta(CarCreateSerializer.Meta):
+        read_only_fields = CarCreateSerializer.Meta.read_only_fields + ('plate',)

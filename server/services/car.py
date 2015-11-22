@@ -56,6 +56,10 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
+# TODO: These fields will be in another model
+tlc_fields = ['make_model', 'year', 'base', 'insurance']
+
+
 def lookup_details(car):
     '''
     Looks up the given car in our copy of the TLC database, and fills in details.
@@ -84,7 +88,7 @@ def create_car(owner, plate):
     if not is_new:
         raise CarDuplicateException()
 
-    model_helpers.copy_fields(new_car, car, ['make_model', 'year', 'base', 'insurance'])
+    model_helpers.copy_fields(new_car, car, tlc_fields)
 
     car.status = Car.STATUS_AVAILABLE
     car.next_available_date = timezone.localtime(timezone.now()).date()

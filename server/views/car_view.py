@@ -8,7 +8,7 @@ from rest_framework import status
 
 from server.models import Car, Owner
 from server.services import car as car_service
-from server.serializers import CarSerializer
+from server.serializers import CarSerializer, CarCreateSerializer
 from server.permissions import OwnsCar, IsAuthenticatedOwner
 
 CAR_NOT_FOUND = 'Sorry, this license plate isn\'t in the TLC database. Please check your plate number and try again.'
@@ -23,8 +23,12 @@ class CarViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    serializer_class = CarSerializer
     model = Car
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CarCreateSerializer
+        return CarSerializer
 
     def get_permissions(self):
         # special case for create: you just have to be an authenticated owner.

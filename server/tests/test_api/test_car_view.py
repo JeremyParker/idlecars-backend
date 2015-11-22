@@ -1,13 +1,15 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
+from decimal import Decimal
 
+from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
 from server import factories, models
+from server.services import car as car_service
 
 
 class CarUnauthorizedTest(APITestCase):
@@ -38,13 +40,19 @@ class CarUnauthorizedTest(APITestCase):
         response = self.client.post(url, data={'plate': 'FAKE_PLATE'})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_cannot_update_car(self):
+        car = factories.Car.create()
+        url = reverse('server:cars-detail', args=(car.pk,))
+        response = self.client.patch(url, {'solo_cost': 350}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class CarAPITest(APITestCase):
     def setUp(self):
         self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
             owner=self.owner,
-            plate='REAL_EXISTING_PLATE', # TODO - add this plate to the TLC db
+            plate='REAL_PLATE', # TODO - add this plate to the TLC db
         )
         self.client = APIClient()
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
@@ -76,6 +84,20 @@ class CarDetailsTest(CarAPITest):
         self.assertEqual(response.data['id'], self.car.pk)
         self.assertEqual(response.data['plate'], self.car.plate)
 
+    def test_get_incomplete_car_details(self):
+        # make an incomplete car (not a BookableCar)
+        car = factories.Car.create(
+            owner=self.owner,
+            plate='ANOTHER_REAL_PLATE',  # TODO: add a plate to the tlc db
+            solo_cost=None,
+            solo_deposit=None,
+        )
+        url = reverse('server:cars-detail', args=(car.pk,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], car.pk)
+        self.assertEqual(response.data['plate'], car.plate)
+
     def test_cannot_get_another_owners_car(self):
         other_car = factories.BookableCar.create()
         url = reverse('server:cars-detail', args=(other_car.pk,))
@@ -99,9 +121,11 @@ class CarCreateTest(CarAPITest):
 
     def test_create_car_success(self):
         self.car = None # forget that we had a car
-        response = self.client.post(self.url, data={'plate': self.plate})
+        plate = 'OTHER_REAL_PLATE'  # TODO: add this plate to the tlc db
+        response = self.client.post(self.url, data={'plate': plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['plate'], self.plate)
+        self.assertEqual(response.data['plate'], plate)
+        self.assertEqual(models.Car.objects.get(plate=plate).owner, self.owner)
 
         # make sure we filled in the stuff we were supposed to fill in
         self.assertIsNotNone(response.data['name'])
@@ -129,5 +153,56 @@ class CarCreateTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('_app_notifications' in response.data.keys())
 
-    # test owner can update a car they just created
-    # test can't update plate
+
+class CarUpdateTest(CarAPITest):
+    def test_change_car_details(self):
+        self.car.solo_cost = None
+        self.car.save()
+
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        data = {'solo_cost': 350}
+        response = self.client.patch(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        self.assertEqual(self.car.solo_cost, Decimal('350'))
+
+    def test_cannot_update_others_cars(self):
+        other_car = factories.Car.create()
+        url = reverse('server:cars-detail', args=(other_car.pk,))
+        response = self.client.patch(url, {'solo_cost': 350}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cannot_update_tlc_or_readonly_fields(self):
+        read_only_fields = [
+            'plate',
+            'id',
+            'created_time',
+            'state',
+            'name',
+            'listing_link',
+        ]
+        # get a car through the API to get the available fields and values
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        other_car_data = self.client.get(url).data
+
+        new_car = factories.BookableCar.create(owner=self.owner)
+        url = reverse('server:cars-detail', args=(new_car.pk,))
+        new_car_data = self.client.get(url).data
+
+        for field in other_car_data.keys():
+            # print field # - uncomment this to debug this unit test
+            original_value = new_car_data.get(field, '1')
+            other_value = other_car_data.get(field, '2')
+
+            # try to set the new_car's field to the exising_car's field
+            response = self.client.patch(url, {field: other_value}, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+            current_value = response.data[field]
+            if field in car_service.tlc_fields + read_only_fields:
+                # values didn't change for the read-only fields
+                self.assertEqual(current_value, original_value)
+            else:
+                # values changed for the writable fields
+                self.assertEqual(current_value, other_value)
