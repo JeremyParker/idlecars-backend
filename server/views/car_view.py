@@ -28,11 +28,11 @@ class CarViewSet(
         # special case for create: you just have to be an authenticated owner.
         if self.action == 'create':
             return (IsAuthenticatedOwner(),)
-        return (OwnsCar(),)
+        return (IsAuthenticatedOwner(), OwnsCar(),)
 
     def get_queryset(self):
         owner = self.request.user.owner_set.first()
-        queryset = Car.objects.all().all().prefetch_related(
+        queryset = Car.objects.all().all().select_related(
             'insurance',
             'make_model',
         )

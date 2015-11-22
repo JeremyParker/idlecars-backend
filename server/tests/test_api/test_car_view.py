@@ -10,6 +10,35 @@ from rest_framework.authtoken.models import Token
 from server import factories, models
 
 
+class CarUnauthorizedTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_cannot_get_cars(self):
+        url = reverse('server:cars-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_cannot_get_car_details(self):
+        car = factories.Car.create()
+        url = reverse('server:cars-detail', args=(car.pk,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_cannot_create_car(self):
+        url = reverse('server:cars-list')
+        response = self.client.post(url, data={'plate': 'FAKE_PLATE'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def authenticated_driver_cannot_create_car(self):
+        driver = factories.Driver.create()
+        token = Token.objects.get(user__username=driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        url = reverse('server:cars-list')
+        response = self.client.post(url, data={'plate': 'FAKE_PLATE'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
 class CarAPITest(APITestCase):
     def setUp(self):
         self.owner = factories.Owner.create()
@@ -83,6 +112,3 @@ class CarCreateTest(CarAPITest):
 
     # test owner can update a car they just created
     # test can't update plate
-
-    # TODO
-    # test authenticated driver can't create a car

@@ -36,8 +36,6 @@ class CarSerializer(ModelSerializer):
             'exterior_color',
             'interior_color',
             'last_known_mileage',
-            # 'split_cost',
-            # 'split_deposit',
         )
         read_only_fields = (
             'id',
