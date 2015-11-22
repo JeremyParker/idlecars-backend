@@ -32,10 +32,13 @@ class CarViewSet(
 
     def get_queryset(self):
         owner = self.request.user.owner_set.first()
-        return Car.objects.all().all().prefetch_related(
+        queryset = Car.objects.all().all().prefetch_related(
             'insurance',
             'make_model',
-        ).filter(owner=owner)
+        )
+        if self.action == 'list':
+            return queryset.filter(owner=owner)
+        return queryset
 
     def perform_create(self, serializer):
         owner = Owner.objects.get(auth_users=self.request.user)

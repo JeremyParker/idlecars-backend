@@ -32,18 +32,30 @@ class CarListTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['plate'], self.car.plate)
+        self.assertFalse(other_car.plate in [c['plate'] for c in response.data])
 
 
 class CarDetailsTest(CarAPITest):
     def setUp(self):
         super(CarDetailsTest, self).setUp()
-        self.url = reverse('server:cars-detail', args=(self.car.pk,))
 
     def test_get_car_details(self):
-        response = self.client.get(self.url)
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.car.pk)
         self.assertEqual(response.data['plate'], self.car.plate)
+
+    def test_cannot_get_another_owners_car(self):
+        other_car = factories.BookableCar.create()
+        url = reverse('server:cars-detail', args=(other_car.pk,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_404(self):
+        url = reverse('server:cars-detail', args=('99999',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class CarCreateTest(CarAPITest):
