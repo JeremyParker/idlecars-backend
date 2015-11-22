@@ -9,8 +9,8 @@ from server.services import car as car_service
 from server.serializers import CarSerializer
 from server.permissions import OwnsCar, IsAuthenticatedOwner
 
-CAR_NOT_FOUND = 'Sorry, that license plate isn\'t in the TLC database. Please check your plate number and try again.'
-CAR_ALREADY_REGISTERED = 'That car is already registered to another user. Please contact idlecars support at {}'.format(
+CAR_NOT_FOUND = 'Sorry, this license plate isn\'t in the TLC database. Please check your plate number and try again.'
+CAR_ALREADY_REGISTERED = 'This car is already registered with idlecars. Please call for support at {}'.format(
     settings.IDLECARS_PHONE_NUMBER
 )
 

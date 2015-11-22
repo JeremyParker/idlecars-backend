@@ -58,7 +58,7 @@ class CarSerializer(ModelSerializer):
 
     def get_insurance(self, obj):
         if obj.insurance:
-            return obj.insurance.name
+            return obj.insurance.insurer_name
         return None
 
     def get_listing_link(self, obj):

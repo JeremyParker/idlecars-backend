@@ -41,6 +41,10 @@ class CarCreateTest(TestCase):
         with self.assertRaises(car_service.CarDuplicateException):
             new_car = car_service.create_car(self.owner, self.plate)
 
+    def test_create_not_in_tlc_db(self):
+        with self.assertRaises(car_service.CarTLCException):
+            new_car = car_service.create_car(self.owner, 'NOT FOUND')
+
 
 class CarTest(TestCase):
     def setUp(self):

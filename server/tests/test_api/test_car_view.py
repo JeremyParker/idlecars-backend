@@ -61,15 +61,25 @@ class CarDetailsTest(CarAPITest):
 class CarCreateTest(CarAPITest):
     def setUp(self):
         super(CarCreateTest, self).setUp()
-        self.url = reverse('server:cars-list')
-        self.plate = 'T208340C'
+        self.car = None # forget that we had a car
+
         # TODO - add a record to the TLC database so we can 'find' it when creating a car.
+        factories.Insurance.create()
+        self.plate = 'T208340C'
+        self.url = reverse('server:cars-list')
 
     def test_create_car_success(self):
         response = self.client.post(self.url, data={'plate': self.plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], self.plate)
 
+        # make sure we filled in the stuff we were supposed to fill in
+        self.assertIsNotNone(response.data['name'])
+        self.assertIsNotNone(response.data['base'])
+        self.assertIsNotNone(response.data['insurance'])
+        self.assertIsNotNone(response.data['listing_link'])
+        self.assertIsNotNone(response.data['status'])
+        self.assertIsNotNone(response.data['next_available_date'])
 
     # test owner can update a car they just created
     # test can't update plate

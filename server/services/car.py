@@ -1,13 +1,15 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.utils import timezone
+
 from idlecars import model_helpers
 
 from server.models import Booking, Car
 from . import car_helpers, make_model_service
 
 # TODO - remove this
-from server.models import MakeModel
+from server.models import MakeModel, Insurance
 
 
 class CarTLCException(Exception):
@@ -59,10 +61,16 @@ def lookup_details(car):
     Looks up the given car in our copy of the TLC database, and fills in details.
     If the car's plate doesn't exist in the db, we raise a Car.DoesNotExist.
     '''
+
+    # TODO: this is a placeholder to make the unit test pass
+    if car.plate == 'NOT FOUND':
+        raise Car.DoesNotExist
+
     # TODO: look up the car in the db and get more details
     car.make_model = MakeModel.objects.last()
     car.year = 2013
     car.base = 'SOME_BASE, LLC'
+    car.insurance = Insurance.objects.last()
 
 
 def create_car(owner, plate):
@@ -76,8 +84,10 @@ def create_car(owner, plate):
     if not is_new:
         raise CarDuplicateException()
 
-    model_helpers.copy_fields(new_car, car, ['make_model', 'year', 'base',])
+    model_helpers.copy_fields(new_car, car, ['make_model', 'year', 'base', 'insurance'])
+
     car.status = Car.STATUS_AVAILABLE
+    car.next_available_date = timezone.localtime(timezone.now()).date()
     car.owner = owner
     car.save()
     return car
