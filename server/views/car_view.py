@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from rest_framework import viewsets, mixins
+from rest_framework.response import Response
+from rest_framework import status
 
 from server.models import Car, Owner
 from server.services import car as car_service
@@ -40,14 +42,16 @@ class CarViewSet(
             return queryset.filter(owner=owner)
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super(CarViewSet, self).create(request, *args, **kwargs)
+        except car_service.CarTLCException:
+            return Response({'_app_notifications': [CAR_NOT_FOUND]}, status.HTTP_400_BAD_REQUEST)
+        except car_service.CarDuplicateException:
+            return Response({'_app_notifications': [CAR_ALREADY_REGISTERED]}, status.HTTP_400_BAD_REQUEST)
+
     def perform_create(self, serializer):
         owner = Owner.objects.get(auth_users=self.request.user)
         plate = serializer.validated_data.get('plate')
-        try:
-            new_car = car_service.create_car(owner, plate)
-        except car_service.CarTLCException:
-            return Response({'_app_notifications': [CAR_NOT_FOUND]}, HTTP_400_BAD_REQUEST)
-        except car_service.CarDuplicate:
-            return Response({'_app_notifications': [CAR_ALREADY_REGISTERED]}, HTTP_400_BAD_REQUEST)
-
+        new_car = car_service.create_car(owner, plate)
         serializer.instance = new_car

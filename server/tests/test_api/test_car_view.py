@@ -44,6 +44,7 @@ class CarAPITest(APITestCase):
         self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
             owner=self.owner,
+            plate='REAL_EXISTING_PLATE', # TODO - add this plate to the TLC db
         )
         self.client = APIClient()
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
@@ -90,14 +91,14 @@ class CarDetailsTest(CarAPITest):
 class CarCreateTest(CarAPITest):
     def setUp(self):
         super(CarCreateTest, self).setUp()
-        self.car = None # forget that we had a car
 
         # TODO - add a record to the TLC database so we can 'find' it when creating a car.
         factories.Insurance.create()
-        self.plate = 'T208340C'
+        self.plate = 'REAL_PLATE'
         self.url = reverse('server:cars-list')
 
     def test_create_car_success(self):
+        self.car = None # forget that we had a car
         response = self.client.post(self.url, data={'plate': self.plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], self.plate)
@@ -109,6 +110,24 @@ class CarCreateTest(CarAPITest):
         self.assertIsNotNone(response.data['listing_link'])
         self.assertIsNotNone(response.data['status'])
         self.assertIsNotNone(response.data['next_available_date'])
+
+    def test_create_duplicate_i_own(self):
+        response = self.client.post(self.url, data={'plate': self.car.plate})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('_app_notifications' in response.data.keys())
+
+    def test_create_other_owners_duplicate(self):
+        self.car = None # forget that we had a car
+        other_car = factories.Car.create()
+        response = self.client.post(self.url, data={'plate': other_car.plate})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('_app_notifications' in response.data.keys())
+
+    def test_unregistered_car_fails(self):
+        self.car = None # forget that we had a car
+        response = self.client.post(self.url, data={'plate': 'NOT FOUND'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('_app_notifications' in response.data.keys())
 
     # test owner can update a car they just created
     # test can't update plate

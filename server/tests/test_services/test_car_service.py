@@ -19,7 +19,7 @@ class CarCreateTest(TestCase):
         self.owner = factories.BankAccountOwner.create(state_code='NY')
 
         # TODO: populate our fake TLC database with some cars, so the lookup succeeds
-        self.plate = 'T2974929C'
+        self.plate = 'REAL_EXISTING_PLATE'
         self.base = 'SOME_BASE, LLC'    # this matches the fake implementation in car service
         self.year = 2013                # this matches the fake implemenation in car service
         self.make_model = factories.MakeModel.create()
