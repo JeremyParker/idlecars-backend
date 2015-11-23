@@ -14,7 +14,7 @@ from rest_framework.test import APITestCase
 from server import factories, models
 
 
-class CarTest(APITestCase):
+class ListingTest(APITestCase):
     def setUp(self):
         self.car = factories.BookableCar.create(
             status='busy',
@@ -65,7 +65,6 @@ class CarTest(APITestCase):
                     ]
                 ),
                 ('deposit', '${}'.format(car.solo_deposit)),
-                ('cost', '{0:.0f}'.format(int((car.solo_cost) + 6) / 7)),
                 ('cost_str', ['14', '29']), # this number base on car.solo_cost, which is $100 in the test
                 ('cost_time', 'a day'),
                 ('cost_bucket', ['cheap']),
@@ -108,8 +107,8 @@ class CarTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         previous_car_cost = 0
         for car in response.data:
-            self.assertTrue(int(car['cost']) >= previous_car_cost)
-            previous_car_cost = int(car['cost'])
+            self.assertTrue(int(car['cost_str'][0]) >= previous_car_cost)
+            previous_car_cost = int(car['cost_str'][0])
 
     def _assert_car_details(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
