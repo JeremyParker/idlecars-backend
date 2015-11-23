@@ -236,9 +236,12 @@ class BookingAdmin(admin.ModelAdmin):
     driver_docs_approved.boolean = True
 
     def queryset(self, request):
-        return super(BookingAdmin, self).queryset(request).prefetch_related(
+        return super(BookingAdmin, self).queryset(request).select_related(
             'driver',
             'car',
+            'car__owner',
+            'car__make_model',
+            'car__insurance',
         )
 
 

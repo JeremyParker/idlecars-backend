@@ -19,10 +19,10 @@ class UserViewSet(
         mixins.CreateModelMixin,
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
-        viewsets.GenericViewSet
+        viewsets.GenericViewSet,
     ):
     model = User
-    queryset = User.objects.all()
+    queryset = User.objects.all().select_related('driver')
     permission_classes = (OwnsUser,)
 
     def get_serializer_class(self):

@@ -26,7 +26,7 @@ class DriverViewSet(
     ):
     serializer_class = DriverSerializer
     model = models.Driver
-    queryset = models.Driver.objects.all()
+    queryset = models.Driver.objects.all().select_related('auth_user')
 
     def get_permissions(self):
         # TODO - don't allow non-authenticated user to create a Driver

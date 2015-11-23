@@ -31,7 +31,6 @@ class DriverAdmin(ReverseModelAdmin):
         'email',
         'all_docs_uploaded',
         'documentation_approved',
-        'booking_count',
         'date_joined',
     ]
     list_filter = [
@@ -78,6 +77,9 @@ class DriverAdmin(ReverseModelAdmin):
     inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
+    def queryset(self, request):
+        return super(DriverAdmin, self).queryset(request).select_related('auth_user')
+
     def date_joined(self, instance):
         return instance.auth_user.date_joined.date()
     date_joined.short_description = 'signup date'
@@ -85,9 +87,6 @@ class DriverAdmin(ReverseModelAdmin):
     def link_name(self, instance):
         return instance.admin_display()
     link_name.short_description = "Driver"
-
-    def booking_count(self, instance):
-        return models.Booking.objects.filter(driver=instance).count()
 
     def dmv_link(self, instance):
         return '<a href={} target="new">View Image</a>'.format(instance.driver_license_image)
