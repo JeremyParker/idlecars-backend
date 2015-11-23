@@ -1,8 +1,6 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import inspect
-
 from django.db import models
 
 
