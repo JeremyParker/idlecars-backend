@@ -85,6 +85,7 @@ class Car(models.Model):
     COLOR_DARK_BLUE = 3
     COLOR_BLUE = 4
     COLOR_TAN = 5
+    COLOR_WHITE = 6
 
     COLOR_CHOICES = [
         (COLOR_BLACK, 'Black'),
@@ -93,6 +94,7 @@ class Car(models.Model):
         (COLOR_DARK_BLUE, 'Dark Blue'),
         (COLOR_BLUE, 'Blue'),
         (COLOR_TAN, 'Tan'),
+        (COLOR_WHITE, 'White'),
     ]
     exterior_color = models.IntegerField(
         choices=COLOR_CHOICES,

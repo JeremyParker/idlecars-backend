@@ -2,12 +2,11 @@
 from __future__ import unicode_literals
 
 from django.utils import timezone
-
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from idlecars import client_side_routes
-
 from server.models import Car
+from server.fields import CarColorField
 
 
 class CarCreateSerializer(ModelSerializer):
@@ -15,6 +14,9 @@ class CarCreateSerializer(ModelSerializer):
     state = SerializerMethodField()
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
+
+    interior_color = CarColorField(required=False, allow_null=True,)
+    exterior_color = CarColorField(required=False, allow_null=True,)
 
     class Meta:
         model = Car
