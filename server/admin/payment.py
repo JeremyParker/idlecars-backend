@@ -55,10 +55,11 @@ class PaymentAdmin(admin.ModelAdmin):
     payment_method_link.short_description = 'Payment method'
 
     def queryset(self, request):
-        return super(PaymentAdmin, self).queryset(request).prefetch_related(
+        return super(PaymentAdmin, self).queryset(request).select_related(
             'booking',
             'booking__driver',
-            'booking__payment_method',
+            'booking__car',
+            'booking__car__make_model',
         )
 
 
