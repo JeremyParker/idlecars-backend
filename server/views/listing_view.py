@@ -6,13 +6,17 @@ from rest_framework.response import Response
 
 from server.models import Car
 from server.services import car as car_service
-from server.serializers import CarSerializer
+from server.serializers import ListingSerializer
 
 class ListingViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    serializer_class = CarSerializer
+    serializer_class = ListingSerializer
 
     def get_queryset(self):
-        return car_service.filter_listable(Car.objects.all())
+        return car_service.filter_listable(Car.objects.all()).prefetch_related(
+            'owner',
+            'insurance',
+            'make_model',
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = car_service.filter_live(

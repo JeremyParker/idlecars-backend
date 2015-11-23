@@ -12,7 +12,7 @@ from idlecars import fields
 from server.models import Car, Booking, Driver, Payment
 from server.services import booking as booking_service
 from server.services import car as car_service
-from server.serializers import car_serializer, payment_serializer
+from server.serializers import listing_serializer, payment_serializer
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -112,9 +112,9 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     def get_car(self, obj):
         # if the booking is in the ACCEPTED state, use a custom serializer with contact info
         if obj.get_state() == Booking.ACCEPTED:
-            serializer = car_serializer.CarPickupSerializer
+            serializer = listing_serializer.ListingPickupSerializer
         else:
-            serializer = car_serializer.CarSerializer
+            serializer = listing_serializer.ListingSerializer
         return serializer(obj.car).data
 
     def get_step(self, obj):

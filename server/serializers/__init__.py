@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from nonce_serializer import NonceSerializer
 from user_serializer import UserSerializer, UserCreateSerializer
 from owner_serializer import OwnerSerializer, OwnerContactSerializer
-from car_serializer import CarSerializer, CarPickupSerializer
+from listing_serializer import ListingSerializer, ListingPickupSerializer
+from car_serializer import CarSerializer, CarCreateSerializer
 from booking_serializer import BookingSerializer, BookingDetailsSerializer
 from payment_method_serializer import PaymentMethodSerializer
 from payment_serializer import PaymentSerializer
