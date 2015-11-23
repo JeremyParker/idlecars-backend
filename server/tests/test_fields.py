@@ -4,22 +4,25 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from idlecars import model_helpers, fields
+from server.fields import CarColorField
 
 
-class TestPhoneNumberField(TestCase):
-    def test_good_number_to_value(self):
-        phone_number = fields.PhoneNumberField()
-        data = phone_number.to_internal_value('1234567890')
-        self.assertEqual(data, '1234567890')
+class TestCarColorField(TestCase):
+    def setUp(self):
+        self.field = CarColorField()
 
-    def test_bad_number_throws_validation_error(self):
-        phone_number = fields.PhoneNumberField()
+    def test_color_number_to_value(self):
+        data = self.field.to_internal_value('black')
+        self.assertEqual(data, 0)
+
+    def test_color_number_to_value_caps(self):
+        data = self.field.to_internal_value('GREY')
+        self.assertEqual(data, 2)
+
+    def test_bad_color_throws_validation_error(self):
         with self.assertRaises(ValidationError):
-            phone_number.to_internal_value('123')
+            self.field.to_internal_value('puke green')
 
     def test_value_to_formatted_string(self):
-        phone_number = fields.PhoneNumberField()
-        representation = phone_number.to_representation('1234567890')
-        self.assertEqual(representation, '(123) 456-7890')
-
+        representation = self.field.to_representation(2)
+        self.assertEqual(representation, 'Grey')
