@@ -18,7 +18,7 @@ class BookingServiceTest(TestCase):
     def setUp(self):
         owner = factories.Owner.create(state_code='NY')
         make_model = factories.MakeModel.create()
-        self.car = factories.Car.create(
+        self.car = factories.BookableCar.create(
             owner=owner,
             make_model=make_model,
             status='available',

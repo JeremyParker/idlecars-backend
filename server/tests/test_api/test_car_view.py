@@ -136,6 +136,15 @@ class CarCreateTest(CarAPITest):
         self.assertIsNotNone(response.data['status'])
         self.assertIsNotNone(response.data['next_available_date'])
 
+    def test_create_unclaimed_car_success(self):
+        self.car.owner = None
+        self.car.save()
+        response = self.client.post(self.url, data={'plate': self.car.plate})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['plate'], self.car.plate)
+        self.car.refresh_from_db()
+        self.assertEqual(self.car.owner, self.owner)
+
     def test_create_duplicate_i_own(self):
         response = self.client.post(self.url, data={'plate': self.car.plate})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -143,7 +152,7 @@ class CarCreateTest(CarAPITest):
 
     def test_create_other_owners_duplicate(self):
         self.car = None # forget that we had a car
-        other_car = factories.Car.create()
+        other_car = factories.ClaimedCar.create()
         response = self.client.post(self.url, data={'plate': other_car.plate})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('_app_notifications' in response.data.keys())
@@ -167,6 +176,21 @@ class CarUpdateTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
         self.assertEqual(self.car.solo_cost, Decimal('350'))
+
+    def test_can_unclaim_car(self):
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        data = {'owner': None}
+        response = self.client.patch(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        self.assertIsNone(self.car.owner)
+
+    def test_can_update_unclaimed_car(self):
+        unclaimed_car = factories.Car.create()
+        url = reverse('server:cars-detail', args=(unclaimed_car.pk,))
+        response = self.client.patch(url, {'owner': self.owner.id}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_set_busy(self):
         data = {'status': 'busy'}
@@ -194,7 +218,7 @@ class CarUpdateTest(CarAPITest):
         self.assertEqual(self.car.next_available_date, expected_date)
 
     def test_cannot_update_others_cars(self):
-        other_car = factories.Car.create()
+        other_car = factories.ClaimedCar.create()
         url = reverse('server:cars-detail', args=(other_car.pk,))
         response = self.client.patch(url, {'solo_cost': 350}, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
