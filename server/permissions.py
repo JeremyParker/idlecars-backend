@@ -28,7 +28,7 @@ class OwnsUser(permissions.BasePermission):
 
 class OwnsCar(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user in obj.owner.auth_users.all()
+        return not obj.owner or request.user in obj.owner.auth_users.all()
 
 
 class IsAuthenticatedOwner(permissions.IsAuthenticated):

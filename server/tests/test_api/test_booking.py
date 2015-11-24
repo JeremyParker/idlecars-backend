@@ -55,7 +55,7 @@ class CreateBookingTest(APITestCase):
         self.assertEqual(response.data['_app_notifications'], ['You have a conflicting rental.'])
 
     def test_fail_when_driver_has_booked_booking(self):
-        other_car = factories.Car.create()
+        other_car = factories.BookableCar.create()
         existing_booking = factories.BookedBooking.create(car=other_car, driver=self.driver)
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

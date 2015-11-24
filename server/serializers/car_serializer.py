@@ -25,6 +25,7 @@ class CarCreateSerializer(ModelSerializer):
             'id',
             'name',
             'plate',
+            'owner',
             'base',
             'state',
             'insurance',

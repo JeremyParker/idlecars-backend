@@ -28,7 +28,7 @@ class DriverPaymentMethodTest(TestCase):
 class DriverServiceTest(TestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
-        self.car = factories.Car.create()
+        self.car = factories.BookableCar.create()
 
     def _set_all_docs(self):
         for doc in driver_service.doc_fields_and_names.keys():
