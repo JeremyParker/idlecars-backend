@@ -28,14 +28,14 @@ class PhoneNumberField(fields.CharField):
 
 
 def format_date_array(date):
-        d = date.astimezone(timezone.get_current_timezone())
-        return [d.year, d.month - 1, d.day]
+    ''' This method is public, so serializer method functions can use it '''
+    return [date.year, date.month - 1, date.day]
 
 
 class DateArrayField(fields.ListField):
     '''
     Field for a python date object that gets serialized as an array of integers for javascript. The
-    format is [year, month, day]. The month is zero-indexed, so Decemner is 11.
+    format is [year, month, day]. The month is zero-indexed, so December is 11.
     '''
     child = fields.IntegerField(min_value=0)
     default_error_messages = {
