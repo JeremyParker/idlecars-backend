@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
+import datetime
 
 from django.core.urlresolvers import reverse
 from rest_framework import status
@@ -190,6 +191,31 @@ class CarUpdateTest(CarAPITest):
         url = reverse('server:cars-detail', args=(unclaimed_car.pk,))
         response = self.client.patch(url, {'owner': self.owner.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_set_busy(self):
+        data = {'status': 'busy'}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        self.assertEqual(self.car.status, models.Car.STATUS_BUSY)
+
+    def test_set_bad_status_fails(self):
+        self.car.status = models.Car.STATUS_BUSY
+        self.car.save()
+        data = {'status': 'imaginary'}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_next_available(self):
+        data = {'next_available_date': [2017, 0, 1]}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        expected_date = datetime.date(2017, 1, 1)
+        self.assertEqual(self.car.next_available_date, expected_date)
 
     def test_cannot_update_others_cars(self):
         other_car = factories.ClaimedCar.create()
