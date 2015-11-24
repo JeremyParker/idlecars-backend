@@ -14,14 +14,15 @@ class CarCreateSerializer(ModelSerializer):
     state = SerializerMethodField()
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
-    next_available_date = fields.DateArrayField()
+
+    next_available_date = fields.DateArrayField(required=False, allow_null=True,)
+    interior_color = CarColorField(required=False, allow_null=True,)
+    exterior_color = CarColorField(required=False, allow_null=True,)
     status = ChoiceField(
         choices=Car.STATUS.keys(),
         required=False,
         allow_null=True,
     )
-    interior_color = CarColorField(required=False, allow_null=True,)
-    exterior_color = CarColorField(required=False, allow_null=True,)
 
     class Meta:
         model = Car
