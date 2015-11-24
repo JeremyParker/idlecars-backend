@@ -16,7 +16,7 @@ class CarCreateSerializer(ModelSerializer):
     listing_link = SerializerMethodField()
     next_available_date = fields.DateArrayField()
     status = ChoiceField(
-        choices=['available', 'busy', 'unkonwn'], # TODO: must sync with Car.STATUS.keys()
+        choices=Car.STATUS.keys(),
         required=False,
         allow_null=True,
     )
