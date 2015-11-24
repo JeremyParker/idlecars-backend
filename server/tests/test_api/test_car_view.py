@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
+import datetime
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
@@ -166,6 +168,26 @@ class CarUpdateTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
         self.assertEqual(self.car.solo_cost, Decimal('350'))
+
+    def test_set_busy(self):
+        data = {'status': 'busy'}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        self.assertEqual(self.car.status, models.Car.STATUS_BUSY)
+
+    def test_set_not_busy(self):
+        pass # TODO
+
+    def test_set_next_available(self):
+        data = {'next_available_date': [2017, 0, 1]}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        expected_date = datetime.date(2017, 1, 1)
+        self.assertEqual(self.car.next_available_date, expected_date)
 
     def test_cannot_update_others_cars(self):
         other_car = factories.Car.create()
