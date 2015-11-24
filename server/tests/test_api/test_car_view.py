@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 
 from server import factories, models
 from server.services import car as car_service
+from server.services import tlc_data_service
 
 
 class CarUnauthorizedTest(APITestCase):
@@ -88,7 +89,7 @@ class CarDetailsTest(CarAPITest):
         # make an incomplete car (not a BookableCar)
         car = factories.Car.create(
             owner=self.owner,
-            plate='ANOTHER_REAL_PLATE',  # TODO: add a plate to the tlc db
+            plate='OTHER_REAL_PLATE',
             solo_cost=None,
             solo_deposit=None,
         )
@@ -121,7 +122,7 @@ class CarCreateTest(CarAPITest):
 
     def test_create_car_success(self):
         self.car = None # forget that we had a car
-        plate = 'OTHER_REAL_PLATE'  # TODO: add this plate to the tlc db
+        plate = 'OTHER_REAL_PLATE'
         response = self.client.post(self.url, data={'plate': plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], plate)
@@ -200,7 +201,7 @@ class CarUpdateTest(CarAPITest):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
             current_value = response.data[field]
-            if field in car_service.tlc_fields + read_only_fields:
+            if field in tlc_data_service.fhv_fields + read_only_fields:
                 # values didn't change for the read-only fields
                 self.assertEqual(current_value, original_value)
             else:

@@ -31,10 +31,30 @@ class Car(models.Model):
         default=1,
     )
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
-    YEARS = [(y, unicode(y)) for y in range((timezone.now().year+1), 1995, -1)]
+    YEARS = [(y, unicode(y)) for y in range(2016, 1995, -1)]
     year = models.IntegerField(choices=YEARS, blank=True, null=True)
     plate = models.CharField(max_length=24, blank=True)
+
+    # TLC data
+    found_in_tlc = models.BooleanField(default=False)
+    last_updated = models.DateTimeField(null=True)
+    active_in_tlc = models.BooleanField(default=False)
     base = models.CharField(max_length=64, blank=True)
+    base_number = models.CharField(max_length=16, blank=True)
+    base_address = models.CharField(max_length=64, blank=True)
+    base_telephone_number = models.CharField(max_length=16, blank=True)
+
+    BASE_TYPE_LIVERY = 1
+    BASE_TYPE_PARATRANS = 2
+    BASE_TYPE_CHOICES = [
+        (BASE_TYPE_LIVERY, 'Livery'),
+        (BASE_TYPE_PARATRANS, 'Paratrans'),
+    ]
+    base_type = models.IntegerField(choices=BASE_TYPE_CHOICES, blank=True, null=True)
+    registrant_name = models.CharField(max_length=64, blank=True)
+    expiration_date = models.DateField(blank=True, null=True)
+    vehicle_vin_number = models.CharField(max_length=32, blank=True)
+
     solo_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     solo_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     split_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)

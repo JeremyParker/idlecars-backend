@@ -185,6 +185,12 @@ OPS_EMAIL = 'test@idlecars.com'
 OPS_PHONE_NUMBER = '6469021306'
 STREET_TEAM_EMAIL = 'test@idlecars.com'
 
+TLC_DATA_IMPLEMENTATION = 'TestClient'
+SOCRATA_APP_TOKEN = os.getenv('SOCRATA_APP_TOKEN', 'token')
+SOCRATA_USERNAME = 'jeremy@idlecars.com'
+SOCRATA_PASSWORD = os.getenv('SOCRATA_PASSWORD', 'password')
+FHV_VEHICLE_RESOURCE = '8wbx-tsch'
+
 # default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
 QUEUE_IMPLEMENTATION = 'FakeQueue'
 
