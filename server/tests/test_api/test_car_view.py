@@ -177,8 +177,13 @@ class CarUpdateTest(CarAPITest):
         self.car.refresh_from_db()
         self.assertEqual(self.car.status, models.Car.STATUS_BUSY)
 
-    def test_set_not_busy(self):
-        pass # TODO
+    def test_set_bad_status_fails(self):
+        self.car.status = models.Car.STATUS_BUSY
+        self.car.save()
+        data = {'status': 'imaginary'}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_set_next_available(self):
         data = {'next_available_date': [2017, 0, 1]}
