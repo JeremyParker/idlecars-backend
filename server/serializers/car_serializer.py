@@ -14,6 +14,7 @@ class CarCreateSerializer(ModelSerializer):
     state = SerializerMethodField()
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
+    available_date_display = SerializerMethodField()
 
     next_available_date = fields.DateArrayField(required=False, allow_null=True,)
     interior_color = CarColorField(required=False, allow_null=True,)
@@ -41,6 +42,7 @@ class CarCreateSerializer(ModelSerializer):
             'solo_deposit',
             'status',
             'next_available_date',
+            'available_date_display',
             'min_lease',
             'exterior_color',
             'interior_color',
@@ -52,7 +54,7 @@ class CarCreateSerializer(ModelSerializer):
             'created_time',
             'state',
             'listing_link',
-
+            'available_date_display',
             # fields we get from the TLC
             'make_model',
             'year',
@@ -74,6 +76,14 @@ class CarCreateSerializer(ModelSerializer):
 
     def get_listing_link(self, obj):
         return client_side_routes.car_details_url(obj)
+
+    def get_available_date_display(self, obj):
+        if obj.status == 'busy':
+            if not obj.next_available_date:
+                return 'Unavailable'
+            elif obj.next_available_date > timezone.now().date():
+                return obj.next_available_date.strftime('%b %d')
+        return 'Immediately'
 
 
 class CarSerializer(CarCreateSerializer):
