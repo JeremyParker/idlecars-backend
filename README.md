@@ -19,7 +19,7 @@ Also install:
 * virtualenvwrapper
 * Heroku toolbelt: https://toolbelt.heroku.com/
 * Postgres: http://postgresapp.com/
-* redis
+* redis (optional)
   * `brew install redis` on OSX
   * `redis-server &` to boot it up
 * direnv

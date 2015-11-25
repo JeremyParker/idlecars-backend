@@ -16,12 +16,12 @@ from . import Owner, MakeModel, Insurance
 class Car(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
 
-    STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
     STATUS_AVAILABLE = 'available'
     STATUS_UNKNOWN = 'unknown'
     STATUS_BUSY = 'busy'
-
+    STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
     status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
+
     next_available_date = models.DateField(blank=True, null=True)
     last_status_update = models.DateTimeField()
     make_model = models.ForeignKey(

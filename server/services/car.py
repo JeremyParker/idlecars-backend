@@ -63,7 +63,7 @@ def create_car(owner, plate):
         raise CarTLCException
 
     car, is_new = Car.objects.get_or_create(plate=new_car.plate)
-    if not is_new:
+    if not is_new and car.owner:
         raise CarDuplicateException()
 
     model_helpers.copy_fields(new_car, car, tlc_data_service.fhv_fields)
