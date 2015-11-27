@@ -1,8 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.conf import settings
-
+import server.services
+from server.models import Car
 
 next_fhv_response = {
     'active': 'YES',
@@ -27,6 +27,8 @@ next_fhv_response = {
     'wheelchair_accessible': 'WAV',
 }
 
+# TODO - a fake response from the tlc database with insurance info
+
 
 class TestClient(object):
     def __init__(
@@ -39,8 +41,12 @@ class TestClient(object):
         return super(TestClient, self).__init__()
 
     def get(self, url):
-        if settings.FHV_VEHICLE_RESOURCE in url:
+        if 'ERROR' in url:
+            raise Car.DoesNotExist
+        if server.services.tlc_data_service.FHV_VEHICLE_RESOURCE in url:
             return [next_fhv_response]
+        if server.services.tlc_data_service.INSURANCE_RESOURCE in url:
+            return [1]
         return []
 
     def close(self):

@@ -45,4 +45,4 @@ class CarCreateTest(TestCase):
 
     def test_create_not_in_tlc_db(self):
         with self.assertRaises(car_service.CarTLCException):
-            new_car = car_service.create_car(self.owner, 'NOT FOUND')
+            new_car = car_service.create_car(self.owner, 'ERROR NOT FOUND')

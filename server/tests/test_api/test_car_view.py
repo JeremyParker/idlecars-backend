@@ -50,6 +50,7 @@ class CarUnauthorizedTest(APITestCase):
 
 
 class CarAPITest(APITestCase):
+    ''' this is a base class for the rest of the Test classes in this file '''
     def setUp(self):
         self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
@@ -115,15 +116,14 @@ class CarDetailsTest(CarAPITest):
 class CarCreateTest(CarAPITest):
     def setUp(self):
         super(CarCreateTest, self).setUp()
-
-        # TODO - add a record to the TLC database so we can 'find' it when creating a car.
-        factories.Insurance.create()
         self.plate = 'REAL_PLATE'
         self.url = reverse('server:cars-list')
 
     def test_create_car_success(self):
         self.car = None # forget that we had a car
         plate = 'OTHER_REAL_PLATE'
+        factories.Insurance.create() # TODO - remove this
+        factories.MakeModel.create() # TODO - remove this
         response = self.client.post(self.url, data={'plate': plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], plate)
@@ -160,7 +160,7 @@ class CarCreateTest(CarAPITest):
 
     def test_unregistered_car_fails(self):
         self.car = None # forget that we had a car
-        response = self.client.post(self.url, data={'plate': 'NOT FOUND'})
+        response = self.client.post(self.url, data={'plate': 'ERROR: TLC'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('_app_notifications' in response.data.keys())
 

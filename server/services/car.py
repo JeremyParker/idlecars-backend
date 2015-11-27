@@ -7,7 +7,7 @@ from idlecars import model_helpers
 
 from server.models import Booking, Car
 from . import car_helpers, make_model_service
-import tlc_data_service
+import tlc_data_service, vin_data_service
 
 
 class CarTLCException(Exception):
@@ -56,17 +56,29 @@ def get_image_url(car):
 
 
 def create_car(owner, plate):
-    new_car = Car(plate=plate)
+    car_info = Car(plate=plate)
     try:
-        tlc_data_service.lookup_fhv_data(new_car)
+        tlc_data_service.lookup_fhv_data(car_info)
     except Car.DoesNotExist:
         raise CarTLCException
 
-    car, is_new = Car.objects.get_or_create(plate=new_car.plate)
+    car, is_new = Car.objects.get_or_create(plate=car_info.plate)
     if not is_new and car.owner:
         raise CarDuplicateException()
+    model_helpers.copy_fields(car_info, car, tlc_data_service.fhv_fields)
 
-    model_helpers.copy_fields(new_car, car, tlc_data_service.fhv_fields)
+    try:
+        vin_data_service.lookup_vin_data(car_info)
+        model_helpers.copy_fields(car_info, car, ['make_model'])
+    except Car.DoesNotExist:
+        pass
+
+    try:
+        tlc_data_service.lookup_insurance_data(car_info)
+        model_helpers.copy_fields(car_info, car, tlc_data_service.insurance_fields)
+    except Car.DoesNotExist:
+        pass
+
 
     car.status = Car.STATUS_AVAILABLE
     car.next_available_date = timezone.localtime(timezone.now()).date()

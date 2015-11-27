@@ -31,4 +31,6 @@ SMS_IMPLEMENTATION = 'TwilioRestClient'  # we're rockin' the real client with te
 
 QUEUE_IMPLEMENTATION = 'RealQueue'
 
+TLC_DATA_IMPLEMENTATION = 'Socrata'
+
 PAYMENT_GATEWAY_NAME = 'braintree'
