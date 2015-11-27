@@ -430,7 +430,7 @@ class BookingCanceled(notification.DriverNotification):
     def get_context(self, **kwargs):
         body = '''
             Your {} rental has been canceled. Now you can go back to idlecars and rent another car!
-        '''
+        '''.format(kwargs['car_name'])
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
