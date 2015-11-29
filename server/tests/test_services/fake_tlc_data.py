@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import server.services
 from server.models import Car
 
+
 next_fhv_response = {
     'active': 'YES',
     'base_address': '4301 GLENWOOD ROAD 2ND FLOOR BROOKLYN NY 11210',
@@ -27,7 +28,16 @@ next_fhv_response = {
     'wheelchair_accessible': 'WAV',
 }
 
-# TODO - a fake response from the tlc database with insurance info
+
+next_insurance_response = {
+    'automobile_insurance_code': '326',
+    'automobile_insurance_policy_number': 'CA241236-0          ',
+    'dmv_plate': 'T521412C  ',
+    'tlc_license_number': '5330345',
+    'tlc_license_type': 'TLCCAR',
+    'vehicle_owner_name': 'SAFETY TRANSPORTATION COPR                                  ',
+    'vin': '1LNHM81WX5Y670250             '
+}
 
 
 class TestClient(object):
@@ -46,8 +56,8 @@ class TestClient(object):
         if server.services.tlc_data_service.FHV_VEHICLE_RESOURCE in url:
             return [next_fhv_response]
         if server.services.tlc_data_service.INSURANCE_RESOURCE in url:
-            return [1]
-        return []
+            return [next_insurance_response]
+        print 'Someone made an unknown request to our fake TLC data client.'
 
     def close(self):
         pass

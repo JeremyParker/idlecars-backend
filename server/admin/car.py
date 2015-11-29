@@ -109,7 +109,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('exterior_color', 'interior_color'),
                 ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
-                ('insurance', 'insurance_link'),
+                ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
                 (
                     'status',

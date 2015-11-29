@@ -14,7 +14,7 @@ class Command(BaseCommand):
     relies on a network connection.
     '''
     def handle(self, *args, **options):
-            # self._run_test('test_lookup_tlc_car')
+            self._run_test('test_lookup_tlc_car')
             self._run_test('test_lookup_insurance')
 
     def _run_test(self, test_name):
@@ -25,8 +25,10 @@ class Command(BaseCommand):
     def test_lookup_tlc_car(self):
         new_car = factories.Car.build(plate=tlc_data_service.get_real_fhv_plate())
         tlc_data_service.lookup_fhv_data(new_car)
-        assert(registrant_name != None)
+        assert(new_car.registrant_name != None)
 
     def test_lookup_insurance(self):
         new_car = factories.Car.build(plate=tlc_data_service.get_real_fhv_plate())
         tlc_data_service.lookup_insurance_data(new_car)
+        if new_car.insurance: # the insurance might not be found
+            assert(new_car.insurance_policy_number)

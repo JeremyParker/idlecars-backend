@@ -122,8 +122,8 @@ class CarCreateTest(CarAPITest):
     def test_create_car_success(self):
         self.car = None # forget that we had a car
         plate = 'OTHER_REAL_PLATE'
-        factories.Insurance.create() # TODO - remove this
         factories.MakeModel.create() # TODO - remove this
+
         response = self.client.post(self.url, data={'plate': plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], plate)

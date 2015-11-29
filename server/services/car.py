@@ -69,7 +69,7 @@ def create_car(owner, plate):
 
     try:
         vin_data_service.lookup_vin_data(car_info)
-        model_helpers.copy_fields(car_info, car, ['make_model'])
+        model_helpers.copy_fields(car_info, car, ['make_model', 'hybrid'])
     except Car.DoesNotExist:
         pass
 
