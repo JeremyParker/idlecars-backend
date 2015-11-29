@@ -35,6 +35,7 @@ class ClaimedCar(Car):
     owner = SubFactory(Owner)
     solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
     solo_deposit = SelfAttribute('solo_cost')
+    min_lease = '_02_one_week'
     next_available_date = LazyAttribute(
         lambda o: timezone.now().date() - datetime.timedelta(days=random.randint(1, 10))
     )
@@ -43,7 +44,6 @@ class ClaimedCar(Car):
 class BookableCar(ClaimedCar):
     owner = SubFactory(BankAccountOwner)
     status = models.Car.STATUS_AVAILABLE
-    min_lease = '_02_one_week'
 
 
 class CarExpiredListing(BookableCar):

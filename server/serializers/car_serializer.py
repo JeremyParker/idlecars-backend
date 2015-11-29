@@ -74,7 +74,7 @@ class CarCreateSerializer(ModelSerializer):
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_state_string(self, obj):
-        return self._get_state_values(obj)['string']
+        return self._get_state_values(obj)['state_string']
 
     def get_state_cta_string(self, obj):
         return self._get_state_values(obj)['cta_string']
@@ -99,63 +99,69 @@ class CarCreateSerializer(ModelSerializer):
         return 'Immediately'
 
     def _get_state_values(self, car):
-        if car_helpers.is_data_complete(car):
+        if not car_helpers.is_data_complete(car):
             return {
-                'string': 'Waiting for information',
+                'state_string': 'Waiting for information',
                 'cta_string': 'Complete this listing',
                 'cta_key': 'GoRequiredField',
             }
         elif car.status == Car.STATUS_BUSY:
             if car.next_available_date:
                 return {
-                    'string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
+                    'state_string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
                     'cta_string': 'Change available date',
                     'cta_key': 'GoNextAvailableDate',
                 }
             else:
                 return {
-                    'string': 'Not listed',
-                    'cta_string': 'Reslist',
+                    'state_string': 'Not listed',
+                    'cta_string': 'Relist',
                     'cta_key': 'GoNextAvailableDate',
                 }
-        elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
+        elif car.owner and not car.owner.merchant_account_state or \
+            car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
             return {
-                'string': 'Waiting for direct deposit information',
+                'state_string': 'Waiting for direct deposit information',
                 'cta_string': 'Add bank details',
                 'cta_key': 'AddBankLink',
             }
         elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
             return {
-                'string': 'Waiting for bank approval',
+                'state_string': 'Waiting for bank approval',
                 'cta_string': 'Remove listing',
                 'cta_key': 'RemoveListing',
             }
         elif booking_service.filter_reserved(car.booking_set.all()):
             return {
-                'string': 'Waiting for insurance approval',
+                'state_string': 'Waiting for insurance approval',
                 'cta_string': '',#'The driver is approved',
                 'cta_key': '',#'ApproveInsurance',
             }
         elif booking_service.filter_accepted(car.booking_set.all()):
             return {
-                'string': 'Ready to be picked up',
+                'state_string': 'Ready to be picked up',
                 'cta_string': '',#'Contact the driver',
                 'cta_key': '',#'ContactDriver',
             }
         elif booking_service.filter_active(car.booking_set.all()):
             b = booking_service.filter_active(car.booking_set.all()).first()
             return {
-                'string': 'Rented until'.format(b.end_date.strftime('%b %d')),
+                'state_string': 'Rented until'.format(b.end_date.strftime('%b %d')),
                 'cta_string': '',#'Contact the driver',
                 'cta_key': '',#'ContactDriver',
             }
+        elif car_helpers.is_stale(car):
+            return {
+                'state_string': 'Listing expired',
+                'cta_string': 'Extend listing',
+                'cta_key': 'ExtendListing',
+            }
         else:
             return {
-                'string': None,
-                'cta_string': None,
-                'cta_key': None,
+                'state_string': 'Listed',
+                'cta_string': 'Remove listing',
+                'cta_key': 'RemoveListing',
             }
-
 
 
 class CarSerializer(CarCreateSerializer):
