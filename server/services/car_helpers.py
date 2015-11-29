@@ -40,6 +40,15 @@ def _filter_data_complete(queryset):
         )
 
 
+def is_data_complete(car):
+    '''
+    this checks the same logic as above for an individual car
+    '''
+    return car.owner and car.make_model and car.year and car.solo_cost and car.solo_deposit \
+        and car.plate and car.base and car.owner.city and car.owner.state_code and car.owner.zipcode \
+        and car.base and car.min_lease != '_00_unknown'
+
+
 def _filter_bookable(queryset):
     '''
     return cars whose status is known, aren't busy through elsewhere, don't have a booking

@@ -5,13 +5,16 @@ from django.utils import timezone
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
 
 from idlecars import client_side_routes, fields
-from server.models import Car
+from server.models import Car, Owner
 from server.fields import CarColorField
+from server.services import car_helpers, booking as booking_service
 
 
 class CarCreateSerializer(ModelSerializer):
     name = SerializerMethodField()
-    state = SerializerMethodField()
+    state_string = SerializerMethodField()
+    state_cta_string = SerializerMethodField()
+    state_cta_key = SerializerMethodField()
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
     available_date_display = SerializerMethodField()
@@ -34,7 +37,9 @@ class CarCreateSerializer(ModelSerializer):
             'plate',
             'owner',
             'base',
-            'state',
+            'state_string',
+            'state_cta_string',
+            'state_cta_key',
             'insurance',
             'listing_link',
 
@@ -55,6 +60,9 @@ class CarCreateSerializer(ModelSerializer):
             'state',
             'listing_link',
             'available_date_display',
+            'state_string',
+            'state_cta_string',
+            'state_cta_key',
             # fields we get from the TLC
             'make_model',
             'year',
@@ -65,9 +73,14 @@ class CarCreateSerializer(ModelSerializer):
     def get_name(self, obj):
         return '{} {}'.format(obj.year, obj.make_model)
 
-    def get_state(self, obj):
-        # TODO - we need to figure out what the state of the car is in some efficient way
-        return 'todo'
+    def get_state_string(self, obj):
+        return self._get_state_values(obj)['string']
+
+    def get_state_cta_string(self, obj):
+        return self._get_state_values(obj)['cta_string']
+
+    def get_state_cta_key(self, obj):
+        return self._get_state_values(obj)['cta_key']
 
     def get_insurance(self, obj):
         if obj.insurance:
@@ -84,6 +97,65 @@ class CarCreateSerializer(ModelSerializer):
             elif obj.next_available_date > timezone.now().date():
                 return obj.next_available_date.strftime('%b %d')
         return 'Immediately'
+
+    def _get_state_values(self, car):
+        if car_helpers.is_data_complete(car):
+            return {
+                'string': 'Waiting for information',
+                'cta_string': 'Complete this listing',
+                'cta_key': 'GoRequiredField',
+            }
+        elif car.status == Car.STATUS_BUSY:
+            if car.next_available_date:
+                return {
+                    'string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
+                    'cta_string': 'Change available date',
+                    'cta_key': 'GoNextAvailableDate',
+                }
+            else:
+                return {
+                    'string': 'Not listed',
+                    'cta_string': 'Reslist',
+                    'cta_key': 'GoNextAvailableDate',
+                }
+        elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
+            return {
+                'string': 'Waiting for direct deposit information',
+                'cta_string': 'Add bank details',
+                'cta_key': 'AddBankLink',
+            }
+        elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
+            return {
+                'string': 'Waiting for bank approval',
+                'cta_string': 'Remove listing',
+                'cta_key': 'RemoveListing',
+            }
+        elif booking_service.filter_reserved(car.booking_set.all()):
+            return {
+                'string': 'Waiting for insurance approval',
+                'cta_string': '',#'The driver is approved',
+                'cta_key': '',#'ApproveInsurance',
+            }
+        elif booking_service.filter_accepted(car.booking_set.all()):
+            return {
+                'string': 'Ready to be picked up',
+                'cta_string': '',#'Contact the driver',
+                'cta_key': '',#'ContactDriver',
+            }
+        elif booking_service.filter_active(car.booking_set.all()):
+            b = booking_service.filter_active(car.booking_set.all()).first()
+            return {
+                'string': 'Rented until'.format(b.end_date.strftime('%b %d')),
+                'cta_string': '',#'Contact the driver',
+                'cta_key': '',#'ContactDriver',
+            }
+        else:
+            return {
+                'string': None,
+                'cta_string': None,
+                'cta_key': None,
+            }
+
 
 
 class CarSerializer(CarCreateSerializer):
