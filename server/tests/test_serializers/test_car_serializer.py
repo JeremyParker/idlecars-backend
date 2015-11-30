@@ -53,3 +53,11 @@ class TestCarSerializer(TestCase):
             serializers.CarSerializer(car).data['available_date_display'],
             'Unavailable',
         )
+
+    def test_min_lease_unknown(self):
+        car = factories.Car.create(min_lease='_00_unknown')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], 'No minimum set')
+
+    def test_min_lease_30(self):
+        car = factories.Car.create(min_lease='_05_one_month')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], '30 days')

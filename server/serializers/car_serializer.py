@@ -15,6 +15,7 @@ class CarCreateSerializer(ModelSerializer):
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
     available_date_display = SerializerMethodField()
+    min_lease_display = SerializerMethodField()
 
     next_available_date = fields.DateArrayField(required=False, allow_null=True,)
     interior_color = CarColorField(required=False, allow_null=True,)
@@ -44,6 +45,7 @@ class CarCreateSerializer(ModelSerializer):
             'next_available_date',
             'available_date_display',
             'min_lease',
+            'min_lease_display',
             'exterior_color',
             'interior_color',
             'last_known_mileage',
@@ -55,6 +57,7 @@ class CarCreateSerializer(ModelSerializer):
             'state',
             'listing_link',
             'available_date_display',
+            'min_lease_display',
             # fields we get from the TLC
             'make_model',
             'year',
@@ -86,6 +89,12 @@ class CarCreateSerializer(ModelSerializer):
             elif obj.next_available_date > timezone.now().date():
                 return obj.next_available_date.strftime('%b %d')
         return 'Immediately'
+
+    def get_min_lease_display(self, obj):
+        days = obj.minimum_rental_days()
+        if not days:
+            return "No minimum set"
+        return '{} day'.format(days) + 's' if days-1 else None
 
 
 class CarSerializer(CarCreateSerializer):
