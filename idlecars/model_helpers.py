@@ -49,6 +49,7 @@ class ChoiceField(models.CharField):
     def to_python(self, value):
         return Choice(value, choices=self.choices)
 
+
 def copy_fields(objfrom, objto, fields):
     for field in fields:
         value = getattr(objfrom, field, None)

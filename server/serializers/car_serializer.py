@@ -63,6 +63,8 @@ class CarCreateSerializer(ModelSerializer):
        )
 
     def get_name(self, obj):
+        if not obj.make_model:
+            return '{} Unknown Car'.format(obj.year)
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_state(self, obj):
