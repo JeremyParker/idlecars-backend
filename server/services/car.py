@@ -68,17 +68,16 @@ def create_car(owner, plate):
     model_helpers.copy_fields(car_info, car, tlc_data_service.fhv_fields)
 
     try:
-        vin_data_service.lookup_vin_data(car_info)
-        model_helpers.copy_fields(car_info, car, ['make_model', 'hybrid'])
+        vin_data_service.lookup_vin_data(car)
     except Car.DoesNotExist:
+        # TODO - maybe we alert ops that this car needs to be looked up?
         pass
 
     try:
-        tlc_data_service.lookup_insurance_data(car_info)
-        model_helpers.copy_fields(car_info, car, tlc_data_service.insurance_fields)
+        tlc_data_service.lookup_insurance_data(car)
     except Car.DoesNotExist:
+        # TODO - maybe we alert ops that this car needs to be looked up?
         pass
-
 
     car.status = Car.STATUS_AVAILABLE
     car.next_available_date = timezone.localtime(timezone.now()).date()

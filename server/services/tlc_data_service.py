@@ -34,12 +34,6 @@ fhv_fields = [
 ]
 
 
-insurance_fields = [
-    'insurance',
-    'insurance_policy_number',
-]
-
-
 def _copy_fhv_fields(car, tlc_data):
     car.found_in_tlc = True
     car.last_updated = _localtime(tlc_data['last_time_updated'])

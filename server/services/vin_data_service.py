@@ -38,4 +38,4 @@ def _request_vin_data(vin):
     if 'application/json' in content_type:
         return response.json()
 
-    return {}
+    return None
