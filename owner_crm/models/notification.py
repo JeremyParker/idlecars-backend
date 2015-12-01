@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from idlecars import email, client_side_routes, sms_service
+from idlecars import email, app_routes_driver, app_routes_owner, sms_service
 from server.services import car as car_service
 from server.models import Driver
 
@@ -72,7 +72,7 @@ def _get_car_params(car):
         'car_plate': car.plate,
         'car_deposit': car.solo_deposit,
         'car_image_url': car_service.get_image_url(car),
-        'car_details_url': client_side_routes.car_details_url(car)
+        'car_details_url': app_routes_driver.car_details_url(car)
     }
 
 
@@ -139,25 +139,25 @@ def _get_message_params(message):
 
 def _get_renewal_params(renewal):
     return {
-        'renewal_url': client_side_routes.renewal_url(renewal),
+        'renewal_url': app_routes_driver.renewal_url(renewal),
     }
 
 def _get_password_reset_params(password_reset):
     return {
         'password_reset_user_first_name': password_reset.auth_user.first_name,
-        'password_reset_url': client_side_routes.password_reset(password_reset),
-        'password_owner_reset_url': client_side_routes.owner_password_reset(password_reset),
+        'driver_password_reset_url': app_routes_driver.password_reset(password_reset),
+        'owner_password_reset_url': app_routes_owner.password_reset(password_reset),
     }
 
 def _get_urls_params(pseudo_argument):
     return {
-        'car_listing_url': client_side_routes.car_listing_url(),
-        'docs_upload_url': client_side_routes.doc_upload_url(),
-        'bookings_url': client_side_routes.bookings(),
-        'driver_account_url': client_side_routes.driver_account(),
-        'terms_of_service_url': client_side_routes.terms_of_service(),
-        'faq_url': client_side_routes.faq(),
-        'add_car_form_url': client_side_routes.add_car_form(),
+        'car_listing_url': app_routes_driver.car_listing_url(),
+        'docs_upload_url': app_routes_driver.doc_upload_url(),
+        'bookings_url': app_routes_driver.bookings(),
+        'driver_account_url': app_routes_driver.driver_account(),
+        'terms_of_service_url': app_routes_driver.terms_of_service(),
+        'faq_url': app_routes_driver.faq(),
+        'add_car_form_url': app_routes_driver.add_car_form(),
     }
 
 

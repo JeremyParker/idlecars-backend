@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from idlecars import app_routes_owner
 import server.factories
 import owner_crm.factories
 from owner_crm import models
@@ -29,7 +30,7 @@ class PasswordResetSetupTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].subject, 'Reset your password on idlecars.')
+        self.assertEqual(outbox[0].subject, 'Reset your idlecars password.')
 
     def test_setup_success_owner(self):
         # look ma! No password reset tokens!
@@ -40,13 +41,18 @@ class PasswordResetSetupTest(APITestCase):
         url = reverse('owner_crm:password_reset_setups')
         response = APIClient().post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         self.assertEqual(models.PasswordReset.objects.count(), 1)
         self.assertEqual(models.PasswordReset.objects.first().auth_user, owner.auth_users.first())
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].subject, 'Reset your password on idlecars.')
+        self.assertEqual(outbox[0].subject, 'Reset your idlecars password.')
+
+        # check that we used the correct owner-app url
+        reset = models.PasswordReset.objects.first()
+        self.assertTrue(
+            app_routes_owner.password_reset(reset) in outbox[0].merge_vars.values()[0]['CTA_URL']
+        )
 
     def test_revokes_other_tokens(self):
         auth_user = server.factories.AuthUser.create()

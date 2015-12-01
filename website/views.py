@@ -6,7 +6,7 @@ from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 
-from idlecars import client_side_routes
+from idlecars import app_routes_driver
 
 import forms
 import models
@@ -20,11 +20,11 @@ actions are both handled through this view.
 '''
 def index(request):
     context = {
-        'login_url': client_side_routes.driver_login(),
-        'signup_url': client_side_routes.driver_signup(),
-        'terms_of_service': client_side_routes.terms_of_service(),
-        'faq': client_side_routes.faq(),
-        'add_car_form': client_side_routes.add_car_form(),
+        'login_url': app_routes_driver.driver_login(),
+        'signup_url': app_routes_driver.driver_signup(),
+        'terms_of_service': app_routes_driver.terms_of_service(),
+        'faq': app_routes_driver.faq(),
+        'add_car_form': app_routes_driver.add_car_form(),
     }
     return render(request, 'landing_page.jade', context)
 
@@ -55,11 +55,11 @@ def about(request):
         return HttpResponseRedirect(url)
 
     context = {
-        'login_url': client_side_routes.driver_account(),
-        'signup_url': client_side_routes.driver_signup(),
-        'terms_of_service': client_side_routes.terms_of_service(),
-        'faq': client_side_routes.faq(),
-        'add_car_form': client_side_routes.add_car_form(),
+        'login_url': app_routes_driver.driver_account(),
+        'signup_url': app_routes_driver.driver_signup(),
+        'terms_of_service': app_routes_driver.terms_of_service(),
+        'faq': app_routes_driver.faq(),
+        'add_car_form': app_routes_driver.add_car_form(),
         'action': urlresolvers.reverse('website:about') + '#thanks',
         'show_thanks': show_thanks(),
     }

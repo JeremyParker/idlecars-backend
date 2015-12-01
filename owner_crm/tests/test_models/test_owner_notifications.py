@@ -12,7 +12,7 @@ from owner_crm.models import Campaign, owner_notifications
 from owner_crm import factories as crm_factories
 
 from server import factories as server_factories
-from idlecars import sms_service, client_side_routes
+from idlecars import sms_service, app_routes_driver
 
 
 class OwnerNotificationTest(TestCase):
@@ -42,7 +42,7 @@ class OwnerNotificationTest(TestCase):
         self.notification_spec = {
             'RenewalEmail': {
                 'argument': 'renewal',
-                'sms_result': client_side_routes.renewal_url(self.renewal),
+                'sms_result': app_routes_driver.renewal_url(self.renewal),
                 'email_result': 'expire',
             },
             'NewBookingEmail': {
@@ -103,7 +103,7 @@ class OwnerNotificationTest(TestCase):
             },
             'PasswordReset': {
                 'argument': 'password_reset',
-                'email_result': 'Reset your password',
+                'email_result': 'Reset your idlecars password',
                 'sms_result': self.password_reset.token,
             },
             'PasswordResetConfirmation': {

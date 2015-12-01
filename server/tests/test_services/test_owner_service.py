@@ -3,10 +3,9 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from idlecars import client_side_routes
+from idlecars import app_routes_owner
 from owner_crm.tests import sample_merge_vars
 from owner_crm.models import PasswordReset
-
 
 from server import factories
 from server.services import owner_service
@@ -31,7 +30,7 @@ class OwnerInvitationTest(TestCase):
         self.assertEqual(outbox[0].merge_vars.keys()[0], email)
         self.assertEqual(
             outbox[0].merge_vars[email]['CTA_URL'],
-            client_side_routes.owner_password_reset(password_reset),
+            app_routes_owner.password_reset(password_reset),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
         self.assertEqual(
