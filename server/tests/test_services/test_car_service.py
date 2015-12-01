@@ -20,7 +20,6 @@ class CarCreateTest(TestCase):
         self.assertIsNotNone(new_car)
         self.assertEqual(new_car.plate, self.plate)
         self.assertEqual(new_car.owner, self.owner)
-        self.assertEqual(new_car.status, models.Car.STATUS_AVAILABLE)
 
         # check the stuff we looked up in the TLC db:
         self.assertIsNotNone(new_car.base)
@@ -35,7 +34,6 @@ class CarCreateTest(TestCase):
         self.assertIsNotNone(new_car)
         self.assertEqual(new_car.plate, self.plate)
         self.assertEqual(new_car.owner, self.owner)
-        self.assertEqual(new_car.status, models.Car.STATUS_AVAILABLE)
 
     def test_create_existing_with_other_owner(self):
         car = factories.ClaimedCar.create(plate=self.plate)

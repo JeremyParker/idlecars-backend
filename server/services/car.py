@@ -79,8 +79,7 @@ def create_car(owner, plate):
         # TODO - maybe we alert ops that this car needs to be looked up?
         pass
 
-    car.status = Car.STATUS_AVAILABLE
-    car.next_available_date = timezone.localtime(timezone.now()).date()
+    car.next_available_date = timezone.localtime(timezone.now())
     car.owner = owner
     car.save()
     return car

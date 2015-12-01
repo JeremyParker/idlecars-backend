@@ -16,19 +16,10 @@ class TestCarSerializer(TestCase):
         self.assertTrue(car.make_model.make in serializers.CarSerializer(car).data['name'])
         self.assertTrue(car.make_model.model in serializers.CarSerializer(car).data['name'])
 
-    def test_available_immediately2(self):
-        car = factories.Car.create(
-            status='available',
-        )
-        self.assertEqual(
-            serializers.CarSerializer(car).data['available_date_display'],
-            'Immediately',
-        )
-
     def test_available_immediately(self):
         car = factories.Car.create(
             status='busy',
-            next_available_date=timezone.now().date() - datetime.timedelta(days=1),
+            next_available_date=timezone.now() - datetime.timedelta(days=1),
         )
         self.assertEqual(
             serializers.CarSerializer(car).data['available_date_display'],
@@ -38,7 +29,7 @@ class TestCarSerializer(TestCase):
     def test_available_tomorrow(self):
         car = factories.Car.create(
             status='busy',
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
         )
         self.assertEqual(
             serializers.CarSerializer(car).data['available_date_display'],

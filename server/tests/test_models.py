@@ -91,7 +91,6 @@ class TestCar(TestCase):
 
     def test_save_updates_status_date(self):
         car = factories.Car.create()
-        car.status = models.Car.STATUS_AVAILABLE
         car.save()
         self.assertEqual(
             car.last_status_update.replace(microsecond=0),

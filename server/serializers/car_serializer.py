@@ -20,11 +20,6 @@ class CarCreateSerializer(ModelSerializer):
     next_available_date = fields.DateArrayField(required=False, allow_null=True,)
     interior_color = CarColorField(required=False, allow_null=True,)
     exterior_color = CarColorField(required=False, allow_null=True,)
-    status = ChoiceField(
-        choices=Car.STATUS.keys(),
-        required=False,
-        allow_null=True,
-    )
 
     class Meta:
         model = Car
@@ -41,7 +36,6 @@ class CarCreateSerializer(ModelSerializer):
 
             'solo_cost',
             'solo_deposit',
-            'status',
             'next_available_date',
             'available_date_display',
             'min_lease',
@@ -83,18 +77,18 @@ class CarCreateSerializer(ModelSerializer):
         return client_side_routes.car_details_url(obj)
 
     def get_available_date_display(self, obj):
-        if obj.status == 'busy':
-            if not obj.next_available_date:
-                return 'Unavailable'
-            elif obj.next_available_date > timezone.now().date():
-                return obj.next_available_date.strftime('%b %d')
-        return 'Immediately'
+        if not obj.next_available_date:
+            return 'Unavailable'
+        elif obj.next_available_date > timezone.now():
+            return obj.next_available_date.strftime('%b %d')
+        else:
+            return 'Immediately'
 
     def get_min_lease_display(self, obj):
         days = obj.minimum_rental_days()
         if not days:
             return "No minimum set"
-        return '{} day'.format(days) + 's' if days-1 else None
+        return '{} day'.format(days) + ('s' if days-1 else '')
 
 
 class CarSerializer(CarCreateSerializer):

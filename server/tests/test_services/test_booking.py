@@ -22,7 +22,7 @@ class BookingServiceTest(TestCase):
             owner=owner,
             make_model=make_model,
             status='available',
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
             hybrid=True,
         )
