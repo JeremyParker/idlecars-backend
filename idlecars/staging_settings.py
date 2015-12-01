@@ -12,7 +12,8 @@ For details on the settings see settings.py
 # heap analytics tracking for staging
 HEAP_APP_ID = '1900221263'
 
-WEBAPP_URL = 'http://app.staging.idlecars.com'
+DRIVER_APP_URL = 'http://app.staging.idlecars.com'
+OWNER_APP_URL = 'http://owner.staging.idlecars.com'
 
 ALLOWED_HOSTS = ['staging.idlecars.com']
 SSLIFY_DISABLE = True

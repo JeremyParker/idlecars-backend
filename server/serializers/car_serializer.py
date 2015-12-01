@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
 
-from idlecars import client_side_routes, fields
+from idlecars import app_routes_driver, fields
 from server.models import Car
 from server.fields import CarColorField
 
@@ -74,7 +74,7 @@ class CarCreateSerializer(ModelSerializer):
         return None
 
     def get_listing_link(self, obj):
-        return client_side_routes.car_details_url(obj)
+        return app_routes_driver.car_details_url(obj)
 
     def get_available_date_display(self, obj):
         if not obj.next_available_date:

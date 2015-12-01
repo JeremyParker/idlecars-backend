@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from django.contrib.auth.models import User
 
-import idlecars.client_side_routes
+import idlecars.app_routes_driver
 import server.models
 import server.factories
 from server.services import owner_service
@@ -63,7 +63,7 @@ class TestOwnerNotifications(TestCase):
             var = message.merge_vars[email]
 
             self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
-            self.assertEqual(var['CTA_URL'], idlecars.client_side_routes.renewal_url(renewal))
+            self.assertEqual(var['CTA_URL'], idlecars.app_routes_driver.renewal_url(renewal))
             self.assertEqual(var['FNAME'], user.first_name)
             self.assertTrue(car.plate in var['TEXT'])
             self.assertTrue(car.display_name() in var['TEXT'])

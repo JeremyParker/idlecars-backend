@@ -8,7 +8,8 @@ from settings import *
 # heap analytics tracking for production
 HEAP_APP_ID = '3053705704'
 
-WEBAPP_URL = 'http://app.idlecars.com'
+DRIVER_APP_URL = 'http://app.idlecars.com'
+OWNER_APP_URL = 'http://owner.idlecars.com'
 
 ALLOWED_HOSTS = ['www.idlecars.com']
 
