@@ -16,14 +16,15 @@ from . import Owner, MakeModel, Insurance
 class Car(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
 
+    # NOTE: don't use status for anything.
     STATUS_AVAILABLE = 'available'
     STATUS_UNKNOWN = 'unknown'
     STATUS_BUSY = 'busy'
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown') # deprecated!
 
-    next_available_date = models.DateField(blank=True, null=True)
-    last_status_update = models.DateTimeField()
+    next_available_date = models.DateTimeField(blank=True, null=True)
+    last_status_update = models.DateTimeField(blank=True, null=True)
     make_model = models.ForeignKey(
         MakeModel,
         verbose_name="Make & Model",
@@ -139,10 +140,12 @@ class Car(models.Model):
             return None
 
     def effective_status(self):
-        if self.next_available_date and self.next_available_date < timezone.now().date():
-            return 'Available'
+        if not self.next_available_date:
+            return 'Busy'
+        elif self.next_available_date > timezone.now():
+            return 'Available {}'.format(self.next_available_date.strftime('%b %d'))
         else:
-            return self.status
+            return 'Available immediately'
 
     # TODO: remove this once the client shows cents in the listing price.
     def normalized_cost(self):
@@ -173,7 +176,7 @@ class Car(models.Model):
                 self.last_status_update = timezone.now()
         else:
             orig = Car.objects.get(pk=self.pk)  # TODO(JP): maybe use __class__ to be more flexible
-            if orig.status != self.status:
+            if orig.next_available_date != self.next_available_date:
                 self.last_status_update = timezone.now()
             if orig.last_known_mileage != self.last_known_mileage:
                 self.last_mileage_update = timezone.now()

@@ -18,7 +18,7 @@ class ListingTest(APITestCase):
     def setUp(self):
         self.car = factories.BookableCar.create(
             status='busy',
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
             hybrid=False,
             min_lease='_03_two_weeks',
             solo_cost=100,
@@ -28,7 +28,7 @@ class ListingTest(APITestCase):
         ''' returns the expected API response for a given car '''
         listing_features = '{} minimum ∙ Available {} ∙ {}, {}'
         booked_features = '{} minimum rental ∙ {}, {}'
-        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
+        tomorrow = timezone.now() + datetime.timedelta(days=1)
         expected = OrderedDict(
             [
                 ('id', car.pk),
@@ -135,7 +135,7 @@ class ListingTest(APITestCase):
 
     def test_get_car_with_all_fields(self):
         self.car = factories.CompleteCar.create(
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
             exterior_color=0,
             interior_color=0,
             min_lease='_03_two_weeks',

@@ -20,7 +20,7 @@ class ListingTest(TestCase):
         self.car = factories.BookableCar.create(
             owner=owner,
             status='available',
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
             min_lease='_03_two_weeks',
             hybrid=True,
         )
@@ -43,22 +43,19 @@ class ListingTest(TestCase):
 
     def test_car_avialable_a_month_away(self):
         ''' car is not listed when it isn't available for another month '''
-        self.car.next_available_date = timezone.now().date() + datetime.timedelta(days=31)
-        self.car.status = 'busy'
+        self.car.next_available_date = timezone.now() + datetime.timedelta(days=31)
         self.car.save()
         self.assertEqual(len(_get_listing_queryset()), 0)
 
     def test_car_unknown_availability_date(self):
         ''' car is not listed when busy and we don't know the available date '''
         self.car.next_available_date = None
-        self.car.status = 'busy'
         self.car.save()
         self.assertEqual(len(_get_listing_queryset()), 0)
 
     def test_car_avialable_a_week_away(self):
         ''' car is listed if it's busy but will become available soon'''
-        self.car.next_available_date = timezone.now().date() + datetime.timedelta(days=7)
-        self.car.status = 'busy'
+        self.car.next_available_date = timezone.now() + datetime.timedelta(days=7)
         self.car.save()
         self.assertEqual(len(_get_listing_queryset()), 1)
 

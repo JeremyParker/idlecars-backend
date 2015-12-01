@@ -9,7 +9,7 @@ from django.db.models import Q
 from server.models import Booking, Car, Owner
 
 
-next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
+next_available_date_threshold = timezone.now() + datetime.timedelta(days=30)
 staleness_threshold = timezone.now() - datetime.timedelta(days=3)
 
 # TODO - this belongs in booking_service
@@ -49,9 +49,8 @@ def _filter_bookable(queryset):
     active_bookings = _filter_booking_in_progress(Booking.objects.all())
     booked_car_ids = [b.car.id for b in active_bookings]
     return queryset.filter(
-        Q(status=Car.STATUS_AVAILABLE) |
-        Q(status=Car.STATUS_BUSY, next_available_date__lt=next_available_date_threshold)
-    ).filter(
+        next_available_date__isnull=False,
+        next_available_date__lt=next_available_date_threshold,
         owner__merchant_account_state=Owner.BANK_ACCOUNT_APPROVED,
     ).exclude(
         id__in=booked_car_ids
