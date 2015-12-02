@@ -34,8 +34,9 @@ def _filter_data_complete(queryset):
             Q(min_lease='_00_unknown') |
             Q(plate='') |
             Q(base='') |
-            Q(owner__city='') |
-            Q(owner__state_code='') |
+            # TODO - put these back in when we're looking up zipcode in the owner portal
+            # Q(owner__city='') |
+            # Q(owner__state_code='') |
             Q(owner__zipcode='')
         )
 
