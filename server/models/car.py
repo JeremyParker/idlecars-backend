@@ -135,9 +135,11 @@ class Car(models.Model):
     def display_mileage(self):
         # TODO(JP): have this change with time based on past data?
         if self.last_known_mileage:
-            return '{},000'.format(self.last_known_mileage / 1000)
-        else:
-            return None
+            try:
+                return '{},000'.format(int(self.last_known_mileage) / 1000)
+            except ValueError:
+                pass
+        return None
 
     def effective_status(self):
         if not self.next_available_date:
