@@ -53,6 +53,6 @@ def faq():
     return '/'.join(parts)
 
 # TODO - remove this
-def add_car_form():
+def owner_app_url():
     return 'https://goo.gl/NhIGM6'
 

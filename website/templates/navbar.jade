@@ -7,7 +7,7 @@ extends ./base.jade
     .links
       a(href="#tutorial") #[p How it works]
       a(href='/about') #[p About Us]
-      a(href="#{ add_car_form }") #[p List your car]
+      a(href="#{ owner_app_url }") #[p List your car]
       a(href="#{ login_url }") #[p Join]
 
     .menu-button(ng-click='showMenu = !showMenu')
@@ -16,5 +16,5 @@ extends ./base.jade
     .menu-container(ng-show='showMenu', ng-click='showMenu=false')
       a(href="#tutorial") How it Works
       a(href='/about') About Us
-      a(href="#{ add_car_form }") List Your Car
+      a(href="#{ owner_app_url }") List Your Car
       a(href="#{ login_url }") Join

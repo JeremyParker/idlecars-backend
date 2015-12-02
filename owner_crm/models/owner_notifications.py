@@ -6,7 +6,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from idlecars import email, app_routes_driver
+from idlecars import email, app_routes_driver, app_routes_owner
 from server.services import car as car_service
 
 from owner_crm.models import notification
@@ -423,7 +423,7 @@ class BankAccountApproved(notification.OwnerNotification):
             'HEADLINE': 'Your bank account has been approved',
             'TEXT': text,
             'CTA_LABEL': 'List more cars',
-            'CTA_URL': app_routes_driver.add_car_form(),
+            'CTA_URL': app_routes_owner.owner_app_url(),
             'template_name': 'one_button_no_image',
             'subject': 'Your bank account has been approved.',
         }
