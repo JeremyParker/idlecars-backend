@@ -8,7 +8,7 @@ from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 
 from owner_crm.tests import sample_merge_vars
-from idlecars import app_routes_driver
+from idlecars import app_routes_owner
 from server import factories
 from server.models import Owner
 
@@ -52,7 +52,7 @@ class WebhookTest(TestCase):
         self.assertEqual(outbox[0].merge_vars.keys()[0], self.owner.auth_users.first().email)
         self.assertEqual(
             outbox[0].merge_vars[self.owner.auth_users.first().email]['CTA_URL'],
-            app_routes_driver.add_car_form(),
+            app_routes_owner.owner_app_url(),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 

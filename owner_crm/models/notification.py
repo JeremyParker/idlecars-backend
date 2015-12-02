@@ -157,7 +157,7 @@ def _get_urls_params(pseudo_argument):
         'driver_account_url': app_routes_driver.driver_account(),
         'terms_of_service_url': app_routes_driver.terms_of_service(),
         'faq_url': app_routes_driver.faq(),
-        'add_car_form_url': app_routes_driver.add_car_form(),
+        'owner_app_url': app_routes_owner.owner_app_url(),
     }
 
 
