@@ -127,7 +127,7 @@ class Car(models.Model):
         blank=True,
         null=True,
     )
-    last_known_mileage = models.IntegerField(blank=True, null=True)
+    last_known_mileage = models.CommaSeparatedIntegerField(max_length=32, blank=True, null=True)
     last_mileage_update = models.DateTimeField(blank=True, null=True)
     insurance = models.ForeignKey(Insurance, blank=True, null=True)
     insurance_policy_number = models.CharField(max_length=32, blank=True, null=True)
