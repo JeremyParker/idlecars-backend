@@ -13,8 +13,7 @@ from server.services import car_helpers, booking as booking_service
 class CarCreateSerializer(ModelSerializer):
     name = SerializerMethodField()
     state_string = SerializerMethodField()
-    state_cta_string = SerializerMethodField()
-    state_cta_key = SerializerMethodField()
+    state_buttons = SerializerMethodField()
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
     available_date_display = SerializerMethodField()
@@ -38,8 +37,7 @@ class CarCreateSerializer(ModelSerializer):
             'owner',
             'base',
             'state_string',
-            'state_cta_string',
-            'state_cta_key',
+            'state_buttons',
             'insurance',
             'listing_link',
 
@@ -61,8 +59,7 @@ class CarCreateSerializer(ModelSerializer):
             'listing_link',
             'available_date_display',
             'state_string',
-            'state_cta_string',
-            'state_cta_key',
+            'state_buttons',
             # fields we get from the TLC
             'make_model',
             'year',
@@ -76,11 +73,8 @@ class CarCreateSerializer(ModelSerializer):
     def get_state_string(self, obj):
         return self._get_state_values(obj)['state_string']
 
-    def get_state_cta_string(self, obj):
-        return self._get_state_values(obj)['cta_string']
-
-    def get_state_cta_key(self, obj):
-        return self._get_state_values(obj)['cta_key']
+    def get_state_buttons(self, obj):
+        return self._get_state_values(obj)['buttons']
 
     def get_insurance(self, obj):
         if obj.insurance:
@@ -102,65 +96,85 @@ class CarCreateSerializer(ModelSerializer):
         if not car_helpers.is_data_complete(car):
             return {
                 'state_string': 'Waiting for information',
-                'cta_string': 'Complete this listing',
-                'cta_key': 'GoRequiredField',
+                'buttons': [{
+                    'label': 'Complete this listing',
+                    'function_key': 'GoRequiredField',
+                }]
             }
         elif car.status == Car.STATUS_BUSY:
             if car.next_available_date:
                 return {
                     'state_string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
-                    'cta_string': 'Change available date',
-                    'cta_key': 'GoNextAvailableDate',
+                    'buttons': [{
+                        'label': 'Change available date',
+                        'function_key': 'GoNextAvailableDate',
+                    }]
                 }
             else:
                 return {
                     'state_string': 'Not listed',
-                    'cta_string': 'Relist',
-                    'cta_key': 'GoNextAvailableDate',
+                    'buttons': [{
+                        'label': 'Relist',
+                        'function_key': 'GoNextAvailableDate',
+                    }]
                 }
         elif car.owner and not car.owner.merchant_account_state or \
             car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
             return {
                 'state_string': 'Waiting for direct deposit information',
-                'cta_string': 'Add bank details',
-                'cta_key': 'AddBankLink',
+                'buttons': [{
+                    'label': 'Add bank details',
+                    'function_key': 'AddBankLink',
+                }]
             }
         elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
             return {
                 'state_string': 'Waiting for bank approval',
-                'cta_string': 'Remove listing',
-                'cta_key': 'RemoveListing',
+                'buttons': [{
+                    'label': 'Remove listing',
+                    'function_key': 'RemoveListing',
+                }]
             }
         elif booking_service.filter_reserved(car.booking_set.all()):
             return {
                 'state_string': 'Waiting for insurance approval',
-                'cta_string': '',#'The driver is approved',
-                'cta_key': '',#'ApproveInsurance',
+                'buttons': [{
+                    'label': '',#'The driver is approved',
+                    'function_key': '',#'ApproveInsurance',
+                }]
             }
         elif booking_service.filter_accepted(car.booking_set.all()):
             return {
                 'state_string': 'Ready to be picked up',
-                'cta_string': '',#'Contact the driver',
-                'cta_key': '',#'ContactDriver',
+                'buttons': [{
+                    'label': '',#'Contact the driver',
+                    'function_key': '',#'ContactDriver',
+                }]
             }
         elif booking_service.filter_active(car.booking_set.all()):
             b = booking_service.filter_active(car.booking_set.all()).first()
             return {
                 'state_string': 'Rented until'.format(b.end_date.strftime('%b %d')),
-                'cta_string': '',#'Contact the driver',
-                'cta_key': '',#'ContactDriver',
+                'buttons': [{
+                    'label': '',#'Contact the driver',
+                    'function_key': '',#'ContactDriver',
+                }]
             }
         elif car_helpers.is_stale(car):
             return {
                 'state_string': 'Listing expired',
-                'cta_string': 'Extend listing',
-                'cta_key': 'ExtendListing',
+                'buttons': [{
+                    'label': 'Extend listing',
+                    'function_key': 'ExtendListing',
+                }]
             }
         else:
             return {
                 'state_string': 'Listed',
-                'cta_string': 'Remove listing',
-                'cta_key': 'RemoveListing',
+                'buttons': [{
+                    'label': 'Remove listing',
+                    'function_key': 'RemoveListing',
+                }]
             }
 
 
