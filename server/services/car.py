@@ -80,6 +80,7 @@ def create_car(owner, plate):
         pass
 
     car.next_available_date = timezone.localtime(timezone.now())
+    car.last_status_update = timezone.localtime(timezone.now())
     car.owner = owner
     car.save()
     return car

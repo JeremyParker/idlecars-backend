@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
@@ -61,5 +62,11 @@ class CarViewSet(
         serializer.instance = new_car
 
     def perform_update(self, serializer):
-        # TDOO - if we're setting the car to 'busy', then set next_available_date to None
-        serializer.save()
+        '''
+        any time we update something on this car through this view, it means the owner
+        interacted with the car. From that we can conclude that the status of the car is up
+        to date. Otherwise they would have changed it. We're overriding this method to set
+        the last status update time to now.
+        '''
+        serializer.validated_data.update({'last_status_update': timezone.localtime(timezone.now())})
+        super(CarViewSet, self).perform_update(serializer)
