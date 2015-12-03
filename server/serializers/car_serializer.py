@@ -7,7 +7,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField, C
 from idlecars import app_routes_driver, fields
 from server.models import Car, Owner
 from server.fields import CarColorField
-from server.services import car_helpers, booking as booking_service
+from server.services import car_helpers, booking as booking_service, car as car_service
 
 
 class CarCreateSerializer(ModelSerializer):
@@ -91,6 +91,12 @@ class CarCreateSerializer(ModelSerializer):
         else:
             return 'Immediately'
 
+    def get_min_lease_display(self, obj):
+        days = obj.minimum_rental_days()
+        if not days:
+            return "No minimum set"
+        return '{} day'.format(days) + ('s' if days-1 else '')
+
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
             return {
@@ -100,23 +106,6 @@ class CarCreateSerializer(ModelSerializer):
                     'function_key': 'GoRequiredField',
                 }]
             }
-        elif car.status == Car.STATUS_BUSY:
-            if car.next_available_date:
-                return {
-                    'state_string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
-                    'buttons': [{
-                        'label': 'Change available date',
-                        'function_key': 'GoNextAvailableDate',
-                    }]
-                }
-            else:
-                return {
-                    'state_string': 'Not listed',
-                    'buttons': [{
-                        'label': 'Relist',
-                        'function_key': 'GoNextAvailableDate',
-                    }]
-                }
         elif car.owner and not car.owner.merchant_account_state or \
             car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
             return {
@@ -127,60 +116,79 @@ class CarCreateSerializer(ModelSerializer):
                 }]
             }
         elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
-            return {
-                'state_string': 'Waiting for bank approval',
-                'buttons': [{
-                    'label': 'Remove listing',
-                    'function_key': 'RemoveListing',
-                }]
-            }
-        elif booking_service.filter_reserved(car.booking_set.all()):
-            return {
-                'state_string': 'Waiting for insurance approval',
-                'buttons': [{
-                    'label': '',#'The driver is approved',
-                    'function_key': '',#'ApproveInsurance',
-                }]
-            }
-        elif booking_service.filter_accepted(car.booking_set.all()):
-            return {
-                'state_string': 'Ready to be picked up',
-                'buttons': [{
-                    'label': '',#'Contact the driver',
-                    'function_key': '',#'ContactDriver',
-                }]
-            }
-        elif booking_service.filter_active(car.booking_set.all()):
-            b = booking_service.filter_active(car.booking_set.all()).first()
-            return {
-                'state_string': 'Rented until'.format(b.end_date.strftime('%b %d')),
-                'buttons': [{
-                    'label': '',#'Contact the driver',
-                    'function_key': '',#'ContactDriver',
-                }]
-            }
-        elif car_helpers.is_stale(car):
-            return {
-                'state_string': 'Listing expired',
-                'buttons': [{
-                    'label': 'Extend listing',
-                    'function_key': 'ExtendListing',
-                }]
-            }
-        else:
-            return {
-                'state_string': 'Listed',
-                'buttons': [{
-                    'label': 'Remove listing',
-                    'function_key': 'RemoveListing',
-                }]
-            }
-
-    def get_min_lease_display(self, obj):
-        days = obj.minimum_rental_days()
-        if not days:
-            return "No minimum set"
-        return '{} day'.format(days) + ('s' if days-1 else '')
+            if car.next_available_date:
+                return {
+                    'state_string': 'This listing is waiting for bank account approval.',
+                    'buttons': [{
+                        'label': 'Remove listing',
+                        'function_key': 'RemoveListing',
+                    }]
+                }
+            else:
+                return {
+                    'state_string': 'Not listed.',
+                    'buttons': [{
+                        'label': 'List this car',
+                        'function_key': 'Relist',
+                    }]
+                }
+        # elif car.next_available_date:
+        #         return {
+        #             'state_string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
+        #             'buttons': [{
+        #                 'label': 'Change available date',
+        #                 'function_key': 'GoNextAvailableDate',
+        #             }]
+        #         }
+        #     else:
+        #         return {
+        #             'state_string': 'Not listed',
+        #             'buttons': [{
+        #                 'label': 'Relist',
+        #                 'function_key': 'GoNextAvailableDate',
+        #             }]
+        #         }
+        # elif booking_service.filter_reserved(car.booking_set.all()):
+        #     return {
+        #         'state_string': 'Waiting for insurance approval',
+        #         'buttons': [{
+        #             'label': '',#'The driver is approved',
+        #             'function_key': '',#'ApproveInsurance',
+        #         }]
+        #     }
+        # elif booking_service.filter_accepted(car.booking_set.all()):
+        #     return {
+        #         'state_string': 'Ready to be picked up',
+        #         'buttons': [{
+        #             'label': '',#'Contact the driver',
+        #             'function_key': '',#'ContactDriver',
+        #         }]
+        #     }
+        # elif booking_service.filter_active(car.booking_set.all()):
+        #     b = booking_service.filter_active(car.booking_set.all()).first()
+        #     return {
+        #         'state_string': 'Rented until'.format(b.end_date.strftime('%b %d')),
+        #         'buttons': [{
+        #             'label': '',#'Contact the driver',
+        #             'function_key': '',#'ContactDriver',
+        #         }]
+        #     }
+        # elif car_helpers.is_stale(car):
+        #     return {
+        #         'state_string': 'Listing expired',
+        #         'buttons': [{
+        #             'label': 'Extend listing',
+        #             'function_key': 'ExtendListing',
+        #         }]
+        #     }
+        # else:
+        #     return {
+        #         'state_string': 'Listed',
+        #         'buttons': [{
+        #             'label': 'Remove listing',
+        #             'function_key': 'RemoveListing',
+        #         }]
+        #     }
 
 
 class CarSerializer(CarCreateSerializer):

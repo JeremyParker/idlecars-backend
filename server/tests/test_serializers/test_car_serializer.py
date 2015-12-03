@@ -46,6 +46,14 @@ class TestCarSerializer(TestCase):
             'Unavailable',
         )
 
+    def test_min_lease_unknown(self):
+        car = factories.Car.create(min_lease='_00_unknown')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], 'No minimum set')
+
+    def test_min_lease_30(self):
+        car = factories.Car.create(min_lease='_05_one_month')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], '30 days')
+
 
 class TextCarState(TestCase):
     def test_data_incomplete(self):
@@ -56,14 +64,46 @@ class TextCarState(TestCase):
         self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Complete this listing')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoRequiredField')
 
-    def test_available_tomorrow(self):
-        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
-        car = factories.ClaimedCar.create(next_available_date=tomorrow)
+    def test_no_bank_deets(self):
+        car = factories.ClaimedCar.create(status=Car.STATUS_AVAILABLE)
         serializer_data = serializers.CarSerializer(car).data
-        self.assertTrue('Busy until' in serializer_data['state_string'])
+        self.assertEqual(serializer_data['state_string'], 'Waiting for direct deposit information')
         self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Change available date')
-        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoNextAvailableDate')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Add bank details')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'AddBankLink')
+
+    def test_bank_pending_available(self):
+        owner = factories.PendingOwner.create()
+        car = factories.ClaimedCar.create(
+            owner=owner,
+            next_available_date=timezone.now(),
+        )
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'This listing is waiting for bank account approval.')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Remove listing')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RemoveListing')
+
+    def test_bank_pending_busy(self):
+        owner = factories.PendingOwner.create()
+        car = factories.ClaimedCar.create(
+            owner=owner,
+            next_available_date=None,
+        )
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Not listed.')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
+
+    # def test_available_tomorrow(self):
+    #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
+    #     car = factories.ClaimedCar.create(next_available_date=tomorrow)
+    #     serializer_data = serializers.CarSerializer(car).data
+    #     self.assertTrue('Busy until' in serializer_data['state_string'])
+    #     self.assertEqual(1, len(serializer_data['state_buttons']))
+    #     self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Change available date')
+    #     self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoNextAvailableDate')
 
     # def test_rented_elsewhere(self):
     #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
@@ -75,13 +115,6 @@ class TextCarState(TestCase):
     #     self.assertEqual(serializer_data['state_string'], 'Not listed')
     #     self.assertEqual(serializer_data['state_cta_string'], 'Relist')
     #     self.assertEqual(serializer_data['state_cta_key'], 'GoNextAvailableDate')
-
-    # def test_no_bank_deets(self):
-    #     car = factories.ClaimedCar.create(status=Car.STATUS_AVAILABLE)
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertEqual(serializer_data['state_string'], 'Waiting for direct deposit information')
-    #     self.assertEqual(serializer_data['state_cta_string'], 'Add bank details')
-    #     self.assertEqual(serializer_data['state_cta_key'], 'AddBankLink')
 
     # def test_bank_pending(self):
     #     owner = factories.PendingOwner.create()
@@ -132,11 +165,3 @@ class TextCarState(TestCase):
         #         'cta_string': None,
         #         'cta_key': None,
         #     }
-
-    def test_min_lease_unknown(self):
-        car = factories.Car.create(min_lease='_00_unknown')
-        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], 'No minimum set')
-
-    def test_min_lease_30(self):
-        car = factories.Car.create(min_lease='_05_one_month')
-        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], '30 days')
