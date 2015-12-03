@@ -49,7 +49,7 @@ def terms_of_service():
     return '/'.join(parts)
 
 def faq():
-    parts = (settings.DRIVER_APP_URL, '#', 'driver_faq')
+    parts = (settings.DRIVER_APP_URL, '#', 'faq')
     return '/'.join(parts)
 
 # TODO - remove this
