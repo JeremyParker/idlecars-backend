@@ -1,12 +1,13 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
+from datetime import timedelta
 from freezegun import freeze_time
 
 
 from django.utils import timezone
 from django.test import TestCase
+from django.conf import settings
 from django.core.management import call_command
 from django.contrib.auth.models import User
 
@@ -30,8 +31,7 @@ class TestOwnerNotifications(TestCase):
         return car
 
     def _update_time_about_to_go_stale(self):
-        # TODO - get the stale_threshold from config
-        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
+        return timezone.now() - (timedelta(days=settings.STALENESS_LIMIT) - timedelta(hours=1))
 
     def test_whole_enchilada(self):
         last_update = self._update_time_about_to_go_stale()

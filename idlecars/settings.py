@@ -220,6 +220,8 @@ BRAINTREE = {
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
 
-TAKE_RATE = '0.059'  # TODO - move this to a config service
+# TODO - move these to a config service
+TAKE_RATE = '0.059'
+STALENESS_LIMIT = 3
 
 IDLECARS_PHONE_NUMBER = '1-844-IDLECAR (1-844-435-3227)'

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.test import TestCase
+from django.conf import settings
 from django.utils import timezone
 
 from server import serializers, factories
@@ -60,9 +61,11 @@ class TextCarState(TestCase):
         car = factories.Car.create()
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Waiting for information')
-        self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Complete this listing')
-        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoRequiredField')
+        self.assertEqual(0, len(serializer_data['state_buttons']))
+        # TODO - put this back in when the client can go to required field
+        # self.assertEqual(1, len(serializer_data['state_buttons']))
+        # self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Complete this listing')
+        # self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoRequiredField')
 
     def test_no_bank_deets(self):
         car = factories.ClaimedCar.create(status=Car.STATUS_AVAILABLE)
@@ -79,7 +82,7 @@ class TextCarState(TestCase):
             next_available_date=timezone.now(),
         )
         serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'This listing is waiting for bank account approval.')
+        self.assertEqual(serializer_data['state_string'], 'Waiting for bank account approval.')
         self.assertEqual(1, len(serializer_data['state_buttons']))
         self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Remove listing')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RemoveListing')
@@ -136,7 +139,7 @@ class TextCarState(TestCase):
 
     def test_stale(self):
         car = factories.BookableCar.create(
-            last_status_update=timezone.now() - datetime.timedelta(days=90)
+            last_status_update=timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT+1)
         )
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Listing expired.')
@@ -163,7 +166,7 @@ class TextCarState(TestCase):
         car = factories.BookableCar.create(next_available_date=tomorrow)
         serializer_data = serializers.CarSerializer(car).data
 
-        expiration_date = car.last_status_update + datetime.timedelta(days=3) # TODO: staleness length comes from config somewhere
+        expiration_date = car.last_status_update + datetime.timedelta(days=settings.STALENESS_LIMIT)
         self.assertEqual(
             'Listed. This listing expires {}'.format(expiration_date.strftime('%b %d')),
             serializer_data['state_string']

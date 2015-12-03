@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.utils import timezone
+from django.conf import settings
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
 
 from idlecars import app_routes_driver, fields
@@ -103,10 +104,12 @@ class CarCreateSerializer(ModelSerializer):
         if not car_helpers.is_data_complete(car):
             return {
                 'state_string': 'Waiting for information',
-                'buttons': [{
-                    'label': 'Complete this listing',
-                    'function_key': 'GoRequiredField',
-                }]
+                'buttons': [
+                    # {
+                    #     'label': 'Complete this listing',
+                    #     'function_key': 'GoRequiredField',
+                    # }
+                ]
             }
         elif car.owner and not car.owner.merchant_account_state or \
             car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
@@ -120,7 +123,7 @@ class CarCreateSerializer(ModelSerializer):
         elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
             if car.next_available_date:
                 return {
-                    'state_string': 'This listing is waiting for bank account approval.',
+                    'state_string': 'Waiting for bank account approval.',
                     'buttons': [{
                         'label': 'Remove listing',
                         'function_key': 'RemoveListing',
@@ -209,8 +212,9 @@ class CarCreateSerializer(ModelSerializer):
                     ]
                 }
         else:
-            # TODO: staleness threshold comes from config somewhere
-            listing_expiration_date = car.last_status_update + datetime.timedelta(days=3)
+            listing_expiration_date = car.last_status_update + datetime.timedelta(
+                days=settings.STALENESS_LIMIT
+            )
             return {
                 'state_string': 'Listed. This listing expires {}'.format(
                     listing_expiration_date.strftime('%b %d')

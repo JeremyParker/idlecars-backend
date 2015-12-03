@@ -10,6 +10,7 @@ from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
 
 from django.utils import timezone
+from django.conf import settings
 
 from idlecars.factory_helpers import Factory, faker
 from server.factories import Owner, BankAccountOwner, MakeModel, Insurance
@@ -47,7 +48,7 @@ class BookableCar(ClaimedCar):
 
 class CarExpiredListing(BookableCar):
     next_available_date = timezone.now() - datetime.timedelta(days=30)
-    last_status_update = timezone.now() - datetime.timedelta(days=30)
+    last_status_update = timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT + 1)
 
 
 class CompleteCar(BookableCar):

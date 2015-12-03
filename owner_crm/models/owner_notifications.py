@@ -215,7 +215,7 @@ class PickupConfirmation(notification.OwnerNotification):
                 Their credit card has been charged and you will receive the payment within 48 hours. The security
                 deposit of ${} has also been placed in escrow for you.
             '''.format(
-                # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
+                # TODO: not always weely_rent_amount, we need to get the real amount, if time < 7 days
                 kwargs['booking_weekly_rent'],
                 kwargs['driver_full_name'],
                 kwargs['car_name'],

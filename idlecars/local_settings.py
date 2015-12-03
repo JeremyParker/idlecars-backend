@@ -35,3 +35,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
+
+STALENESS_LIMIT = 365
