@@ -42,7 +42,7 @@ class CarViewSet(
             'insurance',
             'make_model',
         )
-        if self.action == 'list':
+        if self.action == 'list': # TODO - make sure nobody else can edit or see my car
             return queryset.filter(owner=owner)
         return queryset
 
@@ -59,3 +59,7 @@ class CarViewSet(
         plate = serializer.validated_data.get('plate').upper()
         new_car = car_service.create_car(owner, plate)
         serializer.instance = new_car
+
+    def perform_update(self, serializer):
+        # TDOO - if we're setting the car to 'busy', then set next_available_date to None
+        serializer.save()
