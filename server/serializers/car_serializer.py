@@ -205,7 +205,7 @@ class CarCreateSerializer(ModelSerializer):
                         {
                             'label': 'Change availability',
                             'function_key': 'GoNextAvailableDate',
-                    }
+                        },
                     ]
                 }
         else:
