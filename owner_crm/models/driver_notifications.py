@@ -454,10 +454,10 @@ ignore this message. Otherwise, you can reset your password using this link: '
             'HEADLINE': 'Reset your password',
             'TEXT': text,
             'CTA_LABEL': 'Reset password',
-            'CTA_URL': kwargs['password_reset_url'],
+            'CTA_URL': kwargs['driver_password_reset_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Reset your password on idlecars.',
-            'sms_body': text + kwargs['password_reset_url'],
+            'subject': 'Reset your idlecars password.',
+            'sms_body': text + kwargs['driver_password_reset_url'],
         }
 
 

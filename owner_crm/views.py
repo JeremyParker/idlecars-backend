@@ -30,10 +30,11 @@ class PasswordResetSetupView(views.APIView):
         password_reset = password_reset_service.create(phone_number)
         if password_reset:
             try:
+                owner = password_reset.auth_user.owner_set.first()
+                notification.send('owner_notifications.PasswordReset', password_reset)
+            except Owner.DoesNotExist:
                 driver = password_reset.auth_user.driver
                 notification.send('driver_notifications.PasswordReset', password_reset)
-            except Driver.DoesNotExist:
-                notification.send('owner_notifications.PasswordReset', password_reset)
 
             content = {'phone_number': phone_number}
             return Response(content, status=status.HTTP_201_CREATED)

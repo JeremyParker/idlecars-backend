@@ -93,7 +93,6 @@ class CarAdmin(admin.ModelAdmin):
         CarStaleListFilter,
         InsuranceFilter,
         'owner__rating',
-        'status',
         NoPlateFilter,
     ]
     search_fields = [
@@ -105,22 +104,26 @@ class CarAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('make_model', 'hybrid', 'year'),
+                ('make_model', 'hybrid', 'year', 'plate',),
                 ('exterior_color', 'interior_color'),
-                ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
-                ('insurance', 'insurance_link'),
+                ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
-                (
-                    'status',
-                    'last_status_update',
-                    'next_available_date',
-                ),
+                ('effective_status', 'last_status_update', 'next_available_date',),
                 ('solo_cost', 'solo_deposit'),
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',
                 'work_with',
+            )
+        }),
+        ('TLC data', {
+            'fields': (
+                ('found_in_tlc', 'last_updated', 'active_in_tlc',),
+                ('base', 'base_number', 'base_type',),
+                ('base_address', 'base_telephone_number',),
+                ('registrant_name', 'expiration_date',),
+                ('vehicle_vin_number',),
             )
         }),
     )
@@ -131,6 +134,16 @@ class CarAdmin(admin.ModelAdmin):
         'owner_rating',
         'effective_status',
         'work_with',
+        'found_in_tlc',
+        'last_updated',
+        'active_in_tlc',
+        'base_number',
+        'base_address',
+        'base_telephone_number',
+        'base_type',
+        'registrant_name',
+        'expiration_date',
+        'vehicle_vin_number',
     ]
     inlines = [
         BookingForCarInline,

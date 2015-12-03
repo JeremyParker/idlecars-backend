@@ -7,9 +7,7 @@ from idlecars import model_helpers
 
 from server.models import Booking, Car
 from . import car_helpers, make_model_service
-
-# TODO - remove this
-from server.models import MakeModel, Insurance
+import tlc_data_service, vin_data_service
 
 
 class CarTLCException(Exception):
@@ -18,6 +16,7 @@ class CarTLCException(Exception):
 
 class CarDuplicateException(Exception):
     pass
+
 
 def filter_live(queryset):
     return car_helpers._filter_not_stale(
@@ -56,42 +55,31 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
-# TODO: These fields will be in another model
-tlc_fields = ['make_model', 'year', 'base', 'insurance']
-
-
-def lookup_details(car):
-    '''
-    Looks up the given car in our copy of the TLC database, and fills in details.
-    If the car's plate doesn't exist in the db, we raise a Car.DoesNotExist.
-    '''
-
-    # TODO: this is a placeholder to make the unit test pass
-    if car.plate == 'NOT FOUND':
-        raise Car.DoesNotExist
-
-    # TODO: look up the car in the db and get more details
-    car.make_model = MakeModel.objects.last()
-    car.year = 2013
-    car.base = 'SOME_BASE, LLC'
-    car.insurance = Insurance.objects.last()
-
-
 def create_car(owner, plate):
-    new_car = Car(plate=plate)
+    car_info = Car(plate=plate)
     try:
-        lookup_details(new_car)
+        tlc_data_service.lookup_fhv_data(car_info)
     except Car.DoesNotExist:
         raise CarTLCException
 
-    car, is_new = Car.objects.get_or_create(plate=new_car.plate)
+    car, is_new = Car.objects.get_or_create(plate=car_info.plate)
     if not is_new and car.owner:
         raise CarDuplicateException()
+    model_helpers.copy_fields(car_info, car, tlc_data_service.fhv_fields)
 
-    model_helpers.copy_fields(new_car, car, tlc_fields)
+    try:
+        vin_data_service.lookup_vin_data(car)
+    except Car.DoesNotExist:
+        # TODO - maybe we alert ops that this car needs to be looked up?
+        pass
 
-    car.status = Car.STATUS_AVAILABLE
-    car.next_available_date = timezone.localtime(timezone.now()).date()
+    try:
+        tlc_data_service.lookup_insurance_data(car)
+    except Car.DoesNotExist:
+        # TODO - maybe we alert ops that this car needs to be looked up?
+        pass
+
+    car.next_available_date = timezone.localtime(timezone.now())
     car.owner = owner
     car.save()
     return car

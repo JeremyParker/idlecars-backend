@@ -138,7 +138,7 @@ class ListingSerializer(ModelSerializer):
         return CarCompatibility(obj).all()
 
     def _available_string(self, obj):
-        if obj.next_available_date and obj.next_available_date > timezone.now().date():
+        if obj.next_available_date and obj.next_available_date > timezone.now():
             return '{d.month}/{d.day}'.format(d = obj.next_available_date)
         return "Now"
 

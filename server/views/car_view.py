@@ -56,7 +56,7 @@ class CarViewSet(
 
     def perform_create(self, serializer):
         owner = Owner.objects.get(auth_users=self.request.user)
-        plate = serializer.validated_data.get('plate')
+        plate = serializer.validated_data.get('plate').upper()
         new_car = car_service.create_car(owner, plate)
         serializer.instance = new_car
 

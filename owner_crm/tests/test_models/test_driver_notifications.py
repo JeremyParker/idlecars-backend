@@ -47,47 +47,47 @@ class DriverNotificationTest(TestCase):
         self.notification_spec = {
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
-                'sms_result': settings.WEBAPP_URL + '/#/listing',
+                'sms_result': settings.DRIVER_APP_URL + '/#/listing',
                 'email_result': self.approved_driver.full_name(),
             },
             'BaseLetterApprovedNoCheckout': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/account/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/account/bookings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'FirstDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'FirstDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Submit your documents',
             },
             'SecondDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'SecondDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Are you ready',
             },
             'ThirdDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'submit your driver documents',
             },
             'ThirdDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.WEBAPP_URL + '/#/bookings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Are you ready',
             },
             'BookingTimedOut': {
                 'argument': 'pending_booking',
-                'sms_result': settings.WEBAPP_URL + '/#/listings',
+                'sms_result': settings.DRIVER_APP_URL + '/#/listings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'AwaitingInsuranceEmail': {
@@ -118,7 +118,7 @@ class DriverNotificationTest(TestCase):
             'PasswordReset': {
                 'argument': 'password_reset',
                 'sms_result': 'password',
-                'email_result': 'your password',
+                'email_result': 'your idlecars password',
             },
             'InsuranceRejected': {
                 'argument': 'accepted_booking',

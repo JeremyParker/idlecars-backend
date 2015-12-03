@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 import datetime
 
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
@@ -11,6 +12,7 @@ from rest_framework.authtoken.models import Token
 
 from server import factories, models
 from server.services import car as car_service
+from server.services import tlc_data_service
 
 
 class CarUnauthorizedTest(APITestCase):
@@ -49,6 +51,7 @@ class CarUnauthorizedTest(APITestCase):
 
 
 class CarAPITest(APITestCase):
+    ''' this is a base class for the rest of the Test classes in this file '''
     def setUp(self):
         self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
@@ -89,7 +92,7 @@ class CarDetailsTest(CarAPITest):
         # make an incomplete car (not a BookableCar)
         car = factories.Car.create(
             owner=self.owner,
-            plate='ANOTHER_REAL_PLATE',  # TODO: add a plate to the tlc db
+            plate='OTHER_REAL_PLATE',
             solo_cost=None,
             solo_deposit=None,
         )
@@ -114,15 +117,14 @@ class CarDetailsTest(CarAPITest):
 class CarCreateTest(CarAPITest):
     def setUp(self):
         super(CarCreateTest, self).setUp()
-
-        # TODO - add a record to the TLC database so we can 'find' it when creating a car.
-        factories.Insurance.create()
         self.plate = 'REAL_PLATE'
         self.url = reverse('server:cars-list')
 
     def test_create_car_success(self):
         self.car = None # forget that we had a car
-        plate = 'OTHER_REAL_PLATE'  # TODO: add this plate to the tlc db
+        plate = 'OTHER_REAL_PLATE'
+        factories.MakeModel.create() # TODO - remove this
+
         response = self.client.post(self.url, data={'plate': plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], plate)
@@ -133,7 +135,6 @@ class CarCreateTest(CarAPITest):
         self.assertIsNotNone(response.data['base'])
         self.assertIsNotNone(response.data['insurance'])
         self.assertIsNotNone(response.data['listing_link'])
-        self.assertIsNotNone(response.data['status'])
         self.assertIsNotNone(response.data['next_available_date'])
 
     def test_create_unclaimed_car_success(self):
@@ -159,7 +160,7 @@ class CarCreateTest(CarAPITest):
 
     def test_unregistered_car_fails(self):
         self.car = None # forget that we had a car
-        response = self.client.post(self.url, data={'plate': 'NOT FOUND'})
+        response = self.client.post(self.url, data={'plate': 'ERROR: TLC'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('_app_notifications' in response.data.keys())
 
@@ -193,20 +194,12 @@ class CarUpdateTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_set_busy(self):
-        data = {'status': 'busy'}
+        data = {'next_available_date': None}
         url = reverse('server:cars-detail', args=(self.car.pk,))
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
-        self.assertEqual(self.car.status, models.Car.STATUS_BUSY)
-
-    def test_set_bad_status_fails(self):
-        self.car.status = models.Car.STATUS_BUSY
-        self.car.save()
-        data = {'status': 'imaginary'}
-        url = reverse('server:cars-detail', args=(self.car.pk,))
-        response = self.client.patch(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsNone(self.car.next_available_date)
 
     def test_set_next_available(self):
         data = {'next_available_date': [2017, 0, 1]}
@@ -214,7 +207,7 @@ class CarUpdateTest(CarAPITest):
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
-        expected_date = datetime.date(2017, 1, 1)
+        expected_date = datetime.datetime(2017, 1, 1, tzinfo=timezone.get_current_timezone())
         self.assertEqual(self.car.next_available_date, expected_date)
 
     def test_cannot_update_others_cars(self):
@@ -227,10 +220,12 @@ class CarUpdateTest(CarAPITest):
         read_only_fields = [
             'plate',
             'id',
+            'name',
             'created_time',
             'state',
-            'name',
             'listing_link',
+            'available_date_display',
+            'min_lease_display',
         ]
         # get a car through the API to get the available fields and values
         url = reverse('server:cars-detail', args=(self.car.pk,))
@@ -245,12 +240,13 @@ class CarUpdateTest(CarAPITest):
             original_value = new_car_data.get(field, '1')
             other_value = other_car_data.get(field, '2')
 
+            print field
             # try to set the new_car's field to the exising_car's field
             response = self.client.patch(url, {field: other_value}, format='json')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
             current_value = response.data[field]
-            if field in car_service.tlc_fields + read_only_fields:
+            if field in tlc_data_service.fhv_fields + read_only_fields:
                 # values didn't change for the read-only fields
                 self.assertEqual(current_value, original_value)
             else:

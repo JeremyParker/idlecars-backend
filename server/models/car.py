@@ -16,14 +16,15 @@ from . import Owner, MakeModel, Insurance
 class Car(models.Model):
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
 
+    # NOTE: don't use status for anything.
     STATUS_AVAILABLE = 'available'
     STATUS_UNKNOWN = 'unknown'
     STATUS_BUSY = 'busy'
     STATUS = model_helpers.Choices(available='Available', unknown='Unknown', busy='Busy')
-    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown')
+    status = model_helpers.ChoiceField(choices=STATUS, max_length=32, default='Unknown') # deprecated!
 
-    next_available_date = models.DateField(blank=True, null=True)
-    last_status_update = models.DateTimeField()
+    next_available_date = models.DateTimeField(blank=True, null=True)
+    last_status_update = models.DateTimeField(blank=True, null=True)
     make_model = models.ForeignKey(
         MakeModel,
         verbose_name="Make & Model",
@@ -31,10 +32,30 @@ class Car(models.Model):
         default=1,
     )
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
-    YEARS = [(y, unicode(y)) for y in range((timezone.now().year+1), 1995, -1)]
+    YEARS = [(y, unicode(y)) for y in range(2016, 1995, -1)]
     year = models.IntegerField(choices=YEARS, blank=True, null=True)
     plate = models.CharField(max_length=24, blank=True)
+
+    # TLC data
+    found_in_tlc = models.BooleanField(default=False)
+    last_updated = models.DateTimeField(null=True)
+    active_in_tlc = models.BooleanField(default=False)
     base = models.CharField(max_length=64, blank=True)
+    base_number = models.CharField(max_length=16, blank=True)
+    base_address = models.CharField(max_length=64, blank=True)
+    base_telephone_number = models.CharField(max_length=16, blank=True)
+
+    BASE_TYPE_LIVERY = 1
+    BASE_TYPE_PARATRANS = 2
+    BASE_TYPE_CHOICES = [
+        (BASE_TYPE_LIVERY, 'Livery'),
+        (BASE_TYPE_PARATRANS, 'Paratrans'),
+    ]
+    base_type = models.IntegerField(choices=BASE_TYPE_CHOICES, blank=True, null=True)
+    registrant_name = models.CharField(max_length=64, blank=True)
+    expiration_date = models.DateField(blank=True, null=True)
+    vehicle_vin_number = models.CharField(max_length=32, blank=True)
+
     solo_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     solo_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     split_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
@@ -106,22 +127,27 @@ class Car(models.Model):
         blank=True,
         null=True,
     )
-    last_known_mileage = models.IntegerField(blank=True, null=True)
+    last_known_mileage = models.CommaSeparatedIntegerField(max_length=32, blank=True, null=True)
     last_mileage_update = models.DateTimeField(blank=True, null=True)
     insurance = models.ForeignKey(Insurance, blank=True, null=True)
+    insurance_policy_number = models.CharField(max_length=32, blank=True, null=True)
 
     def display_mileage(self):
         # TODO(JP): have this change with time based on past data?
         if self.last_known_mileage:
-            return '{},000'.format(self.last_known_mileage / 1000)
-        else:
-            return None
+            try:
+                return '{},000'.format(int(self.last_known_mileage) / 1000)
+            except ValueError:
+                pass
+        return None
 
     def effective_status(self):
-        if self.next_available_date and self.next_available_date < timezone.now().date():
-            return 'Available'
+        if not self.next_available_date:
+            return 'Busy'
+        elif self.next_available_date > timezone.now():
+            return 'Available {}'.format(self.next_available_date.strftime('%b %d'))
         else:
-            return self.status
+            return 'Available immediately'
 
     # TODO: remove this once the client shows cents in the listing price.
     def normalized_cost(self):
@@ -152,7 +178,7 @@ class Car(models.Model):
                 self.last_status_update = timezone.now()
         else:
             orig = Car.objects.get(pk=self.pk)  # TODO(JP): maybe use __class__ to be more flexible
-            if orig.status != self.status:
+            if orig.next_available_date != self.next_available_date:
                 self.last_status_update = timezone.now()
             if orig.last_known_mileage != self.last_known_mileage:
                 self.last_mileage_update = timezone.now()

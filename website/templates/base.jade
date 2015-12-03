@@ -4,7 +4,7 @@ html(lang="en", ng-app="app")
     meta(charset='utf-8')
     meta(http-equiv='x-ua-compatible', content='ie=edge')
     title Start renting. Start earning | idlecars
-    meta(name='description', content='Earn more from rideshare by driving a premium vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
+    meta(name='description', content='Earn more from rideshare by driving a tlc-licensed vehicle whenever you want it. On demand rental vehicles registered and insured for driving for rideshare services.')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     meta(name="bitly-verification", content="46bd3f8d09f1")
 
@@ -31,7 +31,7 @@ html(lang="en", ng-app="app")
           .content
             a(href="/#tutorial") #[p.bold How it works]
             a(href='/about') #[p.bold About Us]
-            a(href="#{ add_car_form }") #[p.bold List your car]
+            a(href="#{ owner_app_url }") #[p.bold List your car]
             a(href="#{ signup_url }") #[p.bold Sign up]
             a(href="#{ login_url }") #[p.bold Log in]
 
@@ -41,7 +41,7 @@ html(lang="en", ng-app="app")
         .menu-container(ng-show='showMenu', ng-click='showMenu=false')
           a(href="/#tutorial") #[p How it works]
           a(href='/about') #[p About Us]
-          a(href="#{ add_car_form }") #[p List your car]
+          a(href="#{ owner_app_url }") #[p List your car]
           a(href="#{ signup_url }") #[p Sign up]
           a(href="#{ login_url }") #[p Log in]
 
@@ -60,12 +60,12 @@ html(lang="en", ng-app="app")
                 span |
                 a(href="/#tutorial") How it Works
                 span.desktop-line |
-                a.desktop-line(href="#{ add_car_form }") List Your Car
+                a.desktop-line(href="#{ owner_app_url }") List Your Car
                 span.desktop-line |
                 a.desktop-line(href="#{ login_url }") Join
 
               p.bold.mobile-line
-                a(href="#{ add_car_form }") List Your Car
+                a(href="#{ owner_app_url }") List Your Car
                 span |
                 a(href="#{ login_url }") Join
 
@@ -78,7 +78,7 @@ html(lang="en", ng-app="app")
               p.bold #[a(href="/") Home]
               p.bold #[a(href="/about") About Us]
               p.bold #[a(href="/#tutorial") How it Works]
-              p.bold #[a(href="#{ add_car_form }") List Your Car]
+              p.bold #[a(href="#{ owner_app_url }") List Your Car]
               p.bold #[a(href="#{ login_url }") Join]
 
             .social

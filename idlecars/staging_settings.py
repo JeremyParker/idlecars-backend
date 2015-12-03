@@ -12,7 +12,8 @@ For details on the settings see settings.py
 # heap analytics tracking for staging
 HEAP_APP_ID = '1900221263'
 
-WEBAPP_URL = 'http://app.staging.idlecars.com'
+DRIVER_APP_URL = 'http://app.staging.idlecars.com'
+OWNER_APP_URL = 'http://owner.staging.idlecars.com'
 
 ALLOWED_HOSTS = ['staging.idlecars.com']
 SSLIFY_DISABLE = True
@@ -30,5 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 SMS_IMPLEMENTATION = 'TwilioRestClient'  # we're rockin' the real client with test creds.
 
 QUEUE_IMPLEMENTATION = 'RealQueue'
+
+TLC_DATA_IMPLEMENTATION = 'Socrata'
 
 PAYMENT_GATEWAY_NAME = 'braintree'

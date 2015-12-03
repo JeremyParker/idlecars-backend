@@ -25,3 +25,4 @@ mock==1.0.1
 braintree==3.19.0
 freezegun==0.3.5
 twilio==4.7.0
+sodapy==0.1.6

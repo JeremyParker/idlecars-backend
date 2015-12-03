@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
 
-from idlecars import client_side_routes, fields
+from idlecars import app_routes_driver, fields
 from server.models import Car, Owner
 from server.fields import CarColorField
 from server.services import car_helpers, booking as booking_service
@@ -17,15 +17,11 @@ class CarCreateSerializer(ModelSerializer):
     insurance = SerializerMethodField()
     listing_link = SerializerMethodField()
     available_date_display = SerializerMethodField()
+    min_lease_display = SerializerMethodField()
 
     next_available_date = fields.DateArrayField(required=False, allow_null=True,)
     interior_color = CarColorField(required=False, allow_null=True,)
     exterior_color = CarColorField(required=False, allow_null=True,)
-    status = ChoiceField(
-        choices=Car.STATUS.keys(),
-        required=False,
-        allow_null=True,
-    )
 
     class Meta:
         model = Car
@@ -43,10 +39,10 @@ class CarCreateSerializer(ModelSerializer):
 
             'solo_cost',
             'solo_deposit',
-            'status',
             'next_available_date',
             'available_date_display',
             'min_lease',
+            'min_lease_display',
             'exterior_color',
             'interior_color',
             'last_known_mileage',
@@ -60,6 +56,7 @@ class CarCreateSerializer(ModelSerializer):
             'available_date_display',
             'state_string',
             'state_buttons',
+            'min_lease_display',
             # fields we get from the TLC
             'make_model',
             'year',
@@ -68,6 +65,8 @@ class CarCreateSerializer(ModelSerializer):
        )
 
     def get_name(self, obj):
+        if not obj.make_model:
+            return '{} Unknown Car'.format(obj.year)
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_state_string(self, obj):
@@ -82,15 +81,15 @@ class CarCreateSerializer(ModelSerializer):
         return None
 
     def get_listing_link(self, obj):
-        return client_side_routes.car_details_url(obj)
+        return app_routes_driver.car_details_url(obj)
 
     def get_available_date_display(self, obj):
-        if obj.status == 'busy':
-            if not obj.next_available_date:
-                return 'Unavailable'
-            elif obj.next_available_date > timezone.now().date():
-                return obj.next_available_date.strftime('%b %d')
-        return 'Immediately'
+        if not obj.next_available_date:
+            return 'Unavailable'
+        elif obj.next_available_date > timezone.now():
+            return obj.next_available_date.strftime('%b %d')
+        else:
+            return 'Immediately'
 
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
@@ -176,6 +175,12 @@ class CarCreateSerializer(ModelSerializer):
                     'function_key': 'RemoveListing',
                 }]
             }
+
+    def get_min_lease_display(self, obj):
+        days = obj.minimum_rental_days()
+        if not days:
+            return "No minimum set"
+        return '{} day'.format(days) + ('s' if days-1 else '')
 
 
 class CarSerializer(CarCreateSerializer):

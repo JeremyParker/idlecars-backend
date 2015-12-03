@@ -17,19 +17,10 @@ class TestCarSerializer(TestCase):
         self.assertTrue(car.make_model.make in serializers.CarSerializer(car).data['name'])
         self.assertTrue(car.make_model.model in serializers.CarSerializer(car).data['name'])
 
-    def test_available_immediately2(self):
-        car = factories.Car.create(
-            status='available',
-        )
-        self.assertEqual(
-            serializers.CarSerializer(car).data['available_date_display'],
-            'Immediately',
-        )
-
     def test_available_immediately(self):
         car = factories.Car.create(
             status='busy',
-            next_available_date=timezone.now().date() - datetime.timedelta(days=1),
+            next_available_date=timezone.now() - datetime.timedelta(days=1),
         )
         self.assertEqual(
             serializers.CarSerializer(car).data['available_date_display'],
@@ -39,7 +30,7 @@ class TestCarSerializer(TestCase):
     def test_available_tomorrow(self):
         car = factories.Car.create(
             status='busy',
-            next_available_date=timezone.now().date() + datetime.timedelta(days=1),
+            next_available_date=timezone.now() + datetime.timedelta(days=1),
         )
         self.assertEqual(
             serializers.CarSerializer(car).data['available_date_display'],
@@ -141,3 +132,11 @@ class TextCarState(TestCase):
         #         'cta_string': None,
         #         'cta_key': None,
         #     }
+
+    def test_min_lease_unknown(self):
+        car = factories.Car.create(min_lease='_00_unknown')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], 'No minimum set')
+
+    def test_min_lease_30(self):
+        car = factories.Car.create(min_lease='_05_one_month')
+        self.assertEqual(serializers.CarSerializer(car).data['min_lease_display'], '30 days')

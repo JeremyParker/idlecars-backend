@@ -6,7 +6,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from idlecars import email, client_side_routes
+from idlecars import email, app_routes_driver, app_routes_owner
 from server.services import car as car_service
 
 from owner_crm.models import notification
@@ -15,7 +15,7 @@ from owner_crm.models import notification
 def _get_car_listing_links(owner):
     links = ''
     for car in car_service.filter_live(owner.cars.all()):
-        car_url = client_side_routes.car_details_url(car)
+        car_url = app_routes_driver.car_details_url(car)
         links = links + '<li><a href={}>\n\t{}\n</A>\n'.format(car_url, car_url)
     return links
 
@@ -362,7 +362,7 @@ class AccountCreated(notification.OwnerNotification):
     def get_context(self, **kwargs):
         return {
             'FNAME': kwargs['password_reset_user_first_name'] or None,
-            'CTA_URL': kwargs['password_owner_reset_url'],
+            'CTA_URL': kwargs['owner_password_reset_url'],
             'template_name': 'owner_account_invite',
             'subject': 'Complete your account today - sign up with your bank account and start getting paid',
         }
@@ -377,10 +377,10 @@ ignore this message. Otherwise, you can reset your password using this link: '
             'HEADLINE': 'Reset your password',
             'TEXT': text,
             'CTA_LABEL': 'Reset password',
-            'CTA_URL': kwargs['password_reset_url'],
+            'CTA_URL': kwargs['owner_password_reset_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Reset your password on idlecars.',
-            'sms_body': text + kwargs['password_reset_url'],
+            'subject': 'Reset your idlecars password.',
+            'sms_body': text + kwargs['owner_password_reset_url'],
         }
 
 
@@ -423,7 +423,7 @@ class BankAccountApproved(notification.OwnerNotification):
             'HEADLINE': 'Your bank account has been approved',
             'TEXT': text,
             'CTA_LABEL': 'List more cars',
-            'CTA_URL': client_side_routes.add_car_form(),
+            'CTA_URL': app_routes_owner.owner_app_url(),
             'template_name': 'one_button_no_image',
             'subject': 'Your bank account has been approved.',
         }
