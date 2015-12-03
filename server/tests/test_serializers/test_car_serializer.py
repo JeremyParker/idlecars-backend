@@ -65,18 +65,16 @@ class TextCarState(TestCase):
         self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Complete this listing')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoRequiredField')
 
-    # def test_busy_next_available(self):
-    #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
-    #     car = factories.ClaimedCar.create(
-    #         status=Car.STATUS_BUSY,
-    #         next_available_date=tomorrow,
-    #     )
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertTrue('Busy until' in serializer_data['state_string'])
-    #     self.assertEqual(serializer_data['state_cta_string'], 'Change available date')
-    #     self.assertEqual(serializer_data['state_cta_key'], 'GoNextAvailableDate')
+    def test_available_tomorrow(self):
+        tomorrow = timezone.now().date() + datetime.timedelta(days=1)
+        car = factories.ClaimedCar.create(next_available_date=tomorrow)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertTrue('Busy until' in serializer_data['state_string'])
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Change available date')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoNextAvailableDate')
 
-    # def test_busy_not_available(self):
+    # def test_rented_elsewhere(self):
     #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
     #     car = factories.ClaimedCar.create(
     #         status=Car.STATUS_BUSY,
