@@ -96,72 +96,80 @@ class TextCarState(TestCase):
         self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
 
-    # def test_available_tomorrow(self):
-    #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
-    #     car = factories.ClaimedCar.create(next_available_date=tomorrow)
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertTrue('Busy until' in serializer_data['state_string'])
-    #     self.assertEqual(1, len(serializer_data['state_buttons']))
-    #     self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Change available date')
-    #     self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoNextAvailableDate')
+    def test_reserved(self):
+        car = factories.BookableCar.create()
+        booking = factories.RequestedBooking.create(car=car)
 
-    # def test_rented_elsewhere(self):
-    #     tomorrow = timezone.now().date() + datetime.timedelta(days=1)
-    #     car = factories.ClaimedCar.create(
-    #         status=Car.STATUS_BUSY,
-    #         next_available_date=None,
-    #     )
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertEqual(serializer_data['state_string'], 'Not listed')
-    #     self.assertEqual(serializer_data['state_cta_string'], 'Relist')
-    #     self.assertEqual(serializer_data['state_cta_key'], 'GoNextAvailableDate')
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Booked. Waiting for insurance approval.')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        # TODO - hook up an API for approving/rejecting insurance, and put these buttons in to access it.
+        # self.assertEqual(serializer_data['state_buttons'][0]['label'], 'The driver is approved')
+        # self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'ApproveInsurance')
+        # self.assertEqual(serializer_data['state_buttons'][1]['label'], 'The driver was rejected from the insurance')
+        # self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RejectInsurance')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'This car is no longer available')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RemoveListing')
 
-    # def test_bank_pending(self):
-    #     owner = factories.PendingOwner.create()
-    #     car = factories.ClaimedCar.create(
-    #         owner=owner,
-    #         status=Car.STATUS_AVAILABLE,
-    #     )
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertEqual(serializer_data['state_string'], 'Waiting for bank approval')
-    #     self.assertEqual(serializer_data['state_cta_string'], 'Remove listing')
-    #     self.assertEqual(serializer_data['state_cta_key'], 'RemoveListing')
+    def test_accepted(self):
+        car = factories.BookableCar.create()
+        booking = factories.AcceptedBooking.create(car=car)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Booked. The driver will contact you to arrange pickup.')
+        self.assertEqual(0, len(serializer_data['state_buttons']))
 
-    # def test_bank_approved(self):
-    #     car = factories.BookableCar.create()
-    #     serializer_data = serializers.CarSerializer(car).data
-    #     self.assertEqual(serializer_data['state_string'], 'Listed')
-    #     self.assertEqual(serializer_data['state_cta_string'], 'Remove listing')
-    #     self.assertEqual(serializer_data['state_cta_key'], 'RemoveListing')
+    def test_active_booking(self):
+        car = factories.BookableCar.create()
+        end_time = timezone.now() + datetime.timedelta(days=7)
+        booking = factories.BookedBooking.create(car=car, end_time=end_time)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Rented until {}'.format(end_time.strftime('%b %d')))
+        self.assertEqual(0, len(serializer_data['state_buttons']))
 
-        # elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
-        #     return {
-        #         'string': 'Waiting for bank approval',
-        #         'cta_string': 'Remove listing',
-        #         'cta_key': 'RemoveListing',
-        #     }
-        # elif booking_service.filter_reserved(car.booking_set.all()):
-        #     return {
-        #         'string': 'Waiting for insurance approval',
-        #         'cta_string': '',#'The driver is approved',
-        #         'cta_key': '',#'ApproveInsurance',
-        #     }
-        # elif booking_service.filter_accepted(car.booking_set.all()):
-        #     return {
-        #         'string': 'Ready to be picked up',
-        #         'cta_string': '',#'Contact the driver',
-        #         'cta_key': '',#'ContactDriver',
-        #     }
-        # elif booking_service.filter_active(car.booking_set.all()):
-        #     b = booking_service.filter_active(car.booking_set.all()).first()
-        #     return {
-        #         'string': 'Rented until'.format(b.end_date.strftime('%b %d')),
-        #         'cta_string': '',#'Contact the driver',
-        #         'cta_key': '',#'ContactDriver',
-        #     }
-        # else:
-        #     return {
-        #         'string': None,
-        #         'cta_string': None,
-        #         'cta_key': None,
-        #     }
+    def test_busy(self):
+        car = factories.BookableCar.create(next_available_date=None)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Not listed.')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
+
+    def test_stale(self):
+        car = factories.BookableCar.create(
+            last_status_update=timezone.now() - datetime.timedelta(days=90)
+        )
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Listing expired.')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Extend this listing')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RenewListing')
+
+    def test_available_way_future(self):
+        future = timezone.now() + datetime.timedelta(days=90)
+        car = factories.BookableCar.create(next_available_date=future)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(
+            'Not listed. Busy until {}.'.format(future.strftime('%b %d')),
+            serializer_data['state_string']
+        )
+        self.assertEqual(2, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
+        self.assertEqual(serializer_data['state_buttons'][1]['label'], 'Change availability')
+        self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'GoNextAvailableDate')
+
+    def test_available_tomorrow(self):
+        tomorrow = timezone.now() + datetime.timedelta(days=1)
+        car = factories.BookableCar.create(next_available_date=tomorrow)
+        serializer_data = serializers.CarSerializer(car).data
+
+        expiration_date = car.last_status_update + datetime.timedelta(days=3) # TODO: staleness length comes from config somewhere
+        self.assertEqual(
+            'Listed. This listing expires {}'.format(expiration_date.strftime('%b %d')),
+            serializer_data['state_string']
+        )
+        self.assertEqual(2, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Extend this listing')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RenewListing')
+        self.assertEqual(serializer_data['state_buttons'][1]['label'], 'Remove listing')
+        self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RemoveListing')

@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.utils import timezone
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
 
@@ -132,63 +134,98 @@ class CarCreateSerializer(ModelSerializer):
                         'function_key': 'Relist',
                     }]
                 }
-        # elif car.next_available_date:
-        #         return {
-        #             'state_string': 'Busy until {}'.format(car.next_available_date.strftime('%b %d')),
-        #             'buttons': [{
-        #                 'label': 'Change available date',
-        #                 'function_key': 'GoNextAvailableDate',
-        #             }]
-        #         }
-        #     else:
-        #         return {
-        #             'state_string': 'Not listed',
-        #             'buttons': [{
-        #                 'label': 'Relist',
-        #                 'function_key': 'GoNextAvailableDate',
-        #             }]
-        #         }
-        # elif booking_service.filter_reserved(car.booking_set.all()):
-        #     return {
-        #         'state_string': 'Waiting for insurance approval',
-        #         'buttons': [{
-        #             'label': '',#'The driver is approved',
-        #             'function_key': '',#'ApproveInsurance',
-        #         }]
-        #     }
-        # elif booking_service.filter_accepted(car.booking_set.all()):
-        #     return {
-        #         'state_string': 'Ready to be picked up',
-        #         'buttons': [{
-        #             'label': '',#'Contact the driver',
-        #             'function_key': '',#'ContactDriver',
-        #         }]
-        #     }
-        # elif booking_service.filter_active(car.booking_set.all()):
-        #     b = booking_service.filter_active(car.booking_set.all()).first()
-        #     return {
-        #         'state_string': 'Rented until'.format(b.end_date.strftime('%b %d')),
-        #         'buttons': [{
-        #             'label': '',#'Contact the driver',
-        #             'function_key': '',#'ContactDriver',
-        #         }]
-        #     }
-        # elif car_helpers.is_stale(car):
-        #     return {
-        #         'state_string': 'Listing expired',
-        #         'buttons': [{
-        #             'label': 'Extend listing',
-        #             'function_key': 'ExtendListing',
-        #         }]
-        #     }
-        # else:
-        #     return {
-        #         'state_string': 'Listed',
-        #         'buttons': [{
-        #             'label': 'Remove listing',
-        #             'function_key': 'RemoveListing',
-        #         }]
-        #     }
+        elif booking_service.filter_requested(car.booking_set.all()):
+            return {
+                'state_string': 'Booked. Waiting for insurance approval.',
+                'buttons': [
+                    # {
+                    #     'label': 'The driver is approved',
+                    #     'function_key': 'ApproveInsurance',
+                    # },
+                    # {
+                    #     'label': 'The driver was rejected from the insurance',
+                    #     'function_key': 'RejectInsurance',
+                    # },
+                    {
+                        'label': 'This car is no longer available',
+                        'function_key': 'RemoveListing',
+                    },
+                ]
+            }
+        elif booking_service.filter_accepted(car.booking_set.all()):
+            return {
+                'state_string': 'Booked. The driver will contact you to arrange pickup.',
+                'buttons': [
+                # {
+                    # TODO
+                    # 'label': 'Contact the driver',
+                    # 'function_key': 'ContactDriver',
+                # }
+                ]
+            }
+        elif booking_service.filter_active(car.booking_set.all()):
+            b = booking_service.filter_active(car.booking_set.all()).first()
+            return {
+                'state_string': 'Rented until {}'.format(b.end_time.strftime('%b %d')),
+                'buttons': [
+                # {
+                    # TODO
+                    # 'label': 'Contact the driver',
+                    # 'function_key': 'ContactDriver',
+                # }
+                ]
+            }
+        elif not car.next_available_date:
+            return {
+                'state_string': 'Not listed.',
+                'buttons': [{
+                    'label': 'List this car',
+                    'function_key': 'Relist',
+                }]
+            }
+        elif car_helpers.is_stale(car):
+            return {
+                'state_string': 'Listing expired.',
+                'buttons': [
+                    {
+                        'label': 'Extend this listing',
+                        'function_key': 'RenewListing',
+                    }
+                ]
+            }
+        elif car.next_available_date > car_helpers.next_available_date_threshold:
+            # NOTE: This should result in the same logic as car_helpers.filter_bookable()
+                return {
+                    'state_string': 'Not listed. Busy until {}.'.format(car.next_available_date.strftime('%b %d')),
+                    'buttons': [
+                        {
+                            'label': 'List this car',
+                            'function_key': 'Relist',
+                        },
+                        {
+                            'label': 'Change availability',
+                            'function_key': 'GoNextAvailableDate',
+                    }
+                    ]
+                }
+        else:
+            # TODO: staleness threshold comes from config somewhere
+            listing_expiration_date = car.last_status_update + datetime.timedelta(days=3)
+            return {
+                'state_string': 'Listed. This listing expires {}'.format(
+                    listing_expiration_date.strftime('%b %d')
+                ),
+                'buttons': [
+                    {
+                        'label': 'Extend this listing',
+                        'function_key': 'RenewListing',
+                    },
+                    {
+                        'label': 'Remove listing',
+                        'function_key': 'RemoveListing',
+                    }
+                ]
+            }
 
 
 class CarSerializer(CarCreateSerializer):
