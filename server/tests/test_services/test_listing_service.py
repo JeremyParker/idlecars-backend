@@ -5,6 +5,7 @@ import datetime
 
 from django.utils import timezone
 from django.test import TestCase
+from django.conf import settings
 
 from server.services import car_helpers
 from server.services import car as car_service
@@ -70,8 +71,8 @@ class ListingTest(TestCase):
         self.assertEqual(len(_get_listing_queryset()), 1)
 
     def test_car_filtered_if_stale(self):
-        ''' verify that a car is not listed when we haven't talked to the owner in a week'''
-        self.car.last_status_update = timezone.now() - datetime.timedelta(days=7)
+        ''' verify that a car is not listed when we haven't heard from the owner in a long time'''
+        self.car.last_status_update = timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT + 1)
         self.car.save()
         self.assertEqual(len(_get_listing_queryset()), 0)
 
