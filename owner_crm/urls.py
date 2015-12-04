@@ -8,7 +8,6 @@ import idlecars.routers
 import views
 
 router = idlecars.routers.OptionalApiRootDefaultRouter()
-router.register(r'renewals', views.UpdateRenewalView, base_name='renewals')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

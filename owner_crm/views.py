@@ -91,12 +91,6 @@ class PasswordResetView(views.APIView):
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdateRenewalView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = models.Renewal.objects.all()
-    serializer_class = serializers.Renewal
-    lookup_field = 'token'
-
-
 def email_preview(request, pk):
     if not pk in sample_merge_vars.merge_vars:
         raise Http404('That email template doesn\'t exist.')

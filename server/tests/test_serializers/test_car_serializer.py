@@ -144,7 +144,7 @@ class TextCarState(TestCase):
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Listing expired.')
         self.assertEqual(2, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Extend this listing')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Renew this listing')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RenewListing')
         self.assertEqual(serializer_data['state_buttons'][1]['label'], 'Remove listing')
         self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RemoveListing')

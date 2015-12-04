@@ -12,7 +12,7 @@ from owner_crm.models import Campaign, owner_notifications
 from owner_crm import factories as crm_factories
 
 from server import factories as server_factories
-from idlecars import sms_service, app_routes_driver
+from idlecars import sms_service, app_routes_driver, app_routes_owner
 
 
 class OwnerNotificationTest(TestCase):
@@ -21,18 +21,17 @@ class OwnerNotificationTest(TestCase):
 
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
-        car = server_factories.BookableCar.create(solo_cost=500)
-        self.requested_booking = server_factories.RequestedBooking.create(car=car)
-        self.booked_booking = server_factories.BookedBooking.create(car=car)
+        self.car = server_factories.BookableCar.create(solo_cost=500)
+        self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
+        self.booked_booking = server_factories.BookedBooking.create(car=self.car)
 
-        self.renewal = crm_factories.Renewal.create(car=car)
         self.password_reset = crm_factories.PasswordReset.create(
             auth_user=self.bank_account_owner.auth_users.first()
         )
 
         self.settled_payment = server_factories.SettledPayment.create(
             booking=self.booked_booking,
-            amount=car.solo_cost,
+            amount=self.car.solo_cost,
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7),
         )
@@ -41,8 +40,8 @@ class OwnerNotificationTest(TestCase):
 
         self.notification_spec = {
             'RenewalEmail': {
-                'argument': 'renewal',
-                'sms_result': app_routes_driver.renewal_url(self.renewal),
+                'argument': 'car',
+                'sms_result': app_routes_owner.car_details_url(self.car),
                 'email_result': 'expire',
             },
             'NewBookingEmail': {
