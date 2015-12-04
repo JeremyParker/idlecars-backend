@@ -16,6 +16,11 @@ class OwnsBooking(permissions.BasePermission):
         return request.user == obj.driver.auth_user
 
 
+class IsBookingCarOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, booking):
+        return request.user in booking.car.owner.auth_users.all()
+
+
 class OwnsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.auth_users.all()

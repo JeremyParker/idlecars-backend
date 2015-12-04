@@ -236,11 +236,12 @@ class CarUpdateTest(CarAPITest):
         new_car_data = self.client.get(url).data
 
         for field in other_car_data.keys():
+            new_car.last_status_update = timezone.now() - datetime.timedelta(days=2) # not now
+
             # print field # - uncomment this to debug this unit test
             original_value = new_car_data.get(field, '1')
             other_value = other_car_data.get(field, '2')
 
-            print field
             # try to set the new_car's field to the exising_car's field
             response = self.client.patch(url, {field: other_value}, format='json')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -252,3 +253,17 @@ class CarUpdateTest(CarAPITest):
             else:
                 # values changed for the writable fields
                 self.assertEqual(current_value, other_value)
+                # last_status_update should have updated too
+                new_car.refresh_from_db()
+                self.assertEqual(new_car.last_status_update.date(), timezone.now().date())
+
+
+class CarListingExtensionTest(CarAPITest):
+    def test_extend_listing(self):
+        self.car.last_status_update = timezone.now() - datetime.timedelta(days=5)
+        self.car.save()
+        url = reverse('server:cars-extension', args=(self.car.pk,))
+        response = self.client.post(url, format='json')
+        self.car.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.car.last_status_update.date(), timezone.now().date())
