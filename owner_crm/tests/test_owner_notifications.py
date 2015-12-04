@@ -81,7 +81,7 @@ class TestOwnerNotifications(TestCase):
 
         # if we sent them a message last time it was about to go stale, we message them again
         msg_record = owner_crm.models.Message.objects.get(car=car)
-        msg_record.created_time = timezone.now() - datetime.timedelta(days=5)
+        msg_record.created_time = timezone.now() - timedelta(days=5)
         msg_record.save()
         owner_service._renewal_email()
         self.assertEqual(len(outbox), 2)
