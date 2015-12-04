@@ -132,7 +132,7 @@ class OwnerNotificationTest(TestCase):
                     campaign.preferred_medium = Campaign.SMS_MEDIUM
                     campaign.save()
 
-                    print 'sms: ' + campaign_name
+                    # print 'sms: ' + campaign_name
                     notification.send(campaign_name, argument)
 
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
