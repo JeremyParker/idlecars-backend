@@ -193,6 +193,10 @@ class CarCreateSerializer(ModelSerializer):
                     {
                         'label': 'Extend this listing',
                         'function_key': 'RenewListing',
+                    },
+                    {
+                        'label': 'Remove listing',
+                        'function_key': 'RemoveListing',
                     }
                 ]
             }
@@ -215,22 +219,22 @@ class CarCreateSerializer(ModelSerializer):
             listing_expiration_date = car.last_status_update + datetime.timedelta(
                 days=settings.STALENESS_LIMIT
             )
-            return {
+            result = {
                 'state_string': 'Listed. This listing expires {}'.format(
                     listing_expiration_date.strftime('%b %d')
                 ),
-                'buttons': [
-                    {
-                        'label': 'Extend this listing',
-                        'function_key': 'RenewListing',
-                    },
-                    {
-                        'label': 'Remove listing',
-                        'function_key': 'RemoveListing',
-                    }
-                ]
+                'buttons': [{
+                    'label': 'Remove listing',
+                    'function_key': 'RemoveListing',
+                }]
             }
-
+            # if the last update time was more than two hours ago, let them refresh it again
+            if car.last_status_update < timezone.now() - datetime.timedelta(hours=2):
+                result['buttons'].insert(0, {
+                    'label': 'Extend this listing',
+                    'function_key': 'RenewListing',
+                })
+            return result
 
 class CarSerializer(CarCreateSerializer):
     class Meta(CarCreateSerializer.Meta):
