@@ -12,8 +12,8 @@ class CarCreateTest(TestCase):
         self.owner = factories.BankAccountOwner.create(state_code='NY')
         self.plate = 'A REAL PLATE'
 
-        # note: this `Toyota Sienna` MakeModel depends on the fake data we got from tlc lookup
-        self.make_model = factories.MakeModel.create(make='Toyota', model="Sienna")
+        # note: this MakeModel depends on the fake data we got from tlc lookup
+        self.make_model = factories.MakeModel.create(make='Chevrolet', model="Camaro")
 
     def test_create_success(self):
         new_car = car_service.create_car(self.owner, self.plate)
