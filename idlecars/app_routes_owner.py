@@ -10,3 +10,7 @@ def password_reset(password_reset):
 
 def owner_app_url():
     return settings.OWNER_APP_URL
+
+def car_details_url(car):
+    parts = (settings.OWNER_APP_URL, '#', 'cars', unicode(car.id))
+    return '/'.join(parts)

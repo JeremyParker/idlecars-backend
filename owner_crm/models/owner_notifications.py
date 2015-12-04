@@ -37,13 +37,14 @@ class RenewalEmail(notification.OwnerNotification):
             'FNAME': kwargs.get('user_first_name', None),
             'HEADLINE': 'Your {} listing is about to expire'.format(kwargs['car_name']),
             'TEXT': body,
-            'CTA_LABEL': 'Renew Listing Now',
-            'CTA_URL': kwargs['renewal_url'],
+            'CTA_LABEL': 'Update Listing Now',
+            'CTA_URL': kwargs['car_owner_details_url'],
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Your {} listing is about to expire.'.format(kwargs['car_name']),
-            'sms_body': 'Is your {} with license plate {} still available? If it is, please tap \
-here to let us know: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['renewal_url'])
+            'sms_body': 'The listing for your {} with license plate {} is about to expire. \
+Is it still available? Please tap here to extend or remove your \
+listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_details_url'])
         }
         return context
 
@@ -309,7 +310,7 @@ already re-listed your car on the site so we can find you another driver as soon
             'HEADLINE': headline,
             'TEXT': text,
             'CTA_LABEL': 'See your listing',
-            'CTA_URL': kwargs['car_details_url'],
+            'CTA_URL': kwargs['car_driver_details_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
             'sms_body': text,
@@ -334,7 +335,7 @@ We\'ve already re-listed your car on the site so we can find you another driver 
             'HEADLINE': headline,
             'TEXT': text,
             'CTA_LABEL': 'See your listing',
-            'CTA_URL': kwargs['car_details_url'],
+            'CTA_URL': kwargs['car_driver_details_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
             'sms_body': text,

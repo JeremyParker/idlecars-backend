@@ -59,11 +59,10 @@ class TestOwnerNotifications(TestCase):
             email = message.merge_vars.keys()[0]
             user = User.objects.get(email=email)
             car = server.models.Owner.objects.get(auth_users=user).cars.all()[0]
-            renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
-            self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
-            self.assertEqual(var['CTA_URL'], idlecars.app_routes_driver.renewal_url(renewal))
+            self.assertEqual(var['CTA_LABEL'], 'Update Listing Now')
+            self.assertEqual(var['CTA_URL'], idlecars.app_routes_owner.car_details_url(car))
             self.assertEqual(var['FNAME'], user.first_name)
             self.assertTrue(car.plate in var['TEXT'])
             self.assertTrue(car.display_name() in var['TEXT'])
