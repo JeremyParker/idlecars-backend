@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from owner_crm.services import password_reset_service, throttle_service, notification
-from owner_crm.models import Renewal, driver_notifications, owner_notifications, ops_notifications
+from owner_crm.models import driver_notifications, owner_notifications, ops_notifications
 
 from server.models import Booking, Owner
 from server.services import auth_user as auth_user_service
@@ -22,20 +22,24 @@ from server import payment_gateways
 #TODO: poke_frequency should be from setting, or config
 POKE_FREQUENCY = 60 #minutes
 
+STALENESS_WARNING_HOURS = 2 # we let owners know a few hours before their cars are stale
 
 def _renewable_cars():
-    # TODO - optimize this query
-    oustanding_renewal_cars = [r.car.id for r in Renewal.objects.filter(state=Renewal.STATE_PENDING)]
     return car_service.get_stale_within(
-        minutes_until_stale=60 * 2,
-    ).exclude(
-        id__in = oustanding_renewal_cars,
+        minutes_until_stale=60 * STALENESS_WARNING_HOURS,
     )
 
 
 def _renewal_email():
-    for car in _renewable_cars():
+    throttle_key = 'RenewalEmail'
+    throttled_renewable_cars = throttle_service.throttle(
+        _renewable_cars(),
+        throttle_key,
+        hours=STALENESS_WARNING_HOURS + 1, # by this time cars will be renewed or stale
+    )
+    for car in throttled_renewable_cars:
         notification.send('owner_notifications.RenewalEmail', car)
+    throttle_service.mark_sent(throttled_renewable_cars, throttle_key)
 
 
 def _within_minutes_of_local_time(minutes, target_time):

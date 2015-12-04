@@ -5,6 +5,7 @@ import sys
 
 from owner_crm.models import Message
 
+
 def get_booking_kwargs(obj):
     return {
         'car': obj.car,
@@ -16,6 +17,10 @@ def get_booking_kwargs(obj):
 
 def get_driver_kwargs(obj):
     return { 'driver': obj, }
+
+
+def get_car_kwargs(obj):
+    return { 'car': obj, }
 
 
 def log_message(campaign_name, key_obj):

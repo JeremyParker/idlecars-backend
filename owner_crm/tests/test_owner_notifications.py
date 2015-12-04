@@ -68,14 +68,23 @@ class TestOwnerNotifications(TestCase):
             self.assertTrue(car.display_name() in var['TEXT'])
 
     def test_renewable_cars(self):
-        '''
-        Make sure cars that have an outstanding renewal token don't get included
-        '''
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        owner_crm.models.Renewal.objects.create(car=car, pk=666)
+        owner_service._renewal_email()
 
-        self.assertFalse(owner_service._renewable_cars())
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1) # we sent an email about this car
+
+        # Make sure the car that we just emailed about don't get a second email
+        owner_service._renewal_email()
+        self.assertEqual(len(outbox), 1)
+
+        # if we sent them a message last time it was about to go stale, we message them again
+        msg_record = owner_crm.models.Message.objects.get(car=car)
+        msg_record.created_time = timezone.now() - datetime.timedelta(days=5)
+        msg_record.save()
+        owner_service._renewal_email()
+        self.assertEqual(len(outbox), 2)
 
     def _new_requested_booking(self, create_time):
         with freeze_time(create_time):

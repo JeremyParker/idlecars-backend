@@ -26,7 +26,6 @@ class E2ETestSetup():
     def perform(self):
         self._truncate_tables()
         self._setup_cars()
-        self._setup_renewals()
         self._setup_user()
         self._setup_drivers()
         self._setup_booking()
@@ -70,12 +69,6 @@ class E2ETestSetup():
 
         for i in xrange(2):
             server.factories.BookableCar.create()
-
-    def _setup_renewals(self):
-        '''
-            Create a renewal
-        '''
-        owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
 
     def _setup_booking(self):
         '''

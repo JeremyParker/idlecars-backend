@@ -188,7 +188,7 @@ class CarCreateSerializer(ModelSerializer):
                 'state_string': 'Listing expired.',
                 'buttons': [
                     {
-                        'label': 'Extend this listing',
+                        'label': 'Renew this listing',
                         'function_key': 'RenewListing',
                     },
                     {
