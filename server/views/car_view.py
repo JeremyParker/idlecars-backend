@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import detail_route
 
 from server.models import Car, Owner
 from server.services import car as car_service
@@ -68,5 +69,14 @@ class CarViewSet(
         to date. Otherwise they would have changed it. We're overriding this method to set
         the last status update time to now.
         '''
-        serializer.validated_data.update({'last_status_update': timezone.localtime(timezone.now())})
+        serializer.validated_data.update({'last_status_update': timezone.now()})
         super(CarViewSet, self).perform_update(serializer)
+
+    @detail_route(methods=['post'], permission_classes=[OwnsCar])
+    def extension(self, request, pk=None):
+        car = self.get_object()
+        car.last_status_update = timezone.now()
+        car.save()
+        data = self.get_serializer(car).data
+        data.update({'_app_notifications': [{'success': 'Your listing has been extended'},],})
+        return Response(data, status.HTTP_201_CREATED)

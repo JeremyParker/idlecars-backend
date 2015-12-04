@@ -256,3 +256,14 @@ class CarUpdateTest(CarAPITest):
                 # last_status_update should have updated too
                 new_car.refresh_from_db()
                 self.assertEqual(new_car.last_status_update.date(), timezone.now().date())
+
+
+class CarListingExtensionTest(CarAPITest):
+    def test_extend_listing(self):
+        self.car.last_status_update = timezone.now() - datetime.timedelta(days=5)
+        self.car.save()
+        url = reverse('server:cars-extension', args=(self.car.pk,))
+        response = self.client.post(url, format='json')
+        self.car.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.car.last_status_update.date(), timezone.now().date())
