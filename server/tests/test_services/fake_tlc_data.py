@@ -23,7 +23,7 @@ next_fhv_response = {
     'permit_license_number': 'AA291',
     'reason': 'G',
     'vehicle_license_number': '5536406',
-    'vehicle_vin_number': '5TDKK3DC8ES411904',
+    'vehicle_vin_number': '2G1FC3D33C9165616',
     'vehicle_year': '2014',
     'wheelchair_accessible': 'WAV',
 }
@@ -36,7 +36,7 @@ next_insurance_response = {
     'tlc_license_number': '5330345',
     'tlc_license_type': 'TLCCAR',
     'vehicle_owner_name': 'SAFETY TRANSPORTATION COPR                                  ',
-    'vin': '1LNHM81WX5Y670250             '
+    'vin': '2G1FC3D33C9165616             '
 }
 
 
