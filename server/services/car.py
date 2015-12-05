@@ -84,3 +84,20 @@ def create_car(owner, plate):
     car.owner = owner
     car.save()
     return car
+
+def pre_save(modified_car, orig):
+    if orig.next_available_date != modified_car.next_available_date:
+        modified_car.last_status_update = timezone.now()
+
+    if orig.last_known_mileage != modified_car.last_known_mileage:
+        modified_car.last_mileage_update = timezone.now()
+
+    # if we're setting the cost for the first time, set a default solo deposit
+    if modified_car.solo_cost and not orig.solo_cost:
+        if not orig.solo_deposit and not modified_car.solo_deposit:
+            modified_car.solo_deposit = modified_car.solo_cost / 4
+
+    # if we're setting the car to unavailable, cancel any oustanding bookings
+    if orig.next_available_date and not modified_car.next_available_date:
+        from . import booking as booking_service
+        booking_service.on_car_missed(modified_car)

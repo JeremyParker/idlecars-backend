@@ -94,6 +94,16 @@ def filter_visible(booking_queryset):
     return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
 
 
+def on_car_missed(car):
+    # cancel other bookings on this car
+    conflicting_bookings = []
+    conflicting_bookings.extend(filter_pending(Booking.objects.filter(car=car)))
+    conflicting_bookings.extend(filter_reserved(Booking.objects.filter(car=car)))
+    conflicting_bookings.extend(filter_requested(Booking.objects.filter(car=car)))
+    for conflicting_booking in conflicting_bookings:
+        _make_booking_incomplete(conflicting_booking, Booking.REASON_MISSED)
+
+
 def on_docs_approved(driver):
     if not driver.base_letter:
         bookings = Booking.objects.filter(driver=driver)
