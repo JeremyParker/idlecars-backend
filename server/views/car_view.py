@@ -44,8 +44,8 @@ class CarViewSet(
             'insurance',
             'make_model',
         )
-        if self.action == 'list': # TODO - make sure nobody else can edit or see my car
-            return queryset.filter(owner=owner)
+        if self.action == 'list':
+            return queryset.filter(owner=owner).exclude(plate='')
         return queryset
 
     def create(self, request, *args, **kwargs):
