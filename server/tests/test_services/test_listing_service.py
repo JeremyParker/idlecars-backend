@@ -26,6 +26,10 @@ class ListingTest(TestCase):
             hybrid=True,
         )
 
+    def test_data_complete(self):
+        self.car.solo_deposit = 0
+        self.assertTrue(car_helpers.is_data_complete(self.car))
+
     def test_car_filtered_if_booking_in_progress(self):
         factories.ReservedBooking.create(car=self.car)
         self.assertEqual(len(_get_listing_queryset()), 0)

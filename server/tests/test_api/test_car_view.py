@@ -76,6 +76,13 @@ class CarListTest(CarAPITest):
         self.assertEqual(response.data[0]['plate'], self.car.plate)
         self.assertFalse(other_car.plate in [c['plate'] for c in response.data])
 
+    def test_list_omits_blank_plate_cars(self):
+        self.car.plate = ''
+        self.car.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
 
 class CarDetailsTest(CarAPITest):
     def setUp(self):

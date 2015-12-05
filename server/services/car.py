@@ -101,3 +101,8 @@ def pre_save(modified_car, orig):
     if orig.next_available_date and not modified_car.next_available_date:
         from . import booking as booking_service
         booking_service.on_car_missed(modified_car)
+
+    # if an owner is deleting their car, treat it like a missed car.
+    if orig.owner and not modified_car.owner:
+        from . import booking as booking_service
+        booking_service.on_car_missed(modified_car)
