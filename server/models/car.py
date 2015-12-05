@@ -178,9 +178,7 @@ class Car(models.Model):
                 self.last_status_update = timezone.now()
         else:
             orig = Car.objects.get(pk=self.pk)  # TODO(JP): maybe use __class__ to be more flexible
-            if orig.next_available_date != self.next_available_date:
-                self.last_status_update = timezone.now()
-            if orig.last_known_mileage != self.last_known_mileage:
-                self.last_mileage_update = timezone.now()
+            from server.services import car as car_service
+            car_service.pre_save(self, orig)
 
         super(Car, self).save(*args, **kwargs)
