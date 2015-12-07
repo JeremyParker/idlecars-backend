@@ -25,12 +25,11 @@ class E2ETestSetup():
 
     def perform(self):
         self._truncate_tables()
-        self._setup_cars()
-        self._setup_renewals()
         self._setup_user()
-        self._setup_drivers()
-        self._setup_booking()
         self._setup_owner()
+        self._setup_drivers()
+        self._setup_cars()
+        self._setup_booking()
         self._reset_token()
 
     def _truncate_tables(self):
@@ -52,24 +51,32 @@ class E2ETestSetup():
         Token.objects.filter(user=self.user_without_docs).update(key='without_docs')
         Token.objects.filter(user=self.user_without_docs_approved).update(key='without_docs_approved')
 
-        Token.objects.filter(user=self.owner_user).update(key='owner')
-        PasswordReset.objects.filter(auth_user=self.owner_user).update(token='test')
+        Token.objects.filter(user=self.user_has_no_car).update(key='owner_has_no_car')
+        Token.objects.filter(user=self.user_has_one_car).update(key='owner_has_one_car')
+        Token.objects.filter(user=self.user_has_bank_link).update(key='owner_has_bank_link')
+        PasswordReset.objects.filter(auth_user=self.user_has_no_car).update(token='test')
 
     def _setup_cars(self):
         '''
             Create 4 cars (also creates 4 owners)
         '''
         dmc = server.factories.MakeModel.create(make='DMC', model='Delorean')
-        self.delorean = server.factories.BookableCar.create(make_model=dmc, year=1985)
+        self.delorean = server.factories.BookableCar.create(
+            make_model=dmc,
+            year=1985,
+            owner=self.owner_has_bank_link
+        )
 
         luxy = server.factories.MakeModel.create(make='Venus', model='Xtravaganza', lux_level=1)
-        server.factories.BookableCar.create(make_model=luxy)
+        server.factories.BookableCar.create(make_model=luxy, owner=self.owner_has_one_car)
 
         benz = server.factories.MakeModel.create(make='Benz', model='C350', lux_level=1)
         self.benz = server.factories.BookableCar.create(make_model=benz)
 
         for i in xrange(2):
             server.factories.BookableCar.create()
+
+        print self.delorean.id
 
     def _setup_renewals(self):
         '''
@@ -87,13 +94,25 @@ class E2ETestSetup():
 
     def _setup_user(self):
         '''
-            Create 6 users(1 staff user)
+            Create 7 users(1 staff user)
         '''
-        self.user_owner = server.factories.AuthUser.create(
+        self.user_has_one_car = server.factories.AuthUser.create(
             username='9876543210',
             email='craig@test.com',
             first_name='Craig',
             last_name='List'
+        )
+        self.user_has_no_car = server.factories.AuthUser.create(
+            username='9876543211',
+            email='will@test.com',
+            first_name='Will',
+            last_name='Second'
+        )
+        self.user_has_bank_link = server.factories.AuthUser.create(
+            username='9876543212',
+            email='jeremy@test.com',
+            first_name='Jeremy',
+            last_name='Parker'
         )
         self.user_without_booking = server.factories.AuthUser.create(
             username='1234567891',
@@ -124,9 +143,15 @@ class E2ETestSetup():
         '''
             Create an owner
         '''
-        owner = server.factories.Owner.create()
-        owner.auth_users.add(self.user_owner)
-        self.owner_user = owner_service.invite_legacy_owner(self.user_owner.username)
+        owner_has_no_car = server.factories.Owner.create()
+        owner_has_no_car.auth_users.add(self.user_has_no_car)
+
+        self.owner_has_one_car = server.factories.Owner.create()
+        self.owner_has_one_car.auth_users.add(self.user_has_one_car)
+
+        self.owner_has_bank_link = server.factories.BankAccountOwner.create()
+        self.owner_has_one_car.auth_users.add(self.user_has_bank_link)
+        print self.owner_has_bank_link.id
 
     def _setup_drivers(self):
         '''
