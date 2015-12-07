@@ -2,9 +2,11 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import detail_route
 
 from server.models import Car, Owner
 from server.services import car as car_service
@@ -43,7 +45,7 @@ class CarViewSet(
             'make_model',
         )
         if self.action == 'list':
-            return queryset.filter(owner=owner)
+            return queryset.filter(owner=owner).exclude(plate='')
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -59,3 +61,22 @@ class CarViewSet(
         plate = serializer.validated_data.get('plate').upper()
         new_car = car_service.create_car(owner, plate)
         serializer.instance = new_car
+
+    def perform_update(self, serializer):
+        '''
+        any time we update something on this car through this view, it means the owner
+        interacted with the car. From that we can conclude that the status of the car is up
+        to date. Otherwise they would have changed it. We're overriding this method to set
+        the last status update time to now.
+        '''
+        serializer.validated_data.update({'last_status_update': timezone.now()})
+        super(CarViewSet, self).perform_update(serializer)
+
+    @detail_route(methods=['post'], permission_classes=[OwnsCar])
+    def extension(self, request, pk=None):
+        car = self.get_object()
+        car.last_status_update = timezone.now()
+        car.save()
+        data = self.get_serializer(car).data
+        data.update({'_app_notifications': [{'success': 'Your listing has been extended'},],})
+        return Response(data, status.HTTP_201_CREATED)

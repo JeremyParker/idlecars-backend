@@ -50,7 +50,7 @@ def _copy_fhv_fields(car, tlc_data):
 
 
 def _localtime(datetime_str):
-    return timezone.localtime(dateutil.parser.parse(datetime_str).replace(tzinfo=pytz.UTC))
+    return dateutil.parser.parse(datetime_str).replace(tzinfo=pytz.UTC)
 
 
 def _get_resource(url):

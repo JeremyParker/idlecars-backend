@@ -72,7 +72,8 @@ def _get_car_params(car):
         'car_plate': car.plate,
         'car_deposit': car.solo_deposit,
         'car_image_url': car_service.get_image_url(car),
-        'car_details_url': app_routes_driver.car_details_url(car)
+        'car_driver_details_url': app_routes_driver.car_details_url(car),
+        'car_owner_details_url': app_routes_owner.car_details_url(car),
     }
 
 
@@ -135,11 +136,6 @@ def _get_message_params(message):
         'message_first_name': message.first_name,
         'message_body': message.message,
         'message_email': message.email,
-    }
-
-def _get_renewal_params(renewal):
-    return {
-        'renewal_url': app_routes_driver.renewal_url(renewal),
     }
 
 def _get_password_reset_params(password_reset):
@@ -222,10 +218,9 @@ class Notification(object):
             'UserMessage': {
                 '_get_message_params': 'self.argument',
             },
-            'Renewal': {
-                '_get_renewal_params': 'self.argument',
-                '_get_car_params': 'self.argument.car',
-                '_get_owner_params': 'self.argument.car.owner',
+            'Car': {
+                '_get_car_params': 'self.argument',
+                '_get_owner_params': 'self.argument.owner',
             },
             'PasswordReset': {
                 '_get_password_reset_params': 'self.argument',
@@ -250,7 +245,7 @@ class Notification(object):
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],
-            'Renewal': ['renewal', 'car', 'owner'],
+            'Car': ['car', 'owner'],
             'PasswordReset': ['password_reset', 'urls'],
         }.get(self.argument_class(), [])
 
@@ -338,8 +333,8 @@ class OwnerNotification(Notification):
             users = self.argument.car.owner.auth_users.all()
         elif clas == 'Payment':
             users = self.argument.booking.car.owner.auth_users.all()
-        elif clas == 'Renewal':
-            users = self.argument.car.owner.auth_users.all()
+        elif clas == 'Car':
+            users = self.argument.owner.auth_users.all()
         elif clas == 'PasswordReset':
             users = [self.argument.auth_user]
         else:

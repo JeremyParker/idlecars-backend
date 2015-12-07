@@ -1,12 +1,13 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
+from datetime import timedelta
 from freezegun import freeze_time
 
 
 from django.utils import timezone
 from django.test import TestCase
+from django.conf import settings
 from django.core.management import call_command
 from django.contrib.auth.models import User
 
@@ -30,8 +31,7 @@ class TestOwnerNotifications(TestCase):
         return car
 
     def _update_time_about_to_go_stale(self):
-        # TODO - get the stale_threshold from config
-        return timezone.now() - datetime.timedelta(days=2, hours=23, minutes=50)
+        return timezone.now() - (timedelta(days=settings.STALENESS_LIMIT) - timedelta(hours=1))
 
     def test_whole_enchilada(self):
         last_update = self._update_time_about_to_go_stale()
@@ -59,24 +59,32 @@ class TestOwnerNotifications(TestCase):
             email = message.merge_vars.keys()[0]
             user = User.objects.get(email=email)
             car = server.models.Owner.objects.get(auth_users=user).cars.all()[0]
-            renewal = owner_crm.models.Renewal.objects.get(car=car)
             var = message.merge_vars[email]
 
-            self.assertEqual(var['CTA_LABEL'], 'Renew Listing Now')
-            self.assertEqual(var['CTA_URL'], idlecars.app_routes_driver.renewal_url(renewal))
+            self.assertEqual(var['CTA_LABEL'], 'Update Listing Now')
+            self.assertEqual(var['CTA_URL'], idlecars.app_routes_owner.car_details_url(car))
             self.assertEqual(var['FNAME'], user.first_name)
             self.assertTrue(car.plate in var['TEXT'])
             self.assertTrue(car.display_name() in var['TEXT'])
 
     def test_renewable_cars(self):
-        '''
-        Make sure cars that have an outstanding renewal token don't get included
-        '''
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        owner_crm.models.Renewal.objects.create(car=car, pk=666)
+        owner_service._renewal_email()
 
-        self.assertFalse(owner_service._renewable_cars())
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1) # we sent an email about this car
+
+        # Make sure the car that we just emailed about don't get a second email
+        owner_service._renewal_email()
+        self.assertEqual(len(outbox), 1)
+
+        # if we sent them a message last time it was about to go stale, we message them again
+        msg_record = owner_crm.models.Message.objects.get(car=car)
+        msg_record.created_time = timezone.now() - timedelta(days=5)
+        msg_record.save()
+        owner_service._renewal_email()
+        self.assertEqual(len(outbox), 2)
 
     def _new_requested_booking(self, create_time):
         with freeze_time(create_time):

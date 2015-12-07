@@ -4,10 +4,6 @@ from __future__ import unicode_literals
 from django.conf import settings
 
 
-def renewal_url(renewal):
-    parts = (settings.DRIVER_APP_URL, '#', 'listings', unicode(renewal.car.id), 'renewals', renewal.token)
-    return '/'.join(parts)
-
 def doc_upload_url():
     parts = (settings.DRIVER_APP_URL, '#', 'bookings')
     return '/'.join(parts)
@@ -49,7 +45,7 @@ def terms_of_service():
     return '/'.join(parts)
 
 def faq():
-    parts = (settings.DRIVER_APP_URL, '#', 'driver_faq')
+    parts = (settings.DRIVER_APP_URL, '#', 'faq')
     return '/'.join(parts)
 
 # TODO - remove this
