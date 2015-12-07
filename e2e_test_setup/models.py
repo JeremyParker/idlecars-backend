@@ -76,17 +76,6 @@ class E2ETestSetup():
         for i in xrange(2):
             server.factories.BookableCar.create()
 
-<<<<<<< HEAD
-        print self.delorean.id
-
-    def _setup_renewals(self):
-        '''
-            Create a renewal
-        '''
-        owner_crm.factories.Renewal.create(car=self.delorean, token='faketoken')
-
-=======
->>>>>>> master
     def _setup_booking(self):
         '''
             Create 3 bookings
