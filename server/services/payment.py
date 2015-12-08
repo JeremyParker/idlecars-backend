@@ -30,6 +30,8 @@ def create_payment(
             status=models.Payment.REJECTED,
         )
 
+    # TODO - if the driver has in-app credit, let them use their credit
+
     assert payment_method.driver == booking.driver
     payment = models.Payment.objects.create(
         booking=booking,
