@@ -68,14 +68,14 @@ class E2ETestSetup():
         )
 
         luxy = server.factories.MakeModel.create(make='Venus', model='Xtravaganza', lux_level=1)
-        server.factories.BookableCar.create(
+        server.factories.ClaimedCar.create(
             make_model=luxy,
             solo_cost=500,
             owner=self.owner_has_two_cars,
         )
 
         benz = server.factories.MakeModel.create(make='Benz', model='C350', lux_level=1)
-        self.benz = server.factories.BookableCar.create(
+        self.benz = server.factories.ClaimedCar.create(
             make_model=benz,
             owner=self.owner_has_two_cars
         )
