@@ -35,7 +35,8 @@ class Payment(models.Model):
     invoice_start_time = models.DateTimeField(blank=True, null=True)
     invoice_end_time = models.DateTimeField(blank=True, null=True)
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2) # total amount charged
+    amount = models.DecimalField(max_digits=10, decimal_places=2) # total amount charged in cash
+    credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     service_fee = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
     payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True)

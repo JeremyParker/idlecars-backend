@@ -1,6 +1,8 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import decimal
+
 from django.test import TestCase
 from django.utils import timezone
 
@@ -36,3 +38,11 @@ class PaymentServiceTest(TestCase):
 
         # the new_payment_method should not be the first payment method.
         self.assertNotEqual(first_payment_method, new_payment_method)
+
+    def test_create_payment_with_app_credit(self):
+        payment_method_service.add_payment_method(self.driver, 'some_nonce')
+        self.driver.auth_user.customer.app_credit = decimal.Decimal('50.00')
+        self.driver.auth_user.customer.save()
+        payment = payment_service.create_payment(self.booking, amount = '56.66',)
+        self.assertEqual(payment.credit_amount, decimal.Decimal('50.00'))
+        self.assertEqual(payment.amount, decimal.Decimal('6.66'))

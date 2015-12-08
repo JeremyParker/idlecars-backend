@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import decimal
+
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
@@ -19,9 +21,10 @@ def create_payment(
     invoice_start_time=None,
     invoice_end_time=None
 ):
+    amount = decimal.Decimal(amount) # convert to Decimal in case it was a string
+
     from server.services import driver as driver_service
     payment_method = driver_service.get_default_payment_method(booking.driver)
-
     if not payment_method:
         return models.Payment(
             booking=booking,
@@ -30,12 +33,16 @@ def create_payment(
             status=models.Payment.REJECTED,
         )
 
-    # TODO - if the driver has in-app credit, let them use their credit
+    # user some credit if the customer has any app credit
+    customer = booking.driver.auth_user.customer
+    cash_amount = max(decimal.Decimal('0.00'), amount - customer.app_credit)
+    credit_amount = amount - cash_amount
 
     assert payment_method.driver == booking.driver
     payment = models.Payment.objects.create(
         booking=booking,
-        amount=amount,
+        amount=cash_amount,
+        credit_amount=credit_amount,
         service_fee=service_fee,
         payment_method=payment_method,
         invoice_start_time=invoice_start_time,
