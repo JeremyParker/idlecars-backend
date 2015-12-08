@@ -10,6 +10,7 @@ from server import models
 import server.factories
 from server.services import owner_service
 
+from owner_crm.services import password_reset_service
 from owner_crm.models import PasswordReset
 import owner_crm.factories
 
@@ -144,6 +145,7 @@ class E2ETestSetup():
         '''
         owner_has_no_car = server.factories.Owner.create()
         owner_has_no_car.auth_users.add(self.user_has_no_car)
+        password_reset_service.invite_owner(self.user_has_no_car)
 
         self.owner_has_two_cars = server.factories.Owner.create(company_name='Test')
         self.owner_has_two_cars.auth_users.add(self.user_has_two_cars)
