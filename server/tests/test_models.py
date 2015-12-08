@@ -5,8 +5,9 @@ from django.test import TestCase
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from server import models, factories
+from idlecars.factories import AuthUser
 from idlecars import model_helpers
+from server import models, factories
 
 
 class TestOwner(TestCase):
@@ -57,7 +58,7 @@ class TestOwner(TestCase):
 
 class TestDriver(TestCase):
     def test_admin_display(self):
-        auth_user = factories.AuthUser(first_name='', last_name='')
+        auth_user = AuthUser(first_name='', last_name='')
         driver = factories.Driver(auth_user=auth_user)
         self.assertEqual(driver.auth_user.username, driver.admin_display())
 

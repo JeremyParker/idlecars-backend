@@ -6,7 +6,7 @@ import decimal
 from django.utils import crypto, timezone
 from django.conf import settings
 
-from server.models import CreditCode
+from credit.models import CreditCode
 
 
 def generate_invite_code_string(customer):

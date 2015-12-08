@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
+import idlecars.factories
 import server.factories
 from owner_crm import models
 import owner_crm.factories
@@ -15,7 +16,7 @@ import owner_crm.factories
 
 class PasswordResetTest(APITestCase):
     def setUp(self):
-        self.auth_user = server.factories.AuthUser.create(password='old_password')
+        self.auth_user = idlecars.factories.AuthUser.create(password='old_password')
         self.password_reset = owner_crm.factories.PasswordReset.create(auth_user=self.auth_user)
 
         # we need a driver so we know if we can SMS them or not.

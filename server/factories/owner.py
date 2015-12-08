@@ -8,7 +8,8 @@ from factory import LazyAttribute, RelatedFactory, post_generation
 
 from idlecars.factory_helpers import Factory, faker
 from server.models import Owner as owner_model
-from server.factories import AuthUser
+from idlecars.factories import AuthUser
+
 
 class Owner(Factory):
     class Meta:

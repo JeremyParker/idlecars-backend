@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from idlecars import app_routes_owner
+import idlecars.factories
 import server.factories
 import owner_crm.factories
 from owner_crm import models
@@ -55,7 +56,7 @@ class PasswordResetSetupTest(APITestCase):
         )
 
     def test_revokes_other_tokens(self):
-        auth_user = server.factories.AuthUser.create()
+        auth_user = idlecars.factories.AuthUser.create()
         driver = server.factories.Driver.create(auth_user=auth_user)
         reset = owner_crm.factories.PasswordReset.create(auth_user=auth_user)
         data = {'phone_number': auth_user.username}

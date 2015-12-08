@@ -12,13 +12,14 @@ from owner_crm.services import notification
 from owner_crm.models import Campaign, driver_notifications
 from owner_crm import factories as crm_factories
 
+from idlecars import factories as idlecars_factories
 from server import factories as server_factories
 from idlecars import sms_service
 
 
 class DriverNotificationTest(TestCase):
     def setUp(self):
-        auth_user = server_factories.AuthUser.create(first_name='Tom', last_name='Cat')
+        auth_user = idlecars_factories.AuthUser.create(first_name='Tom', last_name='Cat')
 
         self.driver = server_factories.Driver.create(auth_user=auth_user)
         self.complete_driver = server_factories.CompletedDriver.create()

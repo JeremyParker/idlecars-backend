@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('server', '0078_auto_20151202_1414'),
     ]
 
     operations = [
@@ -32,8 +31,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('invitor_credited', models.BooleanField(default=False)),
                 ('app_credit', models.DecimalField(default=Decimal('0.00'), max_digits=10, decimal_places=2)),
-                ('invite_code', models.OneToOneField(related_name='invitor', null=True, blank=True, to='server.CreditCode')),
-                ('invitor_code', models.ForeignKey(verbose_name='Invited by', blank=True, to='server.CreditCode', null=True)),
+                ('invite_code', models.OneToOneField(related_name='invitor', null=True, blank=True, to='credit.CreditCode')),
+                ('invitor_code', models.ForeignKey(verbose_name='Invited by', blank=True, to='credit.CreditCode', null=True)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),

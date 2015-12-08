@@ -10,6 +10,7 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
 from idlecars import fields
+from idlecars.factories import AuthUser
 from server import factories
 from server import models
 from server import payment_gateways
@@ -87,7 +88,7 @@ class GetOwnerTest(APITestCase):
 
 class OwnerCreateTest(APITestCase):
     def setUp(self):
-        self.user =  factories.AuthUser.create()
+        self.user =  AuthUser.create()
         token = Token.objects.get(user__username=self.user.username)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

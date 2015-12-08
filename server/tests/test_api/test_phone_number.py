@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from idlecars import fields
+from idlecars.factories import AuthUser
 
 from server import factories, models
 
@@ -15,7 +16,7 @@ class PhoneNumberTest(APITestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
         self.owner = factories.Owner.create()
-        self.user = factories.AuthUser.create()
+        self.user = AuthUser.create()
 
     def test_get_phone_number_success_driver(self):
         url = reverse('server:phone_numbers', args=(self.driver.phone_number(),))
