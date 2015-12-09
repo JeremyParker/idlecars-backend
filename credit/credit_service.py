@@ -20,6 +20,7 @@ def generate_invite_code_string(customer):
 
 
 def create_invite_code(customer):
+    # TODO - customers are randomly assigned to a cohort (50/50 or 25/75)
     code = generate_invite_code_string(customer)
     invite_code = CreditCode.objects.create(
         credit_code=code,
