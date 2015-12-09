@@ -312,11 +312,16 @@ def settle(payment):
             'customer_id': settings.IDLECARS_CUSTOMER_ID,
             'merchant_account_id': payment.booking.car.owner.merchant_id,
             'service_fee_amount': '0.00',
-            'submit_for_settlement': True,
+            'options': { 'submit_for_settlement': True, },
         }
         response = _execute_transaction_request(payment, 'sale', request)
         if getattr(response, 'is_success', False):
             payment.idlecars_transaction_id = response.transaction.id
+        else:
+            payment.error_message, payment.notes = _parse_error(response)
+            payment.notes += 'Error on supplement payment'
+            print 'idlecars supplement failed {}'.format(payment.notes)
+            return payment
 
     payment.status = models.Payment.SETTLED
     payment.error_message = ''

@@ -68,7 +68,8 @@ def fake_payment_function(func):
 
 @fake_payment_function
 def pre_authorize(payment):
-    payment.transaction_id = 'transaction id'
+    if payment.amount:
+        payment.transaction_id = 'transaction id'
     payment.status = models.Payment.PRE_AUTHORIZED
     return payment
 
@@ -81,7 +82,10 @@ def void(payment):
 
 @fake_payment_function
 def settle(payment):
-    payment.transaction_id = 'transaction id'
+    if payment.amount:
+        payment.transaction_id = 'transaction id'
+    if payment.idlecars_supplement:
+        payment.idlecars_transaction_id = 'idlecars transaction id'
     payment.status = models.Payment.SETTLED
     return payment
 

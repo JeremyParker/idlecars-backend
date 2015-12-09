@@ -220,6 +220,8 @@ BRAINTREE = {
     'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
+IDLECARS_CUSTOMER_ID = os.getenv('IDLECARS_CUSTOMER_ID', '32418355') # for Braintree
+IDLECARS_PAYMENT_TOKEN = os.getenv('IDLECARS_PAYMENT_TOKEN', 'gwtbsw') # for Braintree
 
 # TODO - move these to a config service
 TAKE_RATE = '0.059'
