@@ -13,6 +13,13 @@ from server.services import payment as payment_service
 from server.services import ServiceError
 
 
+def void_all_payments(booking):
+    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
+        payment_service.void(payment)
+        if payment.error_message:
+            raise ServiceError(payment.error_message)
+
+
 def make_deposit_payment(booking):
     payment = payment_service.create_payment(
         booking,
@@ -20,13 +27,6 @@ def make_deposit_payment(booking):
     )
     payment = payment_service.pre_authorize(payment)
     return payment
-
-
-def void_all_payments(booking):
-    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
-        payment_service.void(payment)
-        if payment.error_message:
-            raise ServiceError(payment.error_message)
 
 
 def find_deposit_payment(booking):

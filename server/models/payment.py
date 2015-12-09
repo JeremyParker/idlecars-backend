@@ -7,6 +7,7 @@ from django.db import models
 
 from server.models import Booking, PaymentMethod
 
+
 class Payment(models.Model):
     PENDING = 0
     PRE_AUTHORIZED = 1
