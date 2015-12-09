@@ -16,27 +16,21 @@ NO_PAYMENT_METHOD = 'Sorry, we don\'t have your payment method on file. Please a
 
 def create_payment(
     booking,
-    amount,
+    cash_amount,
+    credit_amount='0.00',
     service_fee='0.00',
     invoice_start_time=None,
     invoice_end_time=None
 ):
-    amount = decimal.Decimal(amount) # convert to Decimal in case it was a string
-
     from server.services import driver as driver_service
     payment_method = driver_service.get_default_payment_method(booking.driver)
     if not payment_method:
         return models.Payment(
             booking=booking,
             error_message=NO_PAYMENT_METHOD,
-            amount=amount,
+            amount=cash_amount,
             status=models.Payment.REJECTED,
         )
-
-    # user some credit if the customer has any app credit
-    customer = booking.driver.auth_user.customer
-    cash_amount = max(decimal.Decimal('0.00'), amount - customer.app_credit)
-    credit_amount = amount - cash_amount
 
     assert payment_method.driver == booking.driver
     payment = models.Payment.objects.create(

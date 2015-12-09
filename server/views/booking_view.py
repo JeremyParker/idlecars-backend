@@ -10,8 +10,8 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from idlecars import rest_helpers
 from server import models
+from server.services import ServiceError
 from server.services import booking as booking_service
-from server.services.booking import BookingError
 from server.serializers import BookingSerializer, BookingDetailsSerializer
 from server.permissions import OwnsBooking
 
@@ -48,7 +48,7 @@ class BookingViewSet(
         try:
             booking = booking_service.cancel(booking)
             return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
-        except BookingError as booking_error:
+        except ServiceError as booking_error:
             return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
@@ -57,7 +57,7 @@ class BookingViewSet(
         try:
             booking = booking_service.checkout(booking)
             return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
-        except BookingError as booking_error:
+        except ServiceError as booking_error:
             return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsBooking])
@@ -66,5 +66,5 @@ class BookingViewSet(
         try:
             booking = booking_service.pickup(booking)
             return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
-        except BookingError as booking_error:
+        except ServiceError as booking_error:
             return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)

@@ -37,7 +37,12 @@ class Payment(models.Model):
 
     amount = models.DecimalField(max_digits=10, decimal_places=2) # total amount charged in cash
     credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+    # service fee that was actually deducted through Braintree. The amount due is in the booking.
     service_fee = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+    idlecars_supplement = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    idlecars_transaction_id = models.CharField(max_length=32, blank=True)
 
     payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True)
     status = models.IntegerField(choices=STATUS, default=PENDING)
@@ -47,9 +52,6 @@ class Payment(models.Model):
 
     def __unicode__(self):
         return '{} from {}'.format(self.amount, self.booking.driver)
-
-    def is_paid(self):
-        return self.status == Payment.SETTLED or self.status == HELD_IN_ESCROW
 
     def invoice_description(self):
         if self.invoice_start_time and self.invoice_end_time:

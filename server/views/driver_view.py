@@ -58,6 +58,6 @@ class DriverViewSet(
             return Response(result_serializer.data)
         except Http404:
             return Response({'_app_notifications': [DRIVER_NOT_FOUND_ERROR]}, HTTP_400_BAD_REQUEST)
-        except payment_method_service.PaymentMethoError as pm_error:
+        except payment_method_service.ServiceError as pm_error:
             return Response({'_app_notifications': [pm_error.message]}, HTTP_400_BAD_REQUEST)
 

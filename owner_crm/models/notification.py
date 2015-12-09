@@ -28,15 +28,16 @@ def _get_payment_params(payment):
     }
 
 def _get_booking_params(booking):
-    from server.services import booking as booking_service
     if booking.pickup_time:
+        from server.services import invoice_service
         (
             booking_payment_fee,
             next_payment_amount,
             invoice_start_time,
             invoice_end_time
-        ) = booking_service.calculate_next_rent_payment(booking)
+        ) = invoice_service.calculate_next_rent_payment(booking)
     else:
+        from server.services import booking as booking_service
         (
             booking_payment_fee,
             next_payment_amount,

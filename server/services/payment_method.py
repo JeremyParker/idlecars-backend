@@ -7,7 +7,7 @@ from server import payment_gateways
 from server import models
 
 
-class PaymentMethoError(Exception):
+class ServiceError(Exception):
     pass
 
 
@@ -28,4 +28,4 @@ def add_payment_method(driver, nonce):
         payment_method.unique_number_identifier = unique_number_identifier
         payment_method.save()
     else:
-        raise PaymentMethoError(details)  # Not successful? Raise an error.
+        raise ServiceError(details)  # Not successful? Raise an error.
