@@ -84,16 +84,7 @@ def pre_authorize(payment):
 
 
 def settle(payment):
-    payment = _execute('settle', payment)
-    # if not payment.error_message and payment.idlecars_supplement:
-    #     supplement_payment = models.Payment.objects.create(
-    #         booking=booking,
-    #         amount=payment.idlecars_supplement,
-    #         payment_method=idlecars_payment_method,
-    #         invoice_start_time=payment.invoice_start_time,
-    #         invoice_end_time=payment.invoice_end_time,
-    #     )
-    return payment
+    return _execute('settle', payment)
 
 
 def void(payment):
@@ -111,13 +102,21 @@ def escrow(payment):
 
 # TODO - this function and the one for payment_method should probably be moved to wherever the
 # Braintree abstaction is.
-def details_link(payment):
+def _braintree_link(transaction_id):
     l = '<a href="https://{base_url}/merchants/{account}/transactions/{token}">{token}</a>'.format(
         base_url=settings.BRAINTREE_BASE_URL,
         account=settings.BRAINTREE["merchant_id"],
-        token=payment.transaction_id,
+        token=transaction_id,
     )
     return mark_safe(l)
+
+
+def details_link(payment):
+    return _braintree_link(payment.transaction_id)
+
+
+def idlecars_supplement_link(payment):
+    return _braintree_link(payment.idlecars_transaction_id)
 
 
 def payment_method_link(payment_method):
