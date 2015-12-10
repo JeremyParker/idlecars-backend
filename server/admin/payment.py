@@ -15,9 +15,9 @@ class PaymentAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('invoice_description', 'booking_link',),
-                ('created_time', 'amount', 'service_fee', 'payment_method_link',),
-                ('status', 'error_message',),
-                ('gateway_link',),
+                ('amount', 'service_fee', 'credit_amount', 'idlecars_supplement', ),
+                ('created_time', 'status', 'error_message',),
+                ('gateway_link', 'payment_method_link', 'idlecars_supplement_link'),
                 ('notes',),
             )
         }),
@@ -49,6 +49,9 @@ class PaymentAdmin(admin.ModelAdmin):
     def gateway_link(self, instance):
         return payment_service.details_link(instance)
     gateway_link.short_description = 'Gateway link'
+
+    def idlecars_supplement_link(self, instance):
+        return payment_service.idlecars_supplement_link(instance)
 
     def payment_method_link(self, instance):
         return link(instance.payment_method)

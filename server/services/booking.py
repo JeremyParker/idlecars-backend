@@ -2,24 +2,17 @@
 from __future__ import unicode_literals
 
 import datetime
-from decimal import Decimal, ROUND_UP
 
-from django.core.urlresolvers import reverse
-from django.db.models import F
 from django.utils import timezone
 from django.conf import settings
 
-from owner_crm.models import ops_notifications, driver_notifications, owner_notifications, street_team_notifications
 from owner_crm.services import notification
 
 from server.models import Booking, Payment
+from . import invoice_service
 from . import payment as payment_service
-from server.services import car as car_service
-from server.payment_gateways import braintree_payments
+from server.services import ServiceError
 
-
-class BookingError(Exception):
-    pass
 
 CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
@@ -169,7 +162,7 @@ def can_cancel(booking):
 
 def cancel(booking):
     if not can_cancel(booking):
-        raise BookingError(CANCEL_ERROR)
+        raise ServiceError(CANCEL_ERROR)
     _make_booking_incomplete(booking, Booking.REASON_CANCELED)
 
 
@@ -184,7 +177,7 @@ def _make_booking_incomplete(booking, reason):
 
 def on_incomplete(booking, original_booking_state):
     ''' Called any time a booking is set to incomplete'''
-    _void_all_payments(booking)
+    invoice_service.void_all_payments(booking)
 
     # let our customers know what happened
     reason = booking.incomplete_reason
@@ -212,37 +205,6 @@ def on_incomplete(booking, original_booking_state):
         notification.send('driver_notifications.CarRentedElsewhere', booking)
 
 
-def _make_deposit_payment(booking):
-    payment = payment_service.create_payment(
-        booking,
-        booking.car.solo_deposit,
-    )
-    payment = payment_service.pre_authorize(payment)
-    return payment
-
-
-def _void_all_payments(booking):
-    for payment in booking.payment_set.filter(status=Payment.PRE_AUTHORIZED):
-        payment_service.void(payment)
-        if payment.error_message:
-            raise BookingError(payment.error_message)
-
-
-def find_deposit_payment(booking):
-    potential_deposits = booking.payment_set.filter(
-            invoice_start_time__isnull=True,
-            invoice_end_time__isnull=True,
-        )
-    try:
-        deposit_payment = potential_deposits.get(status=Payment.PRE_AUTHORIZED)
-    except Payment.DoesNotExist:
-        try:
-            deposit_payment = potential_deposits.get(status=Payment.HELD_IN_ESCROW)
-        except Payment.DoesNotExist:
-            return None
-    return deposit_payment
-
-
 def estimate_next_rent_payment(booking):
     '''
     Returns a tuple of (service_fee, rent_amount, start_time, end_time), based on
@@ -254,61 +216,10 @@ def estimate_next_rent_payment(booking):
 
     estimated_pickup_time = estimate_pickup_time(booking)
     estimated_end_time = calculate_end_time(booking, estimated_pickup_time)
-    return calculate_next_rent_payment(booking, estimated_pickup_time, estimated_end_time)
-
-
-def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_time=None):
-    '''
-    Returns a tuple of (service_fee, rent_amount, start_time, end_time).
-    pickup_time and end_time may be used to override the booking's values, or
-    for estimation if booking's values aren't set yet.
-    '''
-    assert booking_pickup_time or booking.pickup_time
-    assert booking_end_time or booking.end_time
-
-    previous_payments = booking.payment_set.filter(
-        invoice_start_time__isnull=False,
-        invoice_end_time__isnull=False,
-        status=Payment.SETTLED,
-    ).order_by('invoice_end_time')
-
-    if previous_payments:
-        invoice_start_time = previous_payments.last().invoice_end_time
-    else:
-        invoice_start_time = booking_pickup_time or booking.pickup_time
-
-    invoice_end_time = min(
-        invoice_start_time + datetime.timedelta(days=7),
-        booking_end_time or booking.end_time,
-    )
-
-    week_portion = Decimal((invoice_end_time - invoice_start_time).days) / Decimal(7.00)
-    amount = (
-        week_portion * booking.weekly_rent).quantize(Decimal('.01'),
-        rounding=ROUND_UP
-    )
-    service_fee = Decimal(
-        amount * booking.service_percentage).quantize(Decimal('.01'),
-        rounding=ROUND_UP
-    )
-
-    return (
-        service_fee,
-        amount,
-        invoice_start_time,
-        invoice_end_time
-    )
-
-
-def _create_next_rent_payment(booking):
-    fee, amount, start_time, end_time = calculate_next_rent_payment(booking)
-
-    return payment_service.create_payment(
+    return invoice_service.calculate_next_rent_payment(
         booking,
-        amount,
-        service_fee=fee,
-        invoice_start_time=start_time,
-        invoice_end_time=end_time,
+        estimated_pickup_time,
+        estimated_end_time
     )
 
 
@@ -328,11 +239,11 @@ def can_checkout(booking):
 
 def checkout(booking):
     if not can_checkout(booking):
-        raise BookingError(CHECKOUT_ERROR)
+        raise ServiceError(CHECKOUT_ERROR)
 
-    payment = _make_deposit_payment(booking)
+    payment = invoice_service.make_deposit_payment(booking)
     if payment.error_message:
-        raise BookingError(payment.error_message)
+        raise ServiceError(payment.error_message)
 
     if payment.status == Payment.PRE_AUTHORIZED:
         booking.checkout_time = timezone.now()
@@ -365,32 +276,34 @@ def pickup(booking):
     reload the object before relying on its data.
     '''
     if not can_pickup(booking):
-        raise BookingError(PICKUP_ERROR)
+        raise ServiceError(PICKUP_ERROR)
 
     # NB: we don't save() the booking unless successful...
     booking.pickup_time = timezone.now().replace(microsecond=0)
     booking.end_time = calculate_end_time(booking, booking.pickup_time)
 
-    deposit_payment = find_deposit_payment(booking) or _make_deposit_payment(booking)
+    deposit_payment = invoice_service.find_deposit_payment(booking) or \
+        invoice_service.make_deposit_payment(booking)
+
     if deposit_payment.error_message:
-        raise BookingError(deposit_payment.error_message)
+        raise ServiceError(deposit_payment.error_message)
 
     # pre-authorize the payment for the first week's rent
-    rent_payment = _create_next_rent_payment(booking)
+    rent_payment = invoice_service.create_next_rent_payment(booking)
     rent_payment = payment_service.pre_authorize(rent_payment)
     if rent_payment.status != Payment.PRE_AUTHORIZED:
-        raise BookingError(rent_payment.error_message)
+        raise ServiceError(rent_payment.error_message)
 
     # hold the deposit in escrow for the duration of the rental
     if deposit_payment.status is not Payment.HELD_IN_ESCROW:
         deposit_payment = payment_service.escrow(deposit_payment)
     if deposit_payment.status != Payment.HELD_IN_ESCROW:
-        raise BookingError(deposit_payment.error_message)
+        raise ServiceError(deposit_payment.error_message)
 
     # take payment for the first week's rent
     rent_payment = payment_service.settle(rent_payment)
     if rent_payment.status != Payment.SETTLED:
-        raise BookingError(rent_payment.error_message)
+        raise ServiceError(rent_payment.error_message)
 
     booking.save()
 
@@ -398,43 +311,6 @@ def pickup(booking):
     notification.send('owner_notifications.PickupConfirmation', booking)
 
     return booking
-
-
-def _cron_payments():
-    payment_lead_time_hours = 2  # TODO - get this out of a config system
-    pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
-    active_bookings = filter_active(Booking.objects.all()).prefetch_related('payment_set')
-    for booking in active_bookings:
-        relevant_end_time = min(booking.end_time, pay_time)
-        existing_payments = booking.payment_set.filter(
-            invoice_end_time__isnull=False,
-            invoice_end_time__gte=relevant_end_time,
-            status=Payment.SETTLED,
-        )
-        if existing_payments.exists():
-            continue
-
-        # check if we failed wihtin that past 4 hours. If so, skip for now.
-        if booking.payment_set.filter(
-            invoice_end_time__isnull=False,
-            invoice_end_time__gte=relevant_end_time,
-            status=Payment.DECLINED,
-            created_time__gte=timezone.now() - datetime.timedelta(hours=8)
-        ):
-            continue
-
-        try:
-            payment = _create_next_rent_payment(booking)
-            payment = payment_service.settle(payment)
-            if payment.error_message:
-                print payment.error_message
-                print payment.notes
-                continue
-            notification.send('driver_notifications.PaymentReceipt', payment)
-            notification.send('owner_notifications.PaymentReceipt', payment)
-        except Exception as e:
-            print e
-            notification.send('ops_notifications.PaymentJobFailed', booking, e)
 
 
 def _booking_updates():
@@ -452,7 +328,7 @@ def _booking_updates():
             elif not booking.driver.all_docs_uploaded():
                 _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW_DOCS)
 
-        except BookingError:
+        except ServiceError:
             pass  # TODO: ops will get an email about the payment failure, and
 
     # TEMPORARILY REMOVING THIS FUNCTIONALITY. WE CAN SET OWNER TOO SLOW IN THE ADMIN NOW.
@@ -462,13 +338,13 @@ def _booking_updates():
     # for booking in expired_bookings:
     #     try:
     #         _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
-    #     except BookingError:
+    #     except ServiceError:
     #         pass  # ops will get an email about the payment failure, and
 
 
 def cron_job():
     _booking_updates()
-    _cron_payments()
+    invoice_service.cron_payments(filter_active(Booking.objects.all()))
 
 
 def start_time_display(booking):

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.test import TestCase
 
 from idlecars import app_routes_owner
+from idlecars.factories import AuthUser
 from owner_crm.tests import sample_merge_vars
 from owner_crm.models import PasswordReset
 
@@ -39,7 +40,7 @@ class OwnerInvitationTest(TestCase):
         )
 
     def test_invitation_no_owner(self):
-        self.user = factories.AuthUser.create() # Note: no owner
+        self.user = AuthUser.create() # Note: no owner
         with self.assertRaises(Owner.DoesNotExist):
             auth_user = owner_service.invite_legacy_owner(self.user.username)
 

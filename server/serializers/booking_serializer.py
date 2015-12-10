@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 from idlecars import fields
 from server.models import Car, Booking, Driver, Payment
 from server.services import booking as booking_service
+from server.services import invoice_service
 from server.services import car as car_service
 from server.serializers import listing_serializer, payment_serializer
 
@@ -166,7 +167,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_next_payment(self,obj):
         if obj.get_state() == Booking.ACTIVE:
-            fee, amount, start_time, end_time = booking_service.calculate_next_rent_payment(obj)
+            fee, amount, start_time, end_time = invoice_service.calculate_next_rent_payment(obj)
         else:
             fee, amount, start_time, end_time = booking_service.estimate_next_rent_payment(obj)
         if start_time:

@@ -11,6 +11,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
 from idlecars import fields
+from idlecars.factories import AuthUser
 from server import factories, models
 
 
@@ -159,7 +160,7 @@ class DriverCreateTest(APITestCase):
         self.assertTrue(self.client.login(username=stored_phone_number, password='test'))
 
     def test_create_driver_fails_with_existing_auth_user(self):
-        self.auth_user = factories.AuthUser.create()
+        self.auth_user = AuthUser.create()
 
         self.client = APIClient()
         data = {'phone_number': self.auth_user.username, 'password': 'new_password'}
@@ -177,7 +178,7 @@ class DriverCreateTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_me_creates_new_driver(self):
-        user = factories.AuthUser.create()
+        user = AuthUser.create()
         client = APIClient()
 
         # Include an appropriate `Authorization:` header on all requests.

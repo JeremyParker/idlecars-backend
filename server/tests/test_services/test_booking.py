@@ -326,7 +326,7 @@ class BookingServiceTest(TestCase):
         # fail to pick up the car
         next_response = (models.Payment.DECLINED, 'This transaction was declined for some reason.',)
         gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
-        with self.assertRaises(booking_service.BookingError):
+        with self.assertRaises(booking_service.ServiceError):
             new_booking = booking_service.pickup(new_booking)
         new_booking.refresh_from_db()  # make sure our local copy is fresh. pickup() changed it.
 

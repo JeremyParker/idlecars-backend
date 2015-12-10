@@ -1,17 +1,12 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
-import random
-
-from django.template.defaultfilters import slugify
-from django.utils import timezone
 from django.contrib import auth
 
-from factory import LazyAttribute, PostGenerationMethodCall, post_generation
+from factory import LazyAttribute, post_generation
 from factory.django import DjangoModelFactory
 
-from idlecars.factory_helpers import Factory, faker, random_phone
+from idlecars.factory_helpers import faker, random_phone
 
 
 class AuthUser(DjangoModelFactory):

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 
+import idlecars.factories
 from server import models
 import server.factories
 from server.services import owner_service
@@ -96,43 +97,43 @@ class E2ETestSetup():
         '''
             Create 8 users(1 staff user)
         '''
-        self.user_has_two_cars = server.factories.AuthUser.create(
+        self.user_has_two_cars = idlecars.factories.AuthUser.create(
             username='9876543210',
             email='craig@test.com',
             first_name='Craig',
             last_name='List'
         )
-        self.user_has_no_car = server.factories.AuthUser.create(
+        self.user_has_no_car = idlecars.factories.AuthUser.create(
             username='9876543211',
             email='will@test.com',
             first_name='Will',
             last_name='Second'
         )
-        self.user_has_bank_link = server.factories.AuthUser.create(
+        self.user_has_bank_link = idlecars.factories.AuthUser.create(
             username='9876543212',
             email='jeremy@test.com',
             first_name='Jeremy',
             last_name='Parker'
         )
-        self.user_without_booking = server.factories.AuthUser.create(
+        self.user_without_booking = idlecars.factories.AuthUser.create(
             username='1234567891',
             email='jerry@test.com',
             first_name='Jerry',
             last_name='Mouse'
         )
-        self.user_without_docs = server.factories.AuthUser.create(
+        self.user_without_docs = idlecars.factories.AuthUser.create(
             username='1234567892',
             email='tom@test.com',
             first_name='Tom',
             last_name='Cat'
         )
-        self.user_without_docs_approved = server.factories.AuthUser.create(
+        self.user_without_docs_approved = idlecars.factories.AuthUser.create(
             username='1234567893',
             email='donald@test.com',
             first_name='donald',
             last_name='Duck'
         )
-        self.user_insurance_approved = server.factories.AuthUser.create(
+        self.user_insurance_approved = idlecars.factories.AuthUser.create(
             username='1234567894',
             email='kerry@test.com',
             first_name='Kerry',

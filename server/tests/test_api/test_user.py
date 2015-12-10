@@ -9,13 +9,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from idlecars import fields
+from idlecars.factories import AuthUser
 from server import factories
 
 test_email = "idlecar@idlecars.com"
 
 class UserApiTest(APITestCase):
     def setUp(self):
-        self.user = factories.AuthUser.create(username='2121234567', password='password', email=test_email)
+        self.user = AuthUser.create(username='2121234567', password='password', email=test_email)
         token = Token.objects.get(user__username=self.user.username)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -32,7 +33,7 @@ class UserApiTest(APITestCase):
         self.assertEqual(response.data['last_name'], self.user.last_name)
 
     def test_cannot_get_other_user(self):
-        other_user = factories.AuthUser.create()
+        other_user = AuthUser.create()
         url = reverse('server:users-detail', args=(other_user.id,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -56,7 +57,7 @@ class UserApiTest(APITestCase):
         self.assertEqual(user_reloaded.last_name, 'McCarthy')
 
     def test_cannot_update_someone_else(self):
-        other_user = factories.AuthUser.create()
+        other_user = AuthUser.create()
         url = reverse('server:users-detail', args=(other_user.id,))
         response = self.client.patch(url, {'first_name': 'Mikey'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -112,7 +113,7 @@ class UserCreateTest(APITestCase):
         self.assertTrue(self.client.login(username=stored_phone_number, password='test'))
 
     def test_create_fails_with_existing_user(self):
-        existing_user = factories.AuthUser.create()
+        existing_user = AuthUser.create()
         data = {'phone_number': existing_user.username, 'password': 'new_password'}
         response = APIClient().post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

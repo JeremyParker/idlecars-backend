@@ -275,39 +275,51 @@ def void(payment):
 
 
 def settle(payment):
-    if not payment.amount:
-        payment.status = models.Payment.SETTLED
-        payment.error_message = ''
-        return payment
-
     _configure_braintree()
-    if payment.transaction_id:
-        response = _execute_transaction_request(
-            payment,
-            'submit_for_settlement',
-            payment.transaction_id,
-        )
-    else:
-        request = _transaction_request(payment)
-        request.update({ 'options': { 'submit_for_settlement': True }})
-        response = _execute_transaction_request(payment, 'sale', request)
 
-    if getattr(response, 'is_success', False):
-        if response.transaction.status not in [
-            'settlement_pending',
-            'settlement_confirmed',
-            'submitted_for_settlement',
-        ]:
-            # TODO: logging system
-            print 'WARNING: settled transaction {} had a non-settled status'.format(
+    if payment.amount:
+        if payment.transaction_id:
+            response = _execute_transaction_request(
+                payment,
+                'submit_for_settlement',
                 payment.transaction_id,
             )
-        payment.transaction_id = response.transaction.id
-        payment.status = models.Payment.SETTLED
-        payment.error_message = ''
-    else:
-        payment.status = models.Payment.DECLINED
-        payment.error_message, payment.notes = _parse_error(response)
+        else:
+            request = _transaction_request(payment)
+            request.update({ 'options': { 'submit_for_settlement': True }})
+            response = _execute_transaction_request(payment, 'sale', request)
+
+        if getattr(response, 'is_success', False):
+            if response.transaction.status not in [
+                'settlement_pending',
+                'settlement_confirmed',
+                'submitted_for_settlement',
+            ]:
+                # TODO: logging system
+                print 'WARNING: settled transaction {} had a non-settled status'.format(
+                    payment.transaction_id,
+                )
+            payment.transaction_id = response.transaction.id
+        else:
+            payment.status = models.Payment.DECLINED
+            payment.error_message, payment.notes = _parse_error(response)
+            return payment
+
+    if payment.idlecars_supplement:
+        request = {
+            'payment_method_token': settings.IDLECARS_PAYMENT_TOKEN,
+            'amount': str(payment.idlecars_supplement),
+            'customer_id': settings.IDLECARS_CUSTOMER_ID,
+            'merchant_account_id': payment.booking.car.owner.merchant_id,
+            'service_fee_amount': '0.00',
+            'submit_for_settlement': True,
+        }
+        response = _execute_transaction_request(payment, 'sale', request)
+        if getattr(response, 'is_success', False):
+            payment.idlecars_transaction_id = response.transaction.id
+
+    payment.status = models.Payment.SETTLED
+    payment.error_message = ''
     return payment
 
 

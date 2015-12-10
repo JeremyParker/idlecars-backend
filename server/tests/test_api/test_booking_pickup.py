@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from idlecars import fields
 
 from server import factories
+from server.services import invoice_service
 from server.services import booking as booking_service
 from server.models import Booking, Payment
 from server import payment_gateways
@@ -39,7 +40,7 @@ class BookingPickupTest(APITestCase):
         self.assertEqual(2, len(self.booking.payment_set.all()))
 
         # the deposit payment should be held in escrow
-        deposit = booking_service.find_deposit_payment(self.booking)
+        deposit = invoice_service.find_deposit_payment(self.booking)
         self.assertEqual(deposit.status, Payment.HELD_IN_ESCROW)
 
         # the first week rent should be settled

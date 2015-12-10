@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from insurance_factory import Insurance
-from user import AuthUser, StaffUser
 from owner import Owner, PendingOwner, BankAccountOwner, DeclinedOwner
 from make_model import MakeModel, MakeModelWithImage, MakeModelWithImages
 from car import Car, ClaimedCar, BookableCar, CarExpiredListing, CompleteCar

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from factory import SubFactory, LazyAttribute, post_generation
 
 from idlecars.factory_helpers import Factory, faker, make_item
-from server.factories import AuthUser
+from idlecars.factories import AuthUser
 
 
 class Driver(Factory):

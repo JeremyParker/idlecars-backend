@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'corsheaders',
     'server',
+    'credit',
     'rest_framework',
     'rest_framework.authtoken',
     'website',
@@ -223,5 +224,7 @@ BRAINTREE = {
 # TODO - move these to a config service
 TAKE_RATE = '0.059'
 STALENESS_LIMIT = 3
+SIGNUP_CREDIT = 50
+INVITOR_CREDIT = 50
 
 IDLECARS_PHONE_NUMBER = '1-844-IDLECAR (1-844-435-3227)'
