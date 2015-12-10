@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from credit import credit_service
+from credit import models
 from idlecars.factories import AuthUser
 
 
@@ -52,7 +53,7 @@ class CreditCodeServiceTest(TestCase):
             self.assertFalse(code.credit_code in codes)
             codes.append(code.credit_code)
 
-    def test_redeem_code_success(self):
+    def test_redeem_two_sided_code_success(self):
         existing_user = AuthUser.create()
         code = credit_service.create_invite_code(
             '50.00',
@@ -70,6 +71,44 @@ class CreditCodeServiceTest(TestCase):
         # redeem count should go up by 1
         code.refresh_from_db()
         self.assertEqual(code.redeem_count, 1)
+
+    def test_redeem_one_sided_code_success_only_once(self):
+        code = credit_service.create_invite_code('50.00')
+
+        # new user comes along and redeems the code
+        new_user = AuthUser.create()
+        credit_service.redeem_code(code.credit_code, new_user.customer)
+        self.assertEqual(new_user.customer.app_credit, decimal.Decimal('50.00'))
+
+        # redeem count should go up by 1
+        code.refresh_from_db()
+        self.assertEqual(code.redeem_count, 1)
+
+        # when we try to redeem a second time we get an exception and values didn't change
+        with self.assertRaises(credit_service.CreditError):
+            credit_service.redeem_code(code.credit_code, new_user.customer)
+
+        self.assertEqual(new_user.customer.app_credit, decimal.Decimal('50.00'))
+        code.refresh_from_db()
+        self.assertEqual(code.redeem_count, 1)
+
+    def test_redeem_one_sided_code_customer_not_new(self):
+        old_invite_code = models.CreditCode.objects.create(
+            credit_code='what3ver',
+            credit_amount=decimal.Decimal('10'),
+        )
+        new_user = AuthUser.create()
+        new_user.customer.invitor_code = old_invite_code
+
+        # try to redeem a new code
+        code = credit_service.create_invite_code('50.00')
+        with self.assertRaises(credit_service.CreditError):
+            credit_service.redeem_code(code.credit_code, new_user.customer)
+        self.assertEqual(new_user.customer.app_credit, decimal.Decimal('0.00'))
+
+        # redeem count should still be 0
+        code.refresh_from_db()
+        self.assertEqual(code.redeem_count, 0)
 
     def test_on_cash_spent(self):
         existing_user = AuthUser.create()

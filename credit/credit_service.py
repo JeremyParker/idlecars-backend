@@ -8,7 +8,7 @@ from django.utils import crypto, timezone
 from credit.models import CreditCode, Customer
 
 
-class CreditException(Exception):
+class CreditError(Exception):
     pass
 
 
@@ -53,16 +53,16 @@ def redeem_code(code_string, customer):
     try:
         code = CreditCode.objects.get(credit_code=code_string.upper())
     except CreditCode.DoesNotExist:
-        raise CreditException("Sorry, we don\'t recognize this code.")
+        raise CreditError("Sorry, we don\'t recognize this code.")
 
     if code.expiry_time is not None and code.expiry_time < timezone.now():
-        raise CreditException("Sorry, this code has expired.")
+        raise CreditError("Sorry, this code has expired.")
 
     if customer.invitor_code:
-        raise CreditException("It looks like you\'ve already used an invitation code.")
+        raise CreditError("It looks like you\'ve already used an invitation code.")
 
     if customer.invite_code == code:
-        raise CreditException("Sorry pal, you can't use your own code.")
+        raise CreditError("Sorry pal, you can't use your own code.")
 
     code.redeem_count += 1
     code.save()
@@ -85,4 +85,3 @@ def on_cash_spent(new_customer):
             pass
         new_customer.invitor_credited = True
         new_customer.save()
-
