@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
+from credit import credit_service
 from owner_crm.models import ops_notifications, driver_notifications
 from owner_crm.services import throttle_service, notification
 
@@ -40,6 +42,12 @@ def pre_save(modified_driver, orig):
             notification.send('ops_notifications.DocumentsUploaded', modified_driver)
 
     if modified_driver.documentation_approved and not orig.documentation_approved:
+        # when driver docs are approved, we assign the driver an invite code.
+        credit_service.create_invite_code(
+            invitee_amount=settings.SIGNUP_CREDIT,
+            invitor_amount=settings.INVITOR_CREDIT,
+            customer=modified_driver.auth_user.customer,
+        )
         server.services.booking.on_docs_approved(modified_driver)
 
     return modified_driver
@@ -50,7 +58,7 @@ def post_save(modified_driver, orig):
         server.services.booking.on_base_letter_approved(modified_driver)
 
     if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
-        #TODO: do something after driver fail to get base letter
+        #TODO: do something after driver fails to get base letter
         driver_notifications.base_letter_rejected(modified_driver)
 
 
