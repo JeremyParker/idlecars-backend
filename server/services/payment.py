@@ -22,9 +22,14 @@ def create_payment(
     invoice_end_time=None
 ):
     '''
-    create_payment's parameters are the way the outside world sees the payment. The way the payment is
-    actually paid is reflected in the Payment object.
-    `service_fee` serves as a way of determining how much the owner should get.
+    create_payment's parameters are the way the outside world sees the payment. The way the payment
+    is actually paid is reflected in the Payment object that is returned.
+    @booking - the booking that this payment applies to
+    @cash_amount - how much cash the driver will actually pay
+    @credit_amount - how much credit the driver will actually use up
+    @service_fee - how much of the total value of the payment the owner will NOT get.
+    @invoice_start_time - start of the period covered
+    @invoice_end_time - end of the period covered
     '''
     from server.services import driver as driver_service
     payment_method = driver_service.get_default_payment_method(booking.driver)
@@ -36,8 +41,9 @@ def create_payment(
             credit_amount=credit_amount,
             status=models.Payment.REJECTED,
         )
-
     assert payment_method.driver == booking.driver
+
+    cash_amount = Decimal(cash_amount)
     credit_amount = Decimal(credit_amount)
     service_fee = Decimal(service_fee)
     supplement = Decimal('0.00')
@@ -74,17 +80,27 @@ def _execute(function, payment):
     return payment
 
 
+def _deduct_app_credit(payment):
+    customer = payment.booking.driver.auth_user.customer
+    customer.app_credit -= payment.credit_amount
+    customer.save()
+
+
 def pre_authorize(payment):
     payment = _execute('pre_authorize', payment)
     if not payment.error_message:
-        customer = payment.booking.driver.auth_user.customer
-        customer.app_credit -= payment.credit_amount
-        customer.save()
+        _deduct_app_credit(payment)
     return payment
 
 
 def settle(payment):
-    return _execute('settle', payment)
+    original_status = payment.status
+    payment = _execute('settle', payment)
+
+    # if the payment succeeded, and credit wasn't already deducted
+    if not payment.error_message and original_status != models.Payment.PRE_AUTHORIZED:
+        _deduct_app_credit(payment)
+    return payment
 
 
 def void(payment):

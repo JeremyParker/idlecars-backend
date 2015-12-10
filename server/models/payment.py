@@ -20,12 +20,12 @@ class Payment(models.Model):
 
     STATUS = (
         (PENDING, 'Unpaid'),
-        (PRE_AUTHORIZED, 'Pre-authorized'),
-        (SETTLED, 'Paid'),
-        (HELD_IN_ESCROW, 'In escrow'),
-        (REFUNDED, 'Refunded'),
-        (VOIDED, 'Canceled'),
-        (DECLINED, 'Declined'),
+        (PRE_AUTHORIZED, 'Pre-authorized'), # app credit gets deducted
+        (SETTLED, 'Paid'),                  # app credit has already been deducted
+        (HELD_IN_ESCROW, 'In escrow'),      # no app credit involved
+        (REFUNDED, 'Refunded'),             # no app credit involved
+        (VOIDED, 'Canceled'),               # app credit gets returned
+        (DECLINED, 'Declined'),             # no app credit touched
         (REJECTED, 'Rejected'),
     )
 

@@ -42,6 +42,10 @@ class Command(BaseCommand):
             self.owner = factories.Owner.create()
             self.driver = factories.Driver.create()
 
+            # for some later tests
+            self.car = factories.BookableCar.create(owner=self.owner)
+            self.booking = factories.Booking.create(car=self.car, driver=self.driver)
+
             self._run_test('test_add_bank_account_failure', g)
             self._run_test('test_add_bank_account_individual', g)
             self._run_test('test_add_bank_account_business', g)
@@ -60,12 +64,19 @@ class Command(BaseCommand):
             self._run_test('test_escrow', g)
             self._run_test('test_escrow_fresh', g)
             self._run_test('test_escrow_fresh_error', g)
+            self._run_test('test_idlcars_credit_more_than_fee', g)
+            self._run_test('test_idlcars_supplement_no_cash_amount', g)
+            self._run_test('test_idlcars_supplement_no_cash_no_supplement', g)
+            self._run_test('test_idlcars_supplement_direct_settle', g)
+            self._run_test('test_idlcars_no_cash_direct_settle', g)
 
             # This test is not working right now. Status has to be "Settled". We can't fake that.
             # self._run_test('test_refund', g)
 
             self.owner.delete()
             self.driver.delete()
+            self.car.delete()
+            self.booking.delete()
 
     def test_add_bank_account_failure(self, gateway):
         success, acct, error_fields, error_msgs = gateway.link_bank_account({'funding':{}})
@@ -147,7 +158,7 @@ class Command(BaseCommand):
         '''
         car = factories.BookableCar.create(owner=self.owner)
         booking = factories.Booking.create(car=car, driver=self.driver)
-        dollar_amount = '9.{}'.format(randint(1, 99)) # change so the gateway won't reject as dupe.
+        dollar_amount = '9.{}'.format(randint(10, 99)) # change so the gateway won't reject as dupe.
         return services.payment.create_payment(booking, dollar_amount)
 
     def _create_zero_payment(self):
@@ -304,3 +315,83 @@ class Command(BaseCommand):
         payment = gateway.refund(payment)
         if not payment.status == models.Payment.REFUNDED:
             print 'test_refund failed with {} for {}'.format(payment.error_message, gateway)
+
+    def test_idlcars_credit_more_than_fee(self, gateway):
+        # the total cost for this rental period is $14.XX, with a $2 service fee
+        payment = services.payment.create_payment(
+            self.booking,
+            cash_amount = '9.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            credit_amount='5.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            service_fee='2.00',
+        )
+        if not payment.idlecars_supplement:
+            print 'Unexpected bahavior of create_payment. We didn\'t generate an idlecars_supplement.'
+
+        payment = gateway.pre_authorize(payment)
+        assert payment.status == models.Payment.PRE_AUTHORIZED, 'test_idlcars_credit_more_than_fee authorization'
+
+        payment = gateway.settle(payment)
+        assert payment.status == models.Payment.SETTLED
+        assert payment.error_message == ''
+        assert payment.transaction_id, 'transaction_id in test_idlcars_credit_more_than_fee'
+        assert payment.idlecars_transaction_id, 'idlecars_transaction_id in test_idlcars_credit_more_than_fee'
+
+    def test_idlcars_supplement_no_cash_amount(self, gateway):
+        payment = services.payment.create_payment(
+            self.booking,
+            cash_amount = '0.00',
+            credit_amount='5.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            service_fee='2.00', # we still ower the owner 3.00
+        )
+        assert payment.idlecars_supplement, 'idlecars_supplement in test_idlcars_supplement_no_cash_amount'
+
+        payment = gateway.pre_authorize(payment)
+        assert payment.status == models.Payment.PRE_AUTHORIZED, 'authorization at test_idlcars_supplement_no_cash_amount'
+
+        payment = gateway.settle(payment)
+        assert payment.status == models.Payment.SETTLED
+        assert payment.error_message == ''
+        assert not payment.transaction_id, 'should be no transaction_id if there was no cash_amount'
+        assert payment.idlecars_transaction_id, 'transaction_id in test_idlcars_supplement_no_cash_amount'
+
+    def test_idlcars_supplement_no_cash_no_supplement(self, gateway):
+        payment = services.payment.create_payment(
+            self.booking,
+            cash_amount = '0.00',
+            credit_amount='5.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            service_fee='20.00', # we owe nothing!
+        )
+        payment = gateway.pre_authorize(payment)
+        assert payment.status == models.Payment.PRE_AUTHORIZED, 'authorization at test_idlcars_supplement_no_cash_amount'
+
+        payment = gateway.settle(payment)
+        assert payment.status == models.Payment.SETTLED
+        assert payment.error_message == ''
+        assert not payment.idlecars_transaction_id, 'idlecars_transaction_id in test_idlcars_supplement_no_cash_no_supplement'
+        assert not payment.transaction_id, 'should be no transaction_id if there was no cash_amount'
+
+    def test_idlcars_supplement_direct_settle(self, gateway):
+        payment = services.payment.create_payment(
+            self.booking,
+            cash_amount = '9.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            credit_amount='6.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            service_fee='2.00',
+        )
+        payment = gateway.settle(payment)
+        assert payment.status == models.Payment.SETTLED
+        assert payment.error_message == ''
+        assert payment.transaction_id, 'transaction_id in test_idlcars_supplement_direct_settle'
+        assert payment.idlecars_transaction_id, 'idlecars_transaction_id in test_idlcars_supplement_direct_settle'
+
+    def test_idlcars_no_cash_direct_settle(self, gateway):
+        payment = services.payment.create_payment(
+            self.booking,
+            cash_amount = '0.00',
+            credit_amount='5.{}'.format(randint(10, 99)), # change so the gateway won't reject as dupe.
+            service_fee='2.00',
+        )
+        payment = gateway.settle(payment)
+        assert payment.status == models.Payment.SETTLED
+        assert payment.error_message == ''
+        assert not payment.transaction_id, 'transaction_id in test_idlcars_no_cash_direct_settle'
+        assert payment.idlecars_transaction_id, 'idlecars_transaction_id in test_idlcars_no_cash_direct_settle'

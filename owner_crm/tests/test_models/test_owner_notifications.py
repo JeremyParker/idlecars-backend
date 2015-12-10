@@ -10,11 +10,9 @@ from django.test import TestCase
 from owner_crm.services import notification
 from owner_crm.models import Campaign, owner_notifications
 from owner_crm import factories as crm_factories
-
-from idlecars import factories as idlecars_factories
 from server import factories as server_factories
 from idlecars import factories as idlecars_factories
-from idlecars import sms_service, app_routes_driver, app_routes_owner
+from idlecars import sms_service, app_routes_owner
 
 
 class OwnerNotificationTest(TestCase):
