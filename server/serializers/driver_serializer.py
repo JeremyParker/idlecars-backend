@@ -97,6 +97,5 @@ class DriverSerializer(ModelSerializer):
         return '${}'.format(instance.app_credit())
 
     def get_invite_code(self, instance):
-        import pdb; pdb.set_trace()
         if instance.invite_code():
             return CreditCodeSerializer(instance.invite_code()).data

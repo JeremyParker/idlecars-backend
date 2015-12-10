@@ -45,44 +45,51 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
                 continue
             self.assertEqual(response.data[k], driver_val)
 
-    # def test_get_driver_as_me(self):
-    #     response = self.client.get(self.url, {'pk': 'me'})
-    #     self._test_successful_get(response)
+    def test_get_driver_as_me(self):
+        response = self.client.get(self.url, {'pk': 'me'})
+        self._test_successful_get(response)
 
-    # def test_get_driver_by_id(self):
-    #     response = self.client.get(self.url, {'pk': self.driver.pk})
-    #     self._test_successful_get(response)
+    def test_get_driver_by_id(self):
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self._test_successful_get(response)
 
-    # def test_get_driver_fails_unauthorized(self):
-    #     self.client.credentials()
-    #     response = self.client.get(self.url, {'pk': 'me'})
-    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_get_driver_fails_unauthorized(self):
+        self.client.credentials()
+        response = self.client.get(self.url, {'pk': 'me'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # def test_we_show_default_payment_method(self):
-    #     factories.PaymentMethod.create(driver=self.driver)
-    #     factories.PaymentMethod.create(driver=self.driver, suffix='1234')
-    #     response = self.client.get(self.url, {'pk': self.driver.pk})
-    #     self.assertEqual(response.data['payment_method']['suffix'], '1234')
+    def test_we_show_default_payment_method(self):
+        factories.PaymentMethod.create(driver=self.driver)
+        factories.PaymentMethod.create(driver=self.driver, suffix='1234')
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self.assertEqual(response.data['payment_method']['suffix'], '1234')
 
-    # def test_sms_method(self):
-    #     get_response = self.client.get(self.url, {'pk': self.driver.pk})
-    #     self.assertTrue(get_response.data['sms_enabled'])
-    #     patch_response = self.client.patch(self.url, {'sms_enabled': False})
-    #     self.assertFalse(patch_response.data['sms_enabled'])
+    def test_sms_method(self):
+        get_response = self.client.get(self.url, {'pk': self.driver.pk})
+        self.assertTrue(get_response.data['sms_enabled'])
+        patch_response = self.client.patch(self.url, {'sms_enabled': False})
+        self.assertFalse(patch_response.data['sms_enabled'])
 
-    # def test_app_credit(self):
-    #     self.driver.auth_user.customer.app_credit = decimal.Decimal('55.00')
-    #     self.driver.auth_user.customer.save()
-    #     response = self.client.get(self.url, {'pk': self.driver.pk})
-    #     self._test_successful_get(response)
-    #     self.assertEqual(response.data['app_credit'], '$55.00')
+    def test_app_credit(self):
+        self.driver.auth_user.customer.app_credit = decimal.Decimal('55.00')
+        self.driver.auth_user.customer.save()
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self._test_successful_get(response)
+        self.assertEqual(response.data['app_credit'], '$55.00')
 
     def test_invite_code(self):
-        import pdb; pdb.set_trace()
-        code = credit_service.create_invite_code(self.driver.auth_user.customer)
+        code = credit_service.create_invite_code('10.00', '20.00', self.driver.auth_user.customer)
         response = self.client.get(self.url, {'pk': self.driver.pk})
         self._test_successful_get(response)
         self.assertEqual(response.data['invite_code']['credit_code'], code.credit_code)
+        self.assertEqual(
+            response.data['invite_code']['credit_amount'],
+            '${}'.format(code.credit_amount),
+        )
+        self.assertEqual(
+            response.data['invite_code']['invitor_credit_amount'],
+            '${}'.format(code.invitor_credit_amount),
+        )
 
 
 class DriverUpdateTest(AuthenticatedDriverTest):

@@ -17,7 +17,7 @@ class CreditCodeSerializer(ModelSerializer):
             'id',
             'credit_code',
             'expiry_time',
-            'redeem_count ',
+            'redeem_count',
             'credit_amount',
             'invitor_credit_amount',
         )
@@ -26,7 +26,7 @@ class CreditCodeSerializer(ModelSerializer):
             'id',
             'credit_code',
             'expiry_time',
-            'redeem_count ',
+            'redeem_count',
             'credit_amount',
             'invitor_credit_amount',
         )
