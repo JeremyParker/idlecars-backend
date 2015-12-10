@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import decimal
+
 from braintree.test.nonces import Nonces
 
 from django.core.urlresolvers import reverse
@@ -10,6 +12,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
+from credit.models import CreditCode
+from credit import credit_service
 from idlecars import fields
 from idlecars.factories import AuthUser
 from server import factories, models
@@ -35,10 +39,10 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
                 driver_val = driver_val()
             if k == 'phone_number':
                 driver_val = fields.format_phone_number(driver_val)
-            elif k == 'payment_method':
+            elif k == 'app_credit':
+                driver_val = '${}'.format(driver_val)
+            elif k in ['payment_method', 'invite_code',]: # these are different serializers
                 continue
-                self.assertEqual(response.data[k], driver_val)
-
             self.assertEqual(response.data[k], driver_val)
 
     def test_get_driver_as_me(self):
@@ -65,6 +69,27 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
         self.assertTrue(get_response.data['sms_enabled'])
         patch_response = self.client.patch(self.url, {'sms_enabled': False})
         self.assertFalse(patch_response.data['sms_enabled'])
+
+    def test_app_credit(self):
+        self.driver.auth_user.customer.app_credit = decimal.Decimal('55.00')
+        self.driver.auth_user.customer.save()
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self._test_successful_get(response)
+        self.assertEqual(response.data['app_credit'], '$55.00')
+
+    def test_invite_code(self):
+        code = credit_service.create_invite_code('10.00', '20.00', self.driver.auth_user.customer)
+        response = self.client.get(self.url, {'pk': self.driver.pk})
+        self._test_successful_get(response)
+        self.assertEqual(response.data['invite_code']['credit_code'], code.credit_code)
+        self.assertEqual(
+            response.data['invite_code']['credit_amount'],
+            '${}'.format(code.credit_amount),
+        )
+        self.assertEqual(
+            response.data['invite_code']['invitor_credit_amount'],
+            '${}'.format(code.invitor_credit_amount),
+        )
 
 
 class DriverUpdateTest(AuthenticatedDriverTest):

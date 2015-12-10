@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from credit_code_serializer import CreditCodeSerializer
 from nonce_serializer import NonceSerializer
 from user_serializer import UserSerializer, UserCreateSerializer
 from owner_serializer import OwnerSerializer, OwnerContactSerializer

@@ -9,7 +9,7 @@ from rest_framework.serializers import SerializerMethodField
 
 from idlecars import fields
 from server import models
-from server.serializers import PaymentMethodSerializer
+from server.serializers import PaymentMethodSerializer, CreditCodeSerializer
 from server.services import driver as driver_service
 
 
@@ -21,6 +21,8 @@ class DriverSerializer(ModelSerializer):
     first_name = CharField(max_length=30, required=False, allow_blank=True)
     last_name = CharField(max_length=30, required=False, allow_blank=True)
     payment_method = SerializerMethodField()
+    app_credit = SerializerMethodField()
+    invite_code = SerializerMethodField()
 
     class Meta:
         model = models.Driver
@@ -41,8 +43,16 @@ class DriverSerializer(ModelSerializer):
             'sms_enabled',
             'client_display',
             'payment_method',
+            'app_credit',
+            'invite_code',
         )
-        read_only_fields = ('id', 'all_docs_uploaded', 'payment_method',)
+        read_only_fields = (
+            'id',
+            'all_docs_uploaded',
+            'payment_method',
+            'app_credit',
+            'invite_code',
+        )
 
     def create(self, validated_data):
         phone_number = validated_data.get('phone_number')
@@ -82,3 +92,10 @@ class DriverSerializer(ModelSerializer):
         payment_method = driver_service.get_default_payment_method(instance)
         if payment_method:
             return PaymentMethodSerializer(payment_method).data
+
+    def get_app_credit(self, instance):
+        return '${}'.format(instance.app_credit())
+
+    def get_invite_code(self, instance):
+        if instance.invite_code():
+            return CreditCodeSerializer(instance.invite_code()).data
