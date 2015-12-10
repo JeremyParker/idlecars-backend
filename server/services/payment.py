@@ -27,7 +27,7 @@ def create_payment(
     @booking - the booking that this payment applies to
     @cash_amount - how much cash the driver will actually pay
     @credit_amount - how much credit the driver will actually use up
-    @service_fee - how much of the total value of the payment the owner will not get.
+    @service_fee - how much of the total value of the payment the owner will NOT get.
     @invoice_start_time - start of the period covered
     @invoice_end_time - end of the period covered
     '''
@@ -98,7 +98,7 @@ def settle(payment):
     payment = _execute('settle', payment)
 
     # if the payment succeeded, and credit wasn't already deducted
-    if not payment.error_message and original_status != Payment.PRE_AUTHORIZED:
+    if not payment.error_message and original_status != models.Payment.PRE_AUTHORIZED:
         _deduct_app_credit(payment)
     return payment
 
