@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import decimal
+
 from braintree.test.nonces import Nonces
 
 from django.core.urlresolvers import reverse
@@ -10,6 +12,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
+from credit.models import CreditCode
+from credit import credit_service
 from idlecars import fields
 from idlecars.factories import AuthUser
 from server import factories, models
@@ -35,36 +39,50 @@ class DriverRetrieveTest(AuthenticatedDriverTest):
                 driver_val = driver_val()
             if k == 'phone_number':
                 driver_val = fields.format_phone_number(driver_val)
-            elif k == 'payment_method':
+            elif k == 'app_credit':
+                driver_val = '${}'.format(driver_val)
+            elif k in ['payment_method', 'invite_code',]: # these are different serializers
                 continue
-                self.assertEqual(response.data[k], driver_val)
-
             self.assertEqual(response.data[k], driver_val)
 
-    def test_get_driver_as_me(self):
-        response = self.client.get(self.url, {'pk': 'me'})
-        self._test_successful_get(response)
+    # def test_get_driver_as_me(self):
+    #     response = self.client.get(self.url, {'pk': 'me'})
+    #     self._test_successful_get(response)
 
-    def test_get_driver_by_id(self):
+    # def test_get_driver_by_id(self):
+    #     response = self.client.get(self.url, {'pk': self.driver.pk})
+    #     self._test_successful_get(response)
+
+    # def test_get_driver_fails_unauthorized(self):
+    #     self.client.credentials()
+    #     response = self.client.get(self.url, {'pk': 'me'})
+    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # def test_we_show_default_payment_method(self):
+    #     factories.PaymentMethod.create(driver=self.driver)
+    #     factories.PaymentMethod.create(driver=self.driver, suffix='1234')
+    #     response = self.client.get(self.url, {'pk': self.driver.pk})
+    #     self.assertEqual(response.data['payment_method']['suffix'], '1234')
+
+    # def test_sms_method(self):
+    #     get_response = self.client.get(self.url, {'pk': self.driver.pk})
+    #     self.assertTrue(get_response.data['sms_enabled'])
+    #     patch_response = self.client.patch(self.url, {'sms_enabled': False})
+    #     self.assertFalse(patch_response.data['sms_enabled'])
+
+    # def test_app_credit(self):
+    #     self.driver.auth_user.customer.app_credit = decimal.Decimal('55.00')
+    #     self.driver.auth_user.customer.save()
+    #     response = self.client.get(self.url, {'pk': self.driver.pk})
+    #     self._test_successful_get(response)
+    #     self.assertEqual(response.data['app_credit'], '$55.00')
+
+    def test_invite_code(self):
+        import pdb; pdb.set_trace()
+        code = credit_service.create_invite_code(self.driver.auth_user.customer)
         response = self.client.get(self.url, {'pk': self.driver.pk})
         self._test_successful_get(response)
-
-    def test_get_driver_fails_unauthorized(self):
-        self.client.credentials()
-        response = self.client.get(self.url, {'pk': 'me'})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_we_show_default_payment_method(self):
-        factories.PaymentMethod.create(driver=self.driver)
-        factories.PaymentMethod.create(driver=self.driver, suffix='1234')
-        response = self.client.get(self.url, {'pk': self.driver.pk})
-        self.assertEqual(response.data['payment_method']['suffix'], '1234')
-
-    def test_sms_method(self):
-        get_response = self.client.get(self.url, {'pk': self.driver.pk})
-        self.assertTrue(get_response.data['sms_enabled'])
-        patch_response = self.client.patch(self.url, {'sms_enabled': False})
-        self.assertFalse(patch_response.data['sms_enabled'])
+        self.assertEqual(response.data['invite_code']['credit_code'], code.credit_code)
 
 
 class DriverUpdateTest(AuthenticatedDriverTest):
