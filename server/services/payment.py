@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from credit import credit_service
 from owner_crm.services import notification
 from server import payment_gateways
 from server import models
@@ -81,9 +82,10 @@ def _execute(function, payment):
 
 
 def _deduct_app_credit(payment):
-    customer = payment.booking.driver.auth_user.customer
-    customer.app_credit -= payment.credit_amount
-    customer.save()
+    if payment.credit_amount:
+        customer = payment.booking.driver.auth_user.customer
+        customer.app_credit -= payment.credit_amount
+        customer.save()
 
 
 def pre_authorize(payment):
@@ -97,9 +99,13 @@ def settle(payment):
     original_status = payment.status
     payment = _execute('settle', payment)
 
-    # if the payment succeeded, and credit wasn't already deducted
-    if not payment.error_message and original_status != models.Payment.PRE_AUTHORIZED:
-        _deduct_app_credit(payment)
+    if not payment.error_message:
+        # when a new user spends cash in the app, whoever invited them gets app credit
+        credit_service.on_cash_spent(payment.booking.driver.auth_user.customer)
+
+        # if the payment succeeded, and credit wasn't already deducted, deduct now.
+        if original_status != models.Payment.PRE_AUTHORIZED:
+            _deduct_app_credit(payment)
     return payment
 
 
