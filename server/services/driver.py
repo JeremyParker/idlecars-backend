@@ -6,11 +6,13 @@ import datetime
 from django.utils import timezone
 from django.db.models import Q
 
+from credit import credit_service
 from owner_crm.models import ops_notifications, driver_notifications
 from owner_crm.services import throttle_service, notification
 
 import server.models
 import server.services.booking
+from server.services import ServiceError
 
 
 doc_fields_and_names = {
@@ -52,6 +54,16 @@ def post_save(modified_driver, orig):
     if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
         #TODO: do something after driver fail to get base letter
         driver_notifications.base_letter_rejected(modified_driver)
+
+
+def redeem_code(driver, code_string):
+    # make sure the driver has never completed a booking
+    if any(b.pickup_time for b in driver.booking_set.all()):
+        raise ServiceError('Sorry, referral codes are for new drivers only.')
+    try:
+        credit_service.redeem_code(code_string, driver.auth_user.customer)
+    except credit_service.CreditError as e:
+        raise ServiceError(e.message)
 
 
 def get_missing_docs(driver):

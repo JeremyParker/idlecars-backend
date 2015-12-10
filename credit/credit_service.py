@@ -60,21 +60,21 @@ def redeem_code(code_string, customer):
     WHOEVER CALLS THIS IS RESPONSIBILE FOR MAKING SURE IT'S A *NEW* USER!!!
     '''
     if code_string is None:
-        return
+        raise CreditError('Sorry, we don\'t recognize this code.')
 
     try:
         code = CreditCode.objects.get(credit_code=code_string.upper())
     except CreditCode.DoesNotExist:
-        raise CreditError("Sorry, we don\'t recognize this code.")
+        raise CreditError('Sorry, we don\'t recognize this code.')
 
     if code.expiry_time is not None and code.expiry_time < timezone.now():
-        raise CreditError("Sorry, this code has expired.")
+        raise CreditError('Sorry, this code has expired.')
 
     if customer.invitor_code:
-        raise CreditError("It looks like you\'ve already used an invitation code.")
+        raise CreditError('It looks like you\'ve already used a referral code.')
 
     if customer.invite_code == code:
-        raise CreditError("Sorry pal, you can't use your own code.")
+        raise CreditError('Woah pal! You can\'t use your own code.')
 
     code.redeem_count += 1
     code.save()

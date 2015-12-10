@@ -6,20 +6,25 @@ from django.core.exceptions import PermissionDenied
 
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, ValidationError
 from rest_framework.serializers import SerializerMethodField
+from rest_framework.exceptions import ValidationError
 
 from idlecars import fields
 from server import models
 from server.serializers import PaymentMethodSerializer, CreditCodeSerializer
 from server.services import driver as driver_service
+from server.services import ServiceError
 
 
 class DriverSerializer(ModelSerializer):
-    # we must add fields that are mapped to auth_user
+    # we must add fields that are mapped to auth_user, or auth_user.customer
     phone_number = fields.PhoneNumberField(max_length=30)
     password = CharField(max_length=128, write_only=True)
     email = EmailField(required=False, allow_blank=True)
     first_name = CharField(max_length=30, required=False, allow_blank=True)
     last_name = CharField(max_length=30, required=False, allow_blank=True)
+
+    invitor_code = CharField(max_length=16, required=False, allow_blank=True, write_only=True)
+
     payment_method = SerializerMethodField()
     app_credit = SerializerMethodField()
     invite_code = SerializerMethodField()
@@ -37,6 +42,7 @@ class DriverSerializer(ModelSerializer):
             # stuff from auth_user
             'phone_number',
             'password',
+            'invitor_code',
             'email',
             'first_name',
             'last_name',
@@ -72,6 +78,13 @@ class DriverSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         if 'password' in validated_data:
             raise PermissionDenied()
+
+        if 'invitor_code' in validated_data:
+            try:
+                driver_service.redeem_code(instance, validated_data['invitor_code'])
+            except ServiceError as e:
+                raise ValidationError(e.message)
+
         auth_user = instance.auth_user
         auth_user.username = validated_data.get('phone_number', auth_user.username)
         auth_user.email = validated_data.get('email', auth_user.email)
