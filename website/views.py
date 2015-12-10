@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
 from django.core import urlresolvers
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.conf import settings
 
 from idlecars import app_routes_driver, app_routes_owner
@@ -62,6 +62,18 @@ def about(request):
         'show_thanks': show_thanks(),
     }
     return render(request, 'about_page.jade', context)
+
+
+'''
+View that redirects users to driver sign up page
+'''
+def driver_referral(request, credit=None):
+    if credit != '50' and credit != '75':
+        return HttpResponseNotFound('Sorry, this page is not found')
+
+    utm = '?utm_campaign=referral&utm_medium=fliers&utm_source=-&utm_content=' + credit
+    url = app_routes_driver.driver_signup() + utm
+    return HttpResponseRedirect(url)
 
 
 '''
