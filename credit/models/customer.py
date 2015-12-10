@@ -18,7 +18,7 @@ class Customer(models.Model):
     invitor_code = models.ForeignKey("CreditCode", null=True, blank=True, verbose_name="Invited by")
     invitor_credited = models.BooleanField(default=False)
 
-    # the code I can give out to others
+    # my code I can give out to others
     invite_code = models.OneToOneField("CreditCode", null=True, blank=True, unique=True, related_name="invitor")
 
     # how much app credit I have.
