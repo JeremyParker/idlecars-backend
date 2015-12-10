@@ -148,6 +148,27 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().driver_license_image, 'newurl')
 
+    def test_redeem_bad_referral_code(self):
+        response = self.client.patch(self.url, {'invitor_code': 'BADCODE'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['_app_notifications'], ['Sorry, we don\'t recognize this code.'])
+
+    def test_redeem_not_new_driver(self):
+        factories.BookedBooking.create(driver=self.driver)
+        code = credit_service.create_invite_code('20.00')
+        response = self.client.patch(self.url, {'invitor_code': code.credit_code})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data['_app_notifications'],
+            ['Sorry, referral codes are for new drivers only.']
+        )
+
+    def test_redeem_success(self):
+        code = credit_service.create_invite_code('20.00')
+        response = self.client.patch(self.url, {'invitor_code': code.credit_code})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['app_credit'], '$20.00')
+
     def test_fails_when_not_owner(self):
         other_driver = factories.Driver.create()
         url = reverse('server:drivers-detail', args=(other_driver.id,))
