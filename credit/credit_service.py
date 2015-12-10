@@ -16,7 +16,7 @@ def generate_invite_code_string(customer=None, code=''):
     if customer:
         name = customer.user.first_name or customer.user.last_name or customer.user.email
         code = name.upper()[:8]
-    while CreditCode.objects.filter(credit_code=code).exists():
+    while len(code) < 4 or CreditCode.objects.filter(credit_code=code).exists():
         code = code + crypto.get_random_string(1, "34689") # so we don't create a word
         while CreditCode.objects.filter(credit_code=code).exists():
             code = code + crypto.get_random_string(1, "ABCDEFGHJKLMNPQRTWXY34689")
@@ -25,14 +25,18 @@ def generate_invite_code_string(customer=None, code=''):
 
 def create_invite_code(invitee_amount, invitor_amount='0.00', customer=None):
     # TODO - customers are randomly assigned to a cohort (50/50 or 25/75)
-    code = generate_invite_code_string(customer)
+    code_string = generate_invite_code_string(customer)
     invite_code = CreditCode.objects.create(
-        credit_code=code,
+        credit_code=code_string,
         credit_amount=decimal.Decimal(invitee_amount),
         invitor_credit_amount=decimal.Decimal(invitor_amount),
         expiry_time=None,  # TODO: are we gonna do expiration?
     )
     if customer:
+        invite_code.description = 'Invite code for {} {}'.format(
+            customer.user.first_name,
+            customer.user.last_name,
+        )
         customer.invite_code = invite_code
         customer.save()
     return invite_code

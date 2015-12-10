@@ -13,19 +13,41 @@ from idlecars.factories import AuthUser
 class CreditCodeServiceTest(TestCase):
     def test_create_create_code_no_customer(self):
         code = credit_service.create_invite_code('20.00')
+        # code string should be between 4 and 8 characters
+        self.assertTrue(len(code.credit_code) <= 8)
+        self.assertTrue(len(code.credit_code) >= 4)
 
-    def test_create_create_code(self):
+        self.assertEqual(code.credit_amount, decimal.Decimal('20.00'))
+        self.assertEqual(code.invitor_credit_amount, decimal.Decimal('0.00'))
+        self.assertEqual(code.redeem_count, 0)
+
+    def test_codes_are_unique(self):
+        codes = []
+        for n in range(200):
+            code = credit_service.create_invite_code('0.0')
+            self.assertFalse(code.credit_code in codes)
+            codes.append(code.credit_code)
+
+    def test_create_create_code_with_customer(self):
         auth_user = AuthUser.create()
         code = credit_service.create_invite_code(
             '50.00',
             '50.00',
             auth_user.customer
         )
-        self.assertTrue(len(code.credit_code) <= 8)
         self.assertEqual(auth_user.customer.invite_code, code)
 
-        codes = [code.credit_code]
-        for n in range(50):
+        self.assertTrue(len(code.credit_code) <= 8)
+        self.assertTrue(len(code.credit_code) >= 4)
+
+        self.assertEqual(code.credit_amount, decimal.Decimal('50.00'))
+        self.assertEqual(code.invitor_credit_amount, decimal.Decimal('50.00'))
+        self.assertEqual(code.redeem_count, 0)
+
+    def test_codes_with_customer_are_unique(self):
+        auth_user = AuthUser.create()
+        codes = []
+        for n in range(200):
             code = credit_service.create_invite_code('0.0', '0.0', auth_user.customer)
             self.assertFalse(code.credit_code in codes)
             codes.append(code.credit_code)
