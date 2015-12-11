@@ -33,6 +33,7 @@ def _get_booking_params(booking):
         (
             booking_payment_fee,
             next_payment_amount,
+            next_credit_amount,
             invoice_start_time,
             invoice_end_time,
         ) = invoice_service.calculate_next_rent_payment(booking)
@@ -41,6 +42,7 @@ def _get_booking_params(booking):
         (
             booking_payment_fee,
             next_payment_amount,
+            next_credit_amount,
             invoice_start_time,
             invoice_end_time,
         ) = booking_service.estimate_next_rent_payment(booking)

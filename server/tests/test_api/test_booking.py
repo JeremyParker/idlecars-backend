@@ -269,7 +269,11 @@ class ReservedBookingDetailsTest(APITestCase):
         start_time = self.booking.checkout_time + datetime.timedelta(days=2)
         self.assertEqual(
             response.data['next_payment'],
-            {'amount': self.booking.car.solo_cost, 'start_time': start_time.strftime('%b %d')}
+            {
+                'amount': self.booking.car.solo_cost,
+                'start_time': start_time.strftime('%b %d'),
+                'credit': 0,
+            }
         )
 
     def test_next_rent_payment_partial_week(self):
