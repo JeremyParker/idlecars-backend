@@ -413,8 +413,17 @@ class PaymentReceipt(notification.DriverNotification):
             Car: {} <br /><br />
 
             Invoice Period: {} - {} <br />
-            Payment Amount: {} <br /><br />
+            Payment Amount: ${} <br />
         '''
+        if kwargs['payment_credit_amount'] > 0:
+            text += '''
+                Driver Credit: ${} <br />
+                Payment Amount: ${} <br />
+            '''.format(
+                kwargs['payment_credit_amount'],
+                kwargs['payment_cash_amount'],
+            )
+
         if kwargs['booking_next_payment_amount'] > 0:
             text += 'Your next payment of ${} will occur on {} <br />'.format(
                 kwargs['booking_next_payment_amount'],
