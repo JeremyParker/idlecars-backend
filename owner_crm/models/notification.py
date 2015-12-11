@@ -34,7 +34,7 @@ def _get_booking_params(booking):
             booking_payment_fee,
             next_payment_amount,
             invoice_start_time,
-            invoice_end_time
+            invoice_end_time,
         ) = invoice_service.calculate_next_rent_payment(booking)
     else:
         from server.services import booking as booking_service
@@ -42,7 +42,7 @@ def _get_booking_params(booking):
             booking_payment_fee,
             next_payment_amount,
             invoice_start_time,
-            invoice_end_time
+            invoice_end_time,
         ) = booking_service.estimate_next_rent_payment(booking)
 
     return {
@@ -234,7 +234,8 @@ class Notification(object):
             argument_name = match_list.get(function_name)
             function = eval(function_name)
             argument = eval(argument_name)
-            self.update_params(function(argument))
+            params = function(argument)
+            self.params.update(params)
 
     def argument_class(self):
         return type(self.argument).__name__ or None
@@ -252,9 +253,6 @@ class Notification(object):
 
     def custom_params_sets(self):
         return []
-
-    def update_params(self, params_set):
-        self.params.update(params_set)
 
     def get_receiver_params(self, receiver):
         pass
@@ -323,7 +321,7 @@ class OwnerNotification(Notification):
     def get_receiver_params(self, receiver):
         receiver = receiver['user']
         receiver_params = _get_user_params(receiver)
-        self.update_params(receiver_params)
+        self.params.update(receiver_params)
 
     def get_all_receivers(self):
         clas = self.argument_class()
