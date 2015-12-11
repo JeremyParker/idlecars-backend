@@ -86,7 +86,7 @@ class OwnerAccountDeclined(notification.OpsNotification):
 class NewUserMessage(notification.OpsNotification):
     def get_context(self, **kwargs):
         return {
-            'FNAME': 'New user message',
+            'FNAME': 'Ops team',
             'HEADLINE': 'A new message from user {}'.format(kwargs['message_first_name']),
             'TEXT': '''
                 User first name is: {}

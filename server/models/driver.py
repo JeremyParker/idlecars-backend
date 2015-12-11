@@ -8,7 +8,6 @@ from django.core import exceptions
 from idlecars import model_helpers, fields
 
 
-
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
     documentation_approved = models.BooleanField(
@@ -53,6 +52,12 @@ class Driver(models.Model):
 
     def email(self):
         return self.auth_user.email
+
+    def app_credit(self):
+        return self.auth_user.customer.app_credit
+
+    def invite_code(self):
+        return self.auth_user.customer.invite_code
 
     def all_docs_uploaded(self):
         return bool(

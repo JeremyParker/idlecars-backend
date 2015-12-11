@@ -105,6 +105,16 @@ To deploy to staging:
 git push staging master
 heroku run python manage.py migrate --app staging-idlecars
 ```
+Occasionally, we add manual backfills. To execute a manual backfill, follow this pattern:
+```
+terminal_prompt$ ./manage.py shell
+Python 2.7.9 (default, Feb 10 2015, 03:28:08) 
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.56)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from credit.backfills import _20151207_backfill_customers
+>>> _20151207_backfill_customers.run_backfill_customers()
+```
 
 To deploy to production:
 ```

@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 from django.http import Http404
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.exceptions import ValidationError
 
 from server import models
 from server.services import payment_method as payment_method_service
@@ -45,6 +46,12 @@ class DriverViewSet(
                 return driver_service.create(auth_user=self.request.user)
         return super(DriverViewSet, self).get_object()
 
+    def update(self, request, *args, **kwargs):
+        try:
+            return super(DriverViewSet, self).update(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
+
     @detail_route(methods=['post'], permission_classes=[OwnsDriver])
     def payment_method(self, request, pk=None):
         serializer = NonceSerializer(data=request.DATA)
@@ -60,4 +67,3 @@ class DriverViewSet(
             return Response({'_app_notifications': [DRIVER_NOT_FOUND_ERROR]}, HTTP_400_BAD_REQUEST)
         except payment_method_service.ServiceError as pm_error:
             return Response({'_app_notifications': [pm_error.message]}, HTTP_400_BAD_REQUEST)
-
