@@ -248,12 +248,6 @@ class PaymentReceipt(notification.OwnerNotification):
             Service Fee: ${} <br />
             ---------------------------------- <br />
             Total disbursement: ${} <br /><br />
-
-            Due to an Idlecars promotion we are covering a portion of the driver’s rent.
-            This will cause the payment to come in two separate deposits at the same time: <br />
-            Payment 1: ${} <br />
-            Payemnt 2: ${} <br />
-            <br />
         '''.format(
                 kwargs['car_name'],
                 kwargs['car_plate'],
@@ -261,9 +255,19 @@ class PaymentReceipt(notification.OwnerNotification):
 
                 kwargs['payment_invoice_start_time'].strftime('%b %d'),
                 kwargs['payment_invoice_end_time'].strftime('%b %d'),
-                kwargs['payment_amount'],
+                kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'],
                 kwargs['payment_service_fee'],
                 kwargs['payment_amount'] - kwargs['payment_service_fee'],
+            )
+
+        if kwargs['payment_credit_amount'] > 0:
+            text += '''
+                Due to an Idlecars promotion we are covering a portion of the driver’s rent.
+                This will cause the payment to come in two separate deposits at the same time: <br />
+                Payment 1: ${} <br />
+                Payemnt 2: ${} <br />
+                <br />
+            '''.format(
                 kwargs['payment_cash_amount'],
                 kwargs['payment_credit_amount'],
             )
