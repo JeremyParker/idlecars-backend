@@ -257,7 +257,7 @@ class PaymentReceipt(notification.OwnerNotification):
                 kwargs['payment_invoice_end_time'].strftime('%b %d'),
                 kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'],
                 kwargs['payment_service_fee'],
-                kwargs['payment_amount'] - kwargs['payment_service_fee'],
+                kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'] - kwargs['payment_service_fee'],
             )
 
         if kwargs['payment_credit_amount'] > 0:
