@@ -138,7 +138,7 @@ class E2ETestSetup():
             email='kerry@test.com',
             first_name='Kerry',
             last_name='Goose')
-        server.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
+        idlecars.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
     def _setup_owner(self):
         '''
