@@ -247,8 +247,13 @@ class PaymentReceipt(notification.OwnerNotification):
             Payment Amount: ${} <br />
             Service Fee: ${} <br />
             ---------------------------------- <br />
-            Total disbursement: ${} <br />
-            <br /><br />
+            Total disbursement: ${} <br /><br />
+
+            Due to an Idlecars promotion we are covering a portion of the driver’s rent.
+            This will cause the payment to come in two separate deposits at the same time: <br />
+            Payment 1: ${} <br />
+            Payemnt 2: ${} <br />
+            <br />
         '''.format(
                 kwargs['car_name'],
                 kwargs['car_plate'],
@@ -259,6 +264,8 @@ class PaymentReceipt(notification.OwnerNotification):
                 kwargs['payment_amount'],
                 kwargs['payment_service_fee'],
                 kwargs['payment_amount'] - kwargs['payment_service_fee'],
+                kwargs['payment_cash_amount'],
+                kwargs['payment_credit_amount'],
             )
 
         if kwargs['booking_next_payment_amount'] > 0:
