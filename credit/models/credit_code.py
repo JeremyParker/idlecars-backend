@@ -15,4 +15,4 @@ class CreditCode(models.Model):
     invitor_credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __unicode__(self):
-        return self.credit_code
+        return self.description or self.credit_code

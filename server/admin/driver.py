@@ -58,7 +58,8 @@ class DriverAdmin(ReverseModelAdmin):
         ('None', {
             'fields': (
                 ('sms_enabled'),
-                ('date_joined', 'braintree_customer_id'),
+                ('date_joined', 'invited_by', ),
+                ('app_credit', 'braintree_customer_id',),
                 ('notes'),
             ),
         }),
@@ -66,12 +67,14 @@ class DriverAdmin(ReverseModelAdmin):
     readonly_fields = [
         'sms_enabled',
         'date_joined',
+        'invited_by',
         'full_name',
         'dmv_link',
         'fhv_link',
         'dd_link',
         'poa_link',
         'base_letter_link',
+        'app_credit',
         'braintree_customer_id',
     ]
     inlines = [BookingForDriverInline, PaymentMethodInline,]
@@ -112,4 +115,8 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
     base_letter_link.short_description = ''
     base_letter_link.allow_tags = True
+
+    def invited_by(self, instance):
+        return instance.auth_user.customer.invitor_code
+
 

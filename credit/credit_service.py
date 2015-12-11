@@ -34,12 +34,10 @@ def create_invite_code(invitee_amount, invitor_amount='0.00', customer=None):
     code_string = generate_invite_code_string(customer)
 
     if customer:
-        description = 'Invite code for {} {}'.format(
+        description = '{} {}\'s invite code'.format(
             customer.user.first_name,
             customer.user.last_name,
         )
-    else:
-        description = 'One-sided referral code'
 
     invite_code = CreditCode.objects.create(
         credit_code=code_string,
