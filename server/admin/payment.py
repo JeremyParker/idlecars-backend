@@ -17,7 +17,7 @@ class PaymentAdmin(admin.ModelAdmin):
                 ('invoice_description', 'booking_link',),
                 ('amount', 'service_fee', 'credit_amount', 'idlecars_supplement', ),
                 ('created_time', 'status', 'error_message',),
-                ('gateway_link', 'payment_method_link', 'idlecars_supplement_link'),
+                ('payment_method_link', 'gateway_link', 'idlecars_supplement_link'),
                 ('notes',),
             )
         }),
@@ -33,6 +33,7 @@ class PaymentAdmin(admin.ModelAdmin):
         'status',
         'error_message',
         'gateway_link',
+        'idlecars_supplement_link',
     ]
     inlines = [BraintreeRequestInline,]
     list_display = ('created_time', 'invoice_description', 'booking_link', 'amount', 'status')

@@ -39,6 +39,9 @@ class DriverServiceTest(TestCase):
         self.driver.documentation_approved = True
         self.driver.save()
 
+        # the driver should now have an invite code
+        self.assertTrue(self.driver.auth_user.customer.invite_code)
+
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
@@ -52,6 +55,9 @@ class DriverServiceTest(TestCase):
     def _validate_no_booking_email(self):
         self.driver.documentation_approved = True
         self.driver.save()
+
+        # the driver should now have an invite code
+        self.assertTrue(self.driver.auth_user.customer.invite_code)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
@@ -133,6 +139,9 @@ class DriverServiceTest(TestCase):
         new_booking = factories.ReservedBooking.create(car=self.car, driver=self.driver)
         self.driver.documentation_approved = True
         self.driver.save()
+
+        # the driver should now have an invite code
+        self.assertTrue(self.driver.auth_user.customer.invite_code)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)

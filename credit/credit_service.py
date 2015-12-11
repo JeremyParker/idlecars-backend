@@ -33,6 +33,7 @@ def create_invite_code(invitee_amount, invitor_amount='0.00', customer=None):
     # TODO - customers are randomly assigned to a cohort (50/50 or 25/75)
     code_string = generate_invite_code_string(customer)
 
+    description = ''
     if customer:
         description = '{} {}\'s invite code'.format(
             customer.user.first_name,
