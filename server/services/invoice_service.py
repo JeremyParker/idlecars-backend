@@ -82,6 +82,7 @@ def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_t
     return (
         service_fee,
         amount,
+        0,
         invoice_start_time,
         invoice_end_time
     )
@@ -89,7 +90,7 @@ def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_t
 
 def create_next_rent_payment(booking):
     # invoice the driver
-    fee, amount, start_time, end_time = calculate_next_rent_payment(booking)
+    fee, amount, credit_amount, start_time, end_time = calculate_next_rent_payment(booking)
 
     # user some credit if the customer has any app credit
     customer = booking.driver.auth_user.customer

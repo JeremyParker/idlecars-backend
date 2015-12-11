@@ -207,12 +207,12 @@ def on_incomplete(booking, original_booking_state):
 
 def estimate_next_rent_payment(booking):
     '''
-    Returns a tuple of (service_fee, rent_amount, start_time, end_time), based on
-    an estimated pickup time
+    Returns a tuple of (service_fee, rent_amount, app_credit_amount, start_time, end_time), based
+    on an estimated pickup time
     '''
     assert not booking.pickup_time
     if not booking.checkout_time:
-        return (None, None, None, None)
+        return (None, None, None, None, None)
 
     estimated_pickup_time = estimate_pickup_time(booking)
     estimated_end_time = calculate_end_time(booking, estimated_pickup_time)
