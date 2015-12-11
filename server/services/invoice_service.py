@@ -79,10 +79,15 @@ def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_t
         rounding=ROUND_UP
     )
 
+    # user some credit if the customer has any app credit
+    customer = booking.driver.auth_user.customer
+    cash_amount = max(Decimal('0.00'), amount - customer.app_credit)
+    credit_amount = amount - cash_amount
+
     return (
         service_fee,
-        amount,
-        0,
+        cash_amount,
+        credit_amount,
         invoice_start_time,
         invoice_end_time
     )
@@ -90,13 +95,7 @@ def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_t
 
 def create_next_rent_payment(booking):
     # invoice the driver
-    fee, amount, credit_amount, start_time, end_time = calculate_next_rent_payment(booking)
-
-    # user some credit if the customer has any app credit
-    customer = booking.driver.auth_user.customer
-    cash_amount = max(Decimal('0.00'), amount - customer.app_credit)
-    credit_amount = amount - cash_amount
-
+    fee, cash_amount, credit_amount, start_time, end_time = calculate_next_rent_payment(booking)
     return payment_service.create_payment(
         booking,
         cash_amount,

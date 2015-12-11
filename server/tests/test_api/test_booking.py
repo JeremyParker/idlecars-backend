@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import decimal
 from braintree.test.nonces import Nonces
 
 from django.core.urlresolvers import reverse
@@ -273,6 +274,20 @@ class ReservedBookingDetailsTest(APITestCase):
                 'amount': self.booking.car.solo_cost,
                 'start_time': start_time.strftime('%b %d'),
                 'credit': 0,
+            }
+        )
+
+    def test_next_rent_payment_with_credit(self):
+        self.booking.driver.auth_user.customer.app_credit = decimal.Decimal('50.00')
+        self.booking.driver.auth_user.customer.save()
+        response = self.client.get(self.url, format='json')
+        start_time = self.booking.checkout_time + datetime.timedelta(days=2)
+        self.assertEqual(
+            response.data['next_payment'],
+            {
+                'amount': self.booking.car.solo_cost - 50,
+                'start_time': start_time.strftime('%b %d'),
+                'credit': 50,
             }
         )
 
