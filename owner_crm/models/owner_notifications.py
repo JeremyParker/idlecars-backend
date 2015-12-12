@@ -206,29 +206,41 @@ We don’t want to do that so please let us know if there are any problems.'.for
 
 class PickupConfirmation(notification.OwnerNotification):
     def get_context(self, **kwargs):
+        text = '''
+            You have received a payment of ${} from {} for the {}
+            You can now give them the keys to drive.
+            <br />
+            Their credit card has been charged and you will receive the payment within 48 hours. The security
+            deposit of ${} has also been placed in escrow for you.
+        '''.format(
+            kwargs['payment_credit_amount'] + kwargs ['payment_cash_amount'],
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_deposit']
+        )
+
+        if kwargs['payment_credit_amount'] > 0:
+            text += '''
+                Due to an Idlecars promotion we are covering a portion of the driver’s rent.
+                This will cause the payment to come in two separate deposits at the same time: <br />
+                Payment 1: ${} <br />
+                Payemnt 2: ${} <br />
+                <br />
+            '''.format(
+                kwargs['payment_cash_amount'],
+                kwargs['payment_credit_amount'],
+            )
+
         return {
             'FNAME': kwargs['user_first_name'] or None,
             'HEADLINE': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': '''
-                You have received a payment of ${} from {} for the {}
-                You can now give them the keys to drive.
-                <br />
-                Their credit card has been charged and you will receive the payment within 48 hours. The security
-                deposit of ${} has also been placed in escrow for you.
-            '''.format(
-                # TODO: not always weely_rent_amount, we need to get the real amount, if time < 7 days
-                kwargs['booking_weekly_rent'],
-                kwargs['driver_full_name'],
-                kwargs['car_name'],
-                kwargs['car_deposit']
-            ),
+            'TEXT': text,
             'template_name': 'no_button_no_image',
             'subject': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
             'sms_body': 'You have received a payment of ${} from {} for the {} You can now give them \
 the keys to drive. Their credit card has been charged and you will receive the payment within 48 hours. \
 The security deposit of ${} has also been placed in escrow for you.'.format(
-                # TODO: not always weely_rent_amount, we need to get realy amount, if time < than 7days
-                kwargs['booking_weekly_rent'],
+                kwargs['payment_credit_amount'] + kwargs ['payment_cash_amount'],
                 kwargs['driver_full_name'],
                 kwargs['car_name'],
                 kwargs['car_deposit']
