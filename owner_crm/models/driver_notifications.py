@@ -413,7 +413,7 @@ class PaymentReceipt(notification.DriverNotification):
             Car: {} <br /><br />
 
             Invoice Period: {} - {} <br />
-            Payment Amount: ${} <br />
+            Rental Amount: ${} <br />
         '''
         if kwargs['payment_credit_amount'] > 0:
             text += '''
