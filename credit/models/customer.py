@@ -23,3 +23,6 @@ class Customer(models.Model):
 
     # how much app credit I have.
     app_credit = models.DecimalField(max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+
+    def __unicode__(self):
+        return self.user.__unicode__()
