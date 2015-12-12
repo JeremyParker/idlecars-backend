@@ -438,7 +438,7 @@ class PaymentReceipt(notification.DriverNotification):
             kwargs['car_name'],
             kwargs['payment_invoice_start_time'].strftime('%b %d'),
             kwargs['payment_invoice_end_time'].strftime('%b %d'),
-            kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'],
+            kwargs ['payment_total_amount'],
             kwargs['booking_end_time'].strftime('%b %d'),
         )
 

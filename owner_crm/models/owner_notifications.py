@@ -213,7 +213,7 @@ class PickupConfirmation(notification.OwnerNotification):
             Their credit card has been charged and you will receive the payment within 48 hours. The security
             deposit of ${} has also been placed in escrow for you.
         '''.format(
-            kwargs['payment_credit_amount'] + kwargs ['payment_cash_amount'],
+            kwargs['payment_total_amount'],
             kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_deposit']
@@ -240,7 +240,7 @@ class PickupConfirmation(notification.OwnerNotification):
             'sms_body': 'You have received a payment of ${} from {} for the {} You can now give them \
 the keys to drive. Their credit card has been charged and you will receive the payment within 48 hours. \
 The security deposit of ${} has also been placed in escrow for you.'.format(
-                kwargs['payment_credit_amount'] + kwargs ['payment_cash_amount'],
+                kwargs['payment_total_amount'],
                 kwargs['driver_full_name'],
                 kwargs['car_name'],
                 kwargs['car_deposit']
@@ -267,9 +267,9 @@ class PaymentReceipt(notification.OwnerNotification):
 
                 kwargs['payment_invoice_start_time'].strftime('%b %d'),
                 kwargs['payment_invoice_end_time'].strftime('%b %d'),
-                kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'],
+                kwargs ['payment_total_amount'],
                 kwargs['payment_service_fee'],
-                kwargs['payment_cash_amount'] + kwargs['payment_credit_amount'] - kwargs['payment_service_fee'],
+                kwargs ['payment_total_amount'] - kwargs['payment_service_fee'],
             )
 
         if kwargs['payment_credit_amount'] > 0:
