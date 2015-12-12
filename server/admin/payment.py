@@ -72,8 +72,8 @@ class PaymentInline(admin.TabularInline):
     verbose_name = 'Payments'
     extra = 0
     can_delete = False
-    fields = ['time_link', 'invoice_description', 'amount', 'status', 'payment_method']
-    readonly_fields = ['time_link', 'invoice_description', 'amount', 'status', 'payment_method']
+    fields = ['time_link', 'invoice_description', 'amount', 'credit_amount', 'status', 'payment_method']
+    readonly_fields = ['time_link', 'invoice_description', 'amount', 'credit_amount', 'status', 'payment_method']
     def time_link(self, instance):
         return link(instance, instance.created_time.strftime("%b %d, %Y %H:%M:%S"))
     def gateway_link(self, instance):
