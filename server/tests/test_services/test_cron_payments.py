@@ -183,6 +183,8 @@ class TestCronPayments(TestCase):
         customer = self.booking.driver.auth_user.customer
         customer.app_credit = Decimal('0.00')
         customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
         call_command('cron_job')
 
         from django.core.mail import outbox
@@ -194,15 +196,14 @@ class TestCronPayments(TestCase):
         customer = self.booking.driver.auth_user.customer
         customer.app_credit = Decimal('1.00')
         customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
         call_command('cron_job')
 
         from django.core.mail import outbox
-        # import pdb; pdb.set_trace()
         owner_email = self.booking.car.owner.auth_users.first().email
 
-        cash_amount = self.booking.payment_set.last().amount
-        service_fee = self.booking.payment_set.last().service_fee
-        payment1 = 'Payment 1: $' + str(cash_amount - service_fee)
+        payment1 = 'Payment 1: $457.50'
         payment2 = 'Payment 2: $1.00'
         self.assertTrue(payment1 in outbox[1].merge_vars[owner_email]['TEXT'])
         self.assertTrue(payment2 in outbox[1].merge_vars[owner_email]['TEXT'])
@@ -211,6 +212,8 @@ class TestCronPayments(TestCase):
         customer = self.booking.driver.auth_user.customer
         customer.app_credit = Decimal('10000.00')
         customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
         call_command('cron_job')
 
         from django.core.mail import outbox
