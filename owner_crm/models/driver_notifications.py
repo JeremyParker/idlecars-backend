@@ -11,6 +11,24 @@ from idlecars import email
 from owner_crm.models import notification
 
 
+class SignupCredit(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        subject = 'You have ${} towards and Idlecars rental'.format(kwargs['driver_credit'])
+        cta_url = kwargs['car_listing_url']
+        text = 'Thank you for entering your Idlecars referral code! \
+You have ${} towards your next rental.'.format(kwargs['driver_credit'])
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': subject,
+            'TEXT': text,
+            'CTA_LABEL': 'Find a car here',
+            'CTA_URL': cta_url,
+            'subject': subject,
+            'template_name': 'one_button_no_image',
+            'sms_body': text + ' Find a car here: ' + cta_url
+        }
+
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)

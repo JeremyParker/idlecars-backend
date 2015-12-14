@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.db.models import Q
 
 from credit import credit_service
-from owner_crm.models import ops_notifications, driver_notifications
 from owner_crm.services import throttle_service, notification
 
 import server.models
@@ -60,7 +59,8 @@ def post_save(modified_driver, orig):
 
     if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
         #TODO: do something after driver fails to get base letter
-        driver_notifications.base_letter_rejected(modified_driver)
+        # driver_notifications.base_letter_rejected(modified_driver)
+        pass
 
 
 def redeem_code(driver, code_string):
@@ -69,6 +69,7 @@ def redeem_code(driver, code_string):
         raise ServiceError('Sorry, referral codes are for new drivers only.')
     try:
         credit_service.redeem_code(code_string, driver.auth_user.customer)
+        notification.send('driver_notifications.SignupCredit', driver)
     except credit_service.CreditError as e:
         raise ServiceError(e.message)
 

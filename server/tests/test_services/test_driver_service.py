@@ -207,3 +207,15 @@ class DriverServiceTest(TestCase):
 
     def test_base_letter_rejected(self):
         pass
+
+    def test_redeem_credit(self):
+        from credit import credit_service
+        code = credit_service.create_invite_code('50.00')
+        driver_service.redeem_code(self.driver, code.credit_code)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'You have ${} towards and Idlecars rental'.format(self.driver.app_credit())
+        )

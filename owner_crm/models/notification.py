@@ -107,6 +107,7 @@ def _get_driver_params(driver):
         'driver_first_name': driver.first_name(),
         'driver_full_name': driver.full_name(),
         'driver_phone_number': driver.phone_number(),
+        'driver_credit': driver.app_credit(),
         'driver_all_docs_uploaded': driver.all_docs_uploaded(),
         'driver_license_image': driver.driver_license_image,
         'fhv_license_image': driver.fhv_license_image,
