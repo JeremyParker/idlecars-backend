@@ -386,11 +386,10 @@ class CheckoutReceipt(notification.DriverNotification):
 
 class PickupConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = '''Success! Your card has been charged {} for the {} booking.
-            You have used ${} of Idlecars credit.
-            The owner will receive a notification that the payment was processed and should
-            give you the keys to start driving. Please contact us if there are any issues.
-        '''.format(
+        text = 'Success! Your card has been charged {} for the {} booking. \
+You have used ${} of Idlecars credit. \
+The owner will receive a notification that the payment was processed and should \
+give you the keys to start driving. Please contact us if there are any issues.'.format(
                 kwargs['payment_cash_amount'],
                 kwargs['car_name'],
                 kwargs['payment_credit_amount'],
