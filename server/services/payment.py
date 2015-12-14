@@ -101,7 +101,13 @@ def settle(payment):
 
     if not payment.error_message:
         # when a new user spends cash in the app, whoever invited them gets app credit
-        credit_service.on_cash_spent(payment.booking.driver.auth_user.customer)
+        invitee_customer = payment.booking.driver.auth_user.customer
+        success, invitor_customer = credit_service.on_cash_spent(invitee_customer)
+
+        if success:
+            from server.models import Driver
+            invitor_driver = Driver.objects.get(auth_user__customer=invitor_customer)
+            notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
 
         # if the payment succeeded, and credit wasn't already deducted, deduct now.
         if original_status != models.Payment.PRE_AUTHORIZED:

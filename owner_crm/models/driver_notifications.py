@@ -374,32 +374,33 @@ class CheckoutReceipt(notification.DriverNotification):
         }
 
 
-# class InvitorReceivedCredit(notification.DriverNotification):
-#     def get_context(self, **kwargs):
-#         text = '''
-#             You just received ${} of rental credit because someone rented a car with
-#             Idlecars and used your code! You now have ${} of Idlecars credit to use
-#             towards your next Idlecars rental. <br />
-#             If you are already driving, this amount will be taken off your next rental payment. <br />
-#             If you haven’t rented with us yet, you can use this credit towards your next rental! <br />
-#             <br />
-#             Click below to see our current selection of cars
-#         '''.format(kwargs['referral_balance'], kwargs['credit_amount'])
-#         subject = 'You just received ${} of Idlecars rental credit'.format(kwargs['bonus_amount'])
-#         sms_body = '''
-#             Hi {} someone signed up using your Idlecars referral code!
-#             You just received ${} towards your next rental!
-#         '''.format(kwargs['driver_first_name'], kwargs['bonus_amount'])
-#         return {
-#             'FNAME': kwargs['driver_first_name'] or None,
-#             'HEADLINE': subject,
-#             'TEXT': text,
-#             'CTA_LABEL': 'Find your car',
-#             'CTA_URL': kwargs['car_listing_url'],
-#             'template_name': 'one_button_no_image',
-#             'subject': subject,
-#             'sms_body': sms_body,
-#         }
+class InvitorReceivedCredit(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = '''
+            You just received ${} of rental credit because someone rented a car with
+            Idlecars and used your code! You now have ${} of Idlecars credit to use
+            towards your next Idlecars rental. <br />
+            If you are already driving, this amount will be taken off your next rental payment. <br />
+            If you haven’t rented with us yet, you can use this credit towards your next rental! <br />
+            <br />
+            Click below to see our current selection of cars
+        '''.format(kwargs['credit_amount'], kwargs['driver_credit'])
+        subject = 'You just received ${} of Idlecars rental credit'.format(kwargs['credit_amount'])
+        sms_body = 'Hi {}, someone signed up using your Idlecars referral code! \
+You just received ${} towards your next rental!'.format(
+            kwargs['driver_first_name'],
+            kwargs['credit_amount'],
+        )
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': subject,
+            'TEXT': text,
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': subject,
+            'sms_body': sms_body,
+        }
 
 
 class PickupConfirmation(notification.DriverNotification):
