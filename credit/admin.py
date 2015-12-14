@@ -12,7 +12,6 @@ class CustomerAdmin(admin.ModelAdmin):
         'invitor_credited',
         'invite_code',
         'app_credit',
-        'username',
     ]
     search_fields = [
         'user__username',
