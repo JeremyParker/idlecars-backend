@@ -19,10 +19,11 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 SSLIFY_DISABLE = True
 
-WEBAPP_URL = 'http://localhost:3000'
+DRIVER_APP_URL = 'http://localhost:3000'
+OWNER_APP_URL = 'http://localhost:3001'
 
 # Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = ('localhost:3000',)
+CORS_ORIGIN_WHITELIST = ('localhost:3000','localhost:3001',)
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -34,3 +35,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
+
+STALENESS_LIMIT = 180

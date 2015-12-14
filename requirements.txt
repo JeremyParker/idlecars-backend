@@ -1,5 +1,4 @@
 -e git://github.com/syrusakbary/pyjade.git@4dbd2ffd7ccdf20c7de6ad7dd8e6b0942bee50eb#egg=pyjade
-
 coverage==3.7.1
 dj-database-url==0.3.0
 dj-static==0.0.6
@@ -24,3 +23,6 @@ django-extensions==1.5.5
 mandrill==1.0.57
 mock==1.0.1
 braintree==3.19.0
+freezegun==0.3.5
+twilio==4.7.0
+sodapy==0.1.6

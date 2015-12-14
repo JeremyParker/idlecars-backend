@@ -1,0 +1,30 @@
+.burger-button
+  height: 3px
+  width: 20px
+  background: white
+  display: block
+  content: ''
+
+  position: absolute
+  top: 23px
+  right: 12px
+
+  &.active
+    background: blue
+
+    &:before, &:after
+      background: blue
+
+  &:before, &:after
+    height: 3px
+    width: 20px
+    background: white
+    display: block
+    content: ''
+    position: absolute
+
+  &:before
+    top: -6px
+
+  &:after
+    bottom: -6px

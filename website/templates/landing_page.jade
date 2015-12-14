@@ -1,88 +1,91 @@
 extends ./base.jade
 
 - block content
-  section.headline
-    .container
-      img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png", alt="idlecars", class="logo")
-      .content
-        h1 Start renting #[br] Start earning
-        a.button(href="#{ settings.WEBAPP_URL }") Find your car
-        a.login(href="#{ login_url }") Have an account? #[span Log in]
+  .landing-page
 
-  section.get-more
-    .container
-      h2 A better marketplace
-      p for professional drivers to rent for-hire vehicles, on-demand.
+    section.hero-asset.desktop
+      .hero-top
+        .content
+          h1 Keep more of what you earn
+          p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+          p No leases, loans or long-term commitments. Insurance and maintenance included.
+          a.button(href="#{ settings.DRIVER_APP_URL }") FIND YOUR CAR
 
-  section.select
-    .container
-      .content
-        h2 Ready to drive
-        p Every idlecar is inspected and is already registered with the TLC.
-        p Find a car and start driving the next day. No leases, loans or long-term commitments.
+    section.hero-asset-mobile(id="mobile")
 
-  section.get-more
-    .container
-      h2 It’s your choice
-      p Our cars allow you to drive for any base.
-      img.service-logos-big(src="#{ settings.STATIC_URL }img/services_stacked.jpg", alt="uber lift and others")
-      img.service-logos-small(src="#{ settings.STATIC_URL }img/rideshare_logos.png", alt="uber lift and others")
-
-  section.get-more.convenient
-    .container
-      h2 Convenient for you
-      p We take care of all the paperwork, insurance, and maintenance.
-      p The listed price is all you pay.
-
-  #lets-talk
-  - if show_thanks
-    section.thanks
+    section.hero-content.mobile
       .container
         .content
-          h2 Thanks!
-          p Expect an email from us shortly.
-          p Don't wan't to wait? 1-844-IDLECAR (1-844-435-3227)
+          h1 Keep more of what you earn
+          p NYC's widest selection of TLC registered for-hire rentals, at the best price.
+          p No leases, loans or long-term commitments. Insurance and maintenance included.
+          a.button(href="#{ settings.DRIVER_APP_URL }") FIND YOUR CAR
 
-  section.form
-    .container
-      form(action="#{ action }", ng-app='app', method="post", ng-controller="formCtrl", novalidate='', name="myForm")
-        - csrf_token
+    section.phone
+      .container
+        .phone-image
+          img(src="#{ settings.STATIC_URL }img/phone.png")
+        .content-wrapper(id='desktop')
+          .content
+            h2 Renting a car has #[br] never been easier
+            p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
 
-        ul.role(ng-init="role = 'driver'")
-          li
-            input#id_role_0(name='role', type='radio', value='driver', checked, ng-model='role')
-            div
-              label(for='id_role_0') I’m a driver.
-              p Show me the available cars.
-          li
-            input#id_role_1(name='role', type='radio', value='owner', ng-model='role')
-            div
-              label(for='id_role_1') I own a car.
-              p I want my car to make me money.
+    section.phone-content.mobile
+      .container
+        .content
+          h2 Renting a car has never been easier
+          p Register today, and drive tomorrow. Choose from a huge variety of cars near you to rent for a day, week, or month.
 
-        ul.contact(ng-show="role == 'owner'")
-          li
-            label(for='id_email', ng-bind='emailLabel', ng-class='{red:emailRed}')
+    a.invisible(id="tutorial")
+    section.tutorial
+      .container
+        h3 How it works
+        .segments
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial1.svg", align="middle")
+              p.bold Pick A Car. Any Car.
+              p Find the car that fits your style and budget.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial2.svg")
+              p.bold Start Your Account.
+              p Use your smartphone to upload your driving documents.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial3.svg")
+              p.single-line.bold Reserve Your Car.
+              p Use your credit card or bank account to reserve your car.
+          .segment
+            .pane
+              .image
+                img(src="#{ settings.STATIC_URL }img/tutorial4.svg")
+              p.single-line.bold Drive.
+              p Once you’re added to the insurance, you’re ready to go!
 
-            input#id_email(maxlength='254', name='email', type='email', ng-model='email', placeholder='you@example.com', required='')
+    section.select
+      .container
+        .content-wrapper(id='desktop')
+          .content
+            h2 Join now and start driving in less than a day
+            p Choose your car, get insured, and start driving in less than 24 hours.
+            p It's that easy.
+        .car-image
+          img(src="#{ settings.STATIC_URL }img/selectthebest.jpg")
 
-          li
-            label(for='id_zipcode', ng-bind='zipLabel', ng-class='{red:zipRed}')
+    section.select-content.mobile
+      .container
+        .content
+          h2 Join now and start driving in less than a day
+          p Choose your car, get insured, and start driving in less than 24 hours.
+          p It's that easy.
 
-            input#id_zipcode(maxlength='5', name='zipcode', type='text', ng-pattern='/[0-9]{5}/', ng-model='zipcode', placeholder='10001', required='')
-
-
-        input.button(ng-show="role == 'owner'", type="submit", value="Let's Talk", ng-click='validation($event)')
-
-        a.button(ng-show="role == 'driver'", href="#{ settings.WEBAPP_URL }") Find your car
-
-
-
-  footer
-    .container
-      p.ask
-        a(href='mailto:support@idlecars.com') ASK US ANYTHING
-      div.last_content
-        | <p class='tm'>© {% now 'Y' %} idlecars</p>
-        p.tm All trademarks and images are copyright of their respective owners.
-      p #[a.tm(href="#{ terms_of_service }") terms of service]
+    section.manhattan
+      .container
+        .content
+          h2 Services we #[br.mobile] work with
+          p Idlecars work with all services,#[br.mobile] including Uber, Lyft and More.
+          img(src="#{ settings.STATIC_URL }img/services_stacked.png")

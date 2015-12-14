@@ -60,3 +60,10 @@ venv
 .env
 .envrc
 staticfiles
+
+# css files and sass map file
+*.css
+!main.css
+!normalize.css
+*.map
+*.sassc

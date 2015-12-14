@@ -1,0 +1,527 @@
+.about-page {
+  color: #000; }
+  .about-page .button {
+    padding: 12px 50px;
+    min-width: 200px; }
+  .about-page .section-container {
+    padding: 76px 48px 100px;
+    margin: 0 auto;
+    max-width: 1058px; }
+  .about-page .header-photo {
+    background: url(../img/team_photo.jpg) no-repeat #fff;
+    background-size: cover;
+    background-position: center;
+    height: 500px;
+    margin-top: 48px; }
+  .about-page .about-us, .about-page .get-in-touch {
+    background: #f2f2f2; }
+  .about-page .about-us h2 {
+    margin-bottom: 36px; }
+  .about-page .team-cities-careers {
+    background: #fff; }
+    .about-page .team-cities-careers .topics {
+      margin-bottom: 100px;
+      color: #008aff; }
+      .about-page .team-cities-careers .topics div {
+        text-align: center; }
+      .about-page .team-cities-careers .topics h3 {
+        display: inline-block;
+        padding-bottom: 10px; }
+        .about-page .team-cities-careers .topics h3:hover {
+          cursor: pointer; }
+    .about-page .team-cities-careers .pane {
+      margin: 76px auto 0; }
+    .about-page .team-cities-careers .profile-image {
+      margin-right: 24px; }
+      .about-page .team-cities-careers .profile-image img {
+        height: 125px; }
+    .about-page .team-cities-careers .description .bold {
+      margin-bottom: 18px; }
+    .about-page .team-cities-careers .cities img {
+      width: 100%;
+      margin-top: 48px;
+      margin-bottom: 36px; }
+    .about-page .team-cities-careers .cities a {
+      color: #008aff; }
+    .about-page .team-cities-careers .cities .underline {
+      border-width: 1px; }
+    .about-page .team-cities-careers .careers h2 {
+      margin-top: 100px;
+      margin-bottom: 36px; }
+      .about-page .team-cities-careers .careers h2:first-of-type {
+        margin-top: 0; }
+    .about-page .team-cities-careers .careers .button {
+      margin-top: 48px; }
+  .about-page .get-in-touch p {
+    color: #6f6f6f;
+    margin-bottom: 5px; }
+  .about-page .get-in-touch .red {
+    color: #FF0000; }
+  .about-page .get-in-touch .input {
+    margin-top: 36px; }
+  .about-page .get-in-touch input[type="submit"] {
+    margin-top: 36px; }
+  .about-page .get-in-touch input[type="text"], .about-page .get-in-touch input[type="email"] {
+    width: 300px; }
+  .about-page .get-in-touch textarea {
+    width: 470px;
+    border: none; }
+  .about-page .thanks {
+    background: #008aff;
+    color: white; }
+
+@media (max-width: 530px) {
+  .about-page .section-container {
+    padding: 48px 20px 60px; }
+  .about-page .header-photo {
+    height: 300px; }
+  .about-page .about-us h2 {
+    margin-bottom: 20px; }
+  .about-page .team-cities-careers .topics {
+    margin-bottom: 48px; }
+    .about-page .team-cities-careers .topics h3 {
+      width: 100%;
+      text-align: left;
+      padding-bottom: 0; }
+      .about-page .team-cities-careers .topics h3 span {
+        float: right;
+        font-size: 40px;
+        font-family: inherit; }
+  .about-page .team-cities-careers .pane {
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    margin-top: 60px; }
+  .about-page .team-cities-careers .profile-image, .about-page .team-cities-careers .description, .about-page .team-cities-careers .title h2 {
+    text-align: center; }
+  .about-page .team-cities-careers .profile-image {
+    margin-right: 0;
+    margin-bottom: 32px; }
+  .about-page .team-cities-careers .careers h2 {
+    margin-top: 50px;
+    margin-bottom: 24px; }
+  .about-page .team-cities-careers .careers .button {
+    margin-top: 24px; }
+  .about-page .get-in-touch .section-container {
+    padding-bottom: 76px; }
+  .about-page .get-in-touch .input {
+    margin-top: 20px; }
+  .about-page .get-in-touch input[type="submit"] {
+    margin-top: 48px; }
+  .about-page .get-in-touch input[type="text"], .about-page .get-in-touch input[type="email"] {
+    width: 100%; }
+  .about-page .get-in-touch textarea {
+    width: 100%; } }
+.invisible {
+  display: block;
+  visibility: hidden;
+  margin-top: -3rem;
+  height: 3rem; }
+
+a {
+  color: white;
+  text-decoration: none; }
+  a:hover {
+    cursor: pointer; }
+
+strong {
+  font-weight: 500; }
+
+input {
+  border: 0;
+  padding: 0.5rem; }
+
+section {
+  width: 100%;
+  overflow: hidden; }
+
+.underline {
+  border-bottom: 3px solid #008aff; }
+
+.bold {
+  font-weight: 500; }
+
+.button {
+  display: inline-block;
+  font-weight: 500;
+  padding: 16px;
+  border: 0;
+  background: #008aff;
+  color: white;
+  text-align: center;
+  cursor: pointer; }
+  .button:hover {
+    opacity: 0.9; }
+
+.button, input, textarea {
+  border-radius: 0; }
+
+.mobile, #mobile {
+  display: none; }
+
+@media (max-width: 530px) {
+  .desktop, #desktop {
+    display: none; }
+
+  .mobile, #mobile {
+    display: block; } }
+.burger-button {
+  height: 3px;
+  width: 20px;
+  background: white;
+  display: block;
+  content: "";
+  position: absolute;
+  top: 23px;
+  right: 12px; }
+  .burger-button.active {
+    background: blue; }
+    .burger-button.active:before, .burger-button.active:after {
+      background: blue; }
+  .burger-button:before, .burger-button:after {
+    height: 3px;
+    width: 20px;
+    background: white;
+    display: block;
+    content: "";
+    position: absolute; }
+  .burger-button:before {
+    top: -6px; }
+  .burger-button:after {
+    bottom: -6px; }
+
+.flex, .about-page .team-cities-careers .pane, .about-page .team-cities-careers .topics, footer .content, footer .apps, .flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .flex-center-horizontal, .container, .flex-space-between, .landing-page .tutorial .segments {
+  display: flex;
+  display: -webkit-flex; }
+
+.about-page .team-cities-careers .topics div, .flex-cell, .about-page .team-cities-careers .description {
+  flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1; }
+
+.landing-page .tutorial .segment {
+  flex: auto;
+  -ms-flex: auto;
+  -webkit-flex: auto; }
+
+.container {
+  flex-direction: column;
+  -webkit-flex-direction: column; }
+
+.landing-page .phone .container, .landing-page .select .container {
+  flex-direction: row;
+  -webkit-flex-direction: row; }
+
+.flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-verticle, .landing-page .tutorial .container, .navbar .links, .landing-page .manhattan .container {
+  align-items: center;
+  -webkit-align-items: center; }
+
+.flex-center, .landing-page .content-wrapper, .landing-page .hero-asset .hero-top, .landing-page .phone, .landing-page .tutorial p:first-of-type, .flex-center-horizontal, .container {
+  justify-content: center;
+  -webkit-justify-content: center; }
+
+.flex-space-between, footer .content, .landing-page .tutorial .segments {
+  justify-content: space-between;
+  -webkit-justify-content: space-between; }
+
+footer {
+  background-color: #2f2f2f; }
+  footer .mobile-line {
+    display: none; }
+  footer .container {
+    padding-bottom: 48px; }
+  footer .text.desktop span {
+    margin: 0 10px; }
+  footer .text.desktop p {
+    margin-bottom: 20px; }
+  footer .text.desktop p:last-of-type {
+    margin-bottom: 72px; }
+  footer .apps {
+    margin-top: 12px;
+    margin-bottom: 52px; }
+    footer .apps .app {
+      margin-left: 36px; }
+      footer .apps .app:first-of-type {
+        margin-left: 0; }
+    footer .apps img {
+      height: 40px; }
+  footer .mobile p {
+    margin-bottom: 20px; }
+  footer .text.mobile p:last-of-type {
+    margin-bottom: 64px; }
+
+@media (max-width: 800px) {
+  footer .mobile-line {
+    display: block; }
+  footer .desktop-line {
+    display: none; } }
+@media (max-width: 620px) {
+  footer .apps .app {
+    margin-left: 12px; }
+  footer .apps img {
+    height: 32px; }
+  footer .desktop, footer #desktop {
+    display: none; }
+  footer .mobile, footer #mobile {
+    display: block; } }
+.landing-page {
+  margin-top: 3rem; }
+  .landing-page .content p {
+    margin: 20px 0; }
+    .landing-page .content p:last-of-type {
+      margin-bottom: 32px; }
+  .landing-page .hero-asset .content, .landing-page .hero-content .content {
+    max-width: 400px;
+    margin: 0 auto; }
+    .landing-page .hero-asset .content .button, .landing-page .hero-content .content .button {
+      width: 200px; }
+  .landing-page .hero-asset {
+    background: url(../img/hero_bottom.jpg) no-repeat #fff;
+    background-position: center;
+    height: 600px; }
+    .landing-page .hero-asset .content p:first-of-type {
+      max-width: 400px; }
+    .landing-page .hero-asset .content p:last-of-type {
+      max-width: 300px; }
+    .landing-page .hero-asset .hero-top {
+      background: url(../img/hero_top.png) no-repeat transparent;
+      background-position: right;
+      max-width: 50%;
+      min-width: 560px;
+      height: 100%;
+      padding: 64px 0 64px 48px; }
+  .landing-page .hero-asset-mobile {
+    background: url(../img/hero_asset_mobile.jpg) no-repeat white;
+    background-size: cover;
+    background-position: center;
+    height: 300px; }
+  .landing-page .hero-content .container {
+    background: #2f2f2f; }
+  .landing-page .phone {
+    background: #f2f2f2;
+    height: 100%; }
+    .landing-page .phone .container {
+      padding: 0;
+      max-width: 750px; }
+    .landing-page .phone .phone-image {
+      flex: 2; }
+      .landing-page .phone .phone-image img {
+        display: block;
+        width: 100%; }
+    .landing-page .phone .content-wrapper {
+      flex: 3; }
+    .landing-page .phone .content {
+      color: #000;
+      max-width: 380px;
+      margin-right: 20px; }
+      .landing-page .phone .content p {
+        margin-bottom: 0; }
+      .landing-page .phone .content a {
+        color: #008aff; }
+  .landing-page .phone-content .container {
+    background: #f2f2f2;
+    color: #000; }
+  .landing-page .phone-content a {
+    color: #008aff; }
+  .landing-page .tutorial {
+    background: #fff;
+    text-align: center;
+    color: #000; }
+    .landing-page .tutorial .container {
+      padding-top: 72px;
+      padding-bottom: 80px; }
+    .landing-page .tutorial p:first-of-type {
+      min-height: 54px;
+      margin: 16px 0; }
+    .landing-page .tutorial .segments {
+      width: 100%;
+      margin-top: 48px; }
+    .landing-page .tutorial .segment {
+      max-width: 200px; }
+    .landing-page .tutorial .pane {
+      margin: 0 auto; }
+    .landing-page .tutorial .image {
+      height: 100px; }
+      .landing-page .tutorial .image:before, .landing-page .tutorial .image img {
+        display: inline-block;
+        vertical-align: middle; }
+      .landing-page .tutorial .image:before {
+        content: " ";
+        height: 100%; }
+      .landing-page .tutorial .image img {
+        max-height: 100px;
+        max-width: 96px; }
+  .landing-page .select p:last-of-type, .landing-page .select-content p:last-of-type, .landing-page .phone-content p:last-of-type {
+    margin-bottom: 0; }
+  .landing-page .select {
+    background-position: calc(50% + 336px) center; }
+    .landing-page .select .container {
+      padding: 0 0 0 48px;
+      min-width: 680px; }
+    .landing-page .select .content {
+      max-width: 480px; }
+    .landing-page .select img {
+      display: block;
+      width: 100%;
+      margin-left: 36px; }
+  .landing-page .select-content p:first-of-type {
+    margin: 20px 0; }
+  .landing-page .manhattan {
+    background: url(../img/manhattan.jpg) no-repeat white;
+    background-size: cover;
+    background-position: center;
+    height: 507px;
+    color: #000;
+    text-align: center; }
+    .landing-page .manhattan .content p:last-of-type {
+      margin-bottom: 64px; }
+    .landing-page .manhattan img {
+      max-width: 400px; }
+
+@media (max-width: 748px) {
+  .landing-page .tutorial .segments {
+    justify-content: center;
+    -webkit-justify-content: center;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap; }
+    .landing-page .tutorial .segments .bold {
+      margin: 0; }
+  .landing-page .tutorial .segment {
+    width: 217.5px;
+    max-width: none;
+    margin-top: 48px; }
+    .landing-page .tutorial .segment:nth-of-type(1), .landing-page .tutorial .segment:nth-of-type(2) {
+      margin-top: 0; }
+  .landing-page .tutorial .image {
+    height: 120px; }
+    .landing-page .tutorial .image img {
+      max-height: 120px;
+      max-width: 120px; } }
+@media (max-width: 600px) {
+  .landing-page .phone .content h2 {
+    font-size: 32px; }
+  .landing-page .phone .content > p {
+    margin-bottom: 20px; } }
+@media (max-width: 530px) {
+  .landing-page .phone .phone-image img {
+    width: 300px; }
+  .landing-page .select .container {
+    padding-right: 48px;
+    min-width: 320px; }
+  .landing-page .select img {
+    width: auto;
+    height: 300px;
+    margin: 0; }
+  .landing-page .tutorial .container {
+    padding-top: 48px;
+    padding-bottom: 64px; }
+  .landing-page .tutorial .segments {
+    margin-top: 36px; }
+  .landing-page .tutorial .segment {
+    min-width: 241.5px; }
+    .landing-page .tutorial .segment:nth-of-type(2) {
+      margin-top: 48px; }
+  .landing-page .manhattan {
+    height: 100%; }
+    .landing-page .manhattan img {
+      max-width: 320px; } }
+.navbar {
+  position: fixed;
+  top: 0;
+  background: black;
+  z-index: 9999; }
+  .navbar .logo {
+    height: 48px;
+    max-width: 1160px;
+    padding: 0.5rem 48px;
+    margin: 0 auto; }
+  .navbar img {
+    height: 2rem; }
+  .navbar .links {
+    position: absolute;
+    top: 0;
+    right: 48px;
+    height: 48px; }
+    .navbar .links a {
+      display: inline-block;
+      margin: 0 25px; }
+      .navbar .links a:first-of-type {
+        margin-left: 0; }
+      .navbar .links a:last-of-type {
+        margin-right: 0; }
+  .navbar .menu-button {
+    display: none;
+    cursor: pointer;
+    position: relative;
+    left: calc(100% - 2.75rem);
+    width: 2.75rem;
+    height: 48px; }
+  .navbar .menu-container {
+    background-color: black;
+    width: 100%;
+    padding: 0 1.5rem 1rem; }
+    .navbar .menu-container a {
+      display: block;
+      text-align: right;
+      padding: 0.5rem 0; }
+
+@media (max-width: 800px) {
+  .navbar {
+    display: block; }
+    .navbar .logo {
+      position: absolute; }
+    .navbar .links {
+      display: none; }
+    .navbar .menu-button {
+      display: block; } }
+* {
+  box-sizing: border-box; }
+
+body {
+  background: black;
+  color: white;
+  font-family: "Gotham SSm A", "Gotham SSm B", sans-serif; }
+
+.container {
+  padding: 48px 48px 64px;
+  margin: 0 auto;
+  max-width: 950px;
+  height: 100%; }
+
+@media (max-width: 530px) {
+  .container {
+    padding: 36px 28px 64px; } }
+h1, h2, h3, p {
+  margin: 0;
+  font-style: normal;
+  line-height: 1.25em; }
+
+h1, h2, h3 {
+  font-weight: 500; }
+
+h1 {
+  font-size: 44px; }
+
+h2 {
+  font-size: 32px; }
+
+h3 {
+  font-size: 24px; }
+
+p {
+  font-size: 16px;
+  font-weight: 300; }
+
+@media (max-width: 530px) {
+  h1 {
+    font-size: 40px; }
+
+  h2 {
+    font-size: 28px; }
+
+  h3 {
+    font-size: 20px; }
+
+  p {
+    font-size: 16px; } }
+
+/*# sourceMappingURL=main.css.map */

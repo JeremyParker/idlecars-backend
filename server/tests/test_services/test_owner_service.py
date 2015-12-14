@@ -1,15 +1,12 @@
 # # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
-
-from django.utils import timezone
 from django.test import TestCase
 
-from idlecars import client_side_routes
+from idlecars import app_routes_owner
+from idlecars.factories import AuthUser
 from owner_crm.tests import sample_merge_vars
 from owner_crm.models import PasswordReset
-
 
 from server import factories
 from server.services import owner_service
@@ -19,38 +16,53 @@ from server.models import Owner
 class OwnerInvitationTest(TestCase):
     def setUp(self):
         self.owner = factories.Owner.create()
-        self.user_account = factories.UserAccount.create(owner=self.owner)
+        self.phone_number = self.owner.auth_users.latest('pk').username
 
     def test_invitation_success(self):
-        created, auth_user = owner_service.invite_legacy_owner(self.user_account.phone_number)
-        self.assertEqual(auth_user.username, self.user_account.phone_number)
-        self.assertTrue(created)
+        auth_user = owner_service.invite_legacy_owner(self.phone_number)
+        self.assertEqual(auth_user.username, self.phone_number)
 
         password_reset = PasswordReset.objects.get(auth_user=auth_user)
         self.assertIsNotNone(password_reset)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.user_account.email)
+        email = self.owner.auth_users.first().email
+        self.assertEqual(outbox[0].merge_vars.keys()[0], email)
         self.assertEqual(
-            outbox[0].merge_vars[self.user_account.email]['CTA_URL'],
-            client_side_routes.owner_password_reset(password_reset),
+            outbox[0].merge_vars[email]['CTA_URL'],
+            app_routes_owner.password_reset(password_reset),
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertEqual(
+            outbox[0].subject,
+            'Complete your account today - sign up with your bank account and start getting paid'
+        )
 
     def test_invitation_no_owner(self):
-        self.user_account = factories.Owner.create() # Note: no owner
+        self.user = AuthUser.create() # Note: no owner
         with self.assertRaises(Owner.DoesNotExist):
-            created, auth_user = owner_service.invite_legacy_owner(self.user_account.phone_number)
+            auth_user = owner_service.invite_legacy_owner(self.user.username)
 
-    def test_invitation_no_user_account(self):
+    def test_invitation_no_user(self):
         with self.assertRaises(Owner.DoesNotExist):
-            created, auth_user = owner_service.invite_legacy_owner('0000') # Note - bad phone number
+            auth_user = owner_service.invite_legacy_owner('0000') # Note - bad phone number
 
-    def test_invitation_existing_auth_user(self):
-        auth_user = factories.AuthUser.create(username=self.user_account.phone_number)
-        self.owner.auth_users.add(auth_user)
 
-        created, new_auth_user = owner_service.invite_legacy_owner(self.user_account.phone_number)
-        self.assertEqual(len(self.owner.auth_users.all()), 1)
-        self.assertEqual(new_auth_user, auth_user)
+class OwnerAccountTest(TestCase):
+    def setUp(self):
+        self.owner = factories.BankAccountOwner.create()
+
+    def test_owner_account_declined(self):
+        owner_service.update_account_state(
+            self.owner.merchant_id,
+            Owner.BANK_ACCOUNT_DECLINED,
+            ['test fake errors'],
+        )
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            '{}\'s bank account was declined'.format(self.owner.name())
+        )

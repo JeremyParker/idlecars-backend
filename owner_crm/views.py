@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from services import driver_emails, password_reset_service
+from server.models import Driver
+from services import password_reset_service, notification
 from tests import sample_merge_vars
 import serializers, models
 
@@ -28,10 +29,15 @@ class PasswordResetSetupView(views.APIView):
         phone_number = serializer.validated_data['phone_number']
         password_reset = password_reset_service.create(phone_number)
         if password_reset:
-            driver_emails.password_reset(password_reset)
+            try:
+                owner = password_reset.auth_user.owner_set.first()
+                notification.send('owner_notifications.PasswordReset', password_reset)
+            except Owner.DoesNotExist:
+                driver = password_reset.auth_user.driver
+                notification.send('driver_notifications.PasswordReset', password_reset)
+
             content = {'phone_number': phone_number}
             return Response(content, status=status.HTTP_201_CREATED)
-
 
         # Since this is AllowAny, don't give away the error.
         content = {'_app_notifications': [
@@ -54,11 +60,12 @@ class PasswordResetView(views.APIView):
 
         try:
             password_reset = models.PasswordReset.objects.get(token=token)
-            if password_reset.state != models.ConsumableToken.STATE_PENDING:
-                # TODO(JP) - we should expire the token after a couple of hours
-                # TODO(JP) - it'd be cool if we could just send them a new link here.
-                content = {'_app_notifications': ['Sorry, this link doen\'t work any more.']}
-                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            # TODO - put this security feature back in as sson as owners can sign up more easily.
+            # if password_reset.state != models.ConsumableToken.STATE_PENDING:
+            #     # TODO(JP) - we should expire the token after a couple of hours
+            #     # TODO(JP) - it'd be cool if we could just send them a new link here.
+            #     content = {'_app_notifications': ['Sorry, this link doen\'t work any more.']}
+            #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
             user = password_reset.auth_user
             user.set_password(password)
@@ -69,20 +76,19 @@ class PasswordResetView(views.APIView):
 
             password_reset.state = models.ConsumableToken.STATE_CONSUMED
             password_reset.save()
-            driver_emails.password_reset_confirmation(password_reset)
 
-            content = {'_app_notifications': ['Your password has been set.'], 'token': token.key}
+            try:
+                driver = password_reset.auth_user.driver
+                notification.send('driver_notifications.PasswordResetConfirmation', password_reset)
+            except Driver.DoesNotExist:
+                notification.send('owner_notifications.PasswordResetConfirmation', password_reset)
+
+            content = {'_app_notifications': [{'success': 'Your password has been set.'}], 'token': token.key}
             return Response(content, status=status.HTTP_200_OK)
 
         except models.PasswordReset.DoesNotExist:
             content = {'_app_notifications': ['Unable to verify user.']}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UpdateRenewalView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = models.Renewal.objects.all()
-    serializer_class = serializers.Renewal
-    lookup_field = 'token'
 
 
 def email_preview(request, pk):

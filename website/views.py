@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
 from django.core import urlresolvers
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.conf import settings
 
-from idlecars import client_side_routes
+from idlecars import app_routes_driver, app_routes_owner
 
 import forms
 import models
@@ -14,47 +14,66 @@ import jobs
 
 
 '''
-View that presents the landing page and a 'subscribe' forms for Drivers and Owners.
-There are two forms on the page, each of which has a different 'action' url. The two
-actions are both handled through this view.
+View that presents the landing page for Drivers and Owners.
 '''
 def index(request):
+    context = {
+        'login_url': app_routes_driver.driver_login(),
+        'signup_url': app_routes_driver.driver_signup(),
+        'terms_of_service': app_routes_driver.terms_of_service(),
+        'faq': app_routes_driver.faq(),
+        'owner_app_url': app_routes_owner.owner_app_url(),
+    }
+    return render(request, 'landing_page.jade', context)
 
-    def _show_thanks():
+
+'''
+View that presents the about page
+'''
+def about(request):
+
+    def show_thanks():
         return 'thanks' in request.GET
 
     if request.method == 'POST':
-        contact_form = forms.ContactForm(request.POST)
-        if contact_form.is_valid():
-            try:
-                new_contact = models.Contact.objects.get(email=contact_form.cleaned_data['email'])
-                for attr in contact_form.cleaned_data:
-                    setattr(new_contact, attr, contact_form.cleaned_data[attr])
-            except models.Contact.DoesNotExist:
-                new_contact = contact_form.save()
+        first_name = request.POST.get('first_name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
 
-            jobs.queue_owner_welcome_email(new_contact.email)
+        new_message = models.UserMessage.objects.create(
+            first_name=first_name,
+            email=email,
+            message=message,
+        )
 
-            # NOTE(jefk): survey is not ready yet, so now redirect to home
-            url = '{}?thanks='.format(urlresolvers.reverse('website:index'))
-            return HttpResponseRedirect(url)
-            # if new_contact.role == "driver":
-            #     return HttpResponseRedirect(urlresolvers.reverse('website:driver_survey', args=(new_contact.pk,)))
-            # else:
-            #     return HttpResponseRedirect(urlresolvers.reverse('website:owner_survey', args=(new_contact.pk,)))
-    else:
-        contact_form = forms.ContactForm()
+        from owner_crm.services import notification
+        notification.send('ops_notifications.NewUserMessage', new_message)
 
+        url = '{}?thanks='.format(urlresolvers.reverse('website:about'))
+        return HttpResponseRedirect(url)
 
-    # if it was a GET request, or if there isn't valid form data...
     context = {
-        'action': urlresolvers.reverse('website:index') + '#lets-talk',
-        'contact_form': contact_form,
-        'show_thanks': _show_thanks(),
-        'login_url': client_side_routes.driver_account(),
-        'terms_of_service': client_side_routes.terms_of_service()
+        'login_url': app_routes_driver.driver_account(),
+        'signup_url': app_routes_driver.driver_signup(),
+        'terms_of_service': app_routes_driver.terms_of_service(),
+        'faq': app_routes_driver.faq(),
+        'owner_app_url': app_routes_owner.owner_app_url(),
+        'action': urlresolvers.reverse('website:about') + '#thanks',
+        'show_thanks': show_thanks(),
     }
-    return render(request, 'landing_page.jade', context)
+    return render(request, 'about_page.jade', context)
+
+
+'''
+View that redirects users to driver sign up page
+'''
+def driver_referral(request, credit=None):
+    if credit != '50' and credit != '75':
+        return HttpResponseNotFound('Sorry, this page is not found')
+
+    utm = '?utm_campaign=referral&utm_medium=fliers&utm_source=-&utm_content=' + credit
+    url = app_routes_driver.driver_signup() + utm
+    return HttpResponseRedirect(url)
 
 
 '''

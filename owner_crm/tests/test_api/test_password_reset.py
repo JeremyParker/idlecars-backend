@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
+import idlecars.factories
 import server.factories
 from owner_crm import models
 import owner_crm.factories
@@ -15,8 +16,11 @@ import owner_crm.factories
 
 class PasswordResetTest(APITestCase):
     def setUp(self):
-        self.auth_user = server.factories.AuthUser.create(password='old_password')
+        self.auth_user = idlecars.factories.AuthUser.create(password='old_password')
         self.password_reset = owner_crm.factories.PasswordReset.create(auth_user=self.auth_user)
+
+        # we need a driver so we know if we can SMS them or not.
+        self.driver = server.factories.Driver.create(auth_user=self.auth_user)
 
     def _make_request(self):
         data = {
@@ -38,6 +42,7 @@ class PasswordResetTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Your idlecars password has been set.')
 
         self.auth_user = auth_models.User.objects.get(id=self.auth_user.id)
         new_password = self.auth_user.password
@@ -50,11 +55,12 @@ class PasswordResetTest(APITestCase):
         response = APIClient().patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_reset_fail_token_consumed(self):
-        self.password_reset.state = models.ConsumableToken.STATE_CONSUMED
-        self.password_reset.save()
-        response = self._make_request()
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    # TODO - put this back in when we consume tokens again
+    # def test_reset_fail_token_consumed(self):
+    #     self.password_reset.state = models.ConsumableToken.STATE_CONSUMED
+    #     self.password_reset.save()
+    #     response = self._make_request()
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reset_token_expired(self):
         # TODO - we should expire the token after a couple of hours

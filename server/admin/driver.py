@@ -5,9 +5,10 @@ from django.contrib import admin
 from django.contrib import auth
 
 from idlecars.reverse_admin import ReverseModelAdmin
+
 from server import models
 from server.admin.booking import BookingForDriverInline
-from server.admin.user_account import UserAccountForDriverInline
+from server.admin.payment_method import PaymentMethodInline
 
 
 class DriverAdmin(ReverseModelAdmin):
@@ -30,7 +31,7 @@ class DriverAdmin(ReverseModelAdmin):
         'email',
         'all_docs_uploaded',
         'documentation_approved',
-        'booking_count',
+        'date_joined',
     ]
     list_filter = [
         'documentation_approved',
@@ -40,6 +41,7 @@ class DriverAdmin(ReverseModelAdmin):
         'auth_user__last_name',
         'auth_user__username',
         'auth_user__email',
+        'braintree_customer_id',
     ]
     fieldsets = (
         ('Documentation', {
@@ -49,30 +51,45 @@ class DriverAdmin(ReverseModelAdmin):
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
+                ('base_letter_rejected'),
+                ('base_letter','base_letter_link'),
             )
         }),
         ('None', {
             'fields': (
-               ('notes'),
+                ('sms_enabled'),
+                ('date_joined', 'invited_by', ),
+                ('app_credit', 'braintree_customer_id',),
+                ('notes'),
             ),
         }),
     )
     readonly_fields = [
+        'sms_enabled',
+        'date_joined',
+        'invited_by',
         'full_name',
         'dmv_link',
         'fhv_link',
         'dd_link',
         'poa_link',
+        'base_letter_link',
+        'app_credit',
+        'braintree_customer_id',
     ]
-    inlines = [BookingForDriverInline,]
+    inlines = [BookingForDriverInline, PaymentMethodInline,]
     change_form_template = "change_form_inlines_at_top.html"
+
+    def queryset(self, request):
+        return super(DriverAdmin, self).queryset(request).select_related('auth_user')
+
+    def date_joined(self, instance):
+        return instance.auth_user.date_joined.date()
+    date_joined.short_description = 'signup date'
 
     def link_name(self, instance):
         return instance.admin_display()
     link_name.short_description = "Driver"
-
-    def booking_count(self, instance):
-        return models.Booking.objects.filter(driver=instance).count()
 
     def dmv_link(self, instance):
         return '<a href={} target="new">View Image</a>'.format(instance.driver_license_image)
@@ -93,3 +110,13 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
     poa_link.short_description = ''
     poa_link.allow_tags = True
+
+    def base_letter_link(self, instance):
+        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
+    base_letter_link.short_description = ''
+    base_letter_link.allow_tags = True
+
+    def invited_by(self, instance):
+        return instance.auth_user.customer.invitor_code
+
+

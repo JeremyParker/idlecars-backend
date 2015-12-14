@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'corsheaders',
     'server',
+    'credit',
     'rest_framework',
     'rest_framework.authtoken',
     'website',
@@ -92,7 +93,7 @@ CACHES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'US/Eastern'
+TIME_ZONE = 'EST'
 
 USE_I18N = True
 
@@ -164,7 +165,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 SETTINGS_EXPORT = [
     'STATIC_URL',
     'HEAP_APP_ID',
-    'WEBAPP_URL',
+    'DRIVER_APP_URL',
+    'OWNER_APP_URL',
 ]
 
 REST_FRAMEWORK = {
@@ -178,10 +180,24 @@ REST_FRAMEWORK = {
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ')  # if not in env, test_key
+
+# default to the FakeSmsClient. Replace with TwilioRestClient to use Twilio
+SMS_IMPLEMENTATION = 'FakeSmsClient'
+TWILIO_PHONE_NUMBER = '+16466933874'
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC0f99e71e116ef18f0e8b2e67dcc28e97')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '19f726892e44c923f6c1c67f62d360cc')
+
+MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ') # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'test@idlecars.com'
 OPS_EMAIL = 'test@idlecars.com'
+OPS_PHONE_NUMBER = '6469021306'
+STREET_TEAM_EMAIL = 'test@idlecars.com'
+
+TLC_DATA_IMPLEMENTATION = 'TestClient' #'Socrata'
+SOCRATA_APP_TOKEN = os.getenv('SOCRATA_APP_TOKEN', 'comes from environment')
+SOCRATA_PASSWORD = os.getenv('SOCRATA_PASSWORD', 'comes from environment')
+SOCRATA_USERNAME = 'jeremy@idlecars.com'
 
 # default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
 QUEUE_IMPLEMENTATION = 'FakeQueue'
@@ -202,6 +218,7 @@ CORS_ALLOW_HEADERS = (
 HEAP_APP_ID = '655181858'
 
 PAYMENT_GATEWAY_NAME = 'fake'
+BRAINTREE_BASE_URL = 'sandbox.braintreegateway.com' # doesn't work for fake gateway
 
 MASTER_MERCHANT_ACCOUNT_ID = os.getenv('MASTER_MERCHANT_ACCOUNT_ID', 'idlecarsllc')
 BRAINTREE = {
@@ -210,3 +227,13 @@ BRAINTREE = {
     'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
     'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
 }
+IDLECARS_CUSTOMER_ID = os.getenv('IDLECARS_CUSTOMER_ID', '32418355') # for Braintree
+IDLECARS_PAYMENT_TOKEN = os.getenv('IDLECARS_PAYMENT_TOKEN', 'gwtbsw') # for Braintree
+
+# TODO - move these to a config service
+TAKE_RATE = '0.059'
+STALENESS_LIMIT = 3
+SIGNUP_CREDIT = 50
+INVITOR_CREDIT = 50
+
+IDLECARS_PHONE_NUMBER = '1-844-IDLECAR (1-844-435-3227)'

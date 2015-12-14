@@ -1,25 +1,106 @@
 doctype html
-html(lang="en")
+html(lang="en", ng-app="app")
   head
     meta(charset='utf-8')
     meta(http-equiv='x-ua-compatible', content='ie=edge')
     title Start renting. Start earning | idlecars
-    meta(name='description', content='Earn more from rideshare by driving a premium vehicle whenever you want it. Rental vehicles registered and insured for driving for rideshare services.')
+    meta(name='description', content='Earn more from rideshare by driving a tlc-licensed vehicle whenever you want it. On demand rental vehicles registered and insured for driving for rideshare services.')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     meta(name="bitly-verification", content="46bd3f8d09f1")
 
     link(rel="icon" href="#{ settings.STATIC_URL }img/favicon_32.ico")
     link(rel="stylesheet", type="text/css", href="//cloud.typography.com/6263754/658526/css/fonts.css")
-    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }normalize.css")
-    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }landing_page.css")
+    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }css/normalize.css")
+    link(rel="stylesheet", type="text/css", href="#{ settings.STATIC_URL }css/main.css")
 
     script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js")
-    script(src='/static/formCtrl.js')
+    script(src='/static/javascript/formCtrl.js')
+
 
     script(type="text/javascript").
       window.heap=window.heap||[],heap.load=function(t,e){window.heap.appid=t,window.heap.config=e;var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap-"+t+".js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n);for(var o=function(t){return function(){heap.push([t].concat(Array.prototype.slice.call(arguments,0)))}},p=["clearEventProperties","identify","setEventProperties","track","unsetEventProperty"],c=0;c<p.length;c++)heap[p[c]]=o(p[c])};
       heap.load("#{ settings.HEAP_APP_ID }");
 
   body
+    - block navbar
+      section.navbar
+        .logo
+          a(href="/")
+            img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
+        .links
+          .content
+            a(href="/#tutorial") #[p.bold How it works]
+            a(href='/about') #[p.bold About Us]
+            a(href="#{ owner_app_url }") #[p.bold List your car]
+            a(href="#{ signup_url }") #[p.bold Sign up]
+            a(href="#{ login_url }") #[p.bold Log in]
+
+        .menu-button(ng-click='showMenu = !showMenu')
+          .burger-button(ng-class='{active: showMenu}')
+
+        .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+          a(href="/#tutorial") #[p How it works]
+          a(href='/about') #[p About Us]
+          a(href="#{ owner_app_url }") #[p List your car]
+          a(href="#{ signup_url }") #[p Sign up]
+          a(href="#{ login_url }") #[p Log in]
+
     - block content
     - endblock
+
+    - block footer
+      footer
+        .container
+          .content
+            .text.desktop
+              p.bold
+                a(href="/") Home
+                span |
+                a(href="/about") About Us
+                span |
+                a(href="/#tutorial") How it Works
+                span.desktop-line |
+                a.desktop-line(href="#{ owner_app_url }") List Your Car
+                span.desktop-line |
+                a.desktop-line(href="#{ login_url }") Join
+
+              p.bold.mobile-line
+                a(href="#{ owner_app_url }") List Your Car
+                span |
+                a(href="#{ login_url }") Join
+
+              p
+                a(href="#{ faq }") Help
+                span |
+                a(href="#{ terms_of_service }") Terms & Privacy
+
+            .text.mobile
+              p.bold #[a(href="/") Home]
+              p.bold #[a(href="/about") About Us]
+              p.bold #[a(href="/#tutorial") How it Works]
+              p.bold #[a(href="#{ owner_app_url }") List Your Car]
+              p.bold #[a(href="#{ login_url }") Join]
+
+            .social
+              p.bold Follow us on
+
+              .apps
+                .app
+                  a(href="https://twitter.com/idlecars" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/twitter.svg")
+                .app
+                  a(href="https://www.facebook.com/idlecars" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/facebook.svg")
+                .app
+                  a(href="https://www.linkedin.com/company/10117035" target="_blank")
+                    img(src="#{ settings.STATIC_URL }img/linkedin.svg")
+
+              .mobile
+                p #[a(href="#{ faq }") Help]
+                p #[a(href="#{ terms_of_service }") Terms & Privacy]
+
+
+          .copyright
+            p.bold Copyright © {% now 'Y' %} idlecars. #[br.mobile] All Rights Reserved
+            p 95 Morton St, New York, 10014
+

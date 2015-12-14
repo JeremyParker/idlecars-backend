@@ -11,6 +11,8 @@ from server import models
 from server import services
 from server.admin.booking import BookingForCarInline
 
+from server.models import CarCompatibility
+
 
 class CarStaleListFilter(admin.SimpleListFilter):
     '''
@@ -91,7 +93,6 @@ class CarAdmin(admin.ModelAdmin):
         CarStaleListFilter,
         InsuranceFilter,
         'owner__rating',
-        'status',
         NoPlateFilter,
     ]
     search_fields = [
@@ -103,21 +104,26 @@ class CarAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('make_model', 'hybrid', 'year'),
+                ('make_model', 'hybrid', 'year', 'plate',),
                 ('exterior_color', 'interior_color'),
-                ('plate', 'base'),
                 ('owner', 'owner_link', 'owner_rating'),
-                ('insurance', 'insurance_link'),
+                ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
-                (
-                    'status',
-                    'last_status_update',
-                    'next_available_date',
-                ),
+                ('effective_status', 'last_status_update', 'next_available_date',),
                 ('solo_cost', 'solo_deposit'),
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',
+                'work_with',
+            )
+        }),
+        ('TLC data', {
+            'fields': (
+                ('found_in_tlc', 'last_updated', 'active_in_tlc',),
+                ('base', 'base_number', 'base_type',),
+                ('base_address', 'base_telephone_number',),
+                ('registrant_name', 'expiration_date',),
+                ('vehicle_vin_number',),
             )
         }),
     )
@@ -127,10 +133,24 @@ class CarAdmin(admin.ModelAdmin):
         'last_mileage_update',
         'owner_rating',
         'effective_status',
+        'work_with',
+        'found_in_tlc',
+        'last_updated',
+        'active_in_tlc',
+        'base_number',
+        'base_address',
+        'base_telephone_number',
+        'base_type',
+        'registrant_name',
+        'expiration_date',
+        'vehicle_vin_number',
     ]
     inlines = [
         BookingForCarInline,
     ]
+
+    def work_with(self, instance):
+        return [str(flavor) for flavor in CarCompatibility(instance).all()]
 
     def description(self, instance):
         return instance.__unicode__()

@@ -1,7 +1,7 @@
 # idlecars
-The repo for Idle Cars.
+The repo for the idlecars backend
 
-'server' is the webapp.
+'server' is the main api for the owner and driver apps
 
 ## Local environment setup
 
@@ -19,7 +19,7 @@ Also install:
 * virtualenvwrapper
 * Heroku toolbelt: https://toolbelt.heroku.com/
 * Postgres: http://postgresapp.com/
-* redis
+* redis (optional)
   * `brew install redis` on OSX
   * `redis-server &` to boot it up
 * direnv
@@ -78,11 +78,17 @@ python manage.py test server --nocapture
 
 ### Running e2e tests
 There is a special setup for running e2e (integration) test from the angular web app client.
-Before you start the server, make sure you have created the test database in psql: `create database idlecars_test`.
+Before you start the server, make sure you have created the test database in psql: `create database idlecars_test;`.
 Run the migrations to make sure the database is prepared:
 `python manage.py migrate --settings='idlecars.e2e_test_settings'`
 Then start the e2e test server:
 `python manage.py runserver 9999 --settings='idlecars.e2e_test_settings'`
+
+### Running integration tests
+Integration test support is pretty iffy at the time of this writing. To test the Braintree integration against the
+sandbox, follow the instructions above to `create database idlecars_integration_test;`
+Then run
+`./manage.py test_braintree_sandbox --settings='idlecars.integration_test_settings'`
 
 ### Deployment
 We have two apps on Heroku that we deploy to.
@@ -99,8 +105,18 @@ To deploy to staging:
 git push staging master
 heroku run python manage.py migrate --app staging-idlecars
 ```
+Occasionally, we add manual backfills. To execute a manual backfill, follow this pattern:
+```
+terminal_prompt$ ./manage.py shell
+Python 2.7.9 (default, Feb 10 2015, 03:28:08) 
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.56)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from credit.backfills import _20151207_backfill_customers
+>>> _20151207_backfill_customers.run_backfill_customers()
+```
 
-To deploy to master:
+To deploy to production:
 ```
 git push heroku master
 heroku run python manage.py migrate --app idlecars

@@ -10,40 +10,45 @@ from factory import LazyAttribute
 from factory import SubFactory, SelfAttribute
 
 from django.utils import timezone
+from django.conf import settings
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Owner, MakeModel, Insurance
+from server.factories import Owner, BankAccountOwner, MakeModel, Insurance
 from server import models
+
 
 class Car(Factory):
     class Meta:
         model = 'server.Car'
 
-    owner = SubFactory(Owner)
     status = LazyAttribute(lambda o: random.choice(['available', 'unknown', 'busy']))
     make_model = SubFactory(MakeModel)
     year = LazyAttribute(lambda o: random.randint(2000, 2016))
     plate = LazyAttribute(lambda o: ''.join(
         [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
     ))
-    solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
-    solo_deposit = SelfAttribute('solo_cost')
-
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
     base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
+
+
+class ClaimedCar(Car):
+    ''' car that an owner has claimed and filled in details for '''
+    owner = SubFactory(Owner)
+    solo_cost = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
+    solo_deposit = SelfAttribute('solo_cost')
+    min_lease = '_02_one_week'
     next_available_date = LazyAttribute(
-        lambda o: timezone.now().date() - datetime.timedelta(days=random.randint(1, 10))
+        lambda o: timezone.now() - datetime.timedelta(days=random.randint(1, 10))
     )
 
 
-class BookableCar(Car):
-    status = models.Car.STATUS_AVAILABLE
-    min_lease = '_02_one_week'
+class BookableCar(ClaimedCar):
+    owner = SubFactory(BankAccountOwner)
 
 
 class CarExpiredListing(BookableCar):
-    next_available_date = timezone.now().date() - datetime.timedelta(days=30)
-    last_status_update = timezone.now().date() - datetime.timedelta(days=30)
+    next_available_date = timezone.now() - datetime.timedelta(days=30)
+    last_status_update = timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT + 1)
 
 
 class CompleteCar(BookableCar):

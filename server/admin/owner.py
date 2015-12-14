@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from django.conf import settings
 
 from idlecars.admin_helpers import link
 
 from server import models
-from server.admin.user_account import UserAccountForOwnerInline
 
 
 class CarInline(admin.TabularInline):
@@ -68,23 +68,29 @@ class AuthUserInline(admin.TabularInline):
 class OwnerAdmin(admin.ModelAdmin):
     inlines = [
         AuthUserInline,
-        UserAccountForOwnerInline,
         CarInline,
     ]
+    filter_horizontal = ('auth_users',)
     fieldsets = (
         (None, {
             'fields': (
+                ('sms_enabled'),
                 ('split_shift', 'rating'),
                 ('merchant_id', 'merchant_account_state',),
+                ('service_percentage', 'effective_service_percentage',),
                 'notes',
                 'company_name',
                 'address1',
                 'address2',
                 ('city', 'state_code', 'zipcode'),
+                'auth_users',
             )
         }),
     )
-    readonly_fields = ['merchant_id', 'merchant_account_state']
+    readonly_fields = ['sms_enabled', 'merchant_id', 'merchant_account_state', 'effective_service_percentage',]
+    if settings.DEBUG:
+        readonly_fields = ['merchant_id', 'effective_service_percentage',]
+
     list_display = [
         'link_name',
         'rating',
@@ -100,6 +106,10 @@ class OwnerAdmin(admin.ModelAdmin):
         'user_account__first_name',
         'user_account__phone_number',
         'user_account__email',
+        'auth_users__last_name',
+        'auth_users__first_name',
+        'auth_users__username',
+        'auth_users__email',
         'company_name',
     ]
     change_form_template = "change_form_inlines_at_top.html"

@@ -4,20 +4,22 @@ from __future__ import unicode_literals
 import datetime
 
 from django.utils import timezone
+from django.conf import settings
 from django.db.models import Q
 
-from server import models
+from server.models import Booking, Car, Owner
 
 
-next_available_date_threshold = timezone.now().date() + datetime.timedelta(days=30)
-staleness_threshold = timezone.now() - datetime.timedelta(days=4)
+next_available_date_threshold = timezone.now() + datetime.timedelta(days=30)
+staleness_threshold = timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT)
 
-q_booking_in_progress = Q(booking__state__in=[
-    models.Booking.COMPLETE,
-    models.Booking.REQUESTED,
-    models.Booking.ACCEPTED,
-])
-
+# TODO - this belongs in booking_service
+def _filter_booking_in_progress(booking_queryset):
+    return booking_queryset.filter(
+        checkout_time__isnull=False,
+        return_time__isnull=True,
+        incomplete_time__isnull=True,
+)
 
 def _filter_data_complete(queryset):
     '''
@@ -33,22 +35,37 @@ def _filter_data_complete(queryset):
             Q(min_lease='_00_unknown') |
             Q(plate='') |
             Q(base='') |
-            Q(owner__city='') |
-            Q(owner__state_code='') |
+            # TODO - put these back in when we're looking up zipcode in the owner portal
+            # Q(owner__city='') |
+            # Q(owner__state_code='') |
             Q(owner__zipcode='')
         )
 
 
+def is_data_complete(car):
+    '''
+    this checks the same logic as above for an individual car
+    '''
+    return car.owner and car.make_model and car.year and car.solo_cost and car.solo_deposit != None \
+        and car.plate and car.base and car.owner.zipcode \
+        and car.base and car.min_lease != '_00_unknown'
+        # and car.owner.city and car.owner.state_code \
+
+
 def _filter_bookable(queryset):
     '''
-    return cars whose status is known, aren't busy through elsewhere, and don't have a booking
-    in progress.
+    return cars that aren't busy through elsewhere, don't have a booking
+    in progress, and the owner's bank account details are approved.
     '''
+    # TODO - we probably need to optimize this, or at least cache it
+    active_bookings = _filter_booking_in_progress(Booking.objects.all())
+    booked_car_ids = [b.car.id for b in active_bookings]
     return queryset.filter(
-        Q(status=models.Car.STATUS_AVAILABLE) |
-        Q(status=models.Car.STATUS_BUSY, next_available_date__lt=next_available_date_threshold)
+        next_available_date__isnull=False,
+        next_available_date__lt=next_available_date_threshold,
+        owner__merchant_account_state=Owner.BANK_ACCOUNT_APPROVED,
     ).exclude(
-        q_booking_in_progress
+        id__in=booked_car_ids
     )
 
 
@@ -65,6 +82,10 @@ def _filter_stale(queryset):
     is stale.
     '''
     return queryset.filter(last_status_update__lt=staleness_threshold)
+
+
+def is_stale(car):
+    return car.last_status_update <= staleness_threshold
 
 
 def _filter_stale_within(minutes_until_stale, queryset):

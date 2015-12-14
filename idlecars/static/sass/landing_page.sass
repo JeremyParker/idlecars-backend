@@ -1,0 +1,258 @@
+.landing-page
+  margin-top: 3rem
+
+  .content-wrapper
+    @extend .flex-center
+
+  .content
+    p
+      margin: 20px 0
+
+      &:last-of-type
+        margin-bottom: 32px
+
+
+  .hero-asset, .hero-content
+    .content
+      max-width: 400px
+      margin: 0 auto
+
+      .button
+        width: 200px
+
+  .hero-asset
+    background: url(../img/hero_bottom.jpg) no-repeat #fff
+    background-position: center
+    height: 600px
+
+    .content
+      p:first-of-type
+        max-width: 400px
+
+      p:last-of-type
+        max-width: 300px
+
+    .hero-top
+      @extend .flex-center
+      background: url(../img/hero_top.png) no-repeat transparent
+      background-position: right
+
+      max-width: 50%
+      min-width: 560px
+
+      height: 100%
+      padding: 64px 0 64px 48px
+
+  .hero-asset-mobile
+    background: url(../img/hero_asset_mobile.jpg) no-repeat white
+    background-size: cover
+    background-position: center
+
+    height: 300px
+
+
+  .hero-content
+    .container
+      background: $light_black
+
+
+  .phone
+    @extend .flex-center
+    background: $light_gray
+    height: 100%
+
+    .container
+      @extend %flex_direction_row
+      padding: 0
+      max-width: 750px
+
+    .phone-image
+      flex: 2
+
+      img
+        display: block
+        width: 100%
+
+    .content-wrapper
+      flex: 3
+
+
+    .content
+      color: $black
+      max-width: 380px
+      margin-right: 20px
+
+      p
+        margin-bottom: 0
+
+      a
+        color: $ic_blue
+
+  .phone-content
+    .container
+      background: $light_gray
+      color: $black
+
+    a
+      color: $ic_blue
+
+
+  .tutorial
+    background: $white
+    text-align: center
+    color: $black
+
+    .container
+      @extend .flex-center-verticle
+      padding-top: 72px
+      padding-bottom: 80px
+
+    p:first-of-type
+      @extend .flex-center
+      min-height: 54px
+      margin: 16px 0
+
+    .segments
+      @extend .flex-space-between
+      width: 100%
+      margin-top: 48px
+
+    .segment
+      @extend %flex_cell_auto
+      max-width: 200px
+
+    .pane
+      margin: 0 auto
+
+    .image
+      height: 100px
+
+      &:before, img
+        display: inline-block
+        vertical-align: middle
+
+      &:before
+        content: ' '
+        height: 100%
+
+      img
+        max-height: 100px
+        max-width: 96px
+
+  .select, .select-content, .phone-content
+    p:last-of-type
+      margin-bottom: 0
+
+  .select
+    background-position: calc(50% + 336px) center
+
+    .container
+      @extend %flex_direction_row
+      padding: 0 0 0 $desktop_page_gutter
+      min-width: 680px
+
+    .content
+      max-width: 480px
+
+    img
+      display: block
+      width: 100%
+      margin-left: 36px
+
+  .select-content
+    p:first-of-type
+      margin: 20px 0
+
+
+  .manhattan
+    background: url(../img/manhattan.jpg) no-repeat white
+    background-size: cover
+    background-position: center
+
+    height: 507px
+    color: $black
+    text-align: center
+
+    .container
+      @extend %flex_align_items_center
+
+    .content p:last-of-type
+      margin-bottom: 64px
+
+    img
+      max-width: 400px
+
+
+
+@media (max-width: $tutorial_wrap_threshold)
+  .landing-page .tutorial
+    .segments
+      justify-content: center
+      -webkit-justify-content: center
+      flex-wrap: wrap
+      -webkit-flex-wrap: wrap
+
+      .bold
+        margin: 0
+
+    .segment
+      width: 217.5px
+      max-width: none
+      margin-top: 48px
+
+      &:nth-of-type(1), &:nth-of-type(2)
+        margin-top: 0
+
+    .image
+      height: 120px
+
+      img
+        max-height: 120px
+        max-width: 120px
+
+
+
+@media (max-width: $phone_section_threshold)
+  .landing-page .phone .content
+    h2
+      font-size: 32px
+    & > p
+      margin-bottom: 20px
+
+
+@media (max-width: $mobile_width_threshold)
+  .landing-page
+    .phone .phone-image img
+      width: 300px
+
+
+    .select
+      .container
+        padding-right: 48px
+        min-width: 320px
+
+      img
+        width: auto
+        height: 300px
+        margin: 0
+
+    .tutorial
+      .container
+        padding-top: 48px
+        padding-bottom: 64px
+
+      .segments
+        margin-top: 36px
+
+      .segment
+        min-width: 241.5px
+
+        &:nth-of-type(2)
+          margin-top: 48px
+
+
+    .manhattan
+      height: 100%
+
+      img
+        max-width: 320px

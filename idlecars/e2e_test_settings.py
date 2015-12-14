@@ -17,10 +17,11 @@ DATABASES = {
 DEBUG = False
 SSLIFY_DISABLE = True
 
-WEBAPP_URL = 'localhost:3000'
+DRIVER_APP_URL = 'localhost:3000'
+OWNER_APP_URL = 'localhost:3001'
 
 # Allow cross origin requests from these domains
-CORS_ORIGIN_WHITELIST = ('localhost:3000',)
+CORS_ORIGIN_WHITELIST = ('localhost:3000','localhost:3001',)
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
