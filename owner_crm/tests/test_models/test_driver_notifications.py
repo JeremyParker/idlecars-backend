@@ -107,7 +107,7 @@ class DriverNotificationTest(TestCase):
                 'email_result': self.reserved_booking.car.display_name(),
             },
             'PickupConfirmation': {
-                'argument': 'booked_booking',
+                'argument': 'settled_payment',
                 'sms_result': 'Success!',
                 'email_result': 'ready to drive',
             },

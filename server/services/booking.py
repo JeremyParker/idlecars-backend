@@ -307,8 +307,8 @@ def pickup(booking):
 
     booking.save()
 
-    notification.send('driver_notifications.PickupConfirmation', booking)
-    notification.send('owner_notifications.PickupConfirmation', booking)
+    notification.send('driver_notifications.PickupConfirmation', rent_payment)
+    notification.send('owner_notifications.PickupConfirmation', rent_payment)
 
     return booking
 

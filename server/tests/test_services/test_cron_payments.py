@@ -179,6 +179,48 @@ class TestCronPayments(TestCase):
         owner_email = self.booking.car.owner.auth_users.first().email
         self.assertTrue('This is the last payment' in outbox[1].merge_vars[owner_email]['TEXT'])
 
+    def test_payment_app_credit_zero(self):
+        customer = self.booking.driver.auth_user.customer
+        customer.app_credit = Decimal('0.00')
+        customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
+        call_command('cron_job')
+
+        from django.core.mail import outbox
+        owner_email = self.booking.car.owner.auth_users.first().email
+
+        self.assertFalse('Payment 1' in outbox[1].merge_vars[owner_email]['TEXT'])
+
+    def test_payment_app_credit_less_than_total_amount(self):
+        customer = self.booking.driver.auth_user.customer
+        customer.app_credit = Decimal('1.00')
+        customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
+        call_command('cron_job')
+
+        from django.core.mail import outbox
+        owner_email = self.booking.car.owner.auth_users.first().email
+
+        payment1 = 'Payment 1: $457.50'
+        payment2 = 'Payment 2: $1.00'
+        self.assertTrue(payment1 in outbox[1].merge_vars[owner_email]['TEXT'])
+        self.assertTrue(payment2 in outbox[1].merge_vars[owner_email]['TEXT'])
+
+    def test_payment_app_credit_greater_than_total_amount(self):
+        customer = self.booking.driver.auth_user.customer
+        customer.app_credit = Decimal('10000.00')
+        customer.save()
+        self.booking.weekly_rent = Decimal('500.00')
+        self.booking.save()
+        call_command('cron_job')
+
+        from django.core.mail import outbox
+        owner_email = self.booking.car.owner.auth_users.first().email
+
+        self.assertFalse('Payment 1' in outbox[1].merge_vars[owner_email]['TEXT'])
+
     def test_multiple_cron_payment_email(self):
         with freeze_time("2014-10-20 9:55:00"):
             self.booking.end_time = timezone.now()

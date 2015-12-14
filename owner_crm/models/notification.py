@@ -15,7 +15,9 @@ from owner_crm.services import campaign_service
 def _get_payment_params(payment):
     return {
         'payment': payment,
-        'payment_amount': payment.amount,
+        'payment_cash_amount': payment.amount,
+        'payment_credit_amount': payment.credit_amount,
+        'payment_total_amount': payment.amount + payment.credit_amount,
         'payment_invoice_description': payment.invoice_description(),
         'payment_invoice_start_time': payment.invoice_start_time,
         'payment_invoice_end_time': payment.invoice_end_time,
@@ -62,6 +64,7 @@ def _get_booking_params(booking):
             reverse('admin:server_booking_change', args=(booking.pk,))
         ),
         'booking_next_payment_amount': next_payment_amount,
+        'booking_next_credit_amount': next_credit_amount,
         'booking_payment_fee': booking_payment_fee,
         'booking_invoice_start_time': invoice_start_time,
         'booking_invoice_end_time': invoice_end_time,

@@ -356,12 +356,44 @@ class CheckoutReceipt(notification.DriverNotification):
         }
 
 
+# class InvitorReceivedCredit(notification.DriverNotification):
+#     def get_context(self, **kwargs):
+#         text = '''
+#             You just received ${} of rental credit because someone rented a car with
+#             Idlecars and used your code! You now have ${} of Idlecars credit to use
+#             towards your next Idlecars rental. <br />
+#             If you are already driving, this amount will be taken off your next rental payment. <br />
+#             If you haven’t rented with us yet, you can use this credit towards your next rental! <br />
+#             <br />
+#             Click below to see our current selection of cars
+#         '''.format(kwargs['referral_balance'], kwargs['credit_amount'])
+#         subject = 'You just received ${} of Idlecars rental credit'.format(kwargs['bonus_amount'])
+#         sms_body = '''
+#             Hi {} someone signed up using your Idlecars referral code!
+#             You just received ${} towards your next rental!
+#         '''.format(kwargs['driver_first_name'], kwargs['bonus_amount'])
+#         return {
+#             'FNAME': kwargs['driver_first_name'] or None,
+#             'HEADLINE': subject,
+#             'TEXT': text,
+#             'CTA_LABEL': 'Find your car',
+#             'CTA_URL': kwargs['car_listing_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': subject,
+#             'sms_body': sms_body,
+#         }
+
+
 class PickupConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'Success! Your card has been charged {} for the {} booking. \
+You have used ${} of Idlecars credit. \
 The owner will receive a notification that the payment was processed and should \
-give you the keys to start driving. Please contact us if there are any \
-issues.'.format(kwargs['booking_weekly_rent'], kwargs['car_name'])
+give you the keys to start driving. Please contact us if there are any issues.'.format(
+                kwargs['payment_cash_amount'],
+                kwargs['car_name'],
+                kwargs['payment_credit_amount'],
+            )
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'You are ready to drive!',
@@ -380,8 +412,17 @@ class PaymentReceipt(notification.DriverNotification):
             Car: {} <br /><br />
 
             Invoice Period: {} - {} <br />
-            Payment Amount: {} <br /><br />
+            Rental Amount: ${} <br />
         '''
+        if kwargs['payment_credit_amount'] > 0:
+            text += '''
+                Driver Credit: ${} <br />
+                Payment Amount: ${} <br />
+            '''.format(
+                kwargs['payment_credit_amount'],
+                kwargs['payment_cash_amount'],
+            )
+
         if kwargs['booking_next_payment_amount'] > 0:
             text += 'Your next payment of ${} will occur on {} <br />'.format(
                 kwargs['booking_next_payment_amount'],
@@ -396,7 +437,7 @@ class PaymentReceipt(notification.DriverNotification):
             kwargs['car_name'],
             kwargs['payment_invoice_start_time'].strftime('%b %d'),
             kwargs['payment_invoice_end_time'].strftime('%b %d'),
-            kwargs['payment_amount'],
+            kwargs ['payment_total_amount'],
             kwargs['booking_end_time'].strftime('%b %d'),
         )
 

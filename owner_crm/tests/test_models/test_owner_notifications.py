@@ -70,9 +70,9 @@ class OwnerNotificationTest(TestCase):
                 'sms_result': self.requested_booking.driver.full_name(),
             },
             'PickupConfirmation': {
-                'argument': 'booked_booking',
+                'argument': 'settled_payment',
                 'email_result': 'paid',
-                'sms_result': self.booked_booking.driver.full_name()
+                'sms_result': self.settled_payment.booking.driver.full_name()
             },
             'PaymentReceipt': {
                 'argument': 'settled_payment',
