@@ -221,16 +221,22 @@ class PickupConfirmation(notification.OwnerNotification):
             kwargs['car_deposit']
         )
 
-        if kwargs['payment_credit_amount'] > 0:
+        cash_disbursement = max(
+            Decimal('0.00'),
+            kwargs['payment_cash_amount'] - kwargs['payment_service_fee'],
+        )
+        credit_disbursement = kwargs['payment_total_amount'] - kwargs['payment_service_fee'] - cash_disbursement
+
+        if credit_disbursement > 0 and cash_disbursement > 0:
             text += '''
                 Due to an Idlecars promotion we are covering a portion of the driver’s rent.
                 This will cause the payment to come in two separate deposits at the same time: <br />
                 Payment 1: ${} <br />
-                Payemnt 2: ${} <br />
+                Payment 2: ${} <br />
                 <br />
             '''.format(
-                kwargs['payment_cash_amount'],
-                kwargs['payment_credit_amount'],
+                cash_disbursement,
+                credit_disbursement,
             )
 
         return {
