@@ -15,12 +15,14 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = (
             'amount',
+            'credit_amount',
             'status',
             'created_time',
             'payment_method',
         )
         read_only_fields = (
             'amount',
+            'credit_amount',
             'status',
             'created_time',
             'payment_method',

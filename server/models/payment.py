@@ -37,7 +37,12 @@ class Payment(models.Model):
     invoice_end_time = models.DateTimeField(blank=True, null=True)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2) # total amount charged in cash
-    credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    credit_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name='Credit',
+    )
 
     # service fee that was actually deducted through Braintree. The amount due is in the booking.
     service_fee = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
