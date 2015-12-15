@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.db.models import Sum
+from django.utils import timezone
 
 import models
 
@@ -102,7 +103,8 @@ class ExperimentAdmin(ModelAdmin):
         return super(ExperimentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def live(self, instance):
-        return instance.live
+        return (not instance.start_time or instance.start_time < timezone.now()) and \
+            (not instance.end_time or instance.end_time > timezone.now())
     live.admin_order_field = 'live'
     live.boolean = True
     live.short_description = "Live"

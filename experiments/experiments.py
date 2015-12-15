@@ -37,7 +37,7 @@ def assign_alternative(identity, experiment_id):
         return 'default'
 
     now = timezone.now()
-    if experiment.start_time > now:
+    if experiment.start_time and experiment.start_time > now:
         if experiment.default:
             return experiment.default.identifier
         else:

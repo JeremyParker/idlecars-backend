@@ -13,6 +13,7 @@ from owner_crm.services import throttle_service, notification
 
 import server.models
 import server.services.booking
+import server.services.experiment
 from server.services import ServiceError
 
 
@@ -43,12 +44,7 @@ def pre_save(modified_driver, orig):
             notification.send('ops_notifications.DocumentsUploaded', modified_driver)
 
     if modified_driver.documentation_approved and not orig.documentation_approved:
-        # when driver docs are approved, we assign the driver an invite code.
-        credit_service.create_invite_code(
-            invitee_amount=settings.SIGNUP_CREDIT,
-            invitor_amount=settings.INVITOR_CREDIT,
-            customer=modified_driver.auth_user.customer,
-        )
+        assign_credit_code(modified_driver)
         server.services.booking.on_docs_approved(modified_driver)
 
     return modified_driver
@@ -61,6 +57,15 @@ def post_save(modified_driver, orig):
     if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
         #TODO: do something after driver fails to get base letter
         driver_notifications.base_letter_rejected(modified_driver)
+
+
+def assign_credit_code(driver):
+    invitee, invitor = server.services.experiment.get_referral_rewards(driver)
+    credit_service.create_invite_code(
+        invitee_amount=invitee,
+        invitor_amount=invitor,
+        customer=driver.auth_user.customer,
+    )
 
 
 def redeem_code(driver, code_string):

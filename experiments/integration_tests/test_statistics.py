@@ -51,11 +51,10 @@ class StatisticsTest(TestCase):
             len(self.list_of_identities),
         )
 
-        # NOTE(julius): our assignment algorithm can be viewed as a coin
+        # Our assignment algorithm can be viewed as a coin
         # that may or not be fair. If we toss it 10'000 times and it comes
-        # up heads 5150 times, can we call it fair? [1]
-        #
-        # [1]: http://www.stanford.edu/class/psych252/tutorials/binomial_probability.html
+        # up heads 5150 times, can we call it fair?
+        # http://www.stanford.edu/class/psych252/tutorials/binomial_probability.html
         interval = (4835, 5165)
         self.assertTrue(interval[0] <= participants['alt_A'] <= interval[1])
         self.assertTrue(interval[0] <= participants['alt_B'] <= interval[1])
