@@ -29,6 +29,16 @@ class CreditCodeServiceTest(TestCase):
             self.assertFalse(code.credit_code in codes)
             codes.append(code.credit_code)
 
+    def test_create_create_code_with_spaces(self):
+        auth_user = AuthUser.create()
+        auth_user.first_name = 'S P A C E S'
+        code = credit_service.create_invite_code(
+            '50.00',
+            '50.00',
+            auth_user.customer
+        )
+        self.assertFalse(' ' in code.credit_code)
+
     def test_create_create_code_with_customer(self):
         auth_user = AuthUser.create()
         code = credit_service.create_invite_code(

@@ -20,6 +20,7 @@ def generate_invite_code_string(customer=None, code=''):
     if customer:
         name = customer.user.first_name or customer.user.last_name or customer.user.email
         code = name.upper()[:8]
+        code = ''.join(x for x in code if x.isalpha())
 
     while _code_no_good(code):
         code = code + crypto.get_random_string(1, "34689") # so we don't create a word
