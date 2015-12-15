@@ -254,7 +254,7 @@ class Notification(object):
 
     def default_params_sets(self):
         return {
-            'Driver': ['driver', 'urls', 'credit'],
+            'Driver': ['driver', 'urls'],
             'Owner': ['owner'],
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],

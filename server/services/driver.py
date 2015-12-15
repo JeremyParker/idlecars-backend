@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.utils import timezone
@@ -116,7 +117,27 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
+def _credit_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__customer__app_credit__gt=Decimal('0.00'),
+        auth_user__date_joined__lte=reminder_threshold,
+    )
+    import pdb; pdb.set_trace()
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
+    for driver in throttled_drivers:
+        active_bookings = server.services.booking.filter_active(driver.booking_set)
+        accepted_bookings = server.services.booking.filter_accepted(driver.booking_set)
+
+        if active_bookings or accepted_bookings:
+            throttled_drivers.exclude(pk=driver.pk)
+        else:
+            notification.send('driver_notifications.UseYourCredit', driver)
+    throttle_service.mark_sent(throttled_drivers, 'UseYourCredit')
+
+
 def process_driver_emails():
+    _credit_reminder(delay_days=14)
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
       reminder_name='FirstDocumentsReminder',

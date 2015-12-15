@@ -536,3 +536,27 @@ on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
             'subject': subject,
             'sms_body': subject + ' ' + text,
         }
+
+
+class UseYourCredit(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        subject = 'You have ${} to use towards your next rental'.format(kwargs['driver_credit'])
+        text = 'Don’t forget! You have ${} for your next rental. See our current car selection \
+here <br /> Click below to see our current selection! <br />'.format(kwargs['driver_credit'])
+        sms_body = 'Hi {} don’t forget that you have ${} for your next rental. \
+ See our current car selection here: {}'.format(
+                kwargs['driver_first_name'],
+                kwargs['driver_credit'],
+                kwargs['car_listing_url'],
+            )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': subject,
+            'TEXT': text,
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': subject,
+            'sms_body': sms_body,
+        }
