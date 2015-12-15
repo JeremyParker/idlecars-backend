@@ -13,7 +13,7 @@ from owner_crm.models import notification
 
 class SignupCredit(notification.DriverNotification):
     def get_context(self, **kwargs):
-        subject = 'You have ${} towards and Idlecars rental'.format(kwargs['driver_credit'])
+        subject = 'You have ${} towards an Idlecars rental'.format(kwargs['driver_credit'])
         cta_url = kwargs['car_listing_url']
         text = 'Thank you for entering your Idlecars referral code! \
 You have ${} towards your next rental.'.format(kwargs['driver_credit'])
@@ -388,12 +388,12 @@ class InvitorReceivedCredit(notification.DriverNotification):
             If you haven’t rented with us yet, you can use this credit towards your next rental! <br />
             <br />
             Click below to see our current selection of cars
-        '''.format(kwargs['credit_amount'], kwargs['driver_credit'])
-        subject = 'You just received ${} of Idlecars rental credit'.format(kwargs['credit_amount'])
+        '''.format(kwargs['credit_amount_invitor'], kwargs['driver_credit'])
+        subject = 'You just received ${} of Idlecars rental credit'.format(kwargs['credit_amount_invitor'])
         sms_body = 'Hi {}, someone signed up using your Idlecars referral code! \
 You just received ${} towards your next rental!'.format(
             kwargs['driver_first_name'],
-            kwargs['credit_amount'],
+            kwargs['credit_amount_invitor'],
         )
         return {
             'FNAME': kwargs['driver_first_name'] or None,

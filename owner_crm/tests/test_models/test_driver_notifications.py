@@ -134,7 +134,7 @@ class DriverNotificationTest(TestCase):
             'SignupCredit': {
                 'argument': 'driver',
                 'sms_result': 'referral code',
-                'email_result': 'referral code',
+                'email_result': 'Idlecars rental',
             },
             'InsuranceRejected': {
                 'argument': 'accepted_booking',

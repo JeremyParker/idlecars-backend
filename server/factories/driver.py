@@ -6,6 +6,8 @@ from factory import SubFactory, LazyAttribute, post_generation
 from idlecars.factory_helpers import Factory, faker, make_item
 from idlecars.factories import AuthUser
 
+from credit.factories import CreditCode
+
 
 class Driver(Factory):
     class Meta:
@@ -34,6 +36,10 @@ class PaymentMethodDriver(CompletedDriver):
 
 class ApprovedDriver(PaymentMethodDriver):
     documentation_approved = True
+
+    @post_generation
+    def invite_code(self, create, count, **kwargs):
+        self.auth_user.customer.invite_code = CreditCode.create()
 
 
 class BaseLetterDriver(ApprovedDriver):
