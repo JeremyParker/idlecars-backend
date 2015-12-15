@@ -39,7 +39,9 @@ class ApprovedDriver(PaymentMethodDriver):
 
     @post_generation
     def invite_code(self, create, count, **kwargs):
-        self.auth_user.customer.invite_code = CreditCode.create()
+        customer = self.auth_user.customer
+        customer.invite_code = CreditCode.create()
+        customer.save()
 
 
 class BaseLetterDriver(ApprovedDriver):

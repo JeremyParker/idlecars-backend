@@ -269,8 +269,8 @@ class BookingServiceTest(TestCase):
         first_week_rent_payment = new_booking.payment_set.filter(status=models.Payment.SETTLED)[0]
         self.assertEqual(first_week_rent_payment.amount, new_booking.weekly_rent)
 
-    def test_pickup(self):
-        driver = factories.PaymentMethodDriver.create()
+    def test_pickup_without_invitor(self):
+        driver = factories.ApprovedDriver.create()
         new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
 
         # pick up the car
@@ -285,7 +285,7 @@ class BookingServiceTest(TestCase):
         # a pickup confirmation to driver
         self.assertEqual(
             outbox[0].subject,
-            'You are ready to drive!'
+            'You are ready to drive!',
         )
 
         # a pickup confirmation to owner
@@ -294,6 +294,26 @@ class BookingServiceTest(TestCase):
             '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
         )
 
+    def test_pickup_with_a_invitor(self):
+        invitor = factories.ApprovedDriver.create()
+        invitee = factories.ApprovedDriver.create()
+        invitee.auth_user.customer.invitor_code = invitor.auth_user.customer.invite_code
+        invitee.save()
+
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=invitee)
+
+        # pick up the car
+        new_booking = booking_service.pickup(new_booking)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 3)
+
+        # a credit received notification for the invitor at invitee's pickup
+        invitor_credit_amount = invitor.auth_user.customer.invite_code.invitor_credit_amount
+        self.assertEqual(
+            outbox[0].subject,
+            'You just received ${}.00 of Idlecars rental credit'.format(invitor_credit_amount),
+        )
 
     def test_pickup_six_sevenths_bug(self):
         self.car.min_lease = '_02_one_week'

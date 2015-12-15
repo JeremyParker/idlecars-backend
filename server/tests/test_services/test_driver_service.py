@@ -217,5 +217,5 @@ class DriverServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'You have ${} towards and Idlecars rental'.format(self.driver.app_credit())
+            'You have ${} towards an Idlecars rental'.format(self.driver.app_credit())
         )
