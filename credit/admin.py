@@ -19,6 +19,24 @@ class CustomerAdmin(admin.ModelAdmin):
     def username(self, instance):
         return instance.user.username
 
+class CreditCodeAdmin(admin.ModelAdmin):
+    list_display = [
+        'created_time',
+        'description',
+        'credit_code',
+        'credit_amount',
+        'invitor_credit_amount',
+        'redeem_count',
+        'expiry_time',
+    ]
+    search_fields = [
+        'customer__user__username',
+        'description',
+        'credit_code',
+    ]
+    readonly_fields = [
+        'redeem_count',
+    ]
 
-admin.site.register(models.CreditCode)
+admin.site.register(models.CreditCode, CreditCodeAdmin)
 admin.site.register(models.Customer, CustomerAdmin)
