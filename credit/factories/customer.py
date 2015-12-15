@@ -9,6 +9,8 @@ from factory import LazyAttribute, SubFactory
 from idlecars.factory_helpers import Factory
 from idlecars.factories import AuthUser
 
+from credit.factories import CreditCode
+
 
 class Customer(Factory):
     class Meta:
@@ -17,7 +19,7 @@ class Customer(Factory):
     user = SubFactory(AuthUser, password='password')
     invite_code = SubFactory(CreditCode)
 
-    app_credit = LazyAttribute(lambda o: Decimal(random.randint(1, 5) * 10))
+    app_credit = LazyAttribute(lambda o: Decimal(random.randint(0, 9) * 2))
 
 
 class InvitedCustomer(Customer):

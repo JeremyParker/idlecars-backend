@@ -15,7 +15,7 @@ class CreditCode(Factory):
         model = 'credit.CreditCode'
 
     credit_code = LazyAttribute(lambda o: ''.join(
-        [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
+        [random.choice(string.ascii_uppercase + string.digits) for i in range(4)]
     ))
     credit_amount = LazyAttribute(lambda o: Decimal(random.randint(1, 5) * 10))
     invitor_credit_amount = LazyAttribute(lambda o: Decimal(random.randint(1, 5) * 10))
