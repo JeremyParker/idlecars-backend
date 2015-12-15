@@ -123,7 +123,6 @@ def _credit_reminder(delay_days):
         auth_user__customer__app_credit__gt=Decimal('0.00'),
         auth_user__date_joined__lte=reminder_threshold,
     )
-    import pdb; pdb.set_trace()
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
     for driver in throttled_drivers:
         active_bookings = server.services.booking.filter_active(driver.booking_set)

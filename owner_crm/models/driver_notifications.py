@@ -376,6 +376,9 @@ class CheckoutReceipt(notification.DriverNotification):
 
 
 class InvitorReceivedCredit(notification.DriverNotification):
+    def custom_params_sets(self):
+        return ['credit']
+
     def get_context(self, **kwargs):
         text = '''
             You just received ${} of rental credit because someone rented a car with
