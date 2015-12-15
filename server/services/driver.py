@@ -60,8 +60,7 @@ def post_save(modified_driver, orig):
 
     if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
         #TODO: do something after driver fails to get base letter
-        # driver_notifications.base_letter_rejected(modified_driver)
-        pass
+        driver_notifications.base_letter_rejected(modified_driver)
 
 
 def redeem_code(driver, code_string):
