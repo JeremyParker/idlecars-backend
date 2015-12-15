@@ -23,8 +23,8 @@ class Customer(Factory):
 
 
 class InvitedCustomer(Customer):
-  invitor_code = SubFactory(CreditCode)
+    invitor_code = SubFactory(CreditCode)
 
 
-class InvitorCreditedCustomer(InvitedCustomer)
-  invitor_credited = True
+class InvitorCreditedCustomer(InvitedCustomer):
+    invitor_credited = True

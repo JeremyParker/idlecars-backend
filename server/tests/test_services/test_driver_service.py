@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
+from credit import factories as credit_factories
 from server.services import driver as driver_service
 from server.services import booking as booking_service
 from server import factories
@@ -209,8 +210,7 @@ class DriverServiceTest(TestCase):
         pass
 
     def test_redeem_credit(self):
-        from credit import credit_service
-        code = credit_service.create_invite_code('50.00')
+        code = credit_factories.CreditCode.create(credit_amount=50)
         driver_service.redeem_code(self.driver, code.credit_code)
 
         from django.core.mail import outbox

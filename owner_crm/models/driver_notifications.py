@@ -29,6 +29,7 @@ You have ${} towards your next rental.'.format(kwargs['driver_credit'])
             'sms_body': text + ' Find a car here: ' + cta_url
         }
 
+
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)
