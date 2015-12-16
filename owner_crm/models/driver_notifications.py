@@ -612,10 +612,7 @@ here <br /> Click below to see our current selection! <br />'.format(kwargs['dri
 class InactiveRefer(notification.DriverNotification):
     def __init__(self, campaign_name, argument, *args):
         super(InactiveRefer, self).__init__(campaign_name, argument)
-        if len(args):
-            self.credit = args[0]
-        else:
-            self.credit = '0.00'
+        self.credit = args[0]
 
     def get_context(self, **kwargs):
         subject = ''
