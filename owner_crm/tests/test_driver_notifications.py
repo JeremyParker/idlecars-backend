@@ -161,18 +161,26 @@ class TestDriverCreditNotifications(TestCase):
         self.rich_driver.auth_user.customer.app_credit = Decimal('50.00')
         self.rich_driver.auth_user.customer.save()
 
-    def test_credit_reminder_only_to_rich_drivers(self):
+    def test_poor_driver_no_credit_reminder(self):
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 3)
         self.assertEqual(
             outbox[0].subject,
+            'Let us give you cash towards your rental',
+        )
+        self.assertEqual(
+            outbox[1].subject,
+            'Let us give you cash towards your rental',
+        )
+        self.assertEqual(
+            outbox[2].subject,
             'You have ${} to use towards your next rental'.format(self.rich_driver.app_credit())
         )
 
     @freeze_time("2014-10-23 8:55:00")
-    def test_credit_reminder_delay(self):
+    def test_reminder_delay(self):
         call_command('driver_notifications')
 
         from django.core.mail import outbox
@@ -183,32 +191,32 @@ class TestDriverCreditNotifications(TestCase):
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
+        self.assertEqual(len(outbox), 3)
 
-    def test_no_email_with_active_booking(self):
+    def test_no_credit_email_with_active_booking(self):
         server.factories.BookedBooking.create(driver=self.rich_driver)
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(len(outbox), 1)
 
-    def test_no_email_with_accepted_booking(self):
+    def test_no_credit_email_with_accepted_booking(self):
         server.factories.AcceptedBooking.create(driver=self.rich_driver)
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(len(outbox), 1)
 
-    def test_no_email_with_requested_booking(self):
+    def test_no_credit_email_with_requested_booking(self):
         server.factories.RequestedBooking.create(driver=self.rich_driver)
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(len(outbox), 1)
 
-    def test_no_email_with_reserved_booking(self):
+    def test_no_credit_email_with_reserved_booking(self):
         server.factories.ReservedBooking.create(driver=self.rich_driver)
         call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(len(outbox), 1)

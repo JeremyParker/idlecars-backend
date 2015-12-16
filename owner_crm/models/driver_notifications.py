@@ -607,3 +607,37 @@ here <br /> Click below to see our current selection! <br />'.format(kwargs['dri
             'subject': subject,
             'sms_body': sms_body,
         }
+
+
+class InactiveRefer(notification.DriverNotification):
+    def custom_params_sets(self):
+        return ['credit']
+
+    def get_context(self, **kwargs):
+        subject = ''
+        text = '''
+            We haven’t seen you in a while! Do you still need a rental? We’d like to help you out! <br />
+            If you rent a car with Idlecars and use the code below you will get ${} off
+            your first rental! Click the button below to find a car and experience
+            why drivers love renting with Idlecars!
+        '''.format(
+            kwargs['credit_amount_invitor']
+        )
+        sms_body = 'Hi {}. Get ${} off your next Idlecars rental with this code: \
+{} Find a car here: {}'.format(
+            kwargs['driver_first_name'],
+            kwargs['credit_amount_invitor'],
+            kwargs['credit_code'],
+            kwargs['car_listing_url'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Collect some Idle Cash',
+            'TEXT': text,
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Let us give you cash towards your rental',
+            'sms_body': sms_body,
+        }

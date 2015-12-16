@@ -132,6 +132,30 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
+def processing_bookings(booking_queryset):
+    active_bookings = server.services.booking.filter_active(booking_queryset)
+    accepted_bookings = server.services.booking.filter_accepted(booking_queryset)
+    requested_bookings = server.services.booking.filter_requested(booking_queryset)
+    reserved_bookings = server.services.booking.filter_reserved(booking_queryset)
+    return active_bookings | accepted_bookings | requested_bookings | reserved_bookings
+
+
+def _inactive_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveRefer')
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if processing_bookings(driver.booking_set):
+            skip_drivers.append(driver.pk)
+            continue
+
+        notification.send('driver_notifications.InactiveRefer', driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveRefer')
+
+
 def _credit_reminder(delay_days):
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
@@ -141,12 +165,7 @@ def _credit_reminder(delay_days):
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
     skip_drivers = []
     for driver in throttled_drivers:
-        active_bookings = server.services.booking.filter_active(driver.booking_set)
-        accepted_bookings = server.services.booking.filter_accepted(driver.booking_set)
-        requested_bookings = server.services.booking.filter_requested(driver.booking_set)
-        reserved_bookings = server.services.booking.filter_reserved(driver.booking_set)
-
-        if active_bookings or accepted_bookings or requested_bookings or reserved_bookings:
+        if processing_bookings(driver.booking_set):
             skip_drivers.append(driver.pk)
             continue
 
@@ -155,6 +174,7 @@ def _credit_reminder(delay_days):
 
 
 def process_driver_emails():
+    _inactive_reminder(delay_days=14)
     _credit_reminder(delay_days=14)
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
