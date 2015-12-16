@@ -619,9 +619,9 @@ class InactiveRefer(notification.DriverNotification):
         text = '''
             We haven’t seen you in a while! We’d like to help you out! <br />
 
-            We have gone ahead and applied a ${} credit to your account to be used towards your next rental.\
-            To claim your cash, all you need to do is click the link below and complete a rental with Idlecars\
-            and the money will be automatically deducted from your first week's rent.
+            We have gone ahead and applied a ${} credit to your account to be used towards your next rental.
+            To claim your cash, all you need to do is click the link below and complete a rental with Idlecars
+            and the money will be automatically deducted from your first week's rent. <br />
 
             Click below to find a car.
         '''.format(self.credit)
