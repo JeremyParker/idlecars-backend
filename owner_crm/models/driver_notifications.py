@@ -610,24 +610,28 @@ here <br /> Click below to see our current selection! <br />'.format(kwargs['dri
 
 
 class InactiveRefer(notification.DriverNotification):
-    def custom_params_sets(self):
-        return ['credit']
+    def __init__(self, campaign_name, argument, *args):
+        super(InactiveRefer, self).__init__(campaign_name, argument)
+        if len(args):
+            self.credit = args[0]
+        else:
+            self.credit = '0.00'
 
     def get_context(self, **kwargs):
         subject = ''
         text = '''
-            We haven’t seen you in a while! Do you still need a rental? We’d like to help you out! <br />
-            If you rent a car with Idlecars and use the code below you will get ${} off
-            your first rental! Click the button below to find a car and experience
-            why drivers love renting with Idlecars!
-        '''.format(
-            kwargs['credit_amount_invitor']
-        )
-        sms_body = 'Hi {}. Get ${} off your next Idlecars rental with this code: \
-{} Find a car here: {}'.format(
+            We haven’t seen you in a while! We’d like to help you out! <br />
+
+            We have gone ahead and applied a ${} credit to your account to be used towards your next rental.\
+            To claim your cash, all you need to do is click the link below and complete a rental with Idlecars\
+            and the money will be automatically deducted from your first week's rent.
+
+            Click below to find a car.
+        '''.format(self.credit)
+        sms_body = 'Hi {}, we have given you ${} to use on your next rental! Click here to book a car and claim your cash. \
+Find a car here: {}'.format(
             kwargs['driver_first_name'],
-            kwargs['credit_amount_invitor'],
-            kwargs['credit_code'],
+            self.credit,
             kwargs['car_listing_url'],
         )
 

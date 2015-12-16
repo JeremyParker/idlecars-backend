@@ -143,7 +143,7 @@ class DriverNotificationTest(TestCase):
             },
             'InactiveRefer': {
                 'argument': 'approved_driver',
-                'sms_result': 'code',
+                'sms_result': 'cash',
                 'email_result': 'cash',
             },
             'InsuranceRejected': {

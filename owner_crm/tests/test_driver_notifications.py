@@ -168,7 +168,7 @@ class TestDriverCreditNotifications(TestCase):
         self.assertEqual(len(outbox), 3)
         self.assertEqual(
             outbox[0].subject,
-            'Let us give you cash towards your rental',
+            'You have ${} to use towards your next rental'.format(self.rich_driver.app_credit())
         )
         self.assertEqual(
             outbox[1].subject,
@@ -176,7 +176,7 @@ class TestDriverCreditNotifications(TestCase):
         )
         self.assertEqual(
             outbox[2].subject,
-            'You have ${} to use towards your next rental'.format(self.rich_driver.app_credit())
+            'Let us give you cash towards your rental',
         )
 
     @freeze_time("2014-10-23 8:55:00")
@@ -189,9 +189,16 @@ class TestDriverCreditNotifications(TestCase):
     def test_no_email_twice(self):
         call_command('driver_notifications')
         call_command('driver_notifications')
+        call_command('driver_notifications')
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 3)
+        '''
+        1. app credit reminder to rich_driver
+        2. coupon reminder to poor driver
+        3. coupon reminder to rich driver
+        4. app credit to poor driver(poor driver became rich)
+        '''
+        self.assertEqual(len(outbox), 4)
 
     def test_no_credit_email_with_active_booking(self):
         server.factories.BookedBooking.create(driver=self.rich_driver)
