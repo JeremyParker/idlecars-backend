@@ -136,6 +136,11 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'referral code',
                 'email_result': 'Idlecars rental',
             },
+            'ReferFriends': {
+                'argument': 'approved_driver',
+                'sms_result': 'refer your friends',
+                'email_result': 'refer',
+            },
             'InsuranceRejected': {
                 'argument': 'accepted_booking',
                 'email_result': 'insurance',

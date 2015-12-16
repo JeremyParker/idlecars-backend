@@ -30,6 +30,49 @@ You have ${} towards your next rental.'.format(kwargs['driver_credit'])
         }
 
 
+class ReferFriends(notification.DriverNotification):
+    def custom_params_sets(self):
+        return ['credit']
+
+    def get_context(self, **kwargs):
+        sms_body = 'Do you love Idlecars? Receive ${} of Idlecars rental credit when \
+you refer your friends with this code: {}.'.format(
+            kwargs['credit_amount_invitor'],
+            kwargs['credit_code'],
+        )
+
+        subject = 'Receive ${} for each friend you refer to Idlecars'.format(
+            kwargs['credit_amount_invitor'],
+        )
+
+        text = '''
+            Thank you for renting with Idlecars! <br />
+            Now that you are on the road, you have the chance to save on your weekly rent.
+            Every time you refer another driver with the code below they will get ${} towards
+            their first rental and you will get ${} for each driver you refer -
+            that money will go towards your weekly rent! <br /> <br />
+            Your Code: {} <br /> <br />
+            <ul> How it works:
+            <li> Send the code to your friend </li>
+            <li> They rent a car with Idlecars </li>
+            <li> We give you ${} to be used for your next payment </li> </ul>
+        '''.format(
+            kwargs['credit_amount_invitee'],
+            kwargs['credit_amount_invitor'],
+            kwargs['credit_code'],
+            kwargs['credit_amount_invitor'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': subject,
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': subject,
+            'sms_body': sms_body,
+        }
+
+
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)
