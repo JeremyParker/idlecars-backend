@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
 from credit import credit_service
-from owner_crm.models import ops_notifications, driver_notifications
 from owner_crm.services import throttle_service, notification
 
 import server.models
@@ -74,6 +74,7 @@ def redeem_code(driver, code_string):
         raise ServiceError('Sorry, referral codes are for new drivers only.')
     try:
         credit_service.redeem_code(code_string, driver.auth_user.customer)
+        notification.send('driver_notifications.SignupCredit', driver)
     except credit_service.CreditError as e:
         raise ServiceError(e.message)
 
@@ -120,7 +121,30 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
+def _credit_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__customer__app_credit__gt=Decimal('0.00'),
+        auth_user__date_joined__lte=reminder_threshold,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
+    skip_drivers = []
+    for driver in throttled_drivers:
+        active_bookings = server.services.booking.filter_active(driver.booking_set)
+        accepted_bookings = server.services.booking.filter_accepted(driver.booking_set)
+        requested_bookings = server.services.booking.filter_requested(driver.booking_set)
+        reserved_bookings = server.services.booking.filter_reserved(driver.booking_set)
+
+        if active_bookings or accepted_bookings or requested_bookings or reserved_bookings:
+            skip_drivers.append(driver.pk)
+            continue
+
+        notification.send('driver_notifications.UseYourCredit', driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'UseYourCredit')
+
+
 def process_driver_emails():
+    _credit_reminder(delay_days=14)
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
       reminder_name='FirstDocumentsReminder',

@@ -107,6 +107,7 @@ def _get_driver_params(driver):
         'driver_first_name': driver.first_name(),
         'driver_full_name': driver.full_name(),
         'driver_phone_number': driver.phone_number(),
+        'driver_credit': driver.app_credit(),
         'driver_all_docs_uploaded': driver.all_docs_uploaded(),
         'driver_license_image': driver.driver_license_image,
         'fhv_license_image': driver.fhv_license_image,
@@ -162,6 +163,11 @@ def _get_urls_params(pseudo_argument):
         'owner_app_url': app_routes_owner.owner_app_url(),
     }
 
+def _get_credit_params(credit_code):
+    return {
+        'credit_amount_invitee': credit_code.credit_amount,
+        'credit_amount_invitor': credit_code.invitor_credit_amount,
+    }
 
 def get_merge_vars(context):
     merge_vars_origin = {
@@ -203,6 +209,7 @@ class Notification(object):
             'Driver': {
                 '_get_driver_params': 'self.argument',
                 '_get_urls_params': 'None',
+                '_get_credit_params': 'self.argument.auth_user.customer.invite_code',
             },
             'Owner': {
                 '_get_owner_params': 'self.argument',

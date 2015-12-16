@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
+from credit import factories as credit_factories
 from server.services import driver as driver_service
 from server.services import booking as booking_service
 from server import factories
@@ -207,3 +208,14 @@ class DriverServiceTest(TestCase):
 
     def test_base_letter_rejected(self):
         pass
+
+    def test_redeem_credit(self):
+        code = credit_factories.CreditCode.create(credit_amount=50)
+        driver_service.redeem_code(self.driver, code.credit_code)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'You have ${} towards an Idlecars rental'.format(self.driver.app_credit())
+        )

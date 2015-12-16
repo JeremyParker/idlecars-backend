@@ -97,3 +97,5 @@ def on_cash_spent(new_customer):
             pass
         new_customer.invitor_credited = True
         new_customer.save()
+        return True, invitor
+    return False, None

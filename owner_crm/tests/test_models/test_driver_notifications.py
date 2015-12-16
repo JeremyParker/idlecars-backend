@@ -121,6 +121,21 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'password',
                 'email_result': 'your idlecars password',
             },
+            'InvitorReceivedCredit': {
+                'argument': 'approved_driver',
+                'sms_result': 'referral code',
+                'email_result': 'credit',
+            },
+            'UseYourCredit': {
+                'argument': 'approved_driver',
+                'sms_result': 'next rental',
+                'email_result': 'next rental',
+            },
+            'SignupCredit': {
+                'argument': 'driver',
+                'sms_result': 'referral code',
+                'email_result': 'Idlecars rental',
+            },
             'InsuranceRejected': {
                 'argument': 'accepted_booking',
                 'email_result': 'insurance',
