@@ -199,8 +199,8 @@ class TestDriverCreditNotifications(TestCase):
         from django.core.mail import outbox
         '''
         1. app credit reminder to rich_driver
-        2. coupon reminder to poor driver
-        3. coupon reminder to rich driver
+        2. inactive reminder to poor driver
+        3. inactive reminder to rich driver
         '''
         self.assertEqual(len(outbox), 3)
 

@@ -164,7 +164,7 @@ class ExperimentServiceReferralTest(TestCase):
     #     self.assertEqual(alt.conversion_count, 1)
 
 
-class ExperimentServiceCouponTest(TestCase):
+class ExperimentServiceInactiveCreditTest(TestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
         self.experiment = Experiment.objects.create(
@@ -183,14 +183,14 @@ class ExperimentServiceCouponTest(TestCase):
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='coupon_100',
+            identifier='inactive_100',
             ratio=40,
             participant_count=0,
             conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='coupon_150',
+            identifier='inactive_150',
             ratio=20,
             participant_count=0,
             conversion_count=0,
@@ -211,14 +211,14 @@ class ExperimentServiceCouponTest(TestCase):
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='coupon_100',
+            identifier='inactive_100',
             ratio=0,
             participant_count=0,
             conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='coupon_150',
+            identifier='inactive_150',
             ratio=100,
             participant_count=0,
             conversion_count=0,
