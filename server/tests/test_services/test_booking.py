@@ -280,17 +280,17 @@ class BookingServiceTest(TestCase):
         self._check_payments_after_pickup(new_booking)
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
+        self.assertEqual(len(outbox), 3)
 
         # a pickup confirmation to driver
         self.assertEqual(
-            outbox[0].subject,
+            outbox[1].subject,
             'You are ready to drive!',
         )
 
         # a pickup confirmation to owner
         self.assertEqual(
-            outbox[1].subject,
+            outbox[2].subject,
             '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
         )
 
@@ -306,20 +306,40 @@ class BookingServiceTest(TestCase):
         new_booking = booking_service.pickup(new_booking)
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 3)
+        self.assertEqual(len(outbox), 4)
 
+        referral_credit_amount = invitee.auth_user.customer.invite_code.invitor_credit_amount
+        self.assertEqual(
+            outbox[0].subject,
+            'Receive ${} for each friend you refer to Idlecars'.format(referral_credit_amount),
+        )
         # a credit received notification for the invitor at invitee's pickup
         invitor_credit_amount = invitor.auth_user.customer.invite_code.invitor_credit_amount
         self.assertEqual(
-            outbox[0].subject,
+            outbox[1].subject,
             'You just received ${}.00 of Idlecars rental credit'.format(invitor_credit_amount),
         )
+
+    def test_repeated_driver_pickup(self):
+        invitor = factories.ApprovedDriver.create()
+        invitee = factories.ApprovedDriver.create()
+        invitee.auth_user.customer.invitor_code = invitor.auth_user.customer.invite_code
+        invitee.save()
+
+        old_booking = factories.ReturnedBooking.create(car=self.car, driver=invitee)
+        new_booking = factories.AcceptedBooking.create(car=self.car, driver=invitee)
+
+        new_booking = booking_service.pickup(new_booking)
+
+        from django.core.mail import outbox
+        # repeated driver don't receiver refer friends email and invitor does not get more credit
+        self.assertEqual(len(outbox), 2)
 
     def test_pickup_six_sevenths_bug(self):
         self.car.min_lease = '_02_one_week'
         self.car.save()
 
-        driver = factories.PaymentMethodDriver.create()
+        driver = factories.ApprovedDriver.create()
         new_booking = factories.AcceptedBooking.create(
             car=self.car,
             driver=driver,
@@ -336,7 +356,7 @@ class BookingServiceTest(TestCase):
     def test_pickup_after_failure(self):
         self.car.min_lease = '_02_one_week'
         self.car.save()
-        driver = factories.PaymentMethodDriver.create()
+        driver = factories.ApprovedDriver.create()
 
         new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver, end_time=None)
         self.assertEqual(new_booking.get_state(), models.Booking.ACCEPTED)

@@ -136,6 +136,17 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'referral code',
                 'email_result': 'Idlecars rental',
             },
+            'ReferFriends': {
+                'argument': 'approved_driver',
+                'sms_result': 'refer your friends',
+                'email_result': 'refer',
+            },
+            'InactiveRefer': {
+                'argument': 'approved_driver',
+                'additional_args': '50.00',
+                'sms_result': 'cash',
+                'email_result': 'cash',
+            },
             'InsuranceRejected': {
                 'argument': 'accepted_booking',
                 'email_result': 'insurance',
@@ -180,7 +191,10 @@ class DriverNotificationTest(TestCase):
                     campaign.preferred_medium = Campaign.SMS_MEDIUM
                     campaign.save()
 
-                    notification.send(campaign_name, argument)
+                    if 'additional_args' in spec.keys():
+                        notification.send(campaign_name, argument, spec['additional_args'])
+                    else:
+                        notification.send(campaign_name, argument)
 
                     # print sms_service.test_get_outbox()[0]['body'] + ' --------------- ' + campaign_name
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
@@ -192,7 +206,10 @@ class DriverNotificationTest(TestCase):
                     campaign.preferred_medium = Campaign.EMAIL_MEDIUM
                     campaign.save()
 
-                    notification.send(campaign_name, argument)
+                    if 'additional_args' in spec.keys():
+                        notification.send(campaign_name, argument, spec['additional_args'])
+                    else:
+                        notification.send(campaign_name, argument)
 
                     self.assertEqual(len(mail.outbox), 1)
                     # print mail.outbox[0].subject + ' --------------- ' + campaign_name

@@ -167,6 +167,7 @@ def _get_credit_params(credit_code):
     return {
         'credit_amount_invitee': credit_code.credit_amount,
         'credit_amount_invitor': credit_code.invitor_credit_amount,
+        'credit_code': credit_code.credit_code,
     }
 
 def get_merge_vars(context):

@@ -68,6 +68,13 @@ def assign_credit_code(driver):
     )
 
 
+def assign_coupon_credit(driver):
+    credit = server.services.experiment.get_coupon_credit(driver)
+    customer = driver.auth_user.customer
+    customer.app_credit += Decimal(credit)
+    customer.save()
+    return credit
+
 def redeem_code(driver, code_string):
     # make sure the driver has never completed a booking
     if any(b.pickup_time for b in driver.booking_set.all()):
@@ -78,6 +85,17 @@ def redeem_code(driver, code_string):
     except credit_service.CreditError as e:
         raise ServiceError(e.message)
 
+
+def on_newly_converted(driver):
+    notification.send('driver_notifications.ReferFriends', driver)
+
+    # when a new user spends cash in the app, whoever invited them gets app credit
+    invitee_customer = driver.auth_user.customer
+    success, invitor_customer = credit_service.on_cash_spent(invitee_customer)
+
+    if success:
+        invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
+        notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
 
 def get_missing_docs(driver):
     ''' returns a list of the names of the driver's missing documents.'''
@@ -121,6 +139,23 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
+def _inactive_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveRefer')
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if server.services.booking.processing_bookings(driver.booking_set):
+            skip_drivers.append(driver.pk)
+            continue
+
+        credit = assign_coupon_credit(driver)
+        notification.send('driver_notifications.InactiveRefer', driver, credit)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveRefer')
+
+
 def _credit_reminder(delay_days):
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
@@ -130,12 +165,7 @@ def _credit_reminder(delay_days):
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
     skip_drivers = []
     for driver in throttled_drivers:
-        active_bookings = server.services.booking.filter_active(driver.booking_set)
-        accepted_bookings = server.services.booking.filter_accepted(driver.booking_set)
-        requested_bookings = server.services.booking.filter_requested(driver.booking_set)
-        reserved_bookings = server.services.booking.filter_reserved(driver.booking_set)
-
-        if active_bookings or accepted_bookings or requested_bookings or reserved_bookings:
+        if server.services.booking.processing_bookings(driver.booking_set):
             skip_drivers.append(driver.pk)
             continue
 
@@ -145,6 +175,8 @@ def _credit_reminder(delay_days):
 
 def process_driver_emails():
     _credit_reminder(delay_days=14)
+    _inactive_reminder(delay_days=14)
+
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
       reminder_name='FirstDocumentsReminder',

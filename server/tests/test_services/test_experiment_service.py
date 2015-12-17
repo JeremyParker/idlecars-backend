@@ -11,7 +11,7 @@ from server import factories
 from server.services import driver as driver_service
 
 
-class ExperimentServiceTest(TestCase):
+class ExperimentServiceReferralTest(TestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
         self.experiment = Experiment.objects.create(
@@ -75,7 +75,73 @@ class ExperimentServiceTest(TestCase):
         self.driver.documentation_approved = True
         self.driver.save()
 
-        # driver should have a referral credit code with one of the two experimental values
         code = self.driver.auth_user.customer.invite_code
         reward = Decimal('50.00')
         self.assertTrue(code.invitor_credit_amount == reward and code.credit_amount == reward)
+
+
+class ExperimentServiceCouponTest(TestCase):
+    def setUp(self):
+        self.driver = factories.Driver.create()
+        self.experiment = Experiment.objects.create(
+            identifier='coupon_credit',
+            start_time=timezone.now(),
+            end_time=None,
+        )
+
+    def test_get_coupon_credit(self):
+        default = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='default',
+            ratio=40,
+            participant_count=0,
+            conversion_count=0,
+        )
+        Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='coupon_100',
+            ratio=40,
+            participant_count=0,
+            conversion_count=0,
+        )
+        Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='coupon_150',
+            ratio=20,
+            participant_count=0,
+            conversion_count=0,
+        )
+        self.experiment.default = default
+        self.experiment.save()
+
+        credit = driver_service.assign_coupon_credit(self.driver)
+        self.assertTrue(credit in ['50.00', '100.00', '150.00'])
+
+    def test_get_coupon_credit_biased(self):
+        default = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='default',
+            ratio=0,
+            participant_count=0,
+            conversion_count=0,
+        )
+        Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='coupon_100',
+            ratio=0,
+            participant_count=0,
+            conversion_count=0,
+        )
+        Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='coupon_150',
+            ratio=100,
+            participant_count=0,
+            conversion_count=0,
+        )
+        self.experiment.default = default
+        self.experiment.save()
+
+        credit = driver_service.assign_coupon_credit(self.driver)
+        self.assertTrue(credit == '150.00')
+

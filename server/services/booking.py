@@ -77,6 +77,13 @@ def filter_incomplete(booking_queryset):
         incomplete_time__isnull=False,
     )
 
+def processing_bookings(booking_queryset):
+    active_bookings = filter_active(booking_queryset)
+    accepted_bookings = filter_accepted(booking_queryset)
+    requested_bookings = filter_requested(booking_queryset)
+    reserved_bookings = filter_reserved(booking_queryset)
+    return active_bookings | accepted_bookings | requested_bookings | reserved_bookings
+
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
