@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from django.conf import settings
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ChoiceField
+from rest_framework.exceptions import ValidationError
 
 from idlecars import app_routes_driver, fields
 from server.models import Car, Owner
@@ -66,6 +67,11 @@ class CarCreateSerializer(ModelSerializer):
             'base',
             'insurance',
        )
+
+    def update(self, instance, validated_data):
+        if 'owner' in validated_data and car_service.has_booking_in_progress(instance):
+            raise ValidationError('This car has a booking in progress so it cannot be deleted.')
+        return super(CarCreateSerializer, self).update(instance, validated_data)
 
     def get_name(self, obj):
         if not obj.make_model:

@@ -36,8 +36,13 @@ def filter_needs_renewal(queryset):
 
 
 def filter_booking_in_progress(queryset):
-    active_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
-    return queryset.filter(id__in=[b.car.id for b in active_bookings])
+    in_progress_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
+    return queryset.filter(id__in=[b.car.id for b in in_progress_bookings])
+
+
+def has_booking_in_progress(car):
+    in_progress_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
+    return car.id in [b.car.id for b in in_progress_bookings]
 
 
 def get_stale_within(minutes_until_stale):
