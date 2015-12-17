@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
 
+import credit.factories
 import server.factories
 from server.models import Booking
 from owner_crm.tests import sample_merge_vars
@@ -157,7 +158,11 @@ class TestDriverCreditNotifications(TestCase):
     @freeze_time("2014-10-10 9:55:00")
     def setUp(self):
         self.poor_driver = server.factories.ApprovedDriver.create()
+
+        # rich driver signed up with a credit code, but hasn't spend the credit yet.
         self.rich_driver = server.factories.ApprovedDriver.create()
+        self.rich_driver.auth_user.customer.invitor_code = credit.factories.CreditCode.create()
+        self.rich_driver.auth_user.customer.invitor_credited = False
         self.rich_driver.auth_user.customer.app_credit = Decimal('50.00')
         self.rich_driver.auth_user.customer.save()
 
@@ -196,9 +201,8 @@ class TestDriverCreditNotifications(TestCase):
         1. app credit reminder to rich_driver
         2. coupon reminder to poor driver
         3. coupon reminder to rich driver
-        4. app credit to poor driver(poor driver became rich)
         '''
-        self.assertEqual(len(outbox), 4)
+        self.assertEqual(len(outbox), 3)
 
     def test_no_credit_email_with_active_booking(self):
         server.factories.BookedBooking.create(driver=self.rich_driver)

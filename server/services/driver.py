@@ -166,10 +166,15 @@ def _inactive_reminder(delay_days):
 
 
 def _credit_reminder(delay_days):
+    '''
+    Send a reminder to drivers who signed up with a credit code, but haven't spent
+    the credit yet.
+    '''
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
-        auth_user__customer__app_credit__gt=Decimal('0.00'),
         auth_user__date_joined__lte=reminder_threshold,
+        auth_user__customer__invitor_code__isnull=False,
+        auth_user__customer__invitor_credited=False,
     )
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
     skip_drivers = []
