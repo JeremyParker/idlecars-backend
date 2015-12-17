@@ -74,7 +74,17 @@ def get_assignments(identity):
 
     assignments = {}
     for experiment_id, experiment in experiments.iteritems():
-        if experiment.start_time < now:
+        if experiment.start_time and experiment.start_time < now:
             assignments[experiment_id] = assign_alternative(identity, experiment_id)
 
     return assignments
+
+
+def increment_conversion(identity, experiment_id):
+    from django.db.models import F
+    alternative_id = assign_alternative(identity, experiment_id)
+    models.Alternative.objects.filter(
+        identifier=alternative_id,
+    ).update(
+        conversion_count=F('conversion_count') + 1,
+    )

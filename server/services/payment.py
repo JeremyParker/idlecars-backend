@@ -23,7 +23,9 @@ def create_payment(
 ):
     '''
     create_payment's parameters are the way the outside world sees the payment. The way the payment
-    is actually paid is reflected in the Payment object that is returned.
+    is actually paid is reflected in the Payment object that is returned. Credit deductions are
+    handled at this level. (Braintree and FakeGateway know nothing of credits)
+
     @booking - the booking that this payment applies to
     @cash_amount - how much cash the driver will actually pay
     @credit_amount - how much credit the driver will actually use up

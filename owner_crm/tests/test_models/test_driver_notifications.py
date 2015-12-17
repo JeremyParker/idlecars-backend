@@ -141,7 +141,7 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'refer your friends',
                 'email_result': 'refer',
             },
-            'InactiveRefer': {
+            'InactiveCredit': {
                 'argument': 'approved_driver',
                 'additional_args': '50.00',
                 'sms_result': 'cash',
