@@ -6,8 +6,6 @@ import decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-import experiments.models
-from experiments import experiments
 from credit import credit_service
 from credit import models
 from idlecars.factories import AuthUser
