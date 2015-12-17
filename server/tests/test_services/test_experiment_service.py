@@ -183,7 +183,7 @@ class ExperimentServiceInactiveCreditTest(TestCase):
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='inactive_100',
+            identifier='inactive_75',
             ratio=40,
             participant_count=0,
             conversion_count=0,
@@ -199,7 +199,7 @@ class ExperimentServiceInactiveCreditTest(TestCase):
         self.experiment.save()
 
         credit = driver_service.assign_inactive_credit(self.driver)
-        self.assertTrue(credit in ['50.00', '100.00', '150.00'])
+        self.assertTrue(credit in ['50.00', '75.00', '150.00'])
 
     def test_get_inactive_credit_biased(self):
         default = Alternative.objects.create(
@@ -211,7 +211,7 @@ class ExperimentServiceInactiveCreditTest(TestCase):
         )
         Alternative.objects.create(
             experiment=self.experiment,
-            identifier='inactive_100',
+            identifier='inactive_75',
             ratio=0,
             participant_count=0,
             conversion_count=0,

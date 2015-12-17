@@ -31,7 +31,7 @@ def get_inactive_credit(driver):
     cohort_id = experiments.assign_alternative(driver.auth_user.username, 'inactive_credit')
     if 'default' == cohort_id:
         return '50.00'
-    elif 'inactive_100' == cohort_id:
-        return '100.00'
+    elif 'inactive_75' == cohort_id:
+        return '75.00'
     else:
         return '150.00'
