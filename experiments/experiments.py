@@ -85,6 +85,7 @@ def increment_conversion(identity, experiment_id):
     alternative_id = assign_alternative(identity, experiment_id)
     models.Alternative.objects.filter(
         identifier=alternative_id,
+        experiment__identifier=experiment_id,
     ).update(
         conversion_count=F('conversion_count') + 1,
     )

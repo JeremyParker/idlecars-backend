@@ -97,8 +97,11 @@ def on_newly_converted(driver):
     )
     if success:
         server.services.experiment.referral_reward_converted(invitor_customer)
-        invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
-        notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
+        try:
+            invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
+            notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
+        except Exception:
+            pass # we allow invitors who aren't drivers.
 
 
 def get_missing_docs(driver):
