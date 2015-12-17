@@ -79,7 +79,7 @@ class DriverSerializer(ModelSerializer):
         if 'password' in validated_data:
             raise PermissionDenied()
 
-        if 'invitor_code' in validated_data:
+        if 'invitor_code' in validated_data and validated_data['invitor_code']:
             try:
                 driver_service.redeem_code(instance, validated_data['invitor_code'])
             except ServiceError as e:
