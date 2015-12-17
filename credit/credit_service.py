@@ -31,7 +31,6 @@ def generate_invite_code_string(customer=None, code=''):
 
 
 def create_invite_code(invitee_amount, invitor_amount='0.00', customer=None):
-    # TODO - customers are randomly assigned to a cohort (50/50 or 25/75)
     code_string = generate_invite_code_string(customer)
 
     description = ''
@@ -83,9 +82,19 @@ def redeem_code(code_string, customer):
     customer.save()
 
 
-def on_cash_spent(new_customer):
+def is_reward_virgin(invitor_customer):
     '''
-    When a new customer spends cash, the referrer is awarded app credit.
+    Has this customer ever been rewarded for an invite code?
+    '''
+    return not Customer.objects.filter(
+        invitor_code=invitor_customer.invite_code,
+        invitor_credited=True
+    )
+
+
+def reward_invitor_for(new_customer):
+    '''
+    When a new customer converts, the customer who invited them is awarded app credit.
     '''
     if new_customer.invitor_code and not new_customer.invitor_credited:
         try:

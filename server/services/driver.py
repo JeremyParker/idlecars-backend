@@ -75,6 +75,7 @@ def assign_coupon_credit(driver):
     customer.save()
     return credit
 
+
 def redeem_code(driver, code_string):
     # make sure the driver has never completed a booking
     if any(b.pickup_time for b in driver.booking_set.all()):
@@ -87,15 +88,23 @@ def redeem_code(driver, code_string):
 
 
 def on_newly_converted(driver):
+    # we tell the driver they can now invite their friends
     notification.send('driver_notifications.ReferFriends', driver)
 
-    # when a new user spends cash in the app, whoever invited them gets app credit
-    invitee_customer = driver.auth_user.customer
-    success, invitor_customer = credit_service.on_cash_spent(invitee_customer)
-
+    # whoever invited them gets app credit
+    success, invitor_customer = credit_service.reward_invitor_for(
+        driver.auth_user.customer
+    )
     if success:
-        invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
-        notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
+        if credit_service.is_reward_virgin(invitor_customer):
+            server.services.experiment.referral_reward_converted(invitor_customer)
+
+        try:
+            invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
+            notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
+        except Exception:
+            pass # we allow invitors who aren't drivers.
+
 
 def get_missing_docs(driver):
     ''' returns a list of the names of the driver's missing documents.'''
@@ -144,7 +153,7 @@ def _inactive_reminder(delay_days):
     remindable_drivers = server.models.Driver.objects.filter(
         auth_user__date_joined__lte=reminder_threshold,
     )
-    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveRefer')
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveCredit')
     skip_drivers = []
     for driver in throttled_drivers:
         if server.services.booking.processing_bookings(driver.booking_set):
@@ -152,8 +161,8 @@ def _inactive_reminder(delay_days):
             continue
 
         credit = assign_coupon_credit(driver)
-        notification.send('driver_notifications.InactiveRefer', driver, credit)
-    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveRefer')
+        notification.send('driver_notifications.InactiveCredit', driver, credit)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveCredit')
 
 
 def _credit_reminder(delay_days):

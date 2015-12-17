@@ -6,7 +6,9 @@ from experiments import experiments
 
 def get_referral_rewards(driver):
     '''
-    Returns a (invitee credit, invitor credit) tuple.
+    Returns a (invitee credit, invitor credit) tuple, to assign to the credit code that
+    an existing driver will get. How much credit can they give to referrals? How much will
+    they get as a reward?
     '''
     cohort_id = experiments.assign_alternative(driver.auth_user.username, 'referral_rewards')
     if 'default' == cohort_id:
@@ -15,9 +17,16 @@ def get_referral_rewards(driver):
         return ('50.00', '50.00')
 
 
+def referral_reward_converted(invitor_customer):
+    '''
+    This function records when a driver invited someone, and that person converted.
+    '''
+    experiments.increment_conversion(invitor_customer.user.username, 'referral_rewards')
+
+
 def get_coupon_credit(driver):
     '''
-    Return a credit amount
+    Return a credit amount that we grant to inactive drivers.
     '''
     cohort_id = experiments.assign_alternative(driver.auth_user.username, 'coupon_credit')
     if 'default' == cohort_id:

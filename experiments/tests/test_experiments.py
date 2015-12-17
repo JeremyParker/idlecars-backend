@@ -5,12 +5,12 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from experiments import experiments, models
+from experiments import models
+from experiments import experiments
 from experiments.testutils import TestCase
 
 
-class AssignAlternativeTest(TestCase):
-
+class AlternativeTestBase(TestCase):
     def setUp(self):
         self.identity_A = '1dd26432-25f3-468f-83eb-e1261bf29fa0'
         self.identity_B = '27b72751-3b35-4d03-aa13-cf623514bb3a'
@@ -36,6 +36,8 @@ class AssignAlternativeTest(TestCase):
         self.experiment.default = self.alternative_A
         self.experiment.save()
 
+
+class AssignAlternativeTest(AlternativeTestBase):
     def test_assign_alternative_alternative_assignment(self):
         self.assertEquals(
             experiments.assign_alternative(
@@ -154,7 +156,6 @@ class AssignAlternativeTest(TestCase):
 
 
 class GetAssignmentsTest(TestCase):
-
     def setUp(self):
         self.experiment = models.Experiment.objects.create(
             identifier='test_experiment',
@@ -323,3 +324,15 @@ class GetAssignmentsTest(TestCase):
             {self.experiment.identifier: alternative_id_active,
              experiment.identifier: experiment.winner.identifier}
         )
+
+
+class IncrementConversionTest(AlternativeTestBase):
+    def test_increment_conversion_works(self):
+        experiments.increment_conversion(self.identity_A, self.experiment.identifier)
+
+        alternative_id = experiments.assign_alternative(self.identity_A, self.experiment.identifier)
+        alt = models.Alternative.objects.get(identifier=alternative_id)
+        self.assertEqual(alt.conversion_count, 1)
+
+    def test_no_alternatives_not_crash(self):
+        experiments.increment_conversion(self.identity_A, 'imaginary_alternative')

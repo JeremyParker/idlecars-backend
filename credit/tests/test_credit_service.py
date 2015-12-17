@@ -120,7 +120,7 @@ class CreditCodeServiceTest(TestCase):
         code.refresh_from_db()
         self.assertEqual(code.redeem_count, 0)
 
-    def test_on_cash_spent(self):
+    def test_reward_invitor(self):
         existing_user = AuthUser.create()
         code = credit_service.create_invite_code(
             '50.00',
@@ -131,7 +131,7 @@ class CreditCodeServiceTest(TestCase):
         # new user comes along, redeems code and spends some cash
         new_user = AuthUser.create()
         credit_service.redeem_code(code.credit_code, new_user.customer)
-        credit_service.on_cash_spent(new_user.customer)
+        credit_service.reward_invitor_for(new_user.customer)
 
         # The invitor should have got some app credit
         existing_user.customer.refresh_from_db()
