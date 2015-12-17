@@ -18,6 +18,7 @@ def _get_payment_params(payment):
         'payment_cash_amount': payment.amount,
         'payment_credit_amount': payment.credit_amount,
         'payment_total_amount': payment.amount + payment.credit_amount,
+        'payment_idlecars_supplement': payment.idlecars_supplement,
         'payment_invoice_description': payment.invoice_description(),
         'payment_invoice_start_time': payment.invoice_start_time,
         'payment_invoice_end_time': payment.invoice_end_time,
