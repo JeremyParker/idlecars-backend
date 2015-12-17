@@ -217,6 +217,25 @@ class CarUpdateTest(CarAPITest):
         expected_date = datetime.datetime(2017, 1, 1, tzinfo=timezone.get_current_timezone())
         self.assertEqual(self.car.next_available_date, expected_date)
 
+    def test_delete_car_by_deleting_owner(self):
+        data = {'owner': None}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.car.refresh_from_db()
+        self.assertIsNone(self.car.owner)
+
+    def test_cannot_delete_car_with_booking_in_progress(self):
+        factories.RequestedBooking.create(car=self.car)
+        data = {'owner': None}
+        url = reverse('server:cars-detail', args=(self.car.pk,))
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data['_app_notifications'],
+            ['This car has a booking in progress so it cannot be deleted.'],
+        )
+
     def test_cannot_update_others_cars(self):
         other_car = factories.ClaimedCar.create()
         url = reverse('server:cars-detail', args=(other_car.pk,))
