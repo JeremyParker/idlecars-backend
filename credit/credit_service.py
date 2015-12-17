@@ -82,6 +82,16 @@ def redeem_code(code_string, customer):
     customer.save()
 
 
+def is_reward_virgin(invitor_customer):
+    '''
+    Has this customer ever been rewarded for an invite code?
+    '''
+    return not Customer.objects.filter(
+        invitor_code=invitor_customer.invite_code,
+        invitor_credited=True
+    )
+
+
 def reward_invitor_for(new_customer):
     '''
     When a new customer converts, the customer who invited them is awarded app credit.
