@@ -24,11 +24,11 @@ def referral_reward_converted(invitor_customer):
     experiments.increment_conversion(invitor_customer.user.username, 'referral_rewards')
 
 
-def get_coupon_credit(driver):
+def get_inactive_credit(driver):
     '''
     Return a credit amount that we grant to inactive drivers.
     '''
-    cohort_id = experiments.assign_alternative(driver.auth_user.username, 'coupon_credit')
+    cohort_id = experiments.assign_alternative(driver.auth_user.username, 'inactive_credit')
     if 'default' == cohort_id:
         return '50.00'
     elif 'coupon_100' == cohort_id:

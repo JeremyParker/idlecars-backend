@@ -68,8 +68,8 @@ def assign_credit_code(driver):
     )
 
 
-def assign_coupon_credit(driver):
-    credit = server.services.experiment.get_coupon_credit(driver)
+def assign_inactive_credit(driver):
+    credit = server.services.experiment.get_inactive_credit(driver)
     customer = driver.auth_user.customer
     customer.app_credit += Decimal(credit)
     customer.save()
@@ -160,7 +160,7 @@ def _inactive_reminder(delay_days):
             skip_drivers.append(driver.pk)
             continue
 
-        credit = assign_coupon_credit(driver)
+        credit = assign_inactive_credit(driver)
         notification.send('driver_notifications.InactiveCredit', driver, credit)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveCredit')
 

@@ -168,12 +168,12 @@ class ExperimentServiceCouponTest(TestCase):
     def setUp(self):
         self.driver = factories.Driver.create()
         self.experiment = Experiment.objects.create(
-            identifier='coupon_credit',
+            identifier='inactive_credit',
             start_time=timezone.now(),
             end_time=None,
         )
 
-    def test_get_coupon_credit(self):
+    def test_get_inactive_credit(self):
         default = Alternative.objects.create(
             experiment=self.experiment,
             identifier='default',
@@ -198,10 +198,10 @@ class ExperimentServiceCouponTest(TestCase):
         self.experiment.default = default
         self.experiment.save()
 
-        credit = driver_service.assign_coupon_credit(self.driver)
+        credit = driver_service.assign_inactive_credit(self.driver)
         self.assertTrue(credit in ['50.00', '100.00', '150.00'])
 
-    def test_get_coupon_credit_biased(self):
+    def test_get_inactive_credit_biased(self):
         default = Alternative.objects.create(
             experiment=self.experiment,
             identifier='default',
@@ -226,5 +226,5 @@ class ExperimentServiceCouponTest(TestCase):
         self.experiment.default = default
         self.experiment.save()
 
-        credit = driver_service.assign_coupon_credit(self.driver)
+        credit = driver_service.assign_inactive_credit(self.driver)
         self.assertTrue(credit == '150.00')
