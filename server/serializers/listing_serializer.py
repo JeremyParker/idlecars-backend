@@ -124,7 +124,10 @@ class ListingSerializer(ModelSerializer):
         return car_search.get_cost_bucket(obj)
 
     def get_cost_time(self, obj):
-        return 'a day'
+        if obj.is_split_shift():
+            return 'a shift'
+        else:
+            return 'a day'
 
     def get_image_url(self, obj):
         return car_service.get_image_url(obj)
@@ -142,7 +145,7 @@ class ListingSerializer(ModelSerializer):
 
     def get_shift(self, obj):
         return {
-            'split_shift': obj.shift != Car.SHIFT_FULL_TIME,
+            'split_shift': obj.is_split_shift(),
             'description': Car.SHIFT_CHOICES[obj.shift][1],
         }
 
