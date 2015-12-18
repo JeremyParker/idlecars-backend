@@ -142,7 +142,7 @@ class ListingSerializer(ModelSerializer):
 
     def get_shift(self, obj):
         return {
-            'split_shift': obj.shift != 1,
+            'split_shift': obj.shift != Car.SHIFT_FULL_TIME,
             'description': Car.SHIFT_CHOICES[obj.shift][1],
         }
 
