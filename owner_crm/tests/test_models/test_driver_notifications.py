@@ -27,7 +27,7 @@ class DriverNotificationTest(TestCase):
         self.approved_driver = server_factories.ApprovedDriver.create()
         self.base_letter_driver = server_factories.BaseLetterDriver.create()
 
-        car = server_factories.BookableCar.create(solo_cost=500)
+        car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create(car=car)
         self.reserved_booking = server_factories.ReservedBooking.create(car=car)
         self.requested_booking = server_factories.RequestedBooking.create(car=car)
@@ -38,7 +38,7 @@ class DriverNotificationTest(TestCase):
 
         self.settled_payment = server_factories.SettledPayment.create(
             booking=self.booked_booking,
-            amount=car.solo_cost,
+            amount=car.weekly_rent,
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7),
         )

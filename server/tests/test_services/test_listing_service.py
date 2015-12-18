@@ -27,7 +27,7 @@ class ListingTest(TestCase):
         )
 
     def test_data_complete(self):
-        self.car.solo_deposit = 0
+        self.car.deposit = 0
         self.assertTrue(car_helpers.is_data_complete(self.car))
 
     def test_car_filtered_if_booking_in_progress(self):

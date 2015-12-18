@@ -63,11 +63,11 @@ class NotificationServiceTest(TestCase):
         self.assertIsNotNone(sms['body'])
 
     def test_send_sms_with_no_sms_context_sends_email(self):
-        car = server_factories.BookableCar.create(solo_cost=500)
+        car = server_factories.BookableCar.create(weekly_rent=500)
         self.booked_booking = server_factories.BookedBooking.create(car=car)
         self.settled_payment = server_factories.SettledPayment.create(
             booking=self.booked_booking,
-            amount=car.solo_cost,
+            amount=car.weekly_rent,
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7),
         )

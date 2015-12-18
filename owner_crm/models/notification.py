@@ -77,7 +77,7 @@ def _get_car_params(car):
         'car_daily_cost': car.quantized_cost(),
         'car_status': car.effective_status(),
         'car_plate': car.plate,
-        'car_deposit': car.solo_deposit,
+        'car_deposit': car.deposit,
         'car_image_url': car_service.get_image_url(car),
         'car_driver_details_url': app_routes_driver.car_details_url(car),
         'car_owner_details_url': app_routes_owner.car_details_url(car),

@@ -21,7 +21,7 @@ class OwnerNotificationTest(TestCase):
 
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
-        self.car = server_factories.BookableCar.create(solo_cost=500)
+        self.car = server_factories.BookableCar.create(weekly_rent=500)
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
         self.booked_booking = server_factories.BookedBooking.create(car=self.car)
 
@@ -31,7 +31,7 @@ class OwnerNotificationTest(TestCase):
 
         self.settled_payment = server_factories.SettledPayment.create(
             booking=self.booked_booking,
-            amount=self.car.solo_cost,
+            amount=self.car.weekly_rent,
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7),
         )

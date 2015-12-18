@@ -19,10 +19,9 @@ class CarInline(admin.TabularInline):
         'year',
         'status',
         'next_available_date',
-        'solo_cost',
-        'solo_deposit',
-        'split_cost',
-        'split_deposit',
+        'shift',
+        'weekly_rent',
+        'deposit',
         'min_lease',
     ]
     readonly_fields = ['detail_link']

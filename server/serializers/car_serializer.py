@@ -22,6 +22,7 @@ class CarCreateSerializer(ModelSerializer):
     listing_link = SerializerMethodField()
     available_date_display = SerializerMethodField()
     min_lease_display = SerializerMethodField()
+    shift_display = SerializerMethodField()
 
     next_available_date = fields.DateArrayField(required=False, allow_null=True,)
     interior_color = CarColorField(required=False, allow_null=True,)
@@ -41,8 +42,10 @@ class CarCreateSerializer(ModelSerializer):
             'insurance',
             'listing_link',
 
-            'solo_cost',
-            'solo_deposit',
+            'shift',
+            'shift_display',
+            'weekly_rent',
+            'deposit',
             'next_available_date',
             'available_date_display',
             'min_lease',
@@ -60,6 +63,7 @@ class CarCreateSerializer(ModelSerializer):
             'available_date_display',
             'state_string',
             'state_buttons',
+            'shift_display',
             'min_lease_display',
             # fields we get from the TLC
             'make_model',
@@ -105,6 +109,9 @@ class CarCreateSerializer(ModelSerializer):
         if not days:
             return "No minimum set"
         return '{} day'.format(days) + ('s' if days-1 else '')
+
+    def get_shift_display(self, obj):
+        return Car.SHIFT_CHOICES[obj.shift][1]
 
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):

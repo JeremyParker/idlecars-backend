@@ -256,7 +256,7 @@ def checkout(booking):
         booking.checkout_time = timezone.now()
 
         # lock-in pricing details by copying them to the booking
-        booking.weekly_rent = booking.car.solo_cost
+        booking.weekly_rent = booking.car.weekly_rent
         booking.service_percentage = booking.car.owner.effective_service_percentage
         booking.save()
 

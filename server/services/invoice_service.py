@@ -23,7 +23,7 @@ def void_all_payments(booking):
 def make_deposit_payment(booking):
     payment = payment_service.create_payment(
         booking,
-        booking.car.solo_deposit,
+        booking.car.deposit,
     )
     payment = payment_service.pre_authorize(payment)
     return payment

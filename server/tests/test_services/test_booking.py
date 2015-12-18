@@ -88,7 +88,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
         self.assertEqual(len(new_booking.payment_set.all()), 1)
         self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.PRE_AUTHORIZED)), 1)
-        self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.solo_deposit)
+        self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.deposit)
         return new_booking
 
     def test_checkout_receipt(self):
