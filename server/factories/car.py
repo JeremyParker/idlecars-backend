@@ -35,7 +35,7 @@ class ClaimedCar(Car):
     ''' car that an owner has claimed and filled in details for '''
     owner = SubFactory(Owner)
     weekly_rent = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
-    solo_deposit = SelfAttribute('weekly_rent')
+    deposit = SelfAttribute('weekly_rent')
     min_lease = '_02_one_week'
     next_available_date = LazyAttribute(
         lambda o: timezone.now() - datetime.timedelta(days=random.randint(1, 10))

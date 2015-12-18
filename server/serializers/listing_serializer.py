@@ -84,7 +84,7 @@ class ListingSerializer(ModelSerializer):
         return [
             'Available {}'.format(self._available_string(obj)),
             '{} minimum rental'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
-            '${} deposit'.format(obj.solo_deposit),
+            '${} deposit'.format(obj.deposit),
         ]
 
     def get_certifications(self, obj):
@@ -111,7 +111,7 @@ class ListingSerializer(ModelSerializer):
         return details
 
     def get_deposit(self, obj):
-        return '${}'.format(obj.solo_deposit)
+        return '${}'.format(obj.deposit)
 
     def get_cost_str(self, obj):
         return str(obj.quantized_cost()).split('.')

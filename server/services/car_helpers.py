@@ -30,7 +30,7 @@ def _filter_data_complete(queryset):
             make_model__isnull=False,
             year__isnull=False,
             weekly_rent__isnull=False,
-            solo_deposit__isnull=False,
+            deposit__isnull=False,
         ).exclude(
             Q(min_lease='_00_unknown') |
             Q(plate='') |
@@ -46,7 +46,7 @@ def is_data_complete(car):
     '''
     this checks the same logic as above for an individual car
     '''
-    return car.owner and car.make_model and car.year and car.weekly_rent and car.solo_deposit != None \
+    return car.owner and car.make_model and car.year and car.weekly_rent and car.deposit != None \
         and car.plate and car.base and car.owner.zipcode \
         and car.base and car.min_lease != '_00_unknown'
         # and car.owner.city and car.owner.state_code \

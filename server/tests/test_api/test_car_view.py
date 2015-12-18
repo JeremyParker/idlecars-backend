@@ -101,7 +101,7 @@ class CarDetailsTest(CarAPITest):
             owner=self.owner,
             plate='OTHER_REAL_PLATE',
             weekly_rent=None,
-            solo_deposit=None,
+            deposit=None,
         )
         url = reverse('server:cars-detail', args=(car.pk,))
         response = self.client.get(url)

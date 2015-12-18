@@ -42,7 +42,7 @@ class CarCreateSerializer(ModelSerializer):
             'listing_link',
 
             'weekly_rent',
-            'solo_deposit',
+            'deposit',
             'next_available_date',
             'available_date_display',
             'min_lease',

@@ -44,7 +44,7 @@ class ListingTest(APITestCase):
                     [
                         'Available {d.month}/{d.day}'.format(d = tomorrow),
                         '{} minimum rental'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
-                        '${} deposit'.format(car.solo_deposit),
+                        '${} deposit'.format(car.deposit),
                     ]
                 ),
                 ('certifications',
@@ -64,7 +64,7 @@ class ListingTest(APITestCase):
                         ['TLC Base', car.base]
                     ]
                 ),
-                ('deposit', '${}'.format(car.solo_deposit)),
+                ('deposit', '${}'.format(car.deposit)),
                 ('cost_str', ['14', '29']), # this number base on car.weekly_rent, which is $100 in the test
                 ('cost_time', 'a day'),
                 ('cost_bucket', ['cheap']),

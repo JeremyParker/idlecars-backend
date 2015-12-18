@@ -57,9 +57,7 @@ class Car(models.Model):
     vehicle_vin_number = models.CharField(max_length=32, blank=True)
 
     weekly_rent = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-    solo_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-    split_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
-    split_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _00_unknown='Unknown',

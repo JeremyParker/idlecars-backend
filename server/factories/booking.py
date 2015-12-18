@@ -39,7 +39,7 @@ class ReservedBooking(Booking):
     def payment(self, create, count, **kwargs):
         PreAuthorizedPayment.create(
             booking=self,
-            amount=self.car.solo_deposit,
+            amount=self.car.deposit,
         )
 
 
@@ -60,7 +60,7 @@ class BookedBooking(AcceptedBooking):
             p.status = Payment.HELD_IN_ESCROW
         SettledPayment.create(
             booking=self,
-            amount=self.car.solo_deposit,
+            amount=self.car.deposit,
             invoice_start_time=LazyAttribute(lambda o: timezone.now()),
             invoice_end_time=LazyAttribute(lambda o: (timezone.now()+ datetime.timedelta(days=7)))
         )
