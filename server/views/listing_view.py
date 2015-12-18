@@ -21,7 +21,7 @@ class ListingViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         queryset = car_service.filter_live(
             self.filter_queryset(self.get_queryset())
-        ).order_by('solo_cost')
+        ).order_by('weekly_rent')
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

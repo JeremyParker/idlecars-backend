@@ -56,7 +56,7 @@ class Car(models.Model):
     expiration_date = models.DateField(blank=True, null=True)
     vehicle_vin_number = models.CharField(max_length=32, blank=True)
 
-    solo_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    weekly_rent = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     solo_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     split_cost = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     split_deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
@@ -151,10 +151,10 @@ class Car(models.Model):
 
     # TODO: remove this once the client shows cents in the listing price.
     def normalized_cost(self):
-        return int((self.solo_cost + 6) / 7)
+        return int((self.weekly_rent + 6) / 7)
 
     def quantized_cost(self):
-        return (self.solo_cost / Decimal(7.00)).quantize(Decimal('.01'), rounding=ROUND_UP)
+        return (self.weekly_rent / Decimal(7.00)).quantize(Decimal('.01'), rounding=ROUND_UP)
 
     def __unicode__(self):
         if self.plate and self.year:

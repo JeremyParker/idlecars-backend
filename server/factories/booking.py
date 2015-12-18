@@ -32,7 +32,7 @@ class ReservedBooking(Booking):
     driver = SubFactory(PaymentMethodDriver)
 
     # checkout locks in the price and service_percentage
-    weekly_rent = SelfAttribute('car.solo_cost')
+    weekly_rent = SelfAttribute('car.weekly_rent')
     service_percentage = Decimal('0.085')
 
     @post_generation

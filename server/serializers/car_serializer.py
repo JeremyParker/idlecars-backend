@@ -41,7 +41,7 @@ class CarCreateSerializer(ModelSerializer):
             'insurance',
             'listing_link',
 
-            'solo_cost',
+            'weekly_rent',
             'solo_deposit',
             'next_available_date',
             'available_date_display',

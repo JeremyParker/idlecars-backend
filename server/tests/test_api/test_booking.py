@@ -271,7 +271,7 @@ class ReservedBookingDetailsTest(APITestCase):
         self.assertEqual(
             response.data['next_payment'],
             {
-                'amount': self.booking.car.solo_cost,
+                'amount': self.booking.car.weekly_rent,
                 'start_time': start_time.strftime('%b %d'),
                 'credit': 0,
             }
@@ -285,7 +285,7 @@ class ReservedBookingDetailsTest(APITestCase):
         self.assertEqual(
             response.data['next_payment'],
             {
-                'amount': self.booking.car.solo_cost - 50,
+                'amount': self.booking.car.weekly_rent - 50,
                 'start_time': start_time.strftime('%b %d'),
                 'credit': 50,
             }

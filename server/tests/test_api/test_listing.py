@@ -21,7 +21,7 @@ class ListingTest(APITestCase):
             next_available_date=timezone.now() + datetime.timedelta(days=1),
             hybrid=False,
             min_lease='_03_two_weeks',
-            solo_cost=100,
+            weekly_rent=100,
         )
 
     def _get_expected_representation(self, car):
@@ -65,7 +65,7 @@ class ListingTest(APITestCase):
                     ]
                 ),
                 ('deposit', '${}'.format(car.solo_deposit)),
-                ('cost_str', ['14', '29']), # this number base on car.solo_cost, which is $100 in the test
+                ('cost_str', ['14', '29']), # this number base on car.weekly_rent, which is $100 in the test
                 ('cost_time', 'a day'),
                 ('cost_bucket', ['cheap']),
                 ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['cheap'], 'work_with': []}),
@@ -139,7 +139,7 @@ class ListingTest(APITestCase):
             exterior_color=0,
             interior_color=0,
             min_lease='_03_two_weeks',
-            solo_cost=100, # make it ridiculously cheap, so it's always in the 'cheap' bucket
+            weekly_rent=100, # make it ridiculously cheap, so it's always in the 'cheap' bucket
         )
         url = reverse('server:listings-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')

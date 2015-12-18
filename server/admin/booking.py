@@ -206,9 +206,9 @@ class BookingAdmin(admin.ModelAdmin):
         if instance.weekly_rent:
             return '${}'.format(instance.weekly_rent)
         else:
-            return '${}'.format(instance.car.solo_cost)
+            return '${}'.format(instance.car.weekly_rent)
     car_cost.short_description = 'Rent'
-    car_cost.admin_order_field = 'car__solo_cost'
+    car_cost.admin_order_field = 'car__weekly_rent'
 
     def effective_service_percentage(self, instance):
         return instance.service_percentage or instance.car.owner.effective_service_percentage

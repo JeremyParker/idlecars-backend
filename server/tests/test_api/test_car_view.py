@@ -46,7 +46,7 @@ class CarUnauthorizedTest(APITestCase):
     def test_cannot_update_car(self):
         car = factories.Car.create()
         url = reverse('server:cars-detail', args=(car.pk,))
-        response = self.client.patch(url, {'solo_cost': 350}, format='json')
+        response = self.client.patch(url, {'weekly_rent': 350}, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -100,7 +100,7 @@ class CarDetailsTest(CarAPITest):
         car = factories.Car.create(
             owner=self.owner,
             plate='OTHER_REAL_PLATE',
-            solo_cost=None,
+            weekly_rent=None,
             solo_deposit=None,
         )
         url = reverse('server:cars-detail', args=(car.pk,))
@@ -174,16 +174,16 @@ class CarCreateTest(CarAPITest):
 
 class CarUpdateTest(CarAPITest):
     def test_change_car_details(self):
-        self.car.solo_cost = None
+        self.car.weekly_rent = None
         self.car.save()
 
         url = reverse('server:cars-detail', args=(self.car.pk,))
-        data = {'solo_cost': 350}
+        data = {'weekly_rent': 350}
         response = self.client.patch(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
-        self.assertEqual(self.car.solo_cost, Decimal('350'))
+        self.assertEqual(self.car.weekly_rent, Decimal('350'))
 
     def test_can_unclaim_car(self):
         url = reverse('server:cars-detail', args=(self.car.pk,))
@@ -239,7 +239,7 @@ class CarUpdateTest(CarAPITest):
     def test_cannot_update_others_cars(self):
         other_car = factories.ClaimedCar.create()
         url = reverse('server:cars-detail', args=(other_car.pk,))
-        response = self.client.patch(url, {'solo_cost': 350}, format='json')
+        response = self.client.patch(url, {'weekly_rent': 350}, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_cannot_update_tlc_or_readonly_fields(self):

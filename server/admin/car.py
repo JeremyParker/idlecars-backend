@@ -82,7 +82,7 @@ class InsuranceFilter(admin.SimpleListFilter):
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
-        'solo_cost',
+        'weekly_rent',
         'owner_link',
         'owner_rating',
         'last_status_update',
@@ -110,7 +110,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
                 ('effective_status', 'last_status_update', 'next_available_date',),
-                ('solo_cost', 'solo_deposit'),
+                ('weekly_rent', 'solo_deposit'),
                 ('split_cost', 'split_deposit'),
                 'min_lease',
                 'notes',

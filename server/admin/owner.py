@@ -19,7 +19,7 @@ class CarInline(admin.TabularInline):
         'year',
         'status',
         'next_available_date',
-        'solo_cost',
+        'weekly_rent',
         'solo_deposit',
         'split_cost',
         'split_deposit',
