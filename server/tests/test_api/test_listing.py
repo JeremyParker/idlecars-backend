@@ -47,6 +47,7 @@ class ListingTest(APITestCase):
                         '${} deposit'.format(car.deposit),
                     ]
                 ),
+                ('shift', {'description': '24/7', 'split_shift': False}),
                 ('certifications',
                     [
                         'Base registration verified',

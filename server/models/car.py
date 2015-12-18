@@ -59,6 +59,18 @@ class Car(models.Model):
     weekly_rent = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     deposit = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
 
+    SHIFT_UNKNOWN = 0
+    SHIFT_FULL_TIME = 1
+    SHIFT_DAY = 2
+    SHIFT_NIGHT = 3
+    SHIFT_CHOICES = [
+        (SHIFT_UNKNOWN, 'Unknown'),
+        (SHIFT_FULL_TIME, '24/7'),
+        (SHIFT_DAY, 'Day shift (5am-5pm)'),
+        (SHIFT_NIGHT, 'Night shift (5pm-5am)'),
+    ]
+    shift = models.IntegerField(choices=SHIFT_CHOICES, default=SHIFT_FULL_TIME)
+
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _00_unknown='Unknown',
         _01_no_min='No',

@@ -25,6 +25,7 @@ class ListingSerializer(ModelSerializer):
     zipcode = SerializerMethodField()
     searchable = SerializerMethodField()
     compatibility = SerializerMethodField()
+    shift = SerializerMethodField()
 
     class Meta:
         model = Car
@@ -44,6 +45,7 @@ class ListingSerializer(ModelSerializer):
             'zipcode',
             'searchable',
             'compatibility',
+            'shift',
         )
         read_only_fields = (
             'id',
@@ -60,6 +62,7 @@ class ListingSerializer(ModelSerializer):
             'zipcode',
             'searchable',
             'compatibility',
+            'shift',
         )
 
     def get_name(self, obj):
@@ -136,6 +139,12 @@ class ListingSerializer(ModelSerializer):
 
     def get_compatibility(self, obj):
         return CarCompatibility(obj).all()
+
+    def get_shift(self, obj):
+        return {
+            'split_shift': obj.shift != 1,
+            'description': Car.SHIFT_CHOICES[obj.shift][1],
+        }
 
     def _available_string(self, obj):
         if obj.next_available_date and obj.next_available_date > timezone.now():

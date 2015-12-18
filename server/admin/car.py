@@ -88,6 +88,7 @@ class CarAdmin(admin.ModelAdmin):
         'last_status_update',
         'plate',
         'insurance',
+        'shift',
     ]
     list_filter = [
         CarStaleListFilter,
@@ -110,7 +111,7 @@ class CarAdmin(admin.ModelAdmin):
                 ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
                 ('effective_status', 'last_status_update', 'next_available_date',),
-                ('weekly_rent', 'deposit'),
+                ('shift', 'weekly_rent', 'deposit'),
                 'min_lease',
                 'notes',
                 'work_with',
