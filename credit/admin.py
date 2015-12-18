@@ -6,6 +6,12 @@ from django.contrib import admin
 from credit import models
 
 class CustomerAdmin(admin.ModelAdmin):
+    readonly_fields = [
+        'user',
+        'invite_code',
+        'invitor_code',
+        'invitor_credited',
+    ]
     list_display = [
         'user',
         'invitor_code',
