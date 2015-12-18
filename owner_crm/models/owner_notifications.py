@@ -221,13 +221,7 @@ class PickupConfirmation(notification.OwnerNotification):
             kwargs['car_deposit']
         )
 
-        cash_disbursement = max(
-            Decimal('0.00'),
-            kwargs['payment_cash_amount'] - kwargs['payment_service_fee'],
-        )
-        credit_disbursement = kwargs['payment_total_amount'] - kwargs['payment_service_fee'] - cash_disbursement
-
-        if credit_disbursement > 0 and cash_disbursement > 0:
+        if kwargs['payment_idlecars_supplement'] > 0 and kwargs['payment_cash_amount'] > 0:
             text += '''
                 Due to an Idlecars promotion we are covering a portion of the driver’s rent.
                 This will cause the payment to come in two separate deposits at the same time: <br />
@@ -235,8 +229,8 @@ class PickupConfirmation(notification.OwnerNotification):
                 Payment 2: ${} <br />
                 <br />
             '''.format(
-                cash_disbursement,
-                credit_disbursement,
+                kwargs['payment_cash_amount'],
+                kwargs['payment_idlecars_supplement'],
             )
 
         return {
@@ -280,13 +274,7 @@ class PaymentReceipt(notification.OwnerNotification):
                 kwargs ['payment_total_amount'] - kwargs['payment_service_fee'],
             )
 
-        cash_disbursement = max(
-            Decimal('0.00'),
-            kwargs['payment_cash_amount'] - kwargs['payment_service_fee'],
-        )
-        credit_disbursement = kwargs['payment_total_amount'] - kwargs['payment_service_fee'] - cash_disbursement
-
-        if credit_disbursement > 0 and cash_disbursement > 0:
+        if kwargs['payment_idlecars_supplement'] > 0 and kwargs['payment_cash_amount'] > 0:
             text += '''
                 Due to an Idlecars promotion we are covering a portion of the driver’s rent.
                 This will cause the payment to come in two separate deposits at the same time: <br />
@@ -294,8 +282,8 @@ class PaymentReceipt(notification.OwnerNotification):
                 Payment 2: ${} <br />
                 <br />
             '''.format(
-                cash_disbursement,
-                credit_disbursement,
+                kwargs['payment_cash_amount'],
+                kwargs['payment_idlecars_supplement'],
             )
 
         if kwargs['booking_next_payment_amount'] > 0:
