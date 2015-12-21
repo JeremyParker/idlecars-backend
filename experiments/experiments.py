@@ -5,6 +5,7 @@ import bisect
 import hashlib
 
 from django.utils import timezone
+from django.db.models import F
 
 import models
 
@@ -81,7 +82,6 @@ def get_assignments(identity):
 
 
 def increment_conversion(identity, experiment_id):
-    from django.db.models import F
     alternative_id = assign_alternative(identity, experiment_id)
     models.Alternative.objects.filter(
         identifier=alternative_id,
