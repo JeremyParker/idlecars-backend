@@ -149,7 +149,7 @@ class Car(models.Model):
         # TODO(JP): have this change with time based on past data?
         if self.last_known_mileage:
             try:
-                return '{},000'.format(int(self.last_known_mileage) / 1000)
+                return '{:,}'.format(int(self.last_known_mileage))
             except ValueError:
                 pass
         return None
