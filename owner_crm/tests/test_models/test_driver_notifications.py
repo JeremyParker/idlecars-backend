@@ -56,6 +56,11 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'rideshare',
                 'email_result': 'How Idlecars works',
             },
+            'SignupSecondReminder': {
+                'argument': 'driver',
+                'sms_result': 'interested',
+                'email_result': 'Uber',
+            },
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
                 'sms_result': settings.DRIVER_APP_URL + '/#/listing',
