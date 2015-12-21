@@ -106,6 +106,10 @@ def on_newly_converted(driver):
             pass # we allow invitors who aren't drivers.
 
 
+def on_signup(driver):
+    notification.send('driver_notifications.SignupConfirmation', driver)
+
+
 def get_missing_docs(driver):
     ''' returns a list of the names of the driver's missing documents.'''
     missing = []

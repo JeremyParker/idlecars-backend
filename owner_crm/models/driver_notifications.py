@@ -11,6 +11,55 @@ from idlecars import email
 from owner_crm.models import notification
 
 
+class SignupConfirmation(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, welcome to Idlecars where we make renting rideshare cars safe and easy. \
+See our selection here: {}'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_listing_url'],
+        )
+        text = '''
+            Thank you for joining Idlecars, where we make renting for rideshare easy, safe, and affordable. <br />
+            Drivers love us because we have their back. We fight to make sure drivers never get stuck with
+            bad rental terms or have to pay more than they have to for a rental.
+            We source cars from owners across NYC, which means that you get the best price.
+            And with our online rental process we cut down the time it takes for you to get into a car. <br />
+            Click below to start renting.
+        '''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Welcome to Idlecars!',
+            'TEXT': text,
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': kwargs['car_listing_url'],
+            'subject': 'Welcome to Idlecars',
+            'template_name': 'one_button_no_image',
+            'sms_body': sms_body,
+        }
+
+
+class SignupFirstReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = 'render_to_string("signup_confirmation.jade", {}, django_template.Context(autoescape=False))'
+        sms_body = 'Hi {}, it\'s Idlecars! Come experience a better way to rent for \
+rideshare: {}'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_listing_url'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'How to rent a car with Idlecars',
+            'TEXT': text,
+            'CTA_LABEL': 'Find a car here',
+            'CTA_URL': kwargs['car_listing_url'],
+            'subject': 'How Idlecars works',
+            'template_name': 'one_button_no_image',
+            'sms_body': sms_body,
+        }
+
+
 class SignupCredit(notification.DriverNotification):
     def get_context(self, **kwargs):
         subject = 'You have ${} towards an Idlecars rental'.format(kwargs['driver_credit'])

@@ -46,6 +46,16 @@ class DriverNotificationTest(TestCase):
         sms_service.test_reset()
 
         self.notification_spec = {
+            'SignupConfirmation': {
+                'argument': 'driver',
+                'sms_result': 'rideshare',
+                'email_result': 'Welcome to Idlecars',
+            },
+            'SignupFirstReminder': {
+                'argument': 'driver',
+                'sms_result': 'rideshare',
+                'email_result': 'How Idlecars works',
+            },
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
                 'sms_result': settings.DRIVER_APP_URL + '/#/listing',
