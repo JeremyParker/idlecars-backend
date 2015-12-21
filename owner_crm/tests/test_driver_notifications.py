@@ -231,3 +231,53 @@ class TestDriverCreditNotifications(TestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+
+class TestDriverSignupNotifications(TestCase):
+    @freeze_time("2014-10-10 8:55:00")
+    def setUp(self):
+        self.driver = server.factories.CompletedDriver.create()
+
+    @freeze_time("2014-10-16 9:00:00")
+    def test_no_email_right_after_signup(self):
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_new_driver_gets_notification(self):
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'How Idlecars works',
+        )
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_no_email_twice(self):
+        call_command('driver_notifications')
+        call_command('driver_notifications')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_no_email_with_post_pending_booking(self):
+        payment_driver = server.factories.PaymentMethodDriver.create()
+        accepted_driver = server.factories.ApprovedDriver.create()
+        server.factories.ReservedBooking.create(driver=payment_driver)
+        server.factories.RequestedBooking.create(driver=accepted_driver)
+        server.factories.AcceptedBooking.create(driver=accepted_driver)
+        server.factories.BookedBooking.create(driver=accepted_driver)
+        server.factories.ReturnedBooking.create(driver=accepted_driver)
+        server.factories.RefundedBooking.create(driver=accepted_driver)
+        call_command('driver_notifications')
+        import pdb; pdb.set_trace()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+

@@ -41,7 +41,11 @@ See our selection here: {}'.format(
 
 class SignupFirstReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = 'render_to_string("signup_confirmation.jade", {}, django_template.Context(autoescape=False))'
+        text = render_to_string(
+            "signup_confirmation.jade",
+            {},
+            django_template.Context(autoescape=False)
+        )
         sms_body = 'Hi {}, it\'s Idlecars! Come experience a better way to rent for \
 rideshare: {}'.format(
             kwargs['driver_first_name'],

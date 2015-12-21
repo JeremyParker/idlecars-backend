@@ -84,6 +84,12 @@ def processing_bookings(booking_queryset):
     reserved_bookings = filter_reserved(booking_queryset)
     return active_bookings | accepted_bookings | requested_bookings | reserved_bookings
 
+def post_pending_bookings(booking_queryset):
+    filtered_processing_bookings = processing_bookings(booking_queryset)
+    returned_bookings = filter_returned(booking_queryset)
+    refunded_bookings = filter_refunded(booking_queryset)
+    return filtered_processing_bookings | returned_bookings | refunded_bookings
+
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time

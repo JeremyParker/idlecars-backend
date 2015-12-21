@@ -191,7 +191,29 @@ def _credit_reminder(delay_days):
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'UseYourCredit')
 
 
+def _signup_reminder(delay_days, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+        braintree_customer_id__isnull=True,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, reminder_name)
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if server.services.booking.post_pending_bookings(driver.booking_set):
+            skip_drivers.append(driver.pk)
+            continue
+
+        notification.send('driver_notifications.'+reminder_name, driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), reminder_name)
+
+
 def process_driver_emails():
+    _signup_reminder(
+        delay_days=7,
+        reminder_name='SignupFirstReminder',
+    )
+
     _credit_reminder(delay_days=14)
     _inactive_reminder(delay_days=14)
 
