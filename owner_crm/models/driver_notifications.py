@@ -42,7 +42,7 @@ See our selection here: {}'.format(
 class SignupFirstReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = render_to_string(
-            "signup_confirmation.jade",
+            "signup_reminder.jade",
             {},
             django_template.Context(autoescape=False)
         )
@@ -59,6 +59,31 @@ rideshare: {}'.format(
             'CTA_LABEL': 'Find a car here',
             'CTA_URL': kwargs['car_listing_url'],
             'subject': 'How Idlecars works',
+            'template_name': 'one_button_no_image',
+            'sms_body': sms_body,
+        }
+
+
+class SignupSecondReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = render_to_string(
+            "signup_reminder.jade",
+            {},
+            django_template.Context(autoescape=False)
+        )
+        sms_body = 'Hi {}, it\'s Idlecars. Are you still interested in renting? \
+Visit us at {} or let us know what you are looking for!'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_listing_url'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Find a car for Uber, Lyft or Via',
+            'TEXT': text,
+            'CTA_LABEL': 'Find a car here',
+            'CTA_URL': kwargs['car_listing_url'],
+            'subject': 'Do you need a car for Uber, Lyft, or Via?',
             'template_name': 'one_button_no_image',
             'sms_body': sms_body,
         }

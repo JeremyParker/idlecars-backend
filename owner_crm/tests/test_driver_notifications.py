@@ -275,9 +275,25 @@ class TestDriverSignupNotifications(TestCase):
         server.factories.ReturnedBooking.create(driver=accepted_driver)
         server.factories.RefundedBooking.create(driver=accepted_driver)
         call_command('driver_notifications')
-        import pdb; pdb.set_trace()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
+    def test_signup_reminders(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            call_command('driver_notifications')
+        with freeze_time("2014-11-10 9:00:00"):
+            call_command('driver_notifications')
 
+        '''
+        1. sign up first reminder.
+        2. sign up second reminder.
+        3. InactiveCredit reminder.
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 3)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Do you need a car for Uber, Lyft, or Via?',
+        )

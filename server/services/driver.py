@@ -213,6 +213,10 @@ def process_driver_emails():
         delay_days=7,
         reminder_name='SignupFirstReminder',
     )
+    _signup_reminder(
+        delay_days=30,
+        reminder_name='SignupSecondReminder',
+    )
 
     _credit_reminder(delay_days=14)
     _inactive_reminder(delay_days=14)
