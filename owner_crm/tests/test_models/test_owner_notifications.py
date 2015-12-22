@@ -50,6 +50,16 @@ class OwnerNotificationTest(TestCase):
                 'sms_body': 'Welcome',
                 'email_result': 'Welcome',
             },
+            'FirstAccountReminder': {
+                'argument': 'owner',
+                'sms_body': 'incomplete',
+                'email_result': 'incomplete',
+            },
+            'SecondAccountReminder': {
+                'argument': 'owner',
+                'sms_body': 'complete',
+                'email_result': 'Complete',
+            },
             'NewBookingEmail': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),

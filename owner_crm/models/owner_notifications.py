@@ -123,6 +123,55 @@ class NewBookingEmail(notification.OwnerNotification):
         return context
 
 
+class FirstAccountReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, It’s Idlecars. Your account is incomplete and your cars are not listed. \
+Please complete your account here: {}'.format(
+            kwargs['user_first_name'],
+            kwargs['owner_account_url'],
+        )
+        text = '''Thank you for creating and Idlecars owner account.
+        You are on your way to reaching our network of hundreds of drivers. <br /><br />
+
+        Please click the button below to complete your account'''
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Your account is incomplete and your cars are not listed',
+            'TEXT': text,
+            'CTA_LABEL': 'Complete your Account',
+            'CTA_URL': kwargs['owner_account_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your account is incomplete and your cars are not listed',
+            'sms_body': sms_body,
+        }
+
+
+class SecondAccountReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, your cars are not listed on the Idlecars site. \
+Go to {} to complete your account'.format(
+            kwargs['user_first_name'],
+            kwargs['owner_account_url'],
+        )
+        text = '''Are you ready to reach our network of over 500 drivers?
+        Complete your account today, so we can list your cars on the Idlecars marketplace so
+        drivers know your cars are available. <br /><br />
+
+        Please click the button below to complete your account'''
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Complete your account to post your cars',
+            'TEXT': text,
+            'CTA_LABEL': 'Complete your Account',
+            'CTA_URL': kwargs['owner_account_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your cars are not listed on Idlecars yet! Complete your account today!',
+            'sms_body': sms_body,
+        }
+
+
 class FirstMorningInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = 'We are just checking in on {}\'s {} rental with plate \

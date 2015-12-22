@@ -23,6 +23,10 @@ def get_car_kwargs(obj):
     return { 'car': obj, }
 
 
+def get_owner_kwargs(obj):
+    return { 'owner': obj, }
+
+
 def log_message(campaign_name, key_obj):
     kwargs_func_name = 'get_{}_kwargs'.format(key_obj.__class__.__name__).lower()
     kwargs_func = getattr(sys.modules[__name__], kwargs_func_name)
