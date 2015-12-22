@@ -59,7 +59,7 @@ def post_save(modified_driver, orig):
         driver_notifications.base_letter_rejected(modified_driver)
 
 
-def is_paid_driver(driver):
+def is_converted_driver(driver):
     settled_payments = server.models.Payment.objects.filter(
         status=server.models.Payment.SETTLED,
         booking__driver=driver
@@ -187,7 +187,7 @@ def _inactive_referral_reminder(delay_days):
     skip_drivers = []
     for driver in throttled_drivers:
         if server.services.booking.processing_bookings(driver.booking_set) or \
-            is_paid_driver(driver):
+            is_converted_driver(driver):
             skip_drivers.append(driver.pk)
             continue
 

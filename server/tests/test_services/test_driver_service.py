@@ -31,7 +31,7 @@ class DriverServiceTest(TestCase):
         self.driver = factories.Driver.create()
         self.car = factories.BookableCar.create()
 
-    def test_on_singup(self):
+    def test_on_signup(self):
         driver_service.on_signup(self.driver)
 
         from django.core.mail import outbox
