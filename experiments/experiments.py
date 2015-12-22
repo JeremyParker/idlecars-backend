@@ -12,6 +12,7 @@ import models
 
 def assign_alternative(identity, experiment_id):
     """Start an experiment by returning an alternative identifier assigned to identity.
+    This method can be called multiple times to get the assigment for an identity.
 
     Note, that a generic alternative identifier 'default' will be
     returned in certain circumstances, like:
@@ -37,29 +38,44 @@ def assign_alternative(identity, experiment_id):
     except (models.Experiment.DoesNotExist, KeyError):
         return 'default'
 
+    assignment, new = models.Assignment.objects.get_or_create(
+        experiment=experiment,
+        identity=identity,
+    )
+    if new:
+        alternative = calculate_alternative(identity, experiment)
+        if alternative:
+            assignment.alternative = alternative
+        assignment.save()
+
+    if not assignment.alternative:
+        return 'default'
+    else:
+        return assignment.alternative.identifier
+
+
+def calculate_alternative(identity, experiment):
     now = timezone.now()
     if experiment.start_time and experiment.start_time > now:
         if experiment.default:
-            return experiment.default.identifier
+            return experiment.default
         else:
-            return 'default'
+            return None
     if experiment.end_time and experiment.end_time < now:
         if experiment.winner:
-            return experiment.winner.identifier
+            return experiment.winner
         else:
-            return experiment.default.identifier
+            return experiment.default
+
+    if not experiment.alternatives:
+        return None
 
     hasher = hashlib.md5()
-    hasher.update(experiment_id + identity)
+    hasher.update(experiment.identifier + identity)
     # the [-12:] bit is to keep the value inside float precision.
     value = int(hasher.hexdigest()[-12:], 16) % experiment.boundaries[-1]
     index = bisect.bisect_right(experiment.boundaries, value)
-    if not experiment.alternatives:
-        alternative_id = 'default'
-    else:
-        alternative_id = experiment.alternatives[index].identifier
-
-    return alternative_id
+    return experiment.alternatives[index]
 
 
 def get_assignments(identity):
@@ -82,10 +98,17 @@ def get_assignments(identity):
 
 
 def increment_conversion(identity, experiment_id):
-    alternative_id = assign_alternative(identity, experiment_id)
-    models.Alternative.objects.filter(
-        identifier=alternative_id,
-        experiment__identifier=experiment_id,
-    ).update(
-        conversion_count=F('conversion_count') + 1,
+    try:
+        experiment = models.Experiment.objects.get_experiment(experiment_id)
+    except (models.Experiment.DoesNotExist, KeyError):
+        return
+
+    alternative = calculate_alternative(identity, experiment)
+    assignment, created = models.Assignment.objects.get_or_create(
+        experiment=experiment,
+        alternative=alternative,
+        identity=identity,
     )
+    if not assignment.converted_time:
+        assignment.converted_time = timezone.now()
+        assignment.save()

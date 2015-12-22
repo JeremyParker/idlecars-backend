@@ -23,15 +23,11 @@ class AlternativeTestBase(TestCase):
             experiment=self.experiment,
             identifier='alt_A',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         self.alternative_B = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alt_B',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = self.alternative_A
         self.experiment.save()
@@ -166,15 +162,11 @@ class GetAssignmentsTest(TestCase):
             experiment=self.experiment,
             identifier='alt_A',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         self.alternative_B = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alt_B',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = self.alternative_A
         self.experiment.save()
@@ -205,15 +197,11 @@ class GetAssignmentsTest(TestCase):
             experiment=experiment,
             identifier='alt_A',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         models.Alternative.objects.create(
             experiment=experiment,
             identifier='alt_B',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         experiment.default = alternative_A
         experiment.save()
@@ -238,15 +226,11 @@ class GetAssignmentsTest(TestCase):
             experiment=experiment,
             identifier='alt_A2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         models.Alternative.objects.create(
             experiment=experiment,
             identifier='alt_B2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         experiment.default = alternative_A
         experiment.save()
@@ -268,15 +252,11 @@ class GetAssignmentsTest(TestCase):
             experiment=experiment,
             identifier='alt_A2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         models.Alternative.objects.create(
             experiment=experiment,
             identifier='alt_B2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         experiment.default = alternative_A
         experiment.save()
@@ -301,15 +281,11 @@ class GetAssignmentsTest(TestCase):
             experiment=experiment,
             identifier='alt_A2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         alternative_B = models.Alternative.objects.create(
             experiment=experiment,
             identifier='alt_B2',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         experiment.default = alternative_A
         experiment.winner = alternative_B
@@ -332,7 +308,7 @@ class IncrementConversionTest(AlternativeTestBase):
 
         alternative_id = experiments.assign_alternative(self.identity_A, self.experiment.identifier)
         alt = models.Alternative.objects.get(identifier=alternative_id)
-        self.assertEqual(alt.conversion_count, 1)
+        self.assertEqual(alt.conversion_count(), 1)
 
     def test_no_alternatives_not_crash(self):
         experiments.increment_conversion(self.identity_A, 'imaginary_alternative')

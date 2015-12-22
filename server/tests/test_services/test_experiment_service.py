@@ -33,15 +33,11 @@ class ExperimentServiceReferralTest(TestCase):
             experiment=self.experiment,
             identifier='default',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='50_50',
             ratio=50,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = default
         self.experiment.save()
@@ -61,15 +57,11 @@ class ExperimentServiceReferralTest(TestCase):
             experiment=self.experiment,
             identifier='default',
             ratio=0,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='50_50',
             ratio=100,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = default
         self.experiment.save()
@@ -82,86 +74,77 @@ class ExperimentServiceReferralTest(TestCase):
         reward = Decimal('50.00')
         self.assertTrue(code.invitor_credit_amount == reward and code.credit_amount == reward)
 
-    # def test_increment_conversion(self):
-    #     self.alternative_A = Alternative.objects.create(
-    #         experiment=self.experiment,
-    #         identifier='alt_A',
-    #         ratio=50,
-    #         participant_count=0,
-    #         conversion_count=0,
-    #     )
-    #     self.alternative_B = Alternative.objects.create(
-    #         experiment=self.experiment,
-    #         identifier='alt_B',
-    #         ratio=50,
-    #         participant_count=0,
-    #         conversion_count=0,
-    #     )
-    #     self.experiment.default = self.alternative_A
-    #     self.experiment.save()
+    def test_increment_conversion(self):
+        self.alternative_A = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='alt_A',
+            ratio=50,
+        )
+        self.alternative_B = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='alt_B',
+            ratio=50,
+        )
+        self.experiment.default = self.alternative_A
+        self.experiment.save()
 
-    #     existing_user = AuthUser.create()
-    #     code = credit_service.create_invite_code(
-    #         '50.00',
-    #         '50.00',
-    #         existing_user.customer,
-    #     )
+        existing_user = AuthUser.create()
+        code = credit_service.create_invite_code(
+            '50.00',
+            '50.00',
+            existing_user.customer,
+        )
 
-    #     # new driver comes along, redeems code and spends some cash
-    #     driver = factories.ApprovedDriver.create()
-    #     driver.auth_user.customer.invitor_code = code
-    #     driver.auth_user.customer.save()
+        # new driver comes along, redeems code and spends some cash
+        driver = factories.ApprovedDriver.create()
+        driver.auth_user.customer.invitor_code = code
+        driver.auth_user.customer.save()
 
-    #     driver_service.on_newly_converted(driver)
+        driver_service.on_newly_converted(driver)
 
-    #     # the experiment should show that this driver referred someone
-    #     alt_id = experiments.assign_alternative(existing_user.username, self.experiment.identifier)
-    #     alt = Alternative.objects.get(identifier=alt_id)
-    #     self.assertEqual(alt.conversion_count, 1)
+        # the experiment should show that this driver referred someone
+        alt = experiments.calculate_alternative(existing_user.username, self.experiment)
+        self.assertEqual(alt.conversion_count(), 1)
 
-    # def test_not_increment_conversion_if_already_converted(self):
-    #     self.alternative_A = Alternative.objects.create(
-    #         experiment=self.experiment,
-    #         identifier='alt_A',
-    #         ratio=50,
-    #         participant_count=0,
-    #         conversion_count=0,
-    #     )
-    #     self.alternative_B = Alternative.objects.create(
-    #         experiment=self.experiment,
-    #         identifier='alt_B',
-    #         ratio=50,
-    #         participant_count=0,
-    #         conversion_count=0,
-    #     )
-    #     self.experiment.default = self.alternative_A
-    #     self.experiment.save()
+    def test_not_increment_conversion_if_already_converted(self):
+        self.alternative_A = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='alt_A',
+            ratio=50,
+        )
+        self.alternative_B = Alternative.objects.create(
+            experiment=self.experiment,
+            identifier='alt_B',
+            ratio=50,
+        )
+        self.experiment.default = self.alternative_A
+        self.experiment.save()
 
-    #     existing_user = AuthUser.create()
-    #     code = credit_service.create_invite_code(
-    #         '50.00',
-    #         '50.00',
-    #         existing_user.customer,
-    #     )
+        existing_user = AuthUser.create()
+        code = credit_service.create_invite_code(
+            '50.00',
+            '50.00',
+            existing_user.customer,
+        )
 
-    #     # new driver comes along, redeems code and spends some cash
-    #     driver = factories.ApprovedDriver.create()
-    #     driver.auth_user.customer.invitor_code = code
-    #     driver.auth_user.customer.save()
+        # new driver comes along, redeems code and spends some cash
+        driver = factories.ApprovedDriver.create()
+        driver.auth_user.customer.invitor_code = code
+        driver.auth_user.customer.save()
 
-    #     driver_service.on_newly_converted(driver)
+        driver_service.on_newly_converted(driver)
 
-    #     # ANOTHER new driver comes along, redeems THE SAME code and spends some cash
-    #     driver2 = factories.ApprovedDriver.create()
-    #     driver2.auth_user.customer.invitor_code = code
-    #     driver2.auth_user.customer.save()
+        # ANOTHER new driver comes along, redeems THE SAME code and spends some cash
+        driver2 = factories.ApprovedDriver.create()
+        driver2.auth_user.customer.invitor_code = code
+        driver2.auth_user.customer.save()
 
-    #     driver_service.on_newly_converted(driver2)
+        driver_service.on_newly_converted(driver2)
 
-    #     # the experiment should show that this driver referred someone
-    #     alt_id = experiments.assign_alternative(existing_user.username, self.experiment.identifier)
-    #     alt = Alternative.objects.get(identifier=alt_id)
-    #     self.assertEqual(alt.conversion_count, 1)
+        # the experiment should show that this driver referred someone
+        alt_id = experiments.assign_alternative(existing_user.username, self.experiment.identifier)
+        alt = Alternative.objects.get(identifier=alt_id)
+        self.assertEqual(alt.conversion_count(), 1)
 
 
 class ExperimentServiceInactiveCreditTest(TestCase):
@@ -178,22 +161,16 @@ class ExperimentServiceInactiveCreditTest(TestCase):
             experiment=self.experiment,
             identifier='default',
             ratio=40,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='inactive_75',
             ratio=40,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='inactive_150',
             ratio=20,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = default
         self.experiment.save()
@@ -206,22 +183,16 @@ class ExperimentServiceInactiveCreditTest(TestCase):
             experiment=self.experiment,
             identifier='default',
             ratio=0,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='inactive_75',
             ratio=0,
-            participant_count=0,
-            conversion_count=0,
         )
         Alternative.objects.create(
             experiment=self.experiment,
             identifier='inactive_150',
             ratio=100,
-            participant_count=0,
-            conversion_count=0,
         )
         self.experiment.default = default
         self.experiment.save()
