@@ -23,7 +23,11 @@ from owner_crm.management.commands import owner_notifications
 from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
 
-class TestOwnerNotifications(TestCase):
+
+class TestOwnerAccountNotification(TestCase):
+    pass
+
+class TestOwnerRenewalNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
         car = server.factories.BookableCar.create(
             last_status_update=update_time,
@@ -43,7 +47,7 @@ class TestOwnerNotifications(TestCase):
         # one car just renewed to make sure filtering is working
         self._setup_car_with_update_time(timezone.now())
 
-        call_command('owner_notifications')
+        owner_service.process_renewal_reminder()
 
         # check what got sent
         from django.core.mail import outbox
@@ -70,22 +74,24 @@ class TestOwnerNotifications(TestCase):
     def test_renewable_cars(self):
         last_update = self._update_time_about_to_go_stale()
         car = self._setup_car_with_update_time(last_update)
-        owner_service._renewal_email()
+        owner_service.process_renewal_reminder()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1) # we sent an email about this car
 
         # Make sure the car that we just emailed about don't get a second email
-        owner_service._renewal_email()
+        owner_service.process_renewal_reminder()
         self.assertEqual(len(outbox), 1)
 
         # if we sent them a message last time it was about to go stale, we message them again
         msg_record = owner_crm.models.Message.objects.get(car=car)
         msg_record.created_time = timezone.now() - timedelta(days=5)
         msg_record.save()
-        owner_service._renewal_email()
+        owner_service.process_renewal_reminder()
         self.assertEqual(len(outbox), 2)
 
+
+class TestOwnerInsuranceNotifications(TestCase):
     def _new_requested_booking(self, create_time):
         with freeze_time(create_time):
             return server.factories.RequestedBooking.create()
@@ -94,7 +100,7 @@ class TestOwnerNotifications(TestCase):
     def test_owner_reminder(self):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00")
 
-        call_command('owner_notifications')
+        owner_service.process_insurance_reminder()
         test_message.verify_throttled_on_owner(
             self.booking.car.owner,
             'first_morning_insurance_reminder'
@@ -114,7 +120,7 @@ class TestOwnerNotifications(TestCase):
 
     @freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=timezone.get_current_timezone()))
     def test_no_booking(self):
-        call_command('owner_notifications')
+        owner_service.process_insurance_reminder()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
@@ -124,12 +130,12 @@ class TestOwnerNotifications(TestCase):
         booking_time = timezone.datetime(2014, 10, 10, 18, tzinfo=timezone.get_current_timezone())
         self.booking = self._new_requested_booking(booking_time)
 
-        call_command('owner_notifications')
+        owner_service.process_insurance_reminder()
         test_message.verify_throttled_on_owner(
             self.booking.car.owner,
             'first_morning_insurance_reminder',
         )
-        call_command('owner_notifications')
+        owner_service.process_insurance_reminder()
 
         # we should have sent only one reminder about getting the driver on the insurance.
         from django.core.mail import outbox
@@ -147,7 +153,7 @@ class TestOwnerNotifications(TestCase):
             server.factories.IncompleteBooking.create()
 
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=timezone.get_current_timezone())):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
@@ -157,7 +163,7 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking("2014-10-10 18:00:00") # UTC
 
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
@@ -165,11 +171,11 @@ class TestOwnerNotifications(TestCase):
             )
 
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
@@ -177,11 +183,11 @@ class TestOwnerNotifications(TestCase):
             )
 
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         # the final cancelation of the booking happens through the Admin, which triggers this:
@@ -207,7 +213,7 @@ class TestOwnerNotifications(TestCase):
         self.booking = self._new_requested_booking(timezone.datetime(2014, 10, 10, 23, tzinfo=tz))
 
         with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
@@ -215,11 +221,11 @@ class TestOwnerNotifications(TestCase):
             )
 
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
@@ -227,11 +233,11 @@ class TestOwnerNotifications(TestCase):
             )
 
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 17, tzinfo=tz)):
-            call_command('owner_notifications')
+            owner_service.process_insurance_reminder()
             call_command('cron_job')
 
         # the final cancelation of the booking happens through the Admin, which triggers this:

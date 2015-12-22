@@ -30,7 +30,7 @@ def _renewable_cars():
     )
 
 
-def _renewal_email():
+def process_renewal_reminder():
     throttle_key = 'RenewalEmail'
     throttled_renewable_cars = throttle_service.throttle(
         _renewable_cars(),
@@ -65,7 +65,7 @@ def _send_reminder_email(remindable_bookings, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
-def _reminder_email():
+def process_insurance_reminder():
     # TODO: hour, minute and delay_hours should be from settings
     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
     afternoon_target = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
@@ -95,12 +95,6 @@ def _reminder_email():
             reminder_name='SecondAfternoonInsuranceReminder',
             throttle_key='second_afternoon_insurance_reminder',
         )
-
-
-def process_owner_emails():
-    _renewal_email()
-    _reminder_email()
-
 
 def create(auth_user):
     new_owner = Owner.objects.create()
