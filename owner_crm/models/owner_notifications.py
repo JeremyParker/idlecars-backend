@@ -51,6 +51,28 @@ listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_d
         return context
 
 
+class SignupConfirmation(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Welcome to Idlecars! Thank you for creating a car owner account! \
+Check your email to see more on how Idlecars works.'
+        text = render_to_string(
+            "owner_signup.jade",
+            {},
+            template.Context(autoescape=False)
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Welcome to Idlecars',
+            'TEXT': text,
+            'CTA_LABEL': 'Go to your Account',
+            'CTA_URL': kwargs['owner_app_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Welcome to your Idlecars owner account',
+            'sms_body': sms_body,
+        }
+
+
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
         headline = '{} has booked your {}, with license plate {}'.format(

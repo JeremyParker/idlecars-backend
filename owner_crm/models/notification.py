@@ -215,6 +215,7 @@ class Notification(object):
             },
             'Owner': {
                 '_get_owner_params': 'self.argument',
+                '_get_urls_params': 'None',
             },
             'Booking': {
                 '_get_booking_params': 'self.argument',
@@ -257,7 +258,7 @@ class Notification(object):
     def default_params_sets(self):
         return {
             'Driver': ['driver', 'urls'],
-            'Owner': ['owner'],
+            'Owner': ['owner', 'urls'],
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],

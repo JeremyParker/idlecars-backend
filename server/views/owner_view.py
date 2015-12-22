@@ -50,6 +50,7 @@ class OwnerViewSet(
         except models.Owner.DoesNotExist:
             owner = owner_service.create(auth_user=user)
         serializer.instance = owner
+        owner_service.on_signup(owner)
 
     @detail_route(methods=['post'])
     def bank_link(self, request, pk=None):

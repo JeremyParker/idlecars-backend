@@ -107,6 +107,8 @@ def create(auth_user):
     new_owner.auth_users.add(auth_user)
     return new_owner
 
+def on_signup(owner):
+    notification.send('owner_notifications.SignupConfirmation', owner)
 
 def add_merchant_id_to_owner(merchant_account_id, owner):
     owner.merchant_id = merchant_account_id

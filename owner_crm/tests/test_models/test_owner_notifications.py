@@ -19,6 +19,7 @@ class OwnerNotificationTest(TestCase):
     def setUp(self):
         auth_user = idlecars_factories.AuthUser.create(first_name='Tom', last_name='Cat')
 
+        self.owner = server_factories.Owner.create()
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
         self.car = server_factories.BookableCar.create(weekly_rent=500)
@@ -43,6 +44,11 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'car',
                 'sms_result': app_routes_owner.car_details_url(self.car),
                 'email_result': 'expire',
+            },
+            'SignupConfirmation': {
+                'argument': 'owner',
+                'sms_body': 'Welcome',
+                'email_result': 'Welcome',
             },
             'NewBookingEmail': {
                 'argument': 'requested_booking',
