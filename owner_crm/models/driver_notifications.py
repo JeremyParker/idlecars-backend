@@ -21,9 +21,9 @@ See our selection here: {}'.format(
         text = '''
             Thank you for joining Idlecars, where we make renting for rideshare easy, safe, and affordable. <br />
             Drivers love us because we have their back. We fight to make sure drivers never get stuck with
-            bad rental terms or have to pay more than they have to for a rental.
-            We source cars from owners across NYC, which means that you get the best price.
-            And with our online rental process we cut down the time it takes for you to get into a car. <br />
+            bad rental terms, and never pay too much for a rental. We source cars from owners across NYC,
+            which means that you get the best price. And with our online rental process we cut down the time
+            it takes for you to get into a car. <br />
             Click below to start renting.
         '''
 
