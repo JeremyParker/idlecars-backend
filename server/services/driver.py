@@ -114,7 +114,7 @@ def on_newly_converted(driver):
             pass # we allow invitors who aren't drivers.
 
 
-def on_signup(driver):
+def on_set_email(driver):
     notification.send('driver_notifications.SignupConfirmation', driver)
 
 

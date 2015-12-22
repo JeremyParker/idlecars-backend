@@ -46,10 +46,6 @@ class DriverViewSet(
                 return driver_service.create(auth_user=self.request.user)
         return super(DriverViewSet, self).get_object()
 
-    def perform_create(self, serializer):
-        new_driver = serializer.save()
-        driver_service.on_signup(new_driver)
-
     def update(self, request, *args, **kwargs):
         try:
             return super(DriverViewSet, self).update(request, *args, **kwargs)

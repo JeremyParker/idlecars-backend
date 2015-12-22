@@ -109,6 +109,10 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         driver_reloaded = models.Driver.objects.get(id=driver.id)
         self.assertEqual(driver_reloaded.email(), 'test@testing.com')
 
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Welcome to Idlecars')
+
     def test_update_username_field(self):
         response = self.client.patch(self.url, {'phone_number': '123 555 1212'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)

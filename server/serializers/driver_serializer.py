@@ -13,6 +13,7 @@ from server import models
 from server.serializers import PaymentMethodSerializer, CreditCodeSerializer
 from server.services import driver as driver_service
 from server.services import ServiceError
+from server.services import auth_user as auth_user_service
 
 
 class DriverSerializer(ModelSerializer):
@@ -72,8 +73,7 @@ class DriverSerializer(ModelSerializer):
                 username=phone_number,
                 password=password,
             )
-        new_driver = models.Driver.objects.create(auth_user=auth_user)
-        return new_driver
+        return driver_service.create(auth_user=auth_user)
 
     def update(self, instance, validated_data):
         if 'password' in validated_data:
@@ -85,12 +85,10 @@ class DriverSerializer(ModelSerializer):
             except ServiceError as e:
                 raise ValidationError(e.message)
 
-        auth_user = instance.auth_user
-        auth_user.username = validated_data.get('phone_number', auth_user.username)
-        auth_user.email = validated_data.get('email', auth_user.email)
-        auth_user.first_name = validated_data.get('first_name', auth_user.first_name)
-        auth_user.last_name = validated_data.get('last_name', auth_user.last_name)
-        auth_user.save()
+        had_email = bool(instance.auth_user and instance.auth_user.email)
+        auth_user_service.update(instance.auth_user, validated_data)
+        if instance.auth_user.email and not had_email:
+            driver_service.on_set_email(instance)
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)

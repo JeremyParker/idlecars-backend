@@ -31,8 +31,8 @@ class DriverServiceTest(TestCase):
         self.driver = factories.Driver.create()
         self.car = factories.BookableCar.create()
 
-    def test_on_signup(self):
-        driver_service.on_signup(self.driver)
+    def test_on_set_email(self):
+        driver_service.on_set_email(self.driver)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
