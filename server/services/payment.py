@@ -96,20 +96,12 @@ def pre_authorize(payment):
     return payment
 
 
-def get_settled_payments(payment):
-    return models.Payment.objects.filter(
-        status=models.Payment.SETTLED,
-        booking__driver=payment.booking.driver
-    )
-
-
 def settle(payment):
-    has_settled_payments = len(get_settled_payments(payment))
     original_status = payment.status
     payment = _execute('settle', payment)
 
     if not payment.error_message:
-        if not has_settled_payments:
+        if not driver_service.is_paid_driver(payment.booking.driver):
             from server.services import driver as driver_service
             driver_service.on_newly_converted(payment.booking.driver)
 

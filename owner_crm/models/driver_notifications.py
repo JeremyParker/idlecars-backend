@@ -130,8 +130,8 @@ you refer your friends with this code: {}.'.format(
             their first rental and you will get ${} for each driver you refer -
             that money will go towards your weekly rent! <br /> <br />
             Your Code: {} <br /> <br />
-            <ul> How it works:
-            <li> Send the code to your friend </li>
+            How it works:
+            <ul><li> Send the code to your friend </li>
             <li> They rent a car with Idlecars </li>
             <li> We give you ${} to be used for your next payment </li> </ul>
         '''.format(
@@ -718,5 +718,48 @@ Find a car here: {}'.format(
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Let us give you cash towards your rental',
+            'sms_body': sms_body,
+        }
+
+
+class InactiveReferral(notification.DriverNotification):
+    def custom_params_sets(self):
+        return ['credit']
+
+    def get_context(self, **kwargs):
+        sms_body = 'Give your friends ${} of Idlecars credit  with code {} and get ${} for \
+every friend that rents a car with Idlecars: {}'.format(
+            kwargs['credit_amount_invitee'],
+            kwargs['credit_code'],
+            kwargs['credit_amount_invitor'],
+            kwargs['car_listing_url'],
+        )
+        text = '''
+            Need some extra money to help with your rental? Want to share some saving with your friends?  <br />
+            Now that you have an Idlecars account, you have the chance to save on your weekly rent.
+            Every time you refer another driver with the code below they will get ${} towards their
+            first rental and you will get ${} for each driver you refer -
+            that money will go towards your weekly rent! <br /> <br />
+            Your Code: {} <br /><br />
+            How it works:
+            <ul><li> Send the code to your friend
+                <li> They rent a car with Idlecars </li>
+                <li> We give you ${} to be used for your next payment </li></ul>
+            <br />
+            Don’t have a car yet? Click below to find one!
+        '''.format(
+            kwargs['credit_amount_invitee'],
+            kwargs['credit_amount_invitor'],
+            kwargs['credit_code'],
+            kwargs['credit_amount_invitor'],
+        )
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': ' Share some Idle Cash with your friends and save on your next rental',
+            'TEXT': text,
+            'CTA_LABEL': 'Find your car',
+            'CTA_URL': kwargs['car_listing_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Share some Idle Cash with your friends and save on your next rental',
             'sms_body': sms_body,
         }

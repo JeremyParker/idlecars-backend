@@ -59,6 +59,14 @@ def post_save(modified_driver, orig):
         driver_notifications.base_letter_rejected(modified_driver)
 
 
+def is_paid_driver(driver):
+    settled_payments = server.models.Payment.objects.filter(
+        status=server.models.Payment.SETTLED,
+        booking__driver=driver
+    )
+    return len(settled_payments)
+
+
 def assign_credit_code(driver):
     invitee, invitor = server.services.experiment.get_referral_rewards(driver)
     credit_service.create_invite_code(
@@ -152,7 +160,7 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
-def _inactive_reminder(delay_days):
+def _inactive_coupon_reminder(delay_days):
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
         auth_user__date_joined__lte=reminder_threshold,
@@ -168,6 +176,23 @@ def _inactive_reminder(delay_days):
         notification.send('driver_notifications.InactiveCredit', driver, credit)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveCredit')
 
+
+def _inactive_referral_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+        documentation_approved=True,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveReferral')
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if server.services.booking.processing_bookings(driver.booking_set) or \
+            is_paid_driver(driver):
+            skip_drivers.append(driver.pk)
+            continue
+
+        notification.send('driver_notifications.InactiveReferral', driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveReferral')
 
 def _credit_reminder(delay_days):
     '''
@@ -208,7 +233,7 @@ def _signup_reminder(delay_days, reminder_name):
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), reminder_name)
 
 
-def process_driver_emails():
+def process_signup_notifications():
     _signup_reminder(
         delay_days=7,
         reminder_name='SignupFirstReminder',
@@ -218,9 +243,17 @@ def process_driver_emails():
         reminder_name='SignupSecondReminder',
     )
 
-    _credit_reminder(delay_days=14)
-    _inactive_reminder(delay_days=14)
 
+def process_credit_notifications():
+    _credit_reminder(delay_days=14)
+    _inactive_coupon_reminder(delay_days=14)
+
+
+def process_referral_notifications():
+    _inactive_referral_reminder(delay_days=21)
+
+
+def process_document_notifications():
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
       reminder_name='FirstDocumentsReminder',
