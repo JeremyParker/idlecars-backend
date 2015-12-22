@@ -303,12 +303,16 @@ class GetAssignmentsTest(TestCase):
 
 
 class IncrementConversionTest(AlternativeTestBase):
-    def test_increment_conversion_works(self):
+    def test_unassigned_no_conversion(self):
         experiments.increment_conversion(self.identity_A, self.experiment.identifier)
+        alt = experiments.calculate_alternative(self.identity_A, self.experiment)
+        self.assertEqual(alt.conversion_count(), 0)
 
-        alternative_id = experiments.assign_alternative(self.identity_A, self.experiment.identifier)
-        alt = models.Alternative.objects.get(identifier=alternative_id)
+    def test_assigned_conversion_counts(self):
+        experiments.assign_alternative(self.identity_A, self.experiment.identifier)
+        experiments.increment_conversion(self.identity_A, self.experiment.identifier)
+        alt = experiments.calculate_alternative(self.identity_A, self.experiment)
         self.assertEqual(alt.conversion_count(), 1)
 
-    def test_no_alternatives_not_crash(self):
+    def test_no_alternatives_no_crash(self):
         experiments.increment_conversion(self.identity_A, 'imaginary_alternative')

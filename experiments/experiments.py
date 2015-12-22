@@ -24,7 +24,7 @@ def assign_alternative(identity, experiment_id):
     named 'default', when setting up a new experiment.
 
     Arguments:
-    - identity: an arbitrary string, identifying a test subject (e.g. customer, device).
+    - identity: an arbitrary string, identifying a test subject (e.g. customer, session).
     - experiment_id: string, identifier of experiment to conduct.
 
     Returns: string, identifier of one of the alternatives associated
@@ -99,16 +99,14 @@ def get_assignments(identity):
 
 def increment_conversion(identity, experiment_id):
     try:
-        experiment = models.Experiment.objects.get_experiment(experiment_id)
-    except (models.Experiment.DoesNotExist, KeyError):
+        assignment = models.Assignment.objects.get(
+            experiment__identifier=experiment_id,
+            identity=identity,
+            converted_time__isnull=True,
+        )
+    except (models.Assignment.DoesNotExist):
+        # if this identity wasn't assigned to an alternative, we don't track their conversions.
         return
 
-    alternative = calculate_alternative(identity, experiment)
-    assignment, created = models.Assignment.objects.get_or_create(
-        experiment=experiment,
-        alternative=alternative,
-        identity=identity,
-    )
-    if not assignment.converted_time:
-        assignment.converted_time = timezone.now()
-        assignment.save()
+    assignment.converted_time = timezone.now()
+    assignment.save()

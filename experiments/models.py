@@ -212,8 +212,6 @@ class Assignment(Model):
     experiment = models.ForeignKey(Experiment)
     identity = models.CharField(max_length=256)
     converted_time = models.DateTimeField(null=True, blank=True)
-
-    # cached alt field. This could be calculated. Null means 'default'
     alternative = models.ForeignKey(Alternative, null=True, blank=True)
 
 

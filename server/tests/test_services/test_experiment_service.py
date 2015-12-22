@@ -89,9 +89,10 @@ class ExperimentServiceReferralTest(TestCase):
         self.experiment.save()
 
         existing_user = AuthUser.create()
+        _ = experiments.assign_alternative(existing_user.username, 'referral_rewards')
         code = credit_service.create_invite_code(
-            '50.00',
-            '50.00',
+            '1.00',
+            '0.50',
             existing_user.customer,
         )
 
@@ -121,6 +122,7 @@ class ExperimentServiceReferralTest(TestCase):
         self.experiment.save()
 
         existing_user = AuthUser.create()
+        _ = experiments.assign_alternative(existing_user.username, 'referral_rewards')
         code = credit_service.create_invite_code(
             '50.00',
             '50.00',
