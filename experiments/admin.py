@@ -70,20 +70,10 @@ class ExperimentAdmin(ModelAdmin):
     )
     readonly_fields = (
         'live',
-        # 'participant_count',
-        # 'conversion_count',
     )
     inlines = [
         AlternativeInline,
     ]
-
-    # def get_queryset(self, request):
-    #     queryset = super(ExperimentAdmin, self).get_queryset(request)
-    #     queryset = queryset.annotate(
-    #         participant_count=Sum('alternative__participant_count'),
-    #         conversion_count=Sum('alternative__conversion_count'),
-    #     )
-    #     return queryset
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name in ('default', 'winner'):
