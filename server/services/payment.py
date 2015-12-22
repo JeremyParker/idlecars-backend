@@ -97,12 +97,14 @@ def pre_authorize(payment):
 
 
 def settle(payment):
+    from server.services import driver as driver_service
+    is_paid_driver = driver_service.is_paid_driver(payment.booking.driver)
+
     original_status = payment.status
     payment = _execute('settle', payment)
 
     if not payment.error_message:
-        if not driver_service.is_paid_driver(payment.booking.driver):
-            from server.services import driver as driver_service
+        if not is_paid_driver:
             driver_service.on_newly_converted(payment.booking.driver)
 
         # if the payment succeeded, and credit wasn't already deducted, deduct now.

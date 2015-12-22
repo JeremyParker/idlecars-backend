@@ -64,7 +64,7 @@ def is_paid_driver(driver):
         status=server.models.Payment.SETTLED,
         booking__driver=driver
     )
-    return len(settled_payments)
+    return True if settled_payments else False
 
 
 def assign_credit_code(driver):
