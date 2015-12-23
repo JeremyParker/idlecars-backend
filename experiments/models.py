@@ -109,11 +109,11 @@ class Experiment(Model):
         clear_caches()
 
     def participant_count(self):
-        return assignent_set.all().count()
+        return self.assignment_set.all().count()
     participant_count.admin_order_field = 'participant_count'
 
     def conversion_count(self):
-        return assignent_set.filter(
+        return self.assignment_set.filter(
             experiment=self,
             converted_time__isnull=False
         ).count()

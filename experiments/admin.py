@@ -56,6 +56,8 @@ class ExperimentAdmin(ModelAdmin):
         'start_time',
         'end_time',
         'live',
+        'participant_count',
+        'conversion_count',
         'default',
         'winner',
     )
@@ -70,6 +72,8 @@ class ExperimentAdmin(ModelAdmin):
     )
     readonly_fields = (
         'live',
+        'participant_count',
+        'conversion_count',
     )
     inlines = [
         AlternativeInline,
