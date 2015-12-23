@@ -284,6 +284,49 @@ Tap here to find another car today: {}'.format(kwargs['car_listing_url']),
         }
 
 
+class FirstCCReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi, it’s Idlecars. We need to put a hold on your credit card so you can \
+reserve your car. Please enter one here: {}'.format(kwargs['bookings_url'])
+        text = '''Thank you for renting with Idlecars. To complete your rental we still need you to
+            enter a credit or debit card. We will put a hold on your car for the deposit amount -
+            you will not be charged until you start driving. <br /><br />
+            If you need any help, or have any questions feel free to reply to this email.'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Enter a credit card to reserve your car',
+            'TEXT': text,
+            'CTA_LABEL': 'Checkout my car',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} is waiting on your credit card'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
+class SecondCCReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi, it’s Idlecars. Your booking will be canceled soon if you don’t submit your \
+credit card. Please enter it here: {}'.format(kwargs['bookings_url'])
+        text = '''To complete your reservation of the {} you need to enter a credit or debit card
+        so we can verify that you have enough funds in your account. You will not be charged anything
+        until you pick up the car. Click below to add your credit card. <br /><br />
+        If you need any help, or have any questions feel free to reply to this email.
+        '''.format(kwargs['car_name'])
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Enter a credit card to reserve your car',
+            'TEXT': text,
+            'CTA_LABEL': 'Checkout my car',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} rental will be canceled soon'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
 class AwaitingInsuranceEmail(notification.DriverNotification):
     def get_context(self, **kwargs):
         template_data = {
