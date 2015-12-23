@@ -43,10 +43,10 @@ class UserSerializer(ModelSerializer):
         had_email = bool(instance.email)
         auth_user_service.update(instance, validated_data)
         if instance.email and not had_email:
-            if instance.driver:
-                driver_service.on_set_email(instance.driver)
-            elif instance.owner:
+            if instance.owner:
                 pass # TODO: hookup the owner welcome email here.
+            elif instance.driver:
+                driver_service.on_set_email(instance.driver)
 
         return instance
 
