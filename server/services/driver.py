@@ -60,11 +60,10 @@ def post_save(modified_driver, orig):
 
 
 def is_converted_driver(driver):
-    settled_payments = server.models.Payment.objects.filter(
+    return server.models.Payment.objects.filter(
         status=server.models.Payment.SETTLED,
         booking__driver=driver
-    )
-    return True if settled_payments else False
+    ).exists()
 
 
 def assign_credit_code(driver):
