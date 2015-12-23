@@ -116,6 +116,22 @@ class OwnerUpdateTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('server:owners-detail', args=('me',))
 
+    def test_update_incomplete_model(self):
+        self.url = reverse('server:users-detail', args=(self.owner.auth_users.last().id,))
+        # this is to reset email for testing on set email
+        self.client.patch(self.url, {'email': ''}, format='json')
+
+        response = self.client.patch(self.url, {'email': 'test@testing.com'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.owner.auth_users.last().refresh_from_db()
+        self.assertEqual(self.owner.email(), 'test@testing.com')
+
+        # TODO: we need to test this once we setup the owner signup email
+        # from django.core.mail import outbox
+        # self.assertEqual(len(outbox), 1)
+        # self.assertEqual(outbox[0].subject, 'Welcome to Idlecars')
+
     def test_update_company_name(self):
         company_name = 'Miguel\'s Cars'
         response = self.client.patch(self.url, {'company_name': company_name}, format='json')
