@@ -5,7 +5,7 @@ import string, random
 
 from django.contrib.auth.models import User
 
-user_param_keys = ['phone_number', 'email', 'first_name', 'last_name']
+user_param_keys = ['username', 'email', 'first_name', 'last_name']
 
 def create_auth_user(user_account):
     '''
@@ -25,7 +25,7 @@ def create_auth_user(user_account):
 def update(user, kwargs):
     if not set(kwargs.keys()).intersection(set(user_param_keys)):
         return
-    user.username = kwargs.get('phone_number', user.username)
+    user.username = kwargs.get('username', user.username)
     user.email = kwargs.get('email', user.email)
     user.first_name = kwargs.get('first_name', user.first_name)
     user.last_name = kwargs.get('last_name', user.last_name)

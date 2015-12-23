@@ -40,7 +40,7 @@ class DriverSerializer(ModelSerializer):
             'defensive_cert_image',
             'all_docs_uploaded',
 
-            # stuff from auth_user
+            # stuff from auth_user TOOD - remove User fields
             'phone_number',
             'password',
             'invitor_code',
@@ -84,11 +84,6 @@ class DriverSerializer(ModelSerializer):
                 driver_service.redeem_code(instance, validated_data['invitor_code'])
             except ServiceError as e:
                 raise ValidationError(e.message)
-
-        had_email = bool(instance.auth_user and instance.auth_user.email)
-        auth_user_service.update(instance.auth_user, validated_data)
-        if instance.auth_user.email and not had_email:
-            driver_service.on_set_email(instance)
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)
