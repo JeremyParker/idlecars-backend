@@ -19,15 +19,11 @@ class AssignAlternativeTest(TestCase):
         self.alternative_A = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_A',
-            participant_count=0,
-            conversion_count=0,
             ratio=50,
         )
         self.alternative_B = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_B',
-            participant_count=0,
-            conversion_count=0,
             ratio=50,
         )
         self.experiment.default = self.alternative_B
@@ -43,10 +39,10 @@ class AssignAlternativeTest(TestCase):
             self.assertEquals(experiments.assign_alternative('uuid', 'nonexistant'), 'default')
 
     def test_assign_alternative_success(self):
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(7):
             alternative_id1 = experiments.assign_alternative('uuid', self.experiment.identifier)
 
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(2):
             alternative_id2 = experiments.assign_alternative('uuid', self.experiment.identifier)
 
         self.assertEquals(alternative_id1, alternative_id2)

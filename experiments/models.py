@@ -16,7 +16,6 @@ LOCAL_CACHE_LIFETIME = getattr(settings, 'EXPERIMENTS_LOCAL_CACHE_LIFETIME', 60)
 
 
 class Model(models.Model):
-
     class Meta:
         abstract = True
 
@@ -27,7 +26,6 @@ class Model(models.Model):
 
 
 class ExperimentManager(models.Manager):
-
     def get_experiment(self, experiment_id):
         """Returns active experiments from cache or db.
 
@@ -110,9 +108,19 @@ class Experiment(Model):
         super(Experiment, self).save(*args, **kwargs)
         clear_caches()
 
+    def participant_count(self):
+        return self.assignment_set.all().count()
+    participant_count.admin_order_field = 'participant_count'
+
+    def conversion_count(self):
+        return self.assignment_set.filter(
+            experiment=self,
+            converted_time__isnull=False
+        ).count()
+    conversion_count.admin_order_field = 'conversion_count'
+
 
 class AlternativeManager(models.Manager):
-
     use_for_related_fields = True
 
     def get_alternatives(self, experiment_id):
@@ -151,19 +159,14 @@ class Alternative(Model):
     Properties:
     - experiment: instance of `Experiment` this alternative belongs to.
     - identifier: string identifier of the alternative.
-    - participant_count: number of identities which been assigned to this alternative.
-    - conversion_count: number of identities assigned to this alternative who converted.
     - ratio: float, part of the whole population that should be assigned to this alternative.
     - created_time: datetime when the alternative was created.
     """
-
     experiment = models.ForeignKey(Experiment)
     identifier = models.SlugField(
         max_length=16,
         help_text="Identifier can be made up from letters, digits, dashes and underscores.",
     )
-    participant_count = models.IntegerField(default=0)
-    conversion_count = models.IntegerField(default=0)
     ratio = models.FloatField(
         default=1,
         help_text="Whole number ratio of participants that will be assigned into this alternative"
@@ -192,6 +195,24 @@ class Alternative(Model):
     def save(self, *args, **kwargs):
         super(Alternative, self).save(*args, **kwargs)
         clear_caches()
+
+    def participant_count(self):
+        return self.assignment_set.all().count()
+    participant_count.admin_order_field = 'participant_count'
+
+    def conversion_count(self):
+        return self.assignment_set.filter(
+            converted_time__isnull=False,
+        ).count()
+    conversion_count.admin_order_field = 'conversion_count'
+
+
+class Assignment(Model):
+    ''' stores the identities that are participating in an experiment, and when they converted.'''
+    experiment = models.ForeignKey(Experiment)
+    identity = models.CharField(max_length=256)
+    converted_time = models.DateTimeField(null=True, blank=True)
+    alternative = models.ForeignKey(Alternative, null=True, blank=True)
 
 
 def clear_caches():

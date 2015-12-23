@@ -92,13 +92,9 @@ def on_newly_converted(driver):
     notification.send('driver_notifications.ReferFriends', driver)
 
     # whoever invited them gets app credit
-    success, invitor_customer = credit_service.reward_invitor_for(
-        driver.auth_user.customer
-    )
+    success, invitor_customer = credit_service.reward_invitor_for(driver.auth_user.customer)
     if success:
-        if credit_service.is_reward_virgin(invitor_customer):
-            server.services.experiment.referral_reward_converted(invitor_customer)
-
+        server.services.experiment.referral_reward_converted(invitor_customer)
         try:
             invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
             notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
