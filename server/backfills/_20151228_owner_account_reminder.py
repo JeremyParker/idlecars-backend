@@ -11,11 +11,11 @@ from owner_crm.services import throttle_service
 
 def run_backfill():
     '''
-    mark throttle system the existing owners who signed up 48 hours ago FirstSignupReminder so that
+    mark throttle system the existing owners who signed up 47 hours ago FirstSignupReminder so that
     they don't get two reminders at the same time when we launch
     '''
     backfill_owners = owner_service.filter_incomplete(Owner.objects.all()).filter(
-        auth_users__date_joined__lte=timezone.now() - datetime.timedelta(hours=48),
+        auth_users__date_joined__lte=timezone.now() - datetime.timedelta(hours=47),
         cars__isnull=False,
     )
     for owner in backfill_owners:
