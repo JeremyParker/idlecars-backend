@@ -130,7 +130,7 @@ Please complete your account here: {}'.format(
             kwargs['user_first_name'],
             kwargs['owner_account_url'],
         )
-        text = '''Thank you for creating and Idlecars owner account.
+        text = '''Thank you for creating an Idlecars owner account.
         You are on your way to reaching our network of hundreds of drivers. <br /><br />
 
         Please click the button below to complete your account'''
