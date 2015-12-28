@@ -19,6 +19,3 @@ def run_backfill():
             skip_drivers.append(driver.pk)
             continue
     throttle_service.mark_sent(backfill_drivers.exclude(pk__in=skip_drivers), 'SignupFirstReminder')
-
-
-
