@@ -65,6 +65,18 @@ def _send_reminder_email(remindable_bookings, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
+def _pending_booking_reminder(delay_hours):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    remindable_bookings = booking_service.filter_pending(Booking.objects.all()).filter(
+        created_time__lte=reminder_threshold,
+        driver__paymentmethod__isnull=True,
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'PendingNotification')
+    for booking in throttled_bookings:
+        notification.send('owner_notifications.PendingNotification', booking)
+    throttle_service.mark_sent(throttled_bookings, 'PendingNotification')
+
+
 def _reminder_email():
     # TODO: hour, minute and delay_hours should be from settings
     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
@@ -101,6 +113,8 @@ def process_owner_emails():
     _renewal_email()
     _reminder_email()
 
+def process_pending_booking_reminder():
+    _pending_booking_reminder(delay_hours=24)
 
 def create(auth_user):
     new_owner = Owner.objects.create()

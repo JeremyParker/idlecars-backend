@@ -51,6 +51,28 @@ listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_d
         return context
 
 
+class PendingNotification(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        text = '''Someone is interested in your {} with plates {}. They are still in the process
+        of submitting their documents and entering their payment information, but we will send
+        you everything as soon as possible. <br /><br />
+
+        If this car is no longer available, please click below to de-list the car from our
+        marketplace.'''.format(
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Someone is interested in your {}'.format(kwargs['car_name']),
+            'TEXT': text,
+            'CTA_LABEL': 'Delist this car',
+            'CTA_URL': kwargs['car_driver_details_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Someone is interested in your {}'.format(kwargs['car_name']),
+        }
+
+
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
         headline = '{} has booked your {}, with license plate {}'.format(
