@@ -76,7 +76,8 @@ class BookingAdmin(admin.ModelAdmin):
             'fields': (
                 ('state', 'driver_docs_uploaded',),
                 ('driver_link', 'driver_phone', 'driver_email', 'driver_docs_approved'),
-                ('car_link', 'car_plate', 'car_cost', 'effective_service_percentage',),
+                ('car', 'car_link', 'car_plate',),
+                ('weekly_rent', 'effective_service_percentage',),
                 ('owner_link', 'owner_phone', 'owner_email',),
             ),
         }),
@@ -193,7 +194,7 @@ class BookingAdmin(admin.ModelAdmin):
             return link(instance.car, instance.car.display_name())
         else:
             return None
-    car_link.short_description = 'Car'
+    car_link.short_description = ''
 
     def car_plate(self, instance):
         if instance.car:
