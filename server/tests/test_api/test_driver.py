@@ -102,17 +102,17 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.client = APIClient()
         token = Token.objects.get(user__username=driver.auth_user.username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('server:drivers-detail', args=(driver.id,))
+        self.url = reverse('server:users-detail', args=(auth_user.id,))
 
         response = self.client.patch(self.url, {'email': 'test@testing.com'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        driver_reloaded = models.Driver.objects.get(id=driver.id)
-        self.assertEqual(driver_reloaded.email(), 'test@testing.com')
 
-    def test_update_username_field(self):
-        response = self.client.patch(self.url, {'phone_number': '123 555 1212'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self._driver_reloaded().phone_number(), '1235551212')
+        auth_user.refresh_from_db()
+        self.assertEqual(driver.email(), 'test@testing.com')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Welcome to Idlecars')
 
     def test_update_username_with_full_me(self):
         data = {
@@ -121,16 +121,11 @@ class DriverUpdateTest(AuthenticatedDriverTest):
             'client_display': "1112220987",
             'defensive_cert_image': "",
             'driver_license_image': "",
-            'email': "",
             'fhv_license_image': "",
-            'first_name': "",
             'id': 201,
-            'last_name': "",
-           ' phone_number': "(111) 222-3333",
         }
         response = self.client.patch(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self._driver_reloaded().phone_number(), '1112223333')
 
     def test_update_password_forbidden(self):
         response = self.client.patch(self.url, {'password': 'new_password'})

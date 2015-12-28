@@ -96,21 +96,15 @@ def pre_authorize(payment):
     return payment
 
 
-def get_settled_payments(payment):
-    return models.Payment.objects.filter(
-        status=models.Payment.SETTLED,
-        booking__driver=payment.booking.driver
-    )
-
-
 def settle(payment):
-    has_settled_payments = len(get_settled_payments(payment))
+    from server.services import driver as driver_service
+    is_converted_driver = driver_service.is_converted_driver(payment.booking.driver)
+
     original_status = payment.status
     payment = _execute('settle', payment)
 
     if not payment.error_message:
-        if not has_settled_payments:
-            from server.services import driver as driver_service
+        if not is_converted_driver:
             driver_service.on_newly_converted(payment.booking.driver)
 
         # if the payment succeeded, and credit wasn't already deducted, deduct now.

@@ -13,6 +13,7 @@ from django.core.management import call_command
 import credit.factories
 import server.factories
 from server.models import Booking
+from server.services import driver as driver_service
 from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
 
@@ -29,7 +30,7 @@ class TestDriverDocsNotifications(TestCase):
 
     @freeze_time("2014-10-10 11:00:00")
     def test_docs_reminder(self):
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
 
         test_message.verify_throttled_on_driver(
             self.booking.driver,
@@ -48,7 +49,7 @@ class TestDriverDocsNotifications(TestCase):
     def test_driver_no_booking(self):
         driver = self.booking.driver
         self.booking.delete()
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
         test_message.verify_throttled_on_driver(
             driver,
             'first_documents_reminder',
@@ -60,25 +61,25 @@ class TestDriverDocsNotifications(TestCase):
 
     @freeze_time("2014-10-10 11:00:00")
     def test_no_email_twice(self):
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'first_documents_reminder'
         )
 
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
     @freeze_time("2014-10-10 11:00:00")
     def test_only_new_driver_get_reminder(self):
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
         self._simulate_new_booking()
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
         self.assertEqual(len(outbox), 2)
 
     ''' check that we don't send an email to a driver who already uploaded their docs '''
@@ -86,7 +87,7 @@ class TestDriverDocsNotifications(TestCase):
     def test_docs_reminder_driver_complete(self):
         self.booking.driver.delete()
         server.factories.CompletedDriver.create()
-        call_command('driver_notifications')
+        driver_service.process_document_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
@@ -98,31 +99,31 @@ class TestDriverDocsNotifications(TestCase):
 
         #TODO: time should be from settings
         with freeze_time("2014-10-10 11:00:00"):
-            call_command('driver_notifications')
+            driver_service.process_document_notifications()
             call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'first_documents_reminder'
         )
         with freeze_time("2014-10-11 10:00:00"):
-            call_command('driver_notifications')
+            driver_service.process_document_notifications()
             call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'second_documents_reminder'
         )
         with freeze_time("2014-10-11 22:00:00"):
-            call_command('driver_notifications')
+            driver_service.process_document_notifications()
             call_command('cron_job')
         with freeze_time("2014-10-12 10:00:00"):
-            call_command('driver_notifications')
+            driver_service.process_document_notifications()
             call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'third_documents_reminder'
         )
         with freeze_time("2014-10-13 10:00:00"):
-            call_command('driver_notifications')
+            driver_service.process_document_notifications()
             call_command('cron_job')
 
         from django.core.mail import outbox
@@ -167,7 +168,7 @@ class TestDriverCreditNotifications(TestCase):
         self.rich_driver.auth_user.customer.save()
 
     def test_poor_driver_no_credit_reminder(self):
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 3)
@@ -186,15 +187,15 @@ class TestDriverCreditNotifications(TestCase):
 
     @freeze_time("2014-10-23 8:55:00")
     def test_reminder_delay(self):
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
     def test_no_email_twice(self):
-        call_command('driver_notifications')
-        call_command('driver_notifications')
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
+        driver_service.process_credit_notifications()
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         '''
@@ -206,28 +207,150 @@ class TestDriverCreditNotifications(TestCase):
 
     def test_no_credit_email_with_active_booking(self):
         server.factories.BookedBooking.create(driver=self.rich_driver)
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
     def test_no_credit_email_with_accepted_booking(self):
         server.factories.AcceptedBooking.create(driver=self.rich_driver)
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
     def test_no_credit_email_with_requested_booking(self):
         server.factories.RequestedBooking.create(driver=self.rich_driver)
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
 
     def test_no_credit_email_with_reserved_booking(self):
         server.factories.ReservedBooking.create(driver=self.rich_driver)
-        call_command('driver_notifications')
+        driver_service.process_credit_notifications()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
+
+
+class TestDriverReferralNotifications(TestCase):
+    @freeze_time("2014-10-10 8:55:00")
+    def setUp(self):
+        self.driver = server.factories.ApprovedDriver.create()
+
+    def test_inactive_driver_gets_reminder(self):
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Share some Idle Cash with your friends and save on your next rental',
+        )
+
+    @freeze_time("2014-10-30 8:55:00")
+    def test_no_email_early(self):
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_incompleted_driver_no_email(self):
+        with freeze_time("2014-10-10 8:55:00"):
+            server.factories.Driver.create()
+
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_twice(self):
+        driver_service.process_referral_notifications()
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_processing_booking_no_email(self):
+        server.factories.ReservedBooking.create()
+        server.factories.RequestedBooking.create()
+        server.factories.AcceptedBooking.create()
+        server.factories.BookedBooking.create()
+
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_paid_driver_no_email(self):
+        server.factories.ReturnedBooking.create(driver=self.driver)
+        driver_service.process_referral_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+
+class TestDriverSignupNotifications(TestCase):
+    @freeze_time("2014-10-10 8:55:00")
+    def setUp(self):
+        self.driver = server.factories.CompletedDriver.create()
+
+    @freeze_time("2014-10-16 9:00:00")
+    def test_no_email_right_after_signup(self):
+        driver_service.process_signup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_new_driver_gets_notification(self):
+        driver_service.process_signup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'How Idlecars works',
+        )
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_no_email_twice(self):
+        driver_service.process_signup_notifications()
+        driver_service.process_signup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    @freeze_time("2014-10-17 9:00:00")
+    def test_no_email_with_post_pending_booking(self):
+        server.factories.ReservedBooking.create()
+        server.factories.RequestedBooking.create()
+        server.factories.AcceptedBooking.create()
+        server.factories.BookedBooking.create()
+        server.factories.ReturnedBooking.create()
+        server.factories.RefundedBooking.create()
+        driver_service.process_signup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_signup_reminders(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            driver_service.process_signup_notifications()
+        with freeze_time("2014-11-10 9:00:00"):
+            driver_service.process_signup_notifications()
+
+        '''
+        1. sign up first reminder.
+        2. sign up second reminder.
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Do you need a car for Uber, Lyft, or Via?',
+        )

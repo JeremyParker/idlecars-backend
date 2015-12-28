@@ -38,6 +38,12 @@ class UserApiTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_update_phone_number_field(self):
+        response = self.client.patch(self.url, {'phone_number': '123 555 1212'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, '1235551212')
+
     def test_update_email(self):
         response = self.client.patch(self.url, {'email': 'test@testing.com'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
