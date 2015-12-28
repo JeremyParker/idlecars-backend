@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import datetime
 from django.utils import timezone
 
-from server import models, services
+from server import models
 from owner_crm.services import throttle_service
 
 def run_backfill():
@@ -18,8 +18,10 @@ def run_backfill():
         braintree_customer_id__isnull=True,
     )
     skip_drivers = []
+    from server.services import booking
     for driver in backfill_drivers:
-        if services.booking.post_pending_bookings(driver.booking_set):
+        if booking.post_pending_bookings(driver.booking_set):
             skip_drivers.append(driver.pk)
             continue
+        print '.'
     throttle_service.mark_sent(backfill_drivers.exclude(pk__in=skip_drivers), 'SignupFirstReminder')
