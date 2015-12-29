@@ -154,14 +154,14 @@ class CarCreateSerializer(ModelSerializer):
             return {
                 'state_string': 'Booked. Waiting for insurance approval.',
                 'buttons': [
-                    # {
-                    #     'label': 'The driver is approved',
-                    #     'function_key': 'ApproveInsurance',
-                    # },
-                    # {
-                    #     'label': 'The driver was rejected from the insurance',
-                    #     'function_key': 'RejectInsurance',
-                    # },
+                    {
+                        'label': 'The driver is approved',
+                        'function_key': 'ApproveInsurance',
+                    },
+                    {
+                        'label': 'The driver was rejected from the insurance',
+                        'function_key': 'RejectInsurance',
+                    },
                     {
                         'label': 'This car is no longer available',
                         'function_key': 'RemoveListing',

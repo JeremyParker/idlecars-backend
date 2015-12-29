@@ -64,6 +64,11 @@ class CarViewSet(
         serializer.instance = new_car
 
     def update(self, request, *args, **kwargs):
+        if 'insurance' in request.data:
+            if request.data['insurance'] == 'approved':
+                car_service.insurance(car=self.get_object(), approved=True)
+            elif request.data['insurance'] == 'rejected':
+                car_service.insurance(car=self.get_object(), approved=False)
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:

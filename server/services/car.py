@@ -90,6 +90,7 @@ def create_car(owner, plate):
     car.save()
     return car
 
+
 def pre_save(modified_car, orig):
     if orig.next_available_date != modified_car.next_available_date:
         modified_car.last_status_update = timezone.now()
@@ -111,3 +112,13 @@ def pre_save(modified_car, orig):
     if orig.owner and not modified_car.owner:
         from . import booking as booking_service
         booking_service.on_car_missed(modified_car)
+
+
+def insurance(car, approved=False):
+    from . import booking as booking_service
+    bookings = Booking.objects.filter(car=car)
+    booking = booking_service.filter_requested(bookings).first()
+    if approved:
+        booking_service.approve(booking)
+    else:
+        booking_service.reject(booking)
