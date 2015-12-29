@@ -34,7 +34,6 @@ def _renewable_cars():
 def filter_incomplete(queryset):
     return queryset.filter(
         Q(zipcode='') |
-        Q(merchant_account_state__isnull=True) |
         Q(merchant_id='')
     )
 
@@ -126,10 +125,6 @@ def create(auth_user):
     new_owner = Owner.objects.create()
     new_owner.auth_users.add(auth_user)
     return new_owner
-
-
-def on_signup(owner):
-    notification.send('owner_notifications.SignupConfirmation', owner)
 
 
 def add_merchant_id_to_owner(merchant_account_id, owner):
