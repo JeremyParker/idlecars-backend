@@ -19,15 +19,11 @@ class ExperimentTest(TestCase):
         self.alternative_A = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_A',
-            participant_count=0,
-            conversion_count=0,
             ratio=50,
         )
         self.alternative_B = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_B',
-            participant_count=0,
-            conversion_count=0,
             ratio=50,
         )
         self.experiment.default = self.alternative_B
@@ -58,8 +54,6 @@ class ExperimentTest(TestCase):
         alternative_C = models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_C',
-            participant_count=0,
-            conversion_count=0,
             ratio=40,
         )
 
@@ -74,8 +68,6 @@ class ExperimentTest(TestCase):
         models.Alternative.objects.create(
             experiment=self.experiment,
             identifier='alternative_D',
-            participant_count=0,
-            conversion_count=0,
             ratio=30
         )
 

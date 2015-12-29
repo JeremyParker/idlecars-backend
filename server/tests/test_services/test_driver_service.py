@@ -31,6 +31,13 @@ class DriverServiceTest(TestCase):
         self.driver = factories.Driver.create()
         self.car = factories.BookableCar.create()
 
+    def test_on_set_email(self):
+        driver_service.on_set_email(self.driver)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(outbox[0].subject, 'Welcome to Idlecars')
+
     def _set_all_docs(self):
         for doc in driver_service.doc_fields_and_names.keys():
             setattr(self.driver, doc, 'http://whatever.com')

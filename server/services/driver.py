@@ -59,6 +59,13 @@ def post_save(modified_driver, orig):
         driver_notifications.base_letter_rejected(modified_driver)
 
 
+def is_converted_driver(driver):
+    return server.models.Payment.objects.filter(
+        status=server.models.Payment.SETTLED,
+        booking__driver=driver
+    ).exists()
+
+
 def assign_credit_code(driver):
     invitee, invitor = server.services.experiment.get_referral_rewards(driver)
     credit_service.create_invite_code(
@@ -92,18 +99,18 @@ def on_newly_converted(driver):
     notification.send('driver_notifications.ReferFriends', driver)
 
     # whoever invited them gets app credit
-    success, invitor_customer = credit_service.reward_invitor_for(
-        driver.auth_user.customer
-    )
+    success, invitor_customer = credit_service.reward_invitor_for(driver.auth_user.customer)
     if success:
-        if credit_service.is_reward_virgin(invitor_customer):
-            server.services.experiment.referral_reward_converted(invitor_customer)
-
+        server.services.experiment.referral_reward_converted(invitor_customer)
         try:
             invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
             notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
         except Exception:
             pass # we allow invitors who aren't drivers.
+
+
+def on_set_email(driver):
+    notification.send('driver_notifications.SignupConfirmation', driver)
 
 
 def get_missing_docs(driver):
@@ -148,7 +155,7 @@ def _send_document_reminders(remindable_drivers, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_drivers, throttle_key)
 
 
-def _inactive_reminder(delay_days):
+def _inactive_coupon_reminder(delay_days):
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
         auth_user__date_joined__lte=reminder_threshold,
@@ -164,6 +171,23 @@ def _inactive_reminder(delay_days):
         notification.send('driver_notifications.InactiveCredit', driver, credit)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveCredit')
 
+
+def _inactive_referral_reminder(delay_days):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+        documentation_approved=True,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveReferral')
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if server.services.booking.processing_bookings(driver.booking_set) or \
+            is_converted_driver(driver):
+            skip_drivers.append(driver.pk)
+            continue
+
+        notification.send('driver_notifications.InactiveReferral', driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveReferral')
 
 def _credit_reminder(delay_days):
     '''
@@ -187,10 +211,44 @@ def _credit_reminder(delay_days):
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'UseYourCredit')
 
 
-def process_driver_emails():
-    _credit_reminder(delay_days=14)
-    _inactive_reminder(delay_days=14)
+def _signup_reminder(delay_days, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_drivers = server.models.Driver.objects.filter(
+        auth_user__date_joined__lte=reminder_threshold,
+        braintree_customer_id__isnull=True,
+    )
+    throttled_drivers = throttle_service.throttle(remindable_drivers, reminder_name)
+    skip_drivers = []
+    for driver in throttled_drivers:
+        if server.services.booking.post_pending_bookings(driver.booking_set):
+            skip_drivers.append(driver.pk)
+            continue
 
+        notification.send('driver_notifications.'+reminder_name, driver)
+    throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), reminder_name)
+
+
+def process_signup_notifications():
+    _signup_reminder(
+        delay_days=7,
+        reminder_name='SignupFirstReminder',
+    )
+    _signup_reminder(
+        delay_days=30,
+        reminder_name='SignupSecondReminder',
+    )
+
+
+def process_credit_notifications():
+    _credit_reminder(delay_days=14)
+    _inactive_coupon_reminder(delay_days=14)
+
+
+def process_referral_notifications():
+    _inactive_referral_reminder(delay_days=21)
+
+
+def process_document_notifications():
     _send_document_reminders(
       remindable_drivers=_get_remindable_drivers(1),
       reminder_name='FirstDocumentsReminder',

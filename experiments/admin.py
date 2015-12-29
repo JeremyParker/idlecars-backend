@@ -36,13 +36,13 @@ class TabularInline(admin.TabularInline, AdminMixin):
 
 class AlternativeInline(TabularInline):
     model = models.Alternative
-    readonly_fields = (
-        'participant_count',
-        'conversion_count',
-    )
     fields = (
         'identifier',
         'ratio',
+        'participant_count',
+        'conversion_count',
+    )
+    readonly_fields = (
         'participant_count',
         'conversion_count',
     )
@@ -56,10 +56,10 @@ class ExperimentAdmin(ModelAdmin):
         'start_time',
         'end_time',
         'live',
-        'default',
-        'winner',
         'participant_count',
         'conversion_count',
+        'default',
+        'winner',
     )
     fields = (
         'identifier',
@@ -72,26 +72,12 @@ class ExperimentAdmin(ModelAdmin):
     )
     readonly_fields = (
         'live',
+        'participant_count',
+        'conversion_count',
     )
     inlines = [
         AlternativeInline,
     ]
-
-    def participant_count(self, instance):
-        return instance.participant_count
-    participant_count.admin_order_field = 'participant_count'
-
-    def conversion_count(self, instance):
-        return instance.conversion_count
-    conversion_count.admin_order_field = 'conversion_count'
-
-    def get_queryset(self, request):
-        queryset = super(ExperimentAdmin, self).get_queryset(request)
-        queryset = queryset.annotate(
-            participant_count=Sum('alternative__participant_count'),
-            conversion_count=Sum('alternative__conversion_count'),
-        )
-        return queryset
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name in ('default', 'winner'):

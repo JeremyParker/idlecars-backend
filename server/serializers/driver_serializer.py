@@ -13,6 +13,7 @@ from server import models
 from server.serializers import PaymentMethodSerializer, CreditCodeSerializer
 from server.services import driver as driver_service
 from server.services import ServiceError
+from server.services import auth_user as auth_user_service
 
 
 class DriverSerializer(ModelSerializer):
@@ -39,7 +40,7 @@ class DriverSerializer(ModelSerializer):
             'defensive_cert_image',
             'all_docs_uploaded',
 
-            # stuff from auth_user
+            # stuff from auth_user TOOD - remove User fields
             'phone_number',
             'password',
             'invitor_code',
@@ -72,8 +73,7 @@ class DriverSerializer(ModelSerializer):
                 username=phone_number,
                 password=password,
             )
-        new_driver = models.Driver.objects.create(auth_user=auth_user)
-        return new_driver
+        return driver_service.create(auth_user=auth_user)
 
     def update(self, instance, validated_data):
         if 'password' in validated_data:
@@ -84,13 +84,6 @@ class DriverSerializer(ModelSerializer):
                 driver_service.redeem_code(instance, validated_data['invitor_code'])
             except ServiceError as e:
                 raise ValidationError(e.message)
-
-        auth_user = instance.auth_user
-        auth_user.username = validated_data.get('phone_number', auth_user.username)
-        auth_user.email = validated_data.get('email', auth_user.email)
-        auth_user.first_name = validated_data.get('first_name', auth_user.first_name)
-        auth_user.last_name = validated_data.get('last_name', auth_user.last_name)
-        auth_user.save()
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)

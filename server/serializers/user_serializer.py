@@ -7,6 +7,9 @@ from rest_framework.serializers import PrimaryKeyRelatedField, SerializerMethodF
 
 from idlecars import fields
 from server import models
+from server.services import auth_user as auth_user_service
+from server.services import driver as driver_service
+
 
 user_fields = (
             'id',
@@ -35,6 +38,17 @@ class UserSerializer(ModelSerializer):
             return obj.owner_set.first().pk
         except AttributeError:
             return None
+
+    def update(self, instance, validated_data):
+        had_email = bool(instance.email)
+        auth_user_service.update(instance, validated_data)
+        if instance.email and not had_email:
+            if instance.owner_set.exists():
+                pass # TODO: hookup the owner welcome email here.
+            elif getattr(instance, 'driver', None):
+                driver_service.on_set_email(instance.driver)
+
+        return instance
 
 
 class UserCreateSerializer(UserSerializer):
