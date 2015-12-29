@@ -127,6 +127,10 @@ def create(auth_user):
     return new_owner
 
 
+def on_set_email(owner):
+    notification.send('owner_notifications.SignupConfirmation', owner)
+
+
 def add_merchant_id_to_owner(merchant_account_id, owner):
     owner.merchant_id = merchant_account_id
     owner.merchant_account_state = Owner.BANK_ACCOUNT_PENDING

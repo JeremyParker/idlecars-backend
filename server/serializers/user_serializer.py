@@ -9,6 +9,7 @@ from idlecars import fields
 from server import models
 from server.services import auth_user as auth_user_service
 from server.services import driver as driver_service
+from server.services import owner_service
 
 
 user_fields = (
@@ -44,7 +45,7 @@ class UserSerializer(ModelSerializer):
         auth_user_service.update(instance, validated_data)
         if instance.email and not had_email:
             if instance.owner_set.exists():
-                pass # TODO: hookup the owner welcome email here.
+                owner_service.on_set_email(instance.owner_set.first())
             elif getattr(instance, 'driver', None):
                 driver_service.on_set_email(instance.driver)
 

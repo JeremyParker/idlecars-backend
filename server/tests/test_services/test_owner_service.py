@@ -54,7 +54,7 @@ class OwnerServiceTest(TestCase):
         self.owner = factories.Owner.create()
 
     def test_owner_signup(self):
-        owner_service.on_signup(self.owner)
+        owner_service.on_set_email(self.owner)
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
