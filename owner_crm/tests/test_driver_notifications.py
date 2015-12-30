@@ -274,9 +274,10 @@ class TestDriverCreditCardNotifications(TestCase):
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
 
-    def test_credit_card_driver_no_email(self):
+    def test_incompleted_driver_no_email(self):
+        incompleted_driver = server.factories.Driver.create()
         with freeze_time("2014-10-10 8:55:00"):
-            server.factories.Booking.create()
+            server.factories.Booking.create(driver=incompleted_driver)
 
         driver_service.process_credit_card_notifications()
 

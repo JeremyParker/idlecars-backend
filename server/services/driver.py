@@ -215,7 +215,11 @@ def _credit_card_reminder(delay_hours, reminder_name):
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
     filtered_bookings = server.models.Booking.objects.filter(
         created_time__lte=reminder_threshold,
-        driver__paymentmethod__isnull=True,
+    ).exclude(
+        Q(driver__driver_license_image__exact='') |
+        Q(driver__fhv_license_image__exact='') |
+        Q(driver__address_proof_image__exact='') |
+        Q(driver__defensive_cert_image__exact='')
     )
     remindable_bookings = server.services.booking.filter_pending(filtered_bookings)
     throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)

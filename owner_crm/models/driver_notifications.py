@@ -364,8 +364,11 @@ Tap here to find another car today: {}'.format(kwargs['car_listing_url']),
 
 class FirstCCReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi, it’s Idlecars. We need to put a hold on your credit card so you can \
-reserve your car. Click here to reserve: {}'.format(kwargs['bookings_url'])
+        sms_body = 'Hi, it\'s Idlecars. To complete your {} reservation, please click the link \
+below so we can put a hold on your credit card for the security deposit: {}'.format(
+            kwargs['car_name'],
+            kwargs['bookings_url'],
+        )
         text = '''Thank you for renting with Idlecars. To complete your rental we still need you to
             enter a credit or debit card. We will put a hold on your car for the deposit amount -
             you will not be charged until you start driving. <br /><br />
@@ -385,8 +388,8 @@ reserve your car. Click here to reserve: {}'.format(kwargs['bookings_url'])
 
 class SecondCCReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi, it’s Idlecars. Your booking will be canceled soon if you don’t submit your \
-credit card. Click here to complete the reservation: {}'.format(kwargs['bookings_url'])
+        sms_body = 'Hi, it’s Idlecars. Your booking will be canceled soon if you don’t put a hold \
+on your credit card to reserve it. Click here to complete the reservation: {}'.format(kwargs['bookings_url'])
         text = '''To complete your reservation of the {} you need to enter a credit or debit card
         so we can verify that you have enough funds in your account. You will not be charged anything
         until you pick up the car. Click below to add your credit card. <br /><br />

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 from django.utils import timezone
+from django.db.models import Q
 
 from server.models import Booking
 from server.services import booking as booking_service
@@ -16,7 +17,11 @@ def run_backfill():
 
     filtered_bookings = Booking.objects.filter(
         created_time__lte=timezone.now() - datetime.timedelta(hours=47),
-        driver__paymentmethod__isnull=True,
+    ).exclude(
+        Q(driver__driver_license_image__exact='') |
+        Q(driver__fhv_license_image__exact='') |
+        Q(driver__address_proof_image__exact='') |
+        Q(driver__defensive_cert_image__exact='')
     )
     backfill_bookings = booking_service.filter_pending(filtered_bookings)
     for booking in backfill_bookings:
