@@ -619,7 +619,7 @@ You just received ${} towards your next rental!'.format(
         }
 
 
-class FirstPayAndDriveReminder(notification.DriverNotification):
+class FirstPickupReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
         sms_body = 'Have you scheduled the pickup for the {}? Make sure when you pick it up you \
 go to your booking page click the blue “Pay and Drive” button.'.format(kwargs['car_name'])
@@ -645,7 +645,7 @@ go to your booking page click the blue “Pay and Drive” button.'.format(kwarg
         }
 
 
-class SecondPayAndDriveReminder(notification.DriverNotification):
+class SecondPickupReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
         sms_body = 'Have you scheduled the pickup for the {}? Make sure when you pick it up you \
 go to your booking page click the blue “Pay and Drive” button.'.format(kwargs['car_name'])

@@ -491,3 +491,64 @@ class TestDriverInsuranceNotifications(TestCase):
             outbox[1].subject,
             'We told the owner to get you on the insurance ASAP',
         )
+
+
+class TestDriverPickupNotifications(TestCase):
+    @freeze_time("2014-10-17 11:00:00")
+    def test_only_accepted_bookings_send_email(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            booking = server.factories.AcceptedBooking.create()
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.RequestedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        driver_service.process_pickup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Have you scheduled a time to pickup your {}'.format(booking.car.display_name()),
+        )
+
+    @freeze_time("2014-10-17 11:00:00")
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            server.factories.AcceptedBooking.create()
+
+        driver_service.process_pickup_notifications()
+        driver_service.process_pickup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    @freeze_time("2014-10-17 9:55:00")
+    def test_no_email_early(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            server.factories.AcceptedBooking.create()
+
+        driver_service.process_pickup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2014-10-17 16:00:00")
+    def test_the_second_email(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            booking = server.factories.AcceptedBooking.create()
+
+        driver_service.process_pickup_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Your {} rental – how to pay and drive'.format(booking.car.display_name()),
+        )
+
