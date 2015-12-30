@@ -9,6 +9,7 @@ import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models import Q
 
 from owner_crm.services import password_reset_service, throttle_service, notification
 from owner_crm.models import driver_notifications, owner_notifications, ops_notifications
@@ -30,7 +31,14 @@ def _renewable_cars():
     )
 
 
-def _renewal_email():
+def filter_incomplete(queryset):
+    return queryset.filter(
+        Q(zipcode='') |
+        Q(merchant_id='')
+    )
+
+
+def process_renewal_reminder():
     throttle_key = 'RenewalEmail'
     throttled_renewable_cars = throttle_service.throttle(
         _renewable_cars(),
@@ -77,7 +85,7 @@ def _pending_booking_reminder(delay_hours):
     throttle_service.mark_sent(throttled_bookings, 'PendingNotification')
 
 
-def _reminder_email():
+def process_insurance_reminder():
     # TODO: hour, minute and delay_hours should be from settings
     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
     afternoon_target = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
@@ -108,10 +116,21 @@ def _reminder_email():
             throttle_key='second_afternoon_insurance_reminder',
         )
 
+def _account_reminder(delay_hours, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    remindable_owners = filter_incomplete(Owner.objects.all()).filter(
+        auth_users__date_joined__lte=reminder_threshold,
+        cars__isnull=False,
+    )
+    throttled_owners = throttle_service.throttle(remindable_owners, reminder_name)
+    for owner in throttled_owners:
+        notification.send('owner_notifications.'+reminder_name, owner)
+    throttle_service.mark_sent(throttled_owners, reminder_name)
 
-def process_owner_emails():
-    _renewal_email()
-    _reminder_email()
+
+def process_account_reminder():
+    _account_reminder(delay_hours=24, reminder_name='FirstAccountReminder')
+    _account_reminder(delay_hours=48, reminder_name='SecondAccountReminder')
 
 def process_pending_booking_reminder():
     _pending_booking_reminder(delay_hours=24)
@@ -120,6 +139,10 @@ def create(auth_user):
     new_owner = Owner.objects.create()
     new_owner.auth_users.add(auth_user)
     return new_owner
+
+
+def on_set_email(owner):
+    notification.send('owner_notifications.SignupConfirmation', owner)
 
 
 def add_merchant_id_to_owner(merchant_account_id, owner):

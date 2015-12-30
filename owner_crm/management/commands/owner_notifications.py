@@ -9,4 +9,6 @@ class Command(BaseCommand):
     help = 'Sends notifications to owners about the state of their cars'
 
     def handle(self, *args, **options):
-        owner_service.process_owner_emails()
+        owner_service.process_renewal_reminder()
+        owner_service.process_insurance_reminder()
+        owner_service.process_account_reminder()

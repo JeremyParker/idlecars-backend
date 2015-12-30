@@ -14,3 +14,7 @@ def owner_app_url():
 def car_details_url(car):
     parts = (settings.OWNER_APP_URL, '#', 'cars', unicode(car.id))
     return '/'.join(parts)
+
+def owner_account_url():
+    parts = (settings.OWNER_APP_URL, '#', 'account')
+    return '/'.join(parts)
