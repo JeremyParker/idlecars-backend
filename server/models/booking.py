@@ -129,6 +129,11 @@ class Booking(models.Model):
                 if not orig.incomplete_time:
                     booking_service.on_incomplete(self, orig.get_state())
 
+        # check that all the date/times of events make sense
+        if not (self.refund_time > self.return_time > self.pickup_time > \
+            self.approval_time > self.requested_time > self.checkout_time):
+            raise ValidationError('The event times aren\'t in order')
+
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),
         (1, 'Pending - waiting for driver docs'),
