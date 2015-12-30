@@ -838,7 +838,6 @@ class InactiveCredit(notification.DriverNotification):
         self.credit = args[0]
 
     def get_context(self, **kwargs):
-        subject = ''
         text = '''
             We haven’t seen you in a while! We’d like to help you out! <br />
 
