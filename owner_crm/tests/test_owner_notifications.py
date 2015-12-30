@@ -99,9 +99,8 @@ class TestOwnerAccountNotification(TestCase):
             'Your account is incomplete and your cars are not listed'
         )
 
-        self.assertEqual(
-            outbox[1].merge_vars.keys()[0],
-            missing_bank_account_owner.email(),
+        self.assertFalse(
+            complete_owner.email() in [outbox[1].merge_vars.keys()[0], outbox[0].merge_vars.keys()[0]]
         )
 
     @freeze_time("2014-10-11 12:00:00")
