@@ -62,6 +62,7 @@ class E2ETestSetup():
         Token.objects.filter(user=self.user_has_no_car).update(key='owner_has_no_car')
         Token.objects.filter(user=self.user_has_two_cars).update(key='owner_has_two_cars')
         Token.objects.filter(user=self.user_has_bank_link).update(key='owner_has_bank_link')
+        Token.objects.filter(user=self.user_has_requested_booking).update(key='owner_has_requested_booking')
         PasswordReset.objects.filter(auth_user=self.user_has_no_car).update(token='test')
 
     def _setup_cars(self):
@@ -89,19 +90,25 @@ class E2ETestSetup():
         )
 
         server.factories.CarExpiredListing.create(owner=self.owner_has_bank_link)
-        server.factories.BookableCar.create()
+
+        camery = server.factories.MakeModel.create(make='Toyota', model='Camery')
+        self.camery = server.factories.BookableCar.create(
+            make_model=camery,
+            owner=self.owner_has_requested_booking,
+        )
 
     def _setup_booking(self):
         '''
-            Create 3 bookings
+            Create 4 bookings
         '''
         server.factories.Booking.create(car=self.delorean, driver=self.driver_without_docs)
         server.factories.AcceptedBooking.create(car=self.benz, driver=self.driver_insurance_approved)
         server.factories.Booking.create(car=self.benz, driver=self.driver_without_docs_approved)
+        server.factories.RequestedBooking.create(car=self.camery)
 
     def _setup_user(self):
         '''
-            Create 8 users(1 staff user)
+            Create 9 users(1 staff user)
         '''
         self.user_has_two_cars = idlecars.factories.AuthUser.create(
             username='9876543210',
@@ -143,12 +150,19 @@ class E2ETestSetup():
             username='1234567894',
             email='kerry@test.com',
             first_name='Kerry',
-            last_name='Goose')
+            last_name='Goose'
+        )
+        self.user_has_requested_booking = idlecars.factories.AuthUser.create(
+            username='1234567895',
+            email='brian@test.com',
+            first_name='Brian',
+            last_name='Claypool'
+        )
         idlecars.factories.StaffUser.create(username='idlecars') # just want to access admin, easier to check database
 
     def _setup_owner(self):
         '''
-            Create 3 owner
+            Create 4 owner
         '''
         owner_has_no_car = server.factories.Owner.create()
         owner_has_no_car.auth_users.add(self.user_has_no_car)
@@ -159,6 +173,9 @@ class E2ETestSetup():
 
         self.owner_has_bank_link = server.factories.BankAccountOwner.create()
         self.owner_has_bank_link.auth_users.add(self.user_has_bank_link)
+
+        self.owner_has_requested_booking = server.factories.BankAccountOwner.create()
+        self.owner_has_requested_booking.auth_users.add(self.user_has_requested_booking)
 
     def _setup_drivers(self):
         '''
