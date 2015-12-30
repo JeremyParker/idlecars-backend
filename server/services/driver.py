@@ -211,6 +211,23 @@ def _credit_reminder(delay_days):
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'UseYourCredit')
 
 
+def _credit_card_reminder(delay_hours, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    filtered_bookings = server.models.Booking.objects.filter(
+        created_time__lte=reminder_threshold,
+    ).exclude(
+        Q(driver__driver_license_image__exact='') |
+        Q(driver__fhv_license_image__exact='') |
+        Q(driver__address_proof_image__exact='') |
+        Q(driver__defensive_cert_image__exact='')
+    )
+    remindable_bookings = server.services.booking.filter_pending(filtered_bookings)
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(remindable_bookings, reminder_name)
+
+
 def _signup_reminder(delay_days, reminder_name):
     reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
     remindable_drivers = server.models.Driver.objects.filter(
@@ -254,6 +271,11 @@ def process_signup_notifications():
 def process_credit_notifications():
     _credit_reminder(delay_days=14)
     _inactive_coupon_reminder(delay_days=14)
+
+
+def process_credit_card_notifications():
+    _credit_card_reminder(delay_hours=24, reminder_name='FirstCCReminder')
+    _credit_card_reminder(delay_hours=48, reminder_name='SecondCCReminder')
 
 
 def process_referral_notifications():
