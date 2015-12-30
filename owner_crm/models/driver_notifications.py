@@ -619,6 +619,60 @@ You just received ${} towards your next rental!'.format(
         }
 
 
+class FirstPickupReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Have you scheduled the pickup for the {}? Make sure when you pick it up you \
+go to your booking page click the blue “Pay and Drive” button.'.format(kwargs['car_name'])
+        text ='''Please open the Idlecars app to find the owner's phone number to coordinate pickup.
+        When you pick up the car make sure you go back to the booking page (link below) and click
+        the blue “Pay and Drive” button to make your first week’s payment – DO NOT PAY CASH!
+        <br /><br />
+        You should go pickup the car and then you can register for the rideshare company of your
+         choice. You must have these documents with you:
+        <ul><li> The insurance document (emailed from Idlecars) </li>
+        <li> The FH1 - NY State insurance (receive from owner at pickup) </li>
+        <li> The registration document (receive from owner at pickup) </li></ul>'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Remember to schedule your pickup',
+            'TEXT': text,
+            'CTA_LABEL': 'Your rental',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Have you scheduled a time to pickup your {}'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
+class SecondPickupReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Have you scheduled the pickup for the {}? Make sure when you pick it up you \
+go to your booking page click the blue “Pay and Drive” button.'.format(kwargs['car_name'])
+        text ='''If you haven’t already, please open the Idlecars app to find the owner's phone
+        number to coordinate pickup. <br />
+        When you pick up the car make sure you go back to the booking page (link below) and click
+        the blue “Pay and Drive” button to make your first week’s payment – DO NOT PAY CASH!
+
+        <br /><br />
+        You should go pickup the car and then you can register for the rideshare company of your
+         choice. You must have these documents with you:
+        <ul><li> The insurance document (emailed from Idlecars) </li>
+        <li> The FH1 - NY State insurance (receive from owner at pickup) </li>
+        <li> The registration document (receive from owner at pickup) </li></ul>'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Remember to click the blue “Pay and Drive” button at pickup',
+            'TEXT': text,
+            'CTA_LABEL': 'Your rental',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your {} rental – how to pay and drive'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
 class PickupConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'Success! Your card has been charged {} for the {} booking. \
