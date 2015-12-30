@@ -141,6 +141,16 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'hold of $500 on your credit card',
                 'email_result': self.reserved_booking.car.display_name(),
             },
+            'FirstPayAndDriveReminder': {
+                'argument': 'accepted_booking',
+                'sms_result': 'scheduled the pickup',
+                'email_result': 'to pickup',
+            },
+            'SecondPayAndDriveReminder': {
+                'argument': 'accepted_booking',
+                'sms_result': 'scheduled the pickup',
+                'email_result': 'pay and drive',
+            },
             'PickupConfirmation': {
                 'argument': 'settled_payment',
                 'sms_result': 'Success!',

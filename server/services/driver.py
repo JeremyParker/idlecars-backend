@@ -257,6 +257,18 @@ def _insurance_notification(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
+def _send_pickup_reminder(delay_hours, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    accepted_bookings = server.services.booking.filter_accepted(server.models.Booking.objects.all())
+    remindable_bookings = accepted_bookings.filter(
+        approval_time__lte=delay_hours,
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(throttled_bookings, reminder_name)
+
+
 def process_signup_notifications():
     _signup_reminder(
         delay_days=7,
@@ -299,6 +311,12 @@ def process_document_notifications():
       throttle_key='third_documents_reminder',
     )
 
+
 def process_insurance_notifications():
     _insurance_notification(delay_hours=24, reminder_name='FirstInsuranceNotification')
     _insurance_notification(delay_hours=48, reminder_name='SecondInsuranceNotification')
+
+
+def process_pickup_notifications():
+    _send_pickup_reminder(delay_hours=1, reminder_name='FirstPayAndDriveReminder')
+    _send_pickup_reminder(delay_hours=6, reminder_name='SecondPayAndDriveReminder')
