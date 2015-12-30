@@ -384,6 +384,51 @@ should be ready to drive within 24-48 hours! Hang tight!'.format(kwargs['driver_
         }
 
 
+class FirstInsuranceNotification(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        subject = 'We are still working to get you on the {}’s insurance.'.format(kwargs['car_name'])
+        sms_body = 'Hi {}, we are still working to get you on the {}’s insurance. We will \
+let you know as soon as the car is ready for pickup.'.format(
+            kwargs['driver_first_name'] or None,
+            kwargs['car_name'],
+        )
+        text = '''We are still working to get you on the {}’s insurance. We will let you know
+        as soon as the car is ready for pickup.'''.format(
+            kwargs['car_name'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': text,
+            'HEADLINE': subject,
+            'template_name': 'no_button_no_image',
+            'subject': subject,
+            'sms_body': sms_body,
+        }
+
+
+class SecondInsuranceNotification(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        subject = 'We told the owner to get you on the insurance ASAP'
+        sms_body = 'Hi {}, we told the owner of the {} to get you on the insurance ASAP, \
+so you shouldn’t have to wait much longer!'.format(
+            kwargs['driver_first_name'] or None,
+            kwargs['car_name'],
+        )
+        text = 'We told the owner of the {} to get you on the insurance ASAP, so you shouldn’t \
+        have to wait much longer!'.format(
+            kwargs['car_name'],
+        )
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'TEXT': text,
+            'HEADLINE': subject,
+            'template_name': 'no_button_no_image',
+            'subject': subject,
+            'sms_body': sms_body,
+        }
+
+
 def base_letter_rejected(driver):
     if not driver.email():
         return

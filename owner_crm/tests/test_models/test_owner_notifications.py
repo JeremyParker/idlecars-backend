@@ -23,6 +23,7 @@ class OwnerNotificationTest(TestCase):
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
         self.car = server_factories.BookableCar.create(weekly_rent=500)
+        self.pending_booking = server_factories.Booking.create()
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
         self.booked_booking = server_factories.BookedBooking.create(car=self.car)
 
@@ -89,6 +90,10 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'settled_payment',
                 'email_result': 'paid',
                 'sms_result': self.settled_payment.booking.driver.full_name()
+            },
+            'PendingNotification': {
+                'argument': 'pending_booking',
+                'email_result': 'interested',
             },
             'PaymentReceipt': {
                 'argument': 'settled_payment',

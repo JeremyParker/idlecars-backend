@@ -354,3 +354,65 @@ class TestDriverSignupNotifications(TestCase):
             outbox[1].subject,
             'Do you need a car for Uber, Lyft, or Via?',
         )
+
+
+class TestDriverInsuranceNotifications(TestCase):
+    @freeze_time("2014-10-18 10:00:00")
+    def test_only_requested_bookings_send_emails(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            good_booking = server.factories.RequestedBooking.create()
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.AcceptedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        driver_service.process_insurance_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'We are still working to get you on the {}’s insurance.'.format(
+                good_booking.car.display_name()
+            )
+        )
+
+    @freeze_time("2014-10-18 10:00:00")
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            server.factories.RequestedBooking.create()
+
+        driver_service.process_insurance_notifications()
+        driver_service.process_insurance_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    @freeze_time("2014-10-18 8:00:00")
+    def test_no_email_early(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            server.factories.RequestedBooking.create()
+
+        driver_service.process_insurance_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    @freeze_time("2014-10-19 10:00:00")
+    def test_second_email(self):
+        with freeze_time("2014-10-17 9:00:00"):
+            server.factories.RequestedBooking.create()
+
+        driver_service.process_insurance_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'We told the owner to get you on the insurance ASAP',
+        )
