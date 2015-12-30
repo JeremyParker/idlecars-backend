@@ -12,3 +12,4 @@ class Command(BaseCommand):
         owner_service.process_renewal_reminder()
         owner_service.process_insurance_reminder()
         owner_service.process_account_reminder()
+        owner_service.process_pending_booking_reminder()
