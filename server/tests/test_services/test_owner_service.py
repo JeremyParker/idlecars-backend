@@ -49,6 +49,21 @@ class OwnerInvitationTest(TestCase):
             auth_user = owner_service.invite_legacy_owner('0000') # Note - bad phone number
 
 
+class OwnerServiceTest(TestCase):
+    def setUp(self):
+        self.owner = factories.Owner.create()
+
+    def test_owner_signup(self):
+        owner_service.on_set_email(self.owner)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Welcome to your Idlecars owner account',
+        )
+
+
 class OwnerAccountTest(TestCase):
     def setUp(self):
         self.owner = factories.BankAccountOwner.create()
