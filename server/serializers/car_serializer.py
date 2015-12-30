@@ -215,19 +215,19 @@ class CarCreateSerializer(ModelSerializer):
             }
         elif car.next_available_date > car_helpers.next_available_date_threshold:
             # NOTE: This should result in the same logic as car_helpers.filter_bookable()
-                return {
-                    'state_string': 'Not listed. Busy until {}.'.format(car.next_available_date.strftime('%b %d')),
-                    'buttons': [
-                        {
-                            'label': 'List this car',
-                            'function_key': 'Relist',
-                        },
-                        {
-                            'label': 'Change availability',
-                            'function_key': 'GoNextAvailableDate',
-                        },
-                    ]
-                }
+            return {
+                'state_string': 'Not listed. Busy until {}.'.format(car.next_available_date.strftime('%b %d')),
+                'buttons': [
+                    {
+                        'label': 'List this car',
+                        'function_key': 'Relist',
+                    },
+                    {
+                        'label': 'Change availability',
+                        'function_key': 'GoNextAvailableDate',
+                    },
+                ]
+            }
         else:
             listing_expiration_date = car.last_status_update + datetime.timedelta(
                 days=settings.STALENESS_LIMIT
