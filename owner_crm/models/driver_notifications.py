@@ -392,10 +392,11 @@ let you know as soon as the car is ready for pickup.'.format(
             kwargs['driver_first_name'] or None,
             kwargs['car_name'],
         )
-        text = 'We are still working to get you on the {}’s insurance. We will let you know \
-        as soon as the car is ready for pickup.'.format(
+        text = '''We are still working to get you on the {}’s insurance. We will let you know
+        as soon as the car is ready for pickup.'''.format(
             kwargs['car_name'],
         )
+
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'TEXT': text,

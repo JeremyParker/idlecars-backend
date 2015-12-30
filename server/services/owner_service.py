@@ -73,8 +73,8 @@ def _send_reminder_email(remindable_bookings, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
-def _pending_booking_reminder(delay_hours):
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+def process_pending_booking_reminder():
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=24)
     remindable_bookings = booking_service.filter_pending(Booking.objects.all()).filter(
         created_time__lte=reminder_threshold,
         driver__paymentmethod__isnull=True,
@@ -132,8 +132,6 @@ def process_account_reminder():
     _account_reminder(delay_hours=24, reminder_name='FirstAccountReminder')
     _account_reminder(delay_hours=48, reminder_name='SecondAccountReminder')
 
-def process_pending_booking_reminder():
-    _pending_booking_reminder(delay_hours=24)
 
 def create(auth_user):
     new_owner = Owner.objects.create()

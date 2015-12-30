@@ -67,7 +67,7 @@ class PendingNotification(notification.OwnerNotification):
             'HEADLINE': 'Someone is interested in your {}'.format(kwargs['car_name']),
             'TEXT': text,
             'CTA_LABEL': 'Delist this car',
-            'CTA_URL': kwargs['car_driver_details_url'],
+            'CTA_URL': kwargs['car_owner_details_url'],
             'template_name': 'one_button_no_image',
             'subject': 'Someone is interested in your {}'.format(kwargs['car_name']),
         }
