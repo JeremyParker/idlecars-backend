@@ -12,9 +12,10 @@ import server.factories
 from server.services import owner_service
 
 from owner_crm.services import password_reset_service
-from owner_crm.models import PasswordReset
+from owner_crm.models import PasswordReset, Campaign
 import owner_crm.factories
 
+from credit import models as credit_models
 from rest_framework.authtoken.models import Token
 
 
@@ -43,6 +44,11 @@ class E2ETestSetup():
             models.UserAccount._meta.db_table,
             models.Driver._meta.db_table,
             auth.models.User._meta.db_table,
+            PasswordReset._meta.db_table,
+            Campaign._meta.db_table,
+            Token._meta.db_table,
+            credit_models.Customer._meta.db_table,
+            credit_models.CreditCode._meta.db_table,
         )
         table_list = ','.join(tables)
         self.cursor.execute('TRUNCATE TABLE {} RESTART IDENTITY CASCADE;'.format(table_list))
