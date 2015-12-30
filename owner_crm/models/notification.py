@@ -162,6 +162,7 @@ def _get_urls_params(pseudo_argument):
         'terms_of_service_url': app_routes_driver.terms_of_service(),
         'faq_url': app_routes_driver.faq(),
         'owner_app_url': app_routes_owner.owner_app_url(),
+        'owner_account_url': app_routes_owner.owner_account_url(),
     }
 
 def _get_credit_params(credit_code):
@@ -215,6 +216,7 @@ class Notification(object):
             },
             'Owner': {
                 '_get_owner_params': 'self.argument',
+                '_get_urls_params': 'None',
             },
             'Booking': {
                 '_get_booking_params': 'self.argument',
@@ -257,7 +259,7 @@ class Notification(object):
     def default_params_sets(self):
         return {
             'Driver': ['driver', 'urls'],
-            'Owner': ['owner'],
+            'Owner': ['owner', 'urls'],
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
             'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],

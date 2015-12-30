@@ -105,14 +105,13 @@ class TextCarState(TestCase):
 
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Booked. Waiting for insurance approval.')
-        self.assertEqual(1, len(serializer_data['state_buttons']))
-        # TODO - hook up an API for approving/rejecting insurance, and put these buttons in to access it.
-        # self.assertEqual(serializer_data['state_buttons'][0]['label'], 'The driver is approved')
-        # self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'ApproveInsurance')
-        # self.assertEqual(serializer_data['state_buttons'][1]['label'], 'The driver was rejected from the insurance')
-        # self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RejectInsurance')
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'This car is no longer available')
-        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RemoveListing')
+        self.assertEqual(3, len(serializer_data['state_buttons']))
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'The driver is approved')
+        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'ApproveInsurance')
+        self.assertEqual(serializer_data['state_buttons'][1]['label'], 'The driver was rejected from the insurance')
+        self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RejectInsurance')
+        self.assertEqual(serializer_data['state_buttons'][2]['label'], 'This car is no longer available')
+        self.assertEqual(serializer_data['state_buttons'][2]['function_key'], 'RemoveListing')
 
     def test_accepted(self):
         car = factories.BookableCar.create()

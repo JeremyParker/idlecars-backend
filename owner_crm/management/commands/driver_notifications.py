@@ -15,4 +15,4 @@ class Command(BaseCommand):
         driver_service.process_referral_notifications()
         driver_service.process_document_notifications()
         driver_service.process_credit_card_notifications()
-
+        driver_service.process_insurance_notifications()

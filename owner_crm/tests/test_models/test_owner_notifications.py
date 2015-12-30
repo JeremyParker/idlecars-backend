@@ -19,9 +19,11 @@ class OwnerNotificationTest(TestCase):
     def setUp(self):
         auth_user = idlecars_factories.AuthUser.create(first_name='Tom', last_name='Cat')
 
+        self.owner = server_factories.Owner.create()
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
         self.car = server_factories.BookableCar.create(weekly_rent=500)
+        self.pending_booking = server_factories.Booking.create()
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
         self.booked_booking = server_factories.BookedBooking.create(car=self.car)
 
@@ -43,6 +45,21 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'car',
                 'sms_result': app_routes_owner.car_details_url(self.car),
                 'email_result': 'expire',
+            },
+            'SignupConfirmation': {
+                'argument': 'owner',
+                'sms_body': 'Welcome',
+                'email_result': 'Welcome',
+            },
+            'FirstAccountReminder': {
+                'argument': 'owner',
+                'sms_body': 'incomplete',
+                'email_result': 'incomplete',
+            },
+            'SecondAccountReminder': {
+                'argument': 'owner',
+                'sms_body': 'complete',
+                'email_result': 'Complete',
             },
             'NewBookingEmail': {
                 'argument': 'requested_booking',
@@ -73,6 +90,10 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'settled_payment',
                 'email_result': 'paid',
                 'sms_result': self.settled_payment.booking.driver.full_name()
+            },
+            'PendingNotification': {
+                'argument': 'pending_booking',
+                'email_result': 'interested',
             },
             'PaymentReceipt': {
                 'argument': 'settled_payment',

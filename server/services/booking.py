@@ -15,6 +15,8 @@ from server.services import ServiceError
 
 
 CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
+INSURANCE_APPROVAL_ERROR = 'Sorry, your rental can\'t be approved at this time.'
+INSURANCE_REJECT_ERROR = 'Sorry, your rental can\'t be rejected at this time.'
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are other cars you can rent.'
@@ -277,6 +279,24 @@ def checkout(booking):
         notification.send('driver_notifications.CheckoutReceipt', booking)
 
     return booking
+
+
+def is_requested(booking):
+    return booking.get_state() == Booking.REQUESTED
+
+
+def approve(booking):
+    if not is_requested(booking):
+        raise ServiceError(INSURANCE_APPROVAL_ERROR)
+    booking.approval_time = timezone.now()
+    new_booking = booking.save()
+    on_insurance_approved(new_booking)
+
+
+def reject(booking):
+    if not is_requested(booking):
+        raise ServiceError(INSURANCE_REJECT_ERROR)
+    _make_booking_incomplete(booking, Booking.REASON_OWNER_REJECTED)
 
 
 def can_pickup(booking):

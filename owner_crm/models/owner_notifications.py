@@ -51,6 +51,50 @@ listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_d
         return context
 
 
+class PendingNotification(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        text = '''Someone is interested in your {} with plates {}. They are still in the process
+        of submitting their documents and entering their payment information, but we will send
+        you everything as soon as possible. <br /><br />
+
+        If this car is no longer available, please click below to de-list the car from our
+        marketplace.'''.format(
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Someone is interested in your {}'.format(kwargs['car_name']),
+            'TEXT': text,
+            'CTA_LABEL': 'Delist this car',
+            'CTA_URL': kwargs['car_owner_details_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Someone is interested in your {}'.format(kwargs['car_name']),
+        }
+
+
+class SignupConfirmation(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Welcome to Idlecars! Thank you for creating a car owner account! \
+Check your email to see more on how Idlecars works.'
+        text = render_to_string(
+            "owner_signup.jade",
+            {},
+            template.Context(autoescape=False)
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Welcome to Idlecars',
+            'TEXT': text,
+            'CTA_LABEL': 'Go to your Account',
+            'CTA_URL': kwargs['owner_app_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Welcome to your Idlecars owner account',
+            'sms_body': sms_body,
+        }
+
+
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
         headline = '{} has booked your {}, with license plate {}'.format(
@@ -99,6 +143,55 @@ class NewBookingEmail(notification.OwnerNotification):
             )
         }
         return context
+
+
+class FirstAccountReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, It’s Idlecars. Your account is incomplete and your cars are not listed. \
+Please complete your account here: {}'.format(
+            kwargs['user_first_name'],
+            kwargs['owner_account_url'],
+        )
+        text = '''Thank you for creating an Idlecars owner account.
+        You are on your way to reaching our network of hundreds of drivers. <br /><br />
+
+        Please click the button below to complete your account'''
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Your account is incomplete and your cars are not listed',
+            'TEXT': text,
+            'CTA_LABEL': 'Complete your Account',
+            'CTA_URL': kwargs['owner_account_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your account is incomplete and your cars are not listed',
+            'sms_body': sms_body,
+        }
+
+
+class SecondAccountReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, your cars are not listed on the Idlecars site. \
+Go to {} to complete your account'.format(
+            kwargs['user_first_name'],
+            kwargs['owner_account_url'],
+        )
+        text = '''Are you ready to reach our network of over 500 drivers?
+        Complete your account today, so we can list your cars on the Idlecars marketplace so
+        drivers know your cars are available. <br /><br />
+
+        Please click the button below to complete your account'''
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Complete your account to post your cars',
+            'TEXT': text,
+            'CTA_LABEL': 'Complete your Account',
+            'CTA_URL': kwargs['owner_account_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your cars are not listed on Idlecars yet! Complete your account today!',
+            'sms_body': sms_body,
+        }
 
 
 class FirstMorningInsuranceReminder(notification.OwnerNotification):

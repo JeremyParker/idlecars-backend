@@ -121,6 +121,16 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'pre-approved',
                 'email_result': 'submitted',
             },
+            'FirstInsuranceNotification': {
+                'argument': 'requested_booking',
+                'sms_result': 'insurance',
+                'email_result': 'insurance',
+            },
+            'SecondInsuranceNotification': {
+                'argument': 'requested_booking',
+                'sms_result': 'insurance',
+                'email_result': 'insurance',
+            },
             'InsuranceApproved': {
                 'argument': 'requested_booking',
                 'sms_result': 'approved',
