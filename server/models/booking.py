@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from . import Car, UserAccount, Driver
@@ -14,7 +15,7 @@ class Booking(models.Model):
     car = models.ForeignKey(Car, null=False)
 
     # these payemnt terms are only set after the driver puts down a deposit on the booking
-    weekly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    weekly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     service_percentage = models.DecimalField(max_digits=10, decimal_places=4, null=True) # our take rate
 
     # time of day in end_time is estimated until pickup_time is set.
@@ -128,6 +129,21 @@ class Booking(models.Model):
                     raise ValidationError('To set a booking to incomplete, also select a reason')
                 if not orig.incomplete_time:
                     booking_service.on_incomplete(self, orig.get_state())
+
+        # check that all the date/times of events make sense
+        max_time = timezone.make_aware(timezone.datetime.max, timezone.get_default_timezone())
+        times = [
+            self.checkout_time or max_time,
+            self.requested_time or max_time,
+            self.approval_time or max_time,
+            self.pickup_time or max_time,
+            self.return_time or max_time,
+            self.refund_time or max_time,
+        ]
+        for earlier, later in zip(times[:-1], times[1:]):
+            if earlier > later:
+                raise ValidationError('The event times aren\'t in order')
+
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),
