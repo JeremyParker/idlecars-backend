@@ -14,7 +14,7 @@ def run_backfill():
     mark throttle system the existing bookings which was created 47 hours ago FirstSignupReminder so that
     drivers don't get two reminders at the same time when we launch
     '''
-
+    campaign = 'FirstCCReminder'
     filtered_bookings = Booking.objects.filter(
         created_time__lte=timezone.now() - datetime.timedelta(hours=47),
     ).exclude(
@@ -24,6 +24,4 @@ def run_backfill():
         Q(driver__defensive_cert_image__exact='')
     )
     backfill_bookings = booking_service.filter_pending(filtered_bookings)
-    for booking in backfill_bookings:
-        print '.'
-    throttle_service.mark_sent(backfill_bookings, 'FirstCCReminder')
+    throttle_service.mark_sent(throttle_service.throttle(backfill_bookings, campaign), campaign)

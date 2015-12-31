@@ -14,10 +14,9 @@ def run_backfill():
     mark throttle system the existing owners who signed up 47 hours ago FirstSignupReminder so that
     they don't get two reminders at the same time when we launch
     '''
+    campaign = 'FirstAccountReminder'
     backfill_owners = owner_service.filter_incomplete(Owner.objects.all()).filter(
         auth_users__date_joined__lte=timezone.now() - datetime.timedelta(hours=47),
         cars__isnull=False,
     )
-    for owner in backfill_owners:
-        print '.'
-    throttle_service.mark_sent(backfill_owners, 'FirstAccountReminder')
+    throttle_service.mark_sent(throttle_service.throttle(backfill_owners, campaign), campaign)
