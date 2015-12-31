@@ -16,7 +16,12 @@ class Booking(models.Model):
 
     # these payemnt terms are only set after the driver puts down a deposit on the booking
     weekly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    service_percentage = models.DecimalField(max_digits=10, decimal_places=4, null=True) # our take rate
+    service_percentage = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        null=True,
+        blank=True
+    )
 
     # time of day in end_time is estimated until pickup_time is set.
     end_time = models.DateTimeField(null=True, blank=True)  # end time set by the user
