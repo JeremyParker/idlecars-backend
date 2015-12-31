@@ -76,6 +76,11 @@ class OwnerNotificationTest(TestCase):
                 'email_result': self.requested_booking.car.display_name(),
                 'sms_result': self.requested_booking.driver.full_name(),
             },
+            'ThirdMorningInsuranceReminder': {
+                'argument': 'requested_booking',
+                'email_result': self.requested_booking.driver.full_name(),
+                'sms_result': self.requested_booking.car.display_name(),
+            },
             'FirstAfternoonInsuranceReminder': {
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
@@ -85,6 +90,11 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
                 'sms_result': self.requested_booking.driver.full_name(),
+            },
+            'ThirdAfternoonInsuranceReminder': {
+                'argument': 'requested_booking',
+                'email_result': self.requested_booking.driver.full_name(),
+                'sms_result': self.requested_booking.car.display_name(),
             },
             'PickupConfirmation': {
                 'argument': 'settled_payment',
