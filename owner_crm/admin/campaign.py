@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 
 
-class Campaign(admin.ModelAdmin):
+class CampaignAdmin(admin.ModelAdmin):
     fields = [
         'name',
         'preferred_medium',
