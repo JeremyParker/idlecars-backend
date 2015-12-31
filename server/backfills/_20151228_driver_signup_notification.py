@@ -17,7 +17,7 @@ def run_backfill():
         auth_user__date_joined__lte=timezone.now() - datetime.timedelta(days=29),
         braintree_customer_id__isnull=True,
     )
-    backfill_drivers = throttle_service.throttle(backfill_drivers, campaign):
+    backfill_drivers = throttle_service.throttle(backfill_drivers, campaign)
     skip_drivers = []
     from server.services import booking
     for driver in backfill_drivers:
