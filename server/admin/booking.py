@@ -77,7 +77,7 @@ class BookingAdmin(admin.ModelAdmin):
                 ('state', 'driver_docs_uploaded',),
                 ('driver_link', 'driver_phone', 'driver_email', 'driver_docs_approved'),
                 ('car', 'car_link', 'car_plate',),
-                ('weekly_rent', 'effective_service_percentage',),
+                ('weekly_rent', 'service_percentage', 'effective_service_percentage',),
                 ('owner_link', 'owner_phone', 'owner_email',),
             ),
         }),
@@ -214,7 +214,7 @@ class BookingAdmin(admin.ModelAdmin):
 
     def effective_service_percentage(self, instance):
         return instance.service_percentage or instance.car.owner.effective_service_percentage
-    effective_service_percentage.short_description = 'Take rate'
+    effective_service_percentage.short_description = 'Effective take rate'
 
     def car_insurance(self, instance):
         return instance.car.insurance
