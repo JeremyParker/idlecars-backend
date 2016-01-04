@@ -43,6 +43,9 @@ def _onboarding_reminder(delay_days, reminder_name):
 
 def process_onboarding_reminder():
     _onboarding_reminder(delay_days=0, reminder_name='FirstOnboardingReminder')
+    _onboarding_reminder(delay_days=7, reminder_name='SecondOnboardingReminder')
+    _onboarding_reminder(delay_days=14, reminder_name='ThirdOnboardingReminder')
+    _onboarding_reminder(delay_days=21, reminder_name='ForthOnboardingReminder')
 
 
 def _renewable_cars():

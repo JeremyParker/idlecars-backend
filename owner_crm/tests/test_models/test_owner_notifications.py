@@ -48,7 +48,19 @@ class OwnerNotificationTest(TestCase):
         self.notification_spec = {
             'FirstOnboardingReminder': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
+                'sms_result': 'Idle Cars',
+            },
+            'SecondOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'ThirdOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'ForthOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
             },
             'RenewalEmail': {
                 'argument': 'car',

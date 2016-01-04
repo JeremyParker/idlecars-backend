@@ -32,8 +32,23 @@ class TestOnboardingOwnerNotifications(TestCase):
             name='owner_notifications.FirstOnboardingReminder',
             preferred_medium=Campaign.SMS_MEDIUM,
         )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.SecondOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.ThirdOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.ForthOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
 
     def test_onboarding_owner_gets_email(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
         server.models.OnboardingOwner.objects.create(
             phone_number='1234567890',
             name='Elmi bot'
@@ -41,12 +56,13 @@ class TestOnboardingOwnerNotifications(TestCase):
 
         owner_service.process_onboarding_reminder()
 
-        from idlecars import sms_service
         self.assertEqual(len(sms_service.test_get_outbox()), 1)
-        self.assertTrue('come to idlecars' in sms_service.test_get_outbox()[0]['body'])
-        sms_service.test_reset()
+        self.assertTrue('looking to rent your car' in sms_service.test_get_outbox()[0]['body'])
 
     def test_no_email_twice(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
         server.models.OnboardingOwner.objects.create(
             phone_number='1234567890',
             name='Elmi bot'
@@ -55,11 +71,12 @@ class TestOnboardingOwnerNotifications(TestCase):
         owner_service.process_onboarding_reminder()
         owner_service.process_onboarding_reminder()
 
-        from idlecars import sms_service
         self.assertEqual(len(sms_service.test_get_outbox()), 1)
-        sms_service.test_reset()
 
     def test_no_email_to_converted_owner(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
         exisiting_owner = server.factories.Owner.create()
 
         server.models.OnboardingOwner.objects.create(
@@ -69,9 +86,58 @@ class TestOnboardingOwnerNotifications(TestCase):
 
         owner_service.process_onboarding_reminder()
 
-        from idlecars import sms_service
         self.assertEqual(len(sms_service.test_get_outbox()), 0)
+
+    def test_no_email_early(self):
+        from idlecars import sms_service
         sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-12 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+
+    def test_no_email_late(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2015-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 4)
+
+    def test_all_onboarding_emails(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-17 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-24 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-31 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 4)
+
 
 class TestOwnerPendingBookingNotifications(TestCase):
     @freeze_time("2014-10-10 9:55:00")

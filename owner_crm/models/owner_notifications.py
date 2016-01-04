@@ -16,9 +16,27 @@ from owner_crm.models import notification
 
 class FirstOnboardingReminder(notification.OnboardingOwnerNotification):
     def get_context(self, **kwargs):
+        sms_body = 'Hi {}, We\'re Idle Cars. Are you looking to rent your car. Why don’t youlist \
+your car with us for free. List your car at {}'.format(
+            kwargs['onboarding_owner_name'],
+            kwargs['owner_app_url']
+        )
         return {
-            'sms_body': 'Hi, {}, come to idlecars'.format(kwargs['onboarding_owner_name']),
+            'sms_body': sms_body,
         }
+
+
+class SecondOnboardingReminder(FirstOnboardingReminder):
+    pass
+
+
+class ThirdOnboardingReminder(FirstOnboardingReminder):
+    pass
+
+
+class ForthOnboardingReminder(FirstOnboardingReminder):
+    pass
+
 
 def _get_car_listing_links(owner):
     links = ''
