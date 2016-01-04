@@ -31,9 +31,14 @@ def _onboarding_reminder(delay_days, reminder_name):
     remindable_owners = OnboardingOwner.objects.filter(created_time__lte=reminder_threshold)
 
     throttled_owners = throttle_service.throttle(remindable_owners, reminder_name)
+    skip_owners = []
     for owner in throttled_owners:
+        if Owner.objects.filter(auth_users__username=owner.phone_number):
+            skip_owners.append(owner.pk)
+            continue
+
         notification.send('owner_notifications.'+reminder_name, owner)
-    throttle_service.mark_sent(throttled_owners, reminder_name)
+    throttle_service.mark_sent(throttled_owners.exclude(pk__in=skip_owners), reminder_name)
 
 
 def process_onboarding_reminder():

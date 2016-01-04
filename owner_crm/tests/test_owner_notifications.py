@@ -26,23 +26,52 @@ from owner_crm.tests.test_services import test_message
 
 class TestOnboardingOwnerNotifications(TestCase):
     @freeze_time("2014-10-10 9:55:00")
-    def test_onboarding_owner_gets_email(self):
-        self.owner = server.models.OnboardingOwner.objects.create(
-            phone_number='1234567890',
-            name='Elmi bot'
-        )
-
+    def setUp(self):
         from owner_crm.models import Campaign
         campaign = owner_crm.factories.Campaign.create(
             name='owner_notifications.FirstOnboardingReminder',
             preferred_medium=Campaign.SMS_MEDIUM,
         )
 
+    def test_onboarding_owner_gets_email(self):
+        server.models.OnboardingOwner.objects.create(
+            phone_number='1234567890',
+            name='Elmi bot'
+        )
+
         owner_service.process_onboarding_reminder()
 
         from idlecars import sms_service
         self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        self.assertTrue('come to idlecars' in sms_service.test_get_outbox()[0]['body'])
+        sms_service.test_reset()
 
+    def test_no_email_twice(self):
+        server.models.OnboardingOwner.objects.create(
+            phone_number='1234567890',
+            name='Elmi bot'
+        )
+
+        owner_service.process_onboarding_reminder()
+        owner_service.process_onboarding_reminder()
+
+        from idlecars import sms_service
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        sms_service.test_reset()
+
+    def test_no_email_to_converted_owner(self):
+        exisiting_owner = server.factories.Owner.create()
+
+        server.models.OnboardingOwner.objects.create(
+            phone_number=exisiting_owner.auth_users.first().username,
+            name='Elmi bot'
+        )
+
+        owner_service.process_onboarding_reminder()
+
+        from idlecars import sms_service
+        self.assertEqual(len(sms_service.test_get_outbox()), 0)
+        sms_service.test_reset()
 
 # class TestOwnerPendingBookingNotifications(TestCase):
 #     @freeze_time("2014-10-10 9:55:00")
