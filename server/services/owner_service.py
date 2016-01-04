@@ -12,9 +12,9 @@ from django.utils import timezone
 from django.db.models import Q
 
 from owner_crm.services import password_reset_service, throttle_service, notification
-from owner_crm.models import driver_notifications, owner_notifications, ops_notifications, OnboardingOwner
+from owner_crm.models import driver_notifications, owner_notifications, ops_notifications
 
-from server.models import Booking, Owner
+from server.models import Booking, Owner, OnboardingOwner
 from server.services import auth_user as auth_user_service
 from server.services import car as car_service
 from server.services import  booking as booking_service
@@ -34,10 +34,6 @@ def _onboarding_reminder(delay_days, reminder_name):
     for owner in throttled_owners:
         notification.send('owner_notifications.'+reminder_name, owner)
     throttle_service.mark_sent(throttled_owners, reminder_name)
-
-
-def _remove_converted_owners():
-    pass
 
 
 def process_onboarding_reminder():

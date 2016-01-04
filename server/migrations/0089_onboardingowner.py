@@ -8,7 +8,7 @@ import idlecars.model_helpers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('owner_crm', '0009_auto_20151204_1542'),
+        ('server', '0088_auto_20151231_1650'),
     ]
 
     operations = [

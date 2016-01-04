@@ -15,10 +15,6 @@ class OnboardingOwner(models.Model):
 
     def save(self, *args, **kwargs):
         self.phone_number = fields.parse_phone_number(self.phone_number)
-        if Owner.objects.filter(auth_users__username=self.phone_number):
-            raise exceptions.ValidationError(
-                "This owner has already converted."
-            )
         super(OnboardingOwner, self).save(*args, **kwargs)
 
     def __unicode__(self):

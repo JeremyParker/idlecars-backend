@@ -5,4 +5,3 @@ from password_reset import PasswordReset
 from consumable_token import ConsumableToken
 from message import Message
 from campaign import Campaign
-from onboarding_owner import OnboardingOwner
