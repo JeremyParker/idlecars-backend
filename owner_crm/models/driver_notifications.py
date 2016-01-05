@@ -649,7 +649,7 @@ class SecondPickupReminder(notification.DriverNotification):
     def get_context(self, **kwargs):
         sms_body = 'Have you scheduled the pickup for the {}? Make sure when you pick it up you \
 go to your booking page click the blue “Pay and Drive” button.'.format(kwargs['car_name'])
-        text ='''If you haven’t already picked up, please open the Idlecars app to find the owner's phone
+        text ='''If you haven’t already, please open the Idlecars app to find the owner's phone
         number to coordinate pickup. <br />
         When you pick up the car make sure you go back to the booking page (link below) and click
         the blue “Pay and Drive” button to make your first week’s payment – DO NOT PAY CASH!
