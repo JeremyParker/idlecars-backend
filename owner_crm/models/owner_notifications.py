@@ -14,6 +14,34 @@ from server.services import car as car_service
 from owner_crm.models import notification
 
 
+class OnboardingReminderBase(notification.OnboardingOwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, We\'re Idle Cars. Are you looking to rent your car. Why don’t you list \
+your car with us for free. List your car at {}'.format(
+            kwargs['onboarding_owner_name'],
+            kwargs['owner_app_url']
+        )
+        return {
+            'sms_body': sms_body,
+        }
+
+
+class FirstOnboardingReminder(OnboardingReminderBase):
+    pass
+
+
+class SecondOnboardingReminder(OnboardingReminderBase):
+    pass
+
+
+class ThirdOnboardingReminder(OnboardingReminderBase):
+    pass
+
+
+class ForthOnboardingReminder(OnboardingReminderBase):
+    pass
+
+
 def _get_car_listing_links(owner):
     links = ''
     for car in car_service.filter_live(owner.cars.all()):

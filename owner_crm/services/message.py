@@ -14,7 +14,6 @@ def get_booking_kwargs(obj):
         'booking': obj,
     }
 
-
 def get_driver_kwargs(obj):
     return { 'driver': obj, }
 
@@ -26,6 +25,8 @@ def get_car_kwargs(obj):
 def get_owner_kwargs(obj):
     return { 'owner': obj, }
 
+def get_onboardingowner_kwargs(obj):
+    return { 'onboarding_owner': obj }
 
 def log_message(campaign_name, key_obj):
     kwargs_func_name = 'get_{}_kwargs'.format(key_obj.__class__.__name__).lower()
