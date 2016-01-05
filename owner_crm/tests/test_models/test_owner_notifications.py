@@ -46,6 +46,10 @@ class OwnerNotificationTest(TestCase):
         sms_service.test_reset()
 
         self.notification_spec = {
+            'OnboardingReminderBase': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
             'FirstOnboardingReminder': {
                 'argument': 'onboarding_owner',
                 'sms_result': 'Idle Cars',
