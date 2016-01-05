@@ -14,7 +14,7 @@ from make_model import MakeModelAdmin
 from payment import PaymentAdmin
 from payment_method import PaymentMethodAdmin
 from rideshare_flavor import RideshareFlavorAdmin
-
+from onboarding_owner import OnboardingOwnerAdmin
 
 admin.site.register(models.Owner, OwnerAdmin)
 admin.site.register(models.Car, CarAdmin)
@@ -26,6 +26,7 @@ admin.site.register(models.Payment, PaymentAdmin)
 admin.site.register(models.PaymentMethod, PaymentMethodAdmin)
 admin.site.register(models.RideshareFlavor, RideshareFlavorAdmin)
 admin.site.register(models.BraintreeRequest)
+admin.site.register(models.OnboardingOwner, OnboardingOwnerAdmin)
 
 admin.site.site_header = "idlecars operations"
 admin.site.site_title = ''

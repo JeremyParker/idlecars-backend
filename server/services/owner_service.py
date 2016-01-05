@@ -14,7 +14,7 @@ from django.db.models import Q
 from owner_crm.services import password_reset_service, throttle_service, notification
 from owner_crm.models import driver_notifications, owner_notifications, ops_notifications
 
-from server.models import Booking, Owner
+from server.models import Booking, Owner, OnboardingOwner
 from server.services import auth_user as auth_user_service
 from server.services import car as car_service
 from server.services import  booking as booking_service
@@ -24,6 +24,29 @@ from server import payment_gateways
 POKE_FREQUENCY = 60 #minutes
 
 STALENESS_WARNING_HOURS = 2 # we let owners know a few hours before their cars are stale
+
+
+def _onboarding_reminder(delay_days, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(days=delay_days)
+    remindable_owners = OnboardingOwner.objects.filter(created_time__lte=reminder_threshold)
+
+    throttled_owners = throttle_service.throttle(remindable_owners, reminder_name)
+    skip_owners = []
+    for owner in throttled_owners:
+        if Owner.objects.filter(auth_users__username=owner.phone_number):
+            skip_owners.append(owner.pk)
+            continue
+
+        notification.send('owner_notifications.'+reminder_name, owner)
+    throttle_service.mark_sent(throttled_owners.exclude(pk__in=skip_owners), reminder_name)
+
+
+def process_onboarding_reminder():
+    _onboarding_reminder(delay_days=0, reminder_name='FirstOnboardingReminder')
+    _onboarding_reminder(delay_days=7, reminder_name='SecondOnboardingReminder')
+    _onboarding_reminder(delay_days=14, reminder_name='ThirdOnboardingReminder')
+    _onboarding_reminder(delay_days=21, reminder_name='ForthOnboardingReminder')
+
 
 def _renewable_cars():
     return car_service.get_stale_within(
