@@ -63,7 +63,7 @@ def get_image_url(car):
 def create_car(owner, plate):
     car_info = Car(plate=plate)
     try:
-        tlc_data_service.lookup_fhv_data(car_info)
+        tlc_data_service.lookup_car_data(car_info)
     except Car.DoesNotExist:
         raise CarTLCException
 
