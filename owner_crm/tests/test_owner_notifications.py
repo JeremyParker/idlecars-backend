@@ -370,3 +370,70 @@ class TestOwnerInsuranceNotifications(TestCase):
         '''
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 6)
+
+
+class TestOwnerPickupNotifications(TestCase):
+    @freeze_time("2014-10-10 9:55:00")
+    def setUp(self):
+        self.accepted_booking = server.factories.AcceptedBooking.create()
+
+    def test_only_accepted_bookings_has_reminder(self):
+        with freeze_time("2014-10-10 9:55:00"):
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.RequestedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        with freeze_time("2014-10-10 11:00:00"):
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
+        )
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-10 11:00:00"):
+            owner_service.process_pickup_reminder()
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_after_pickup(self):
+        with freeze_time("2014-10-10 11:00:00"):
+            self.accepted_booking.pickup_time = timezone.now()
+            self.accepted_booking.save()
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_second_reminder(self):
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_pickup_reminder()
+        with freeze_time("2014-10-10 22:00:00"):
+            owner_service.process_pickup_reminder()
+
+        '''
+            - message to owner: first pickup reminder
+            - message to owner: second pickup reminder
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+        self.assertEqual(
+            outbox[1].subject,
+            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
+        )

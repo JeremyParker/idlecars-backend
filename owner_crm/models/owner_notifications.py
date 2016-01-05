@@ -299,6 +299,71 @@ We don’t want to do that so please let us know if there are any problems.'.for
         }
 
 
+class FirstPickupReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Thank you for adding {} on the insurance for your car {} {}. They will contact \
+you soon to arrange pickup. Before they start driving make sure they click the blue “Pay and Drive” \
+button so you receive the first week’s payment.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''Thank you for adding {} to the {} {}’s insurance policy. They will call you soon to
+        schedule a time to pick up the car.
+        <br /><br />
+        Upon pick up, make sure the driver goes into their booking page to click the blue “Pay and
+        Drive” button to make sure your receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        <br /><br />
+        When they click “Pay and Drive”, you will be paid the first week’s rent and we will put the
+        deposit in an escrow account to be used for any damages to the car.
+        <br /><br />
+        Also, make sure you provide the driver with these documents so they can register for a
+        rideshare service:
+        <ul><li> The FH1 - NY State insurance </li>
+        <li> The registration document </li></ul>'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': '{} will schedule pickup soon'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': '{} will schedule pickup soon'.format(kwargs['driver_full_name']),
+            'sms_body': sms_body,
+        }
+
+
+class SecondPickupReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Remember, when {} picks up your car to remind them to click the blue “Pay and \
+Drive” button so and to provide them will the required documentation.'.format(
+            kwargs['driver_full_name'],
+        )
+        text = '''Just a reminder - when {} picks up the {} {} that they click the blue “Pay and Drive”
+        you receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        <br /><br />
+        Also, make sure you provide the driver with these documents so they can register for a
+        rideshare service:
+        <ul><li> The FH1 - NY State insurance </li>
+        <li> The registration document </li></ul>'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': '{} will schedule pickup soon'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': '{} will schedule pickup soon'.format(kwargs['driver_full_name']),
+            'sms_body': sms_body,
+        }
+
+
 class PickupConfirmation(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = '''
