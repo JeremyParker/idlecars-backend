@@ -61,6 +61,7 @@ def _filter_bookable(queryset):
     active_bookings = _filter_booking_in_progress(Booking.objects.all())
     booked_car_ids = [b.car.id for b in active_bookings]
     return queryset.filter(
+        medallion=False,
         next_available_date__isnull=False,
         next_available_date__lt=next_available_date_threshold,
         owner__merchant_account_state=Owner.BANK_ACCOUNT_APPROVED,

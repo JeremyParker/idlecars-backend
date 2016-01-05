@@ -37,6 +37,7 @@ class Car(models.Model):
     plate = models.CharField(max_length=24, blank=True)
 
     # TLC data
+    medallion = models.BooleanField(default=False)
     found_in_tlc = models.BooleanField(default=False)
     last_updated = models.DateTimeField(null=True)
     active_in_tlc = models.BooleanField(default=False)
