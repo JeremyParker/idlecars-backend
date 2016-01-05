@@ -139,6 +139,22 @@ def process_insurance_reminder():
             throttle_key='second_afternoon_insurance_reminder',
         )
 
+
+def _pickup_reminder(delay_hours, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    remindable_bookings = booking_service.filter_accepted(Booking.objects.all()).filter(
+        approval_time__lte=reminder_threshold,
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('owner_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(throttled_bookings, reminder_name)
+
+def process_pickup_reminder():
+    _pickup_reminder(reminder_name='FirstPickupReminder', delay_hours=1)
+    _pickup_reminder(reminder_name='SecondPickupReminder', delay_hours=12)
+
+
 def _account_reminder(delay_hours, reminder_name):
     reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
     remindable_owners = filter_incomplete(Owner.objects.all()).filter(

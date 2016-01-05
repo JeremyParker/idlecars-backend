@@ -30,6 +30,7 @@ class OwnerNotificationTest(TestCase):
         self.car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create()
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
+        self.accepted_booking = server_factories.AcceptedBooking.create(car=self.car)
         self.booked_booking = server_factories.BookedBooking.create(car=self.car)
 
         self.password_reset = crm_factories.PasswordReset.create(
@@ -110,6 +111,16 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'requested_booking',
                 'email_result': self.requested_booking.car.display_name(),
                 'sms_result': self.requested_booking.driver.full_name(),
+            },
+            'FirstPickupReminder': {
+                'argument': 'accepted_booking',
+                'email_result': 'pickup',
+                'sms_result': 'pickup',
+            },
+            'SecondPickupReminder': {
+                'argument': 'accepted_booking',
+                'email_result': 'pickup',
+                'sms_result': 'picks up',
             },
             'PickupConfirmation': {
                 'argument': 'settled_payment',
