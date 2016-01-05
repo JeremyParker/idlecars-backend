@@ -5,8 +5,9 @@ from django.contrib import admin
 
 from owner_crm import models
 
-from campaign import Campaign
+from campaign import CampaignAdmin
+from message import MessageAdmin
 
 
-admin.site.register(models.Campaign, Campaign)
-admin.site.register(models.Message)
+admin.site.register(models.Campaign, CampaignAdmin)
+admin.site.register(models.Message, MessageAdmin)

@@ -29,21 +29,19 @@ html(lang="en", ng-app="app")
             img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
         .links
           .content
-            a(href="/#tutorial") #[p.bold How it works]
+            a(href="/#tutorial") #[p.bold How It Works]
             a(href='/about') #[p.bold About Us]
-            a(href="#{ owner_app_url }") #[p.bold List your car]
-            a(href="#{ signup_url }") #[p.bold Sign up]
-            a(href="#{ login_url }") #[p.bold Log in]
+            a(href="#{ owner_app_url }") #[p.bold I Own A Car]
+            a(href="#{ login_url }") #[p.bold Driver Log In]
 
         .menu-button(ng-click='showMenu = !showMenu')
           .burger-button(ng-class='{active: showMenu}')
 
         .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-          a(href="/#tutorial") #[p How it works]
+          a(href="/#tutorial") #[p How It Works]
           a(href='/about') #[p About Us]
-          a(href="#{ owner_app_url }") #[p List your car]
-          a(href="#{ signup_url }") #[p Sign up]
-          a(href="#{ login_url }") #[p Log in]
+          a(href="#{ owner_app_url }") #[p I Own A Car]
+          a(href="#{ login_url }") #[p Driver Log In]
 
     - block content
     - endblock
@@ -58,16 +56,16 @@ html(lang="en", ng-app="app")
                 span |
                 a(href="/about") About Us
                 span |
-                a(href="/#tutorial") How it Works
+                a(href="/#tutorial") How It Works
                 span.desktop-line |
-                a.desktop-line(href="#{ owner_app_url }") List Your Car
+                a.desktop-line(href="#{ owner_app_url }") I Own A Car
                 span.desktop-line |
-                a.desktop-line(href="#{ login_url }") Join
+                a.desktop-line(href="#{ login_url }") Driver Log In
 
               p.bold.mobile-line
-                a(href="#{ owner_app_url }") List Your Car
+                a(href="#{ owner_app_url }") I Own A Car
                 span |
-                a(href="#{ login_url }") Join
+                a(href="#{ login_url }") Driver Log In
 
               p
                 a(href="#{ faq }") Help
@@ -77,9 +75,9 @@ html(lang="en", ng-app="app")
             .text.mobile
               p.bold #[a(href="/") Home]
               p.bold #[a(href="/about") About Us]
-              p.bold #[a(href="/#tutorial") How it Works]
-              p.bold #[a(href="#{ owner_app_url }") List Your Car]
-              p.bold #[a(href="#{ login_url }") Join]
+              p.bold #[a(href="/#tutorial") How It Works]
+              p.bold #[a(href="#{ owner_app_url }") I Own A Car]
+              p.bold #[a(href="#{ login_url }") Driver Log In]
 
             .social
               p.bold Follow us on

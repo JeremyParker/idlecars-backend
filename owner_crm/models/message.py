@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
-from server.models import Driver, Owner, Booking, Car
+from server.models import Driver, Owner, Booking, Car, OnboardingOwner
 
 
 class Message(models.Model):
@@ -17,6 +17,7 @@ class Message(models.Model):
     car = models.ForeignKey(Car, blank=True, null=True)
     driver = models.ForeignKey(Driver, blank=True, null=True)
     booking = models.ForeignKey(Booking, blank=True, null=True)
+    onboarding_owner = models.ForeignKey(OnboardingOwner, blank=True, null=True)
 
     # TODO: also store what media of message this was: email or sms
 

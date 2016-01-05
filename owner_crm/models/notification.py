@@ -163,6 +163,7 @@ def _get_urls_params(pseudo_argument):
         'faq_url': app_routes_driver.faq(),
         'owner_app_url': app_routes_owner.owner_app_url(),
         'owner_account_url': app_routes_owner.owner_account_url(),
+        'base_letter_sample_url': app_routes_driver.base_letter_sample_url(),
     }
 
 def _get_credit_params(credit_code):
@@ -170,6 +171,11 @@ def _get_credit_params(credit_code):
         'credit_amount_invitee': credit_code.credit_amount,
         'credit_amount_invitor': credit_code.invitor_credit_amount,
         'credit_code': credit_code.credit_code,
+    }
+
+def _get_onboarding_owner_params(onboarding_owner):
+    return {
+        'onboarding_owner_name': onboarding_owner.name
     }
 
 def get_merge_vars(context):
@@ -242,6 +248,10 @@ class Notification(object):
             'PasswordReset': {
                 '_get_password_reset_params': 'self.argument',
                 '_get_urls_params': 'None',
+            },
+            'OnboardingOwner': {
+                '_get_onboarding_owner_params': 'self.argument',
+                '_get_urls_params': 'None',
             }
         }.get(self.argument_class(), {})
 
@@ -265,6 +275,7 @@ class Notification(object):
             'UserMessage': ['message'],
             'Car': ['car', 'owner'],
             'PasswordReset': ['password_reset', 'urls'],
+            'OnboardingOwner': ['onboarding_owner', 'urls'],
         }.get(self.argument_class(), [])
 
     def custom_params_sets(self):
@@ -362,6 +373,15 @@ class OwnerNotification(Notification):
                 'sms_enabled': True,  # by default owners have their SMS functionality enabled
                 'user': user
             } for user in users]
+
+
+class OnboardingOwnerNotification(Notification):
+    def get_all_receivers(self):
+        return [{
+            'email_address': None,
+            'phone_number': self.argument.phone_number,
+            'sms_enabled': True,
+        }]
 
 
 class OpsNotification(Notification):

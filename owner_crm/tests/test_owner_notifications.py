@@ -24,6 +24,121 @@ from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
 
 
+class TestOnboardingOwnerNotifications(TestCase):
+    @freeze_time("2014-10-10 9:55:00")
+    def setUp(self):
+        from owner_crm.models import Campaign
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.FirstOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.SecondOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.ThirdOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+        campaign = owner_crm.factories.Campaign.create(
+            name='owner_notifications.ForthOnboardingReminder',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+
+    def test_onboarding_owner_gets_email(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        server.models.OnboardingOwner.objects.create(
+            phone_number='1234567890',
+            name='Elmi bot'
+        )
+
+        owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        self.assertTrue('looking to rent your car' in sms_service.test_get_outbox()[0]['body'])
+
+    def test_no_email_twice(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        server.models.OnboardingOwner.objects.create(
+            phone_number='1234567890',
+            name='Elmi bot'
+        )
+
+        owner_service.process_onboarding_reminder()
+        owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+
+    def test_no_email_to_converted_owner(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        exisiting_owner = server.factories.Owner.create()
+
+        server.models.OnboardingOwner.objects.create(
+            phone_number=exisiting_owner.auth_users.first().username,
+            name='Elmi bot'
+        )
+
+        owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 0)
+
+    def test_no_email_early(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-12 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+
+    def test_no_email_late(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2015-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 4)
+
+    def test_all_onboarding_emails(self):
+        from idlecars import sms_service
+        sms_service.test_reset()
+
+        with freeze_time("2014-10-10 9:55:00"):
+            server.models.OnboardingOwner.objects.create(
+                phone_number='1234567890',
+                name='Elmi bot'
+            )
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-17 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-24 10:00:00"):
+            owner_service.process_onboarding_reminder()
+        with freeze_time("2014-10-31 10:00:00"):
+            owner_service.process_onboarding_reminder()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 4)
+
+
 class TestOwnerPendingBookingNotifications(TestCase):
     @freeze_time("2014-10-10 9:55:00")
     def setUp(self):
@@ -371,3 +486,70 @@ class TestOwnerInsuranceNotifications(TestCase):
         '''
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 7)
+
+
+class TestOwnerPickupNotifications(TestCase):
+    @freeze_time("2014-10-10 9:55:00")
+    def setUp(self):
+        self.accepted_booking = server.factories.AcceptedBooking.create()
+
+    def test_only_accepted_bookings_has_reminder(self):
+        with freeze_time("2014-10-10 9:55:00"):
+            server.factories.Booking.create()
+            server.factories.ReservedBooking.create()
+            server.factories.RequestedBooking.create()
+            server.factories.BookedBooking.create()
+            server.factories.ReturnedBooking.create()
+            server.factories.RefundedBooking.create()
+            server.factories.IncompleteBooking.create()
+
+        with freeze_time("2014-10-10 11:00:00"):
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
+        )
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-10 11:00:00"):
+            owner_service.process_pickup_reminder()
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_after_pickup(self):
+        with freeze_time("2014-10-10 11:00:00"):
+            self.accepted_booking.pickup_time = timezone.now()
+            self.accepted_booking.save()
+            owner_service.process_pickup_reminder()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_second_reminder(self):
+        with freeze_time("2014-10-10 10:00:00"):
+            owner_service.process_pickup_reminder()
+        with freeze_time("2014-10-10 22:00:00"):
+            owner_service.process_pickup_reminder()
+
+        '''
+            - message to owner: first pickup reminder
+            - message to owner: second pickup reminder
+        '''
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+        self.assertEqual(
+            outbox[1].subject,
+            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
+        )
