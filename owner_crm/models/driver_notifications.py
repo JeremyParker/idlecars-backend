@@ -764,7 +764,7 @@ class BookingCanceled(notification.DriverNotification):
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': body.format(kwargs['car_name']),
+            'TEXT': body,
             'CTA_LABEL': 'Find another car',
             'CTA_URL': kwargs['car_listing_url'],
             'HEADLINE': 'Your rental has been canceled',
