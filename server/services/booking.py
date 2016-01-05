@@ -364,15 +364,14 @@ def _booking_updates():
         except ServiceError:
             pass  # TODO: ops will get an email about the payment failure, and
 
-    # TEMPORARILY REMOVING THIS FUNCTIONALITY. WE CAN SET OWNER TOO SLOW IN THE ADMIN NOW.
-    # expired_bookings = filter_requested(Booking.objects.all()).filter(
-    #     requested_time__lte=timezone.now() - datetime.timedelta(hours=60), # TODO: from config
-    # )
-    # for booking in expired_bookings:
-    #     try:
-    #         _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
-    #     except ServiceError:
-    #         pass  # ops will get an email about the payment failure, and
+    expired_bookings = filter_requested(Booking.objects.all()).filter(
+        requested_time__lte=timezone.now() - datetime.timedelta(hours=72), # TODO: from config
+    )
+    for booking in expired_bookings:
+        try:
+            _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
+        except ServiceError:
+            pass  # ops will get an email about the payment failure, and
 
 
 def cron_job():

@@ -388,7 +388,7 @@ class TestOwnerInsuranceNotifications(TestCase):
 
     def test_reminder_emails_morning_until_failure(self):
         tz = timezone.get_current_timezone()
-        self.booking = self._new_requested_booking("2014-10-10 18:00:00") # UTC
+        self.booking = self._new_requested_booking(timezone.datetime(2014, 10, 10, 18, tzinfo=tz)) # UTC
 
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
@@ -398,7 +398,7 @@ class TestOwnerInsuranceNotifications(TestCase):
                 'first_morning_insurance_reminder'
             )
 
-        with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 11, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
@@ -410,7 +410,7 @@ class TestOwnerInsuranceNotifications(TestCase):
                 'second_morning_insurance_reminder'
             )
 
-        with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 12, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
@@ -418,41 +418,44 @@ class TestOwnerInsuranceNotifications(TestCase):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
-        # the final cancelation of the booking happens through the Admin, which triggers this:
-        original_state = self.booking.get_state()
-        self.booking.incomplete_time = timezone.now()
-        self.booking.incomplete_reason = server.models.Booking.REASON_OWNER_TOO_SLOW
-        booking_service.on_incomplete(self.booking, original_state)
-        self.booking.save()
+        with freeze_time(timezone.datetime(2014, 10, 13, 13, tzinfo=tz)):
+            owner_service.process_insurance_reminder()
+            call_command('cron_job')
+
+        with freeze_time(timezone.datetime(2014, 10, 13, 18, tzinfo=tz)):
+            owner_service.process_insurance_reminder()
+            call_command('cron_job')
 
         '''
             - message to owner: first morning reminder
             - message to owner: first afternoon reminder
             - message to owner: second morning reminder
             - message to owner: second afternoon reminder
+            - message to owner: third morning reminder
+            - message to owner: third afternoon reminder
             - message to owner: insurance too slow reminder
             - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 6)
+        self.assertEqual(len(outbox), 8)
 
     def test_reminder_emails_afternoon_until_failure(self):
         tz = timezone.get_current_timezone()
-        self.booking = self._new_requested_booking(timezone.datetime(2014, 10, 10, 23, tzinfo=tz))
+        self.booking = self._new_requested_booking(timezone.datetime(2014, 10, 10, 0, tzinfo=tz))
 
-        with freeze_time(timezone.datetime(2014, 10, 11, 17, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 10, 13, tzinfo=tz)):
+
             owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
                 'first_afternoon_insurance_reminder'
             )
-
-        with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
-        with freeze_time(timezone.datetime(2014, 10, 12, 17, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 11, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
             test_message.verify_throttled_on_owner(
@@ -460,31 +463,29 @@ class TestOwnerInsuranceNotifications(TestCase):
                 'second_afternoon_insurance_reminder'
             )
 
-        with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
-        with freeze_time(timezone.datetime(2014, 10, 13, 17, tzinfo=tz)):
+        with freeze_time(timezone.datetime(2014, 10, 12, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
             call_command('cron_job')
 
-        # the final cancelation of the booking happens through the Admin, which triggers this:
-        original_state = self.booking.get_state()
-        self.booking.incomplete_time = timezone.now()
-        self.booking.incomplete_reason = server.models.Booking.REASON_OWNER_TOO_SLOW
-        booking_service.on_incomplete(self.booking, original_state)
-        self.booking.save()
+        with freeze_time(timezone.datetime(2014, 10, 13, 0, tzinfo=tz)):
+            owner_service.process_insurance_reminder()
+            call_command('cron_job')
 
         '''
-            - message to owner: first morning reminder
             - message to owner: first afternoon reminder
-            - message to owner: second morning reminder
+            - message to owner: first morning reminder
             - message to owner: second afternoon reminder
+            - message to owner: second morning reminder
+            - message to owner: third afternoon reminder
             - message to owner: insurance too slow reminder
             - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 6)
+        self.assertEqual(len(outbox), 7)
 
 
 class TestOwnerPickupNotifications(TestCase):

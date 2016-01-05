@@ -111,7 +111,7 @@ def process_pending_booking_reminder():
 def process_insurance_reminder():
     # TODO: hour, minute and delay_hours should be from settings
     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
-    afternoon_target = timezone.localtime(timezone.now()).replace(hour=17, minute=0)
+    afternoon_target = timezone.localtime(timezone.now()).replace(hour=13, minute=0)
     delay_hours = 12
 
     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
@@ -126,6 +126,11 @@ def process_insurance_reminder():
             reminder_name='SecondMorningInsuranceReminder',
             throttle_key='second_morning_insurance_reminder',
         )
+        _send_reminder_email(
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
+            reminder_name='ThirdMorningInsuranceReminder',
+            throttle_key='third_morning_insurance_reminder',
+        )
 
     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
         _send_reminder_email(
@@ -137,6 +142,11 @@ def process_insurance_reminder():
             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
             reminder_name='SecondAfternoonInsuranceReminder',
             throttle_key='second_afternoon_insurance_reminder',
+        )
+        _send_reminder_email(
+            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
+            reminder_name='ThirdAfternoonInsuranceReminder',
+            throttle_key='third_afternoon_insurance_reminder',
         )
 
 
