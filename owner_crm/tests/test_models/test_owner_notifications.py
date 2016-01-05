@@ -11,6 +11,7 @@ from owner_crm.services import notification
 from owner_crm.models import Campaign, owner_notifications
 from owner_crm import factories as crm_factories
 from server import factories as server_factories
+from server.models import OnboardingOwner
 from idlecars import factories as idlecars_factories
 from idlecars import sms_service, app_routes_owner
 
@@ -19,6 +20,10 @@ class OwnerNotificationTest(TestCase):
     def setUp(self):
         auth_user = idlecars_factories.AuthUser.create(first_name='Tom', last_name='Cat')
 
+        self.onboarding_owner = OnboardingOwner.objects.create(
+            phone_number='1234567890',
+            name='onboarding_owner',
+        )
         self.owner = server_factories.Owner.create()
         self.bank_account_owner = server_factories.BankAccountOwner.create()
 
@@ -41,6 +46,26 @@ class OwnerNotificationTest(TestCase):
         sms_service.test_reset()
 
         self.notification_spec = {
+            'OnboardingReminderBase': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'FirstOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'SecondOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'ThirdOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
+            'ForthOnboardingReminder': {
+                'argument': 'onboarding_owner',
+                'sms_result': 'Idle Cars',
+            },
             'RenewalEmail': {
                 'argument': 'car',
                 'sms_result': app_routes_owner.car_details_url(self.car),
