@@ -18,6 +18,5 @@ def run_backfill():
     backfill_bookings = booking_service.filter_accepted(Booking.objects.all()).filter(
         approval_time__lte=timezone.now() - datetime.timedelta(hours=1),
     )
-    for booking in backfill_bookings:
-        print '.'
+    print 'total backfill bookings: {}'.format(backfill_bookings.count())
     throttle_service.mark_sent(throttle_service.throttle(backfill_bookings, campaign), campaign)
