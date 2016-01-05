@@ -52,3 +52,5 @@ def faq():
 def owner_app_url():
     return 'https://goo.gl/NhIGM6'
 
+def base_letter_sample_url():
+    return 'https://s3.amazonaws.com/driverdocs.idlecars.com/Base+Letters/base_letter_fake.gif'

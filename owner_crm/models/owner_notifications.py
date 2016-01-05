@@ -159,7 +159,7 @@ class NewBookingEmail(notification.OwnerNotification):
             'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                 kwargs['address_proof_image']
             ),
-            'IMAGE_5_URL': kwargs['base_letter'],
+            'IMAGE_5_URL': kwargs['base_letter_sample_url'],
             'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
                 kwargs['base_letter']
             ),

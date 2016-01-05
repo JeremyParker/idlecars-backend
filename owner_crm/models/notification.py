@@ -163,6 +163,7 @@ def _get_urls_params(pseudo_argument):
         'faq_url': app_routes_driver.faq(),
         'owner_app_url': app_routes_owner.owner_app_url(),
         'owner_account_url': app_routes_owner.owner_account_url(),
+        'base_letter_sample_url': app_routes_driver.base_letter_sample_url(),
     }
 
 def _get_credit_params(credit_code):
