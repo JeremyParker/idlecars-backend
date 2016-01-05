@@ -63,7 +63,7 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'onboarding_owner',
                 'sms_result': 'Idle Cars',
             },
-            'ForthOnboardingReminder': {
+            'FourthOnboardingReminder': {
                 'argument': 'onboarding_owner',
                 'sms_result': 'Idle Cars',
             },

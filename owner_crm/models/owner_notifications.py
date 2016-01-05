@@ -38,7 +38,7 @@ class ThirdOnboardingReminder(OnboardingReminderBase):
     pass
 
 
-class ForthOnboardingReminder(OnboardingReminderBase):
+class FourthOnboardingReminder(OnboardingReminderBase):
     pass
 
 
