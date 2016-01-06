@@ -89,11 +89,13 @@ class CarAdmin(admin.ModelAdmin):
         'plate',
         'insurance',
         'shift',
+        'medallion',
     ]
     list_filter = [
         CarStaleListFilter,
         InsuranceFilter,
         'owner__rating',
+        'medallion',
         NoPlateFilter,
     ]
     search_fields = [
@@ -106,7 +108,7 @@ class CarAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('make_model', 'hybrid', 'year', 'plate',),
-                ('exterior_color', 'interior_color'),
+                ('medallion', 'exterior_color', 'interior_color'),
                 ('owner', 'owner_link', 'owner_rating'),
                 ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
