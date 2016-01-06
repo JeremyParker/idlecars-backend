@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from decimal import Decimal, ROUND_DOWN
+
 from django.utils import timezone
 
 from idlecars import model_helpers
@@ -69,34 +71,43 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
-def dictate_rent(car):
+def recommended_rent(car):
     match_cars = filter_catalog(car)
     convinced_price_cars = match_cars.filter(
         booking__checkout_time__isnull=False,
-    )
+    ).order_by('weekly_rent')
+    convinced_price_cars = convinced_price_cars[:convinced_price_cars.count() / 2]
+
     attractive_price_cars = match_cars.filter(
+        booking__isnull=False,
         booking__checkout_time__isnull=True,
         booking__incomplete_time__isnull=True,
-    )
+    ).order_by('weekly_rent')
+    attractive_price_cars = attractive_price_cars[:attractive_price_cars.count() / 2]
+
     listable_price_cars = match_cars.filter(
         booking__isnull=True,
-    )
+    ).order_by('weekly_rent')
+    listable_price_cars = listable_price_cars[:listable_price_cars.count() / 2]
 
     price = 0
     if convinced_price_cars:
         for car in convinced_price_cars:
             price += car.weekly_rent
-        return price / convinced_price_cars.count()
+        average_price = price / Decimal(convinced_price_cars.count())
+        return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
 
     elif attractive_price_cars:
         for car in attractive_price_cars:
             price += car.weekly_rent
-        return price / attractive_price_cars.count()
+        average_price = price / attractive_price_cars.count()
+        return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
 
-    elif listable_price_cars and listable_price_cars.count() > 1:
+    elif listable_price_cars:
         for car in listable_price_cars:
             price += car.weekly_rent
-        return price * 0.9 / listable_price_cars.count()
+        average_price = price * Decimal(0.9) / listable_price_cars.count()
+        return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
     else:
         return None
 
@@ -139,8 +150,8 @@ def pre_save(modified_car, orig):
     if orig.last_known_mileage != modified_car.last_known_mileage:
         modified_car.last_mileage_update = timezone.now()
 
-    if not orig.shift and modified_car.shift:
-        car.weekly_rent = dictate_rent(car)
+    if not orig.shift and modified_car.shift and not modified_car.weekly_rent:
+        modified_car.weekly_rent = recommended_rent(modified_car)
 
     # if we're setting the cost for the first time, set a default solo deposit
     if modified_car.weekly_rent and not orig.weekly_rent:
