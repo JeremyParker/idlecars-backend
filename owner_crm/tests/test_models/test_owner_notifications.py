@@ -122,12 +122,12 @@ class OwnerNotificationTest(TestCase):
                 'email_result': self.requested_booking.driver.full_name(),
                 'sms_result': self.requested_booking.car.display_name(),
             },
-            'FirstPickupReminder': {
+            'FirstOwnerPickupReminder': {
                 'argument': 'accepted_booking',
                 'email_result': 'pickup',
                 'sms_result': 'pickup',
             },
-            'SecondPickupReminder': {
+            'SecondOwnerPickupReminder': {
                 'argument': 'accepted_booking',
                 'email_result': 'pickup',
                 'sms_result': 'picks up',

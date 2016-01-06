@@ -161,8 +161,8 @@ def _pickup_reminder(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 def process_pickup_reminder():
-    _pickup_reminder(reminder_name='FirstPickupReminder', delay_hours=1)
-    _pickup_reminder(reminder_name='SecondPickupReminder', delay_hours=12)
+    _pickup_reminder(reminder_name='FirstOwnerPickupReminder', delay_hours=1)
+    _pickup_reminder(reminder_name='SecondOwnerPickupReminder', delay_hours=12)
 
 
 def _account_reminder(delay_hours, reminder_name):
