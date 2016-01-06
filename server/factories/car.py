@@ -29,7 +29,7 @@ class Car(Factory):
     ))
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
     base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
-
+    shift = models.Car.SHIFT_FULL_TIME
 
 class ClaimedCar(Car):
     ''' car that an owner has claimed and filled in details for '''

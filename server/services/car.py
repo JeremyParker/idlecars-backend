@@ -40,6 +40,15 @@ def filter_booking_in_progress(queryset):
     return queryset.filter(id__in=[b.car.id for b in in_progress_bookings])
 
 
+def filter_catalog(car):
+    return Car.objects.filter(
+        make_model=car.make_model,
+        year=car.year,
+        shift=car.shift,
+        medallion=car.medallion,
+    )
+
+
 def has_booking_in_progress(car):
     in_progress_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
     return car.id in [b.car.id for b in in_progress_bookings]
@@ -58,6 +67,38 @@ def get_stale_within(minutes_until_stale):
 
 def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
+
+
+def dictate_rent(car):
+    match_cars = filter_catalog(car)
+    convinced_price_cars = match_cars.filter(
+        booking__checkout_time__isnull=False,
+    )
+    attractive_price_cars = match_cars.filter(
+        booking__checkout_time__isnull=True,
+        booking__incomplete_time__isnull=True,
+    )
+    listable_price_cars = match_cars.filter(
+        booking__isnull=True,
+    )
+
+    price = 0
+    if convinced_price_cars:
+        for car in convinced_price_cars:
+            price += car.weekly_rent
+        return price / convinced_price_cars.count()
+
+    elif attractive_price_cars:
+        for car in attractive_price_cars:
+            price += car.weekly_rent
+        return price / attractive_price_cars.count()
+
+    elif listable_price_cars and listable_price_cars.count() > 1:
+        for car in listable_price_cars:
+            price += car.weekly_rent
+        return price * 0.9 / listable_price_cars.count()
+    else:
+        return None
 
 
 def create_car(owner, plate):
@@ -97,6 +138,9 @@ def pre_save(modified_car, orig):
 
     if orig.last_known_mileage != modified_car.last_known_mileage:
         modified_car.last_mileage_update = timezone.now()
+
+    if not orig.shift and modified_car.shift:
+        car.weekly_rent = dictate_rent(car)
 
     # if we're setting the cost for the first time, set a default solo deposit
     if modified_car.weekly_rent and not orig.weekly_rent:
