@@ -42,7 +42,7 @@ def filter_booking_in_progress(queryset):
     return queryset.filter(id__in=[b.car.id for b in in_progress_bookings])
 
 
-def filter_catalog(car):
+def similar_cars(car):
     return Car.objects.filter(
         make_model=car.make_model,
         year=car.year,
@@ -72,11 +72,18 @@ def get_image_url(car):
 
 
 def recommended_rent(car):
-    match_cars = filter_catalog(car)
+    price = 0
+    match_cars = similar_cars(car)
     convinced_price_cars = match_cars.filter(
         booking__checkout_time__isnull=False,
     ).order_by('weekly_rent')
     convinced_price_cars = convinced_price_cars[:convinced_price_cars.count() / 2]
+
+    if convinced_price_cars:
+        for car in convinced_price_cars:
+            price += car.weekly_rent
+        average_price = price / Decimal(convinced_price_cars.count())
+        return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
 
     attractive_price_cars = match_cars.filter(
         booking__isnull=False,
@@ -85,31 +92,24 @@ def recommended_rent(car):
     ).order_by('weekly_rent')
     attractive_price_cars = attractive_price_cars[:attractive_price_cars.count() / 2]
 
-    listable_price_cars = match_cars.filter(
-        booking__isnull=True,
-    ).order_by('weekly_rent')
-    listable_price_cars = listable_price_cars[:listable_price_cars.count() / 2]
-
-    price = 0
-    if convinced_price_cars:
-        for car in convinced_price_cars:
-            price += car.weekly_rent
-        average_price = price / Decimal(convinced_price_cars.count())
-        return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
-
-    elif attractive_price_cars:
+    if attractive_price_cars:
         for car in attractive_price_cars:
             price += car.weekly_rent
         average_price = price / attractive_price_cars.count()
         return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
 
-    elif listable_price_cars:
+    listable_price_cars = match_cars.filter(
+        booking__isnull=True,
+    ).order_by('weekly_rent')
+    listable_price_cars = listable_price_cars[:listable_price_cars.count() / 2]
+
+    if listable_price_cars:
         for car in listable_price_cars:
             price += car.weekly_rent
         average_price = price * Decimal(0.9) / listable_price_cars.count()
         return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
-    else:
-        return None
+
+    return None
 
 
 def create_car(owner, plate):
