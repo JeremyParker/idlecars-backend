@@ -221,6 +221,10 @@ class DriverNotificationTest(TestCase):
                 'argument': 'password_reset',
                 'email_result': 'password',
             },
+            'PaymentFailed': {
+                'argument': 'accepted_booking',
+                'sms_result': 'Received',
+            },
         }
 
     def test_driver_notifications(self):

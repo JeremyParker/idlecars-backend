@@ -739,22 +739,10 @@ class PaymentReceipt(notification.DriverNotification):
         }
 
 
-class FirstPaymentFailed(notification.DriverNotification):
+class PaymentFailed(notification.DriverNotification):
     def get_context(self, **kwargs):
         sms_body = 'Hi {}, your payment for the {} failed. We will try to charge your card again in \
 8 hours. Please make sure you have the funds available.'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-        )
-        return {
-            'sms_body': sms_body,
-        }
-
-
-class SecondPaymentFailed(notification.DriverNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Hi {}, your payment for the {} failed. We will try to charge your card again \
-in 8 hours. Please text us back to let us know what is going on.'.format(
             kwargs['driver_full_name'],
             kwargs['car_name'],
         )
