@@ -12,10 +12,13 @@ from django.core.management import call_command
 
 import credit.factories
 import server.factories
+from idlecars import sms_service
+
 from server.models import Booking
 from server.services import driver as driver_service
 from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
+from owner_crm import factories as owner_crm_factories
 
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
@@ -552,3 +555,82 @@ class TestDriverPickupNotifications(TestCase):
             'Your {} rental – how to pay and drive'.format(booking.car.display_name()),
         )
 
+
+class TestPaymentFailedNotifications(TestCase):
+    # @freeze_time("2014-10-10 10:00:00")
+    def setUp(self):
+        from owner_crm.models import Campaign
+        campaign = owner_crm_factories.Campaign.create(
+            name='driver_notifications.PaymentFailed',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+
+    def test_only_failed_payment_bookings_send_sms(self):
+        server.factories.BookedBooking.create()
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        # import pdb; pdb.set_trace()
+        driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        self.assertEqual(
+            sms_service.test_get_outbox()[0]['to'],
+            '+1{}'.format(failed_booking.driver.phone_number())
+        )
+        sms_service.test_reset()
+
+    def test_no_sms_twice_in_24_hours(self):
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        driver_service.process_payment_failure_notifications()
+        driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        sms_service.test_reset()
+
+    def test_every_24_hours(self):
+        with freeze_time("2014-10-10 9:00:00"):
+            failed_booking = server.factories.BookedBooking.create()
+            server.factories.FailedPayment.create(booking=failed_booking)
+
+        with freeze_time("2014-10-10 9:00:00"):
+            driver_service.process_payment_failure_notifications()
+        with freeze_time("2014-10-11 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 2)
+        sms_service.test_reset()
+
+    def test_no_sms_after_repay(self):
+        with freeze_time("2014-10-10 9:00:00"):
+            failed_booking = server.factories.BookedBooking.create()
+            server.factories.FailedPayment.create(booking=failed_booking)
+
+        with freeze_time("2014-10-10 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+        with freeze_time("2014-10-10 10:00:00"):
+            server.factories.SettledPayment.create(booking=failed_booking)
+        with freeze_time("2014-10-11 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        sms_service.test_reset()
+
+    def test_no_sms_but_email(self):
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        failed_booking.driver.sms_enabled = False
+        failed_booking.driver.save()
+
+        driver_service.process_payment_failure_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Your {} rental payment had failed.'.format(failed_booking.car.display_name()),
+        )

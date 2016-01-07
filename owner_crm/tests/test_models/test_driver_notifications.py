@@ -223,7 +223,7 @@ class DriverNotificationTest(TestCase):
             },
             'PaymentFailed': {
                 'argument': 'accepted_booking',
-                'sms_result': 'Received',
+                'sms_result': 'failed',
             },
         }
 

@@ -746,7 +746,15 @@ class PaymentFailed(notification.DriverNotification):
             kwargs['driver_full_name'],
             kwargs['car_name'],
         )
+        text = '''Your payment for the {} failed. We will try to charge your card again in 8 hours.
+        Please make sure you have the funds available.'''.format(kwargs['car_name'])
+
         return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
             'sms_body': sms_body,
         }
 

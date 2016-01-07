@@ -323,16 +323,17 @@ def process_pickup_notifications():
 
 
 def process_payment_failure_notifications():
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
     all_bookings = server.models.Booking.objects.all()
     remindable_bookings = server.services.booking.filter_active(all_bookings).filter(
-        payment__error_message__isnull=False,
+        payment__status=server.models.Payment.DECLINED,
     )
 
     skip_bookings = []
     throttled_bookings = throttle_service.throttle(remindable_bookings, 'PaymentFailed', 24)
-    for booking in throttled_bookings.select_related('payment')
+    for booking in throttled_bookings.prefetch_related('payment_set'):
         if not booking.payment_set.order_by('created_time').last().error_message:
             skip_bookings.append(booking.pk)
+            continue
+
         notification.send('driver_notifications.PaymentFailed', booking)
-    throttle_service.mark_sent(throttled_bookings.exclude(pk__in=skip_bookings, 'PaymentFailed')
+    throttle_service.mark_sent(throttled_bookings.exclude(pk__in=skip_bookings), 'PaymentFailed')
