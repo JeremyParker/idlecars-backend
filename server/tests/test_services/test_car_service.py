@@ -101,9 +101,8 @@ class CarRecommendedRentTest(TestCase):
         self.assertEqual(self.car.weekly_rent, Decimal(450))
 
     def test_no_similar_cars(self):
-        make_model = factories.MakeModel.create(make='Fake', model="Test")
         factories.BookableCar.create(
-            make_model=make_model,
+            make_model=factories.MakeModel.create(make='Fake', model="Test"),
             year=self.car.year,
         )
 
