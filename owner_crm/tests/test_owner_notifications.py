@@ -41,7 +41,7 @@ class TestOnboardingOwnerNotifications(TestCase):
             preferred_medium=Campaign.SMS_MEDIUM,
         )
         campaign = owner_crm.factories.Campaign.create(
-            name='owner_notifications.ForthOnboardingReminder',
+            name='owner_notifications.FourthOnboardingReminder',
             preferred_medium=Campaign.SMS_MEDIUM,
         )
 

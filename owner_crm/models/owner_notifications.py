@@ -38,7 +38,7 @@ class ThirdOnboardingReminder(OnboardingReminderBase):
     pass
 
 
-class ForthOnboardingReminder(OnboardingReminderBase):
+class FourthOnboardingReminder(OnboardingReminderBase):
     pass
 
 
@@ -395,7 +395,7 @@ us know where they are in the process: {}'.format(
         }
 
 
-class FirstPickupReminder(notification.OwnerNotification):
+class FirstOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
         sms_body = 'Thank you for adding {} on the insurance for your car {} {}. They will contact \
 you soon to arrange pickup. Before they start driving make sure they click the blue “Pay and Drive” \
@@ -432,7 +432,7 @@ button so you receive the first week’s payment.'.format(
         }
 
 
-class SecondPickupReminder(notification.OwnerNotification):
+class SecondOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
         sms_body = 'Remember, when {} picks up your car to remind them to click the blue “Pay and \
 Drive” button so and to provide them will the required documentation.'.format(

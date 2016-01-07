@@ -45,7 +45,7 @@ def process_onboarding_reminder():
     _onboarding_reminder(delay_days=0, reminder_name='FirstOnboardingReminder')
     _onboarding_reminder(delay_days=7, reminder_name='SecondOnboardingReminder')
     _onboarding_reminder(delay_days=14, reminder_name='ThirdOnboardingReminder')
-    _onboarding_reminder(delay_days=21, reminder_name='ForthOnboardingReminder')
+    _onboarding_reminder(delay_days=21, reminder_name='FourthOnboardingReminder')
 
 
 def _renewable_cars():
@@ -161,8 +161,8 @@ def _pickup_reminder(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 def process_pickup_reminder():
-    _pickup_reminder(reminder_name='FirstPickupReminder', delay_hours=1)
-    _pickup_reminder(reminder_name='SecondPickupReminder', delay_hours=12)
+    _pickup_reminder(reminder_name='FirstOwnerPickupReminder', delay_hours=1)
+    _pickup_reminder(reminder_name='SecondOwnerPickupReminder', delay_hours=12)
 
 
 def _account_reminder(delay_hours, reminder_name):
