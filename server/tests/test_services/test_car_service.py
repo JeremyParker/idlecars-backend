@@ -71,12 +71,12 @@ class CarRecommendedRentTest(TestCase):
         return getattr(factories, booking_type).create(car=self._create_car(rent))
 
     def test_convicted_price_cars(self):
-        booking_1 = self._create_booking('ReservedBooking', 500)
-        booking_2 = self._create_booking('RequestedBooking', 600)
-        booking_3 = self._create_booking('AcceptedBooking', 700)
-        booking_4 = self._create_booking('BookedBooking', 900)
-        booking_5 = self._create_booking('ReturnedBooking', 300)
-        booking_6 = self._create_booking('RefundedBooking', 400)
+        self._create_booking('ReservedBooking', 500)
+        self._create_booking('RequestedBooking', 600)
+        self._create_booking('AcceptedBooking', 700)
+        self._create_booking('BookedBooking', 900)
+        self._create_booking('ReturnedBooking', 300)
+        self._create_booking('RefundedBooking', 400)
 
         self.assertEqual(self.car.shift, models.Car.SHIFT_UNKNOWN)
         self.assertEqual(self.car.weekly_rent, None)
@@ -85,22 +85,28 @@ class CarRecommendedRentTest(TestCase):
         self.assertEqual(self.car.weekly_rent, Decimal(400))
 
     def test_attractive_price_cars(self):
-        booking_1 = self._create_booking('Booking', 450)
-        booking_2 = self._create_booking('Booking', 550)
+        self._create_booking('Booking', 450)
+        self._create_booking('Booking', 550)
 
         self.car.shift = models.Car.SHIFT_FULL_TIME
         self.car.save()
         self.assertEqual(self.car.weekly_rent, Decimal(450))
 
     def test_listable_price_cars(self):
-        car_1 = self._create_car(500)
-        car_2 = self._create_car(600)
+        self._create_car(500)
+        self._create_car(600)
 
         self.car.shift = models.Car.SHIFT_FULL_TIME
         self.car.save()
         self.assertEqual(self.car.weekly_rent, Decimal(450))
 
     def test_no_similar_cars(self):
+        make_model = factories.MakeModel.create(make='Fake', model="Test")
+        factories.BookableCar.create(
+            make_model=make_model,
+            year=self.car.year,
+        )
+
         self.car.shift = models.Car.SHIFT_FULL_TIME
         self.car.save()
         self.assertEqual(self.car.weekly_rent, None)
