@@ -44,13 +44,6 @@ def find_deposit_payment(booking):
     return deposit_payment
 
 
-def failure_count(booking):
-    return booking.payment_set.exclude(
-        status=Payment.SETTLED,
-    ).exclude(
-        status=Payment.HELD_IN_ESCROW,
-    ).count()
-
 def calculate_next_rent_payment(booking, booking_pickup_time=None, booking_end_time=None):
     '''
     Returns a tuple of (service_fee, rent_amount, start_time, end_time).
@@ -140,11 +133,6 @@ def cron_payments(active_bookings_qs):
             payment = create_next_rent_payment(booking)
             payment = payment_service.settle(payment)
             if payment.error_message:
-                if failure_count(booking) == 1:
-                    notification.send('driver_notifications.FirstPaymentFailed', payment)
-                else:
-                    notification.send('driver_notifications.SecondPaymentFailed', payment)
-
                 print payment.error_message
                 print payment.notes
                 continue
