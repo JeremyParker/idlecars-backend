@@ -379,6 +379,17 @@ def cron_job():
     invoice_service.cron_payments(filter_active(Booking.objects.all()))
 
 
+def is_active_booking(booking):
+    return booking.incomplete_time == None and booking.refund_time == None and \
+        booking.return_time == None and booking.pickup_time != None
+
+def pre_save(modified_booking, orig):
+    if is_active_booking(modified_booking) and is_active_booking(orig) and orig.end_time \
+        and modified_booking.end_time and modified_booking.end_time != orig.end_time:
+
+        notification.send('owner_notifications.ExtendedRental', modified_booking)
+
+
 def start_time_display(booking):
     def _format_date(date):
         return date.strftime('%b %d')

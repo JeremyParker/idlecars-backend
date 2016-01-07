@@ -155,6 +155,11 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
+            'ExtendedRental': {
+                'argument': 'booked_booking',
+                'email_result': 'extended',
+                'sms_body': 'extended',
+            },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',

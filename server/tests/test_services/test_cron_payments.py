@@ -147,6 +147,10 @@ class TestCronPayments(TestCase):
         self.assertEqual(self.booking.payment_set.count(), 2)  # no new payments
 
     def test_final_payment_is_partial_week(self):
+        # This is a hack not to call owner extend rental
+        self.booking.end_time = None
+        self.booking.save()
+
         self.booking.end_time = self.first_rent_payment.invoice_end_time + datetime.timedelta(days=2)
         self.booking.save()
         call_command('cron_job')
@@ -222,6 +226,10 @@ class TestCronPayments(TestCase):
 
     def test_multiple_cron_payment_email(self):
         with freeze_time("2014-10-20 9:55:00"):
+            # This is a hack not to call owner extend rental
+            self.booking.end_time = None
+            self.booking.save()
+
             self.booking.end_time = timezone.now()
             self.booking.save()
 

@@ -149,6 +149,12 @@ class Booking(models.Model):
             if earlier > later:
                 raise ValidationError('The event times aren\'t in order')
 
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            from server.services import booking as booking_service
+            orig = Booking.objects.get(pk=self.pk)
+            booking_service.pre_save(self, orig)
+        super(Booking, self).save(*args, **kwargs)
 
     OLD_STATES = (
         (0, 'State comes from event times, not from this field.'),

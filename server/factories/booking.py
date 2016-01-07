@@ -52,7 +52,12 @@ class AcceptedBooking(RequestedBooking):
 
 
 class BookedBooking(AcceptedBooking):
-    pickup_time = LazyAttribute(lambda o: timezone.now())
+    pickup_time = LazyAttribute(lambda o: timezone.now().replace(
+        hour = 0,
+        minute = 0,
+        second = 0,
+        microsecond = 0,
+    ))
 
     @post_generation
     def payment(self, create, count, **kwargs):
@@ -63,14 +68,6 @@ class BookedBooking(AcceptedBooking):
             amount=self.car.deposit,
             invoice_start_time=LazyAttribute(lambda o: timezone.now()),
             invoice_end_time=LazyAttribute(lambda o: (timezone.now()+ datetime.timedelta(days=7)))
-        )
-
-    @post_generation
-    def update_end_time(self, create, count, **kwargs):
-        self.end_time = self.end_time.replace(
-            hour=self.pickup_time.hour,
-            minute=self.pickup_time.minute,
-            second=self.pickup_time.second,
         )
 
 
