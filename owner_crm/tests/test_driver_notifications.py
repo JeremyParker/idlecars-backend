@@ -557,7 +557,6 @@ class TestDriverPickupNotifications(TestCase):
 
 
 class TestPaymentFailedNotifications(TestCase):
-    # @freeze_time("2014-10-10 10:00:00")
     def setUp(self):
         from owner_crm.models import Campaign
         campaign = owner_crm_factories.Campaign.create(
@@ -570,7 +569,6 @@ class TestPaymentFailedNotifications(TestCase):
         failed_booking = server.factories.BookedBooking.create()
         server.factories.FailedPayment.create(booking=failed_booking)
 
-        # import pdb; pdb.set_trace()
         driver_service.process_payment_failure_notifications()
 
         self.assertEqual(len(sms_service.test_get_outbox()), 1)
