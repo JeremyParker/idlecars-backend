@@ -775,6 +775,37 @@ class BookingCanceled(notification.DriverNotification):
         }
 
 
+class ExtendReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental is due back in 48 hours. Either notify the owner that you \
+will return it, or go to your booking page and click “Change End Date” to extend your rental.'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ends in 48 hours, so you either have to schedule a drop-off or extend
+        the duration of your rental. <br /><br />
+
+        How to extend your rental:
+        <ul><li> Go to your booking page </li>
+        <li> Click “Change End Date” </li>
+        <li> Choose a new end date for your rental </li></ul>
+        <br />
+        How to drop off your car:
+        <ul><li>  Call the owner to schedule the drop-off </li>
+        <li> Drop off the car on that specific time and date </li></ul>'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ends in 48 hours',
+            'TEXT': text,
+            'CTA_LABEL': 'My rental',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your rental ends in 48 hours',
+            'sms_body': sms_body,
+        }
+
+
 class PasswordReset(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \

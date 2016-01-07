@@ -320,3 +320,16 @@ def process_insurance_notifications():
 def process_pickup_notifications():
     _send_pickup_reminder(delay_hours=1, reminder_name='FirstPickupReminder')
     _send_pickup_reminder(delay_hours=6, reminder_name='SecondPickupReminder')
+
+
+def process_extend_notifications():
+    reminder_threshold = timezone.now() + datetime.timedelta(hours=24)
+    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
+    remindable_bookings = active_bookings.filter(
+        end_time__lte=reminder_threshold,
+        end_time__gt=timezone.now(),
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 24)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.ExtendReminder', booking)
+    throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')
