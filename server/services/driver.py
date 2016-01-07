@@ -323,10 +323,9 @@ def process_pickup_notifications():
 
 
 def process_extend_notifications():
-    reminder_threshold = timezone.now() + datetime.timedelta(hours=24)
     active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
     remindable_bookings = active_bookings.filter(
-        end_time__lte=reminder_threshold,
+        end_time__lte=timezone.now() + datetime.timedelta(hours=24),
         end_time__gt=timezone.now(),
     )
     throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 24)
