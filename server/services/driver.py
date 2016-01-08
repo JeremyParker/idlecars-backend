@@ -328,7 +328,7 @@ def process_extend_notifications():
         end_time__lte=timezone.now() + datetime.timedelta(hours=24),
         end_time__gt=timezone.now(),
     )
-    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 24)
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 25)
     for booking in throttled_bookings:
         notification.send('driver_notifications.ExtendReminder', booking)
     throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')
