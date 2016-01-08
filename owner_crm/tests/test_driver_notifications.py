@@ -565,6 +565,7 @@ class TestPaymentFailedNotifications(TestCase):
         )
 
     def test_only_failed_payment_bookings_send_sms(self):
+        sms_service.test_reset()
         server.factories.BookedBooking.create()
         failed_booking = server.factories.BookedBooking.create()
         server.factories.FailedPayment.create(booking=failed_booking)
@@ -579,6 +580,7 @@ class TestPaymentFailedNotifications(TestCase):
         sms_service.test_reset()
 
     def test_no_sms_twice_in_24_hours(self):
+        sms_service.test_reset()
         failed_booking = server.factories.BookedBooking.create()
         server.factories.FailedPayment.create(booking=failed_booking)
 
@@ -589,6 +591,7 @@ class TestPaymentFailedNotifications(TestCase):
         sms_service.test_reset()
 
     def test_every_24_hours(self):
+        sms_service.test_reset()
         with freeze_time("2014-10-10 9:00:00"):
             failed_booking = server.factories.BookedBooking.create()
             server.factories.FailedPayment.create(booking=failed_booking)
@@ -602,6 +605,7 @@ class TestPaymentFailedNotifications(TestCase):
         sms_service.test_reset()
 
     def test_no_sms_after_repay(self):
+        sms_service.test_reset()
         with freeze_time("2014-10-10 9:00:00"):
             failed_booking = server.factories.BookedBooking.create()
             server.factories.FailedPayment.create(booking=failed_booking)
