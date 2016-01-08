@@ -411,7 +411,7 @@ was received.'.format(
         When they pick up the car, make sure you receive a text message or email indicating that
         the driver has paid for the rental.
         <br /><br />
-        To do this, the driver will click the blue “Pay and Drive” button to make sure your receive
+        To do this, the driver will click the blue “Pay and Drive” button to make sure you receive
         their first week’s payment – THEY WILL NOT PAY IN CASH!
         <br /><br />
         When they click “Pay and Drive”, you will be paid the first week’s rent and we will put the
