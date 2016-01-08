@@ -397,18 +397,22 @@ us know where they are in the process: {}'.format(
 
 class FirstOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Thank you for adding {} on the insurance for your car {} {}. They will contact \
-you soon to arrange pickup. Before they start driving make sure they click the blue “Pay and Drive” \
-button so you receive the first week’s payment.'.format(
+        sms_body = 'Hi {}, it’s Idle Cars. {} will contact you soon to arrange the pickup of your \
+{} ({}). Before they drive off with the car, make sure you receive a text message that their payment \
+was received.'.format(
+            kwargs['user_first_name'],
             kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_plate'],
         )
-        text = '''Thank you for adding {} to the {} {}’s insurance policy. They will call you soon to
+        text = '''Thank you for adding {} to the {} ({})’s insurance policy. They will call you soon to
         schedule a time to pick up the car.
         <br /><br />
-        Upon pick up, make sure the driver goes into their booking page to click the blue “Pay and
-        Drive” button to make sure your receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        When they pick up the car, make sure you receive a text message or email indicating that
+        the driver has paid for the rental.
+        <br /><br />
+        To do this, the driver will click the blue “Pay and Drive” button to make sure your receive
+        their first week’s payment – THEY WILL NOT PAY IN CASH!
         <br /><br />
         When they click “Pay and Drive”, you will be paid the first week’s rent and we will put the
         deposit in an escrow account to be used for any damages to the car.
@@ -434,12 +438,13 @@ button so you receive the first week’s payment.'.format(
 
 class SecondOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Remember, when {} picks up your car to remind them to click the blue “Pay and \
-Drive” button so and to provide them will the required documentation.'.format(
+        sms_body = 'Hi {}. when {} picks up your car, make sure you receive a text/email that the \
+payment was processed to make sure you receive your rental payment.'.format(
+            kwargs['user_first_name'],
             kwargs['driver_full_name'],
         )
-        text = '''Just a reminder - when {} picks up the {} {} that they click the blue “Pay and Drive”
-        you receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        text = '''Just a reminder - when {} picks up the {} ({}) make sure you receive a text message
+        or email indicating that the driver has paid for the rental before letting them drive.
         <br /><br />
         Also, make sure you provide the driver with these documents so they can register for a
         rideshare service:
