@@ -72,8 +72,10 @@ def get_image_url(car):
 
 
 def get_average_price(cars, discount_factor=1):
-    recommendable_cars = cars.order_by('weekly_rent')[:cars.count() / 2]
+    if cars.count() <= 1:
+        return None
 
+    recommendable_cars = cars.order_by('weekly_rent')[:cars.count() / 2]
     price = 0
     for car in recommendable_cars:
         price += car.weekly_rent
