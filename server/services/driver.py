@@ -337,3 +337,15 @@ def process_payment_failure_notifications():
 
         notification.send('driver_notifications.PaymentFailed', booking)
     throttle_service.mark_sent(throttled_bookings.exclude(pk__in=skip_bookings), 'PaymentFailed')
+
+
+def process_extend_notifications():
+    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
+    remindable_bookings = active_bookings.filter(
+        end_time__lte=timezone.now() + datetime.timedelta(hours=24),
+        end_time__gt=timezone.now(),
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 25)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.ExtendReminder', booking)
+    throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')

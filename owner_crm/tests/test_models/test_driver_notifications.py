@@ -161,6 +161,11 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'canceled',
                 'email_result': 'canceled',
             },
+            'ExtendReminder': {
+                'argument': 'booked_booking',
+                'sms_result': 'extend',
+                'email_result': 'ends',
+            },
             'PasswordReset': {
                 'argument': 'password_reset',
                 'sms_result': 'password',

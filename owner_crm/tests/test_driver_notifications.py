@@ -632,3 +632,83 @@ class TestPaymentFailedNotifications(TestCase):
             outbox[0].subject,
             'Your {} rental payment had failed.'.format(failed_booking.car.display_name()),
         )
+
+
+class TestExtendBookingNotifications(TestCase):
+    def setUp(self):
+        self._create_booking('BookedBooking')
+
+    @freeze_time("2014-10-10 9:00:00")
+    def _create_booking(self, booking_type):
+        self.booking = getattr(server.factories, booking_type).create(
+            end_time=timezone.now() + datetime.timedelta(days=10)
+        )
+    def test_expiring_booking(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Your rental ends in 24 hours',
+        )
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_after_end_time(self):
+        with freeze_time("2014-10-20 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-18 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_for_non_active_bookings(self):
+        self._create_booking('Booking')
+        self._create_booking('ReservedBooking')
+        self._create_booking('RequestedBooking')
+        self._create_booking('AcceptedBooking')
+        self._create_booking('ReturnedBooking')
+        self._create_booking('RefundedBooking')
+        self._create_booking('IncompleteBooking')
+
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_end_time_extended(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        with freeze_time("2014-10-25 9:00:00"):
+            self.booking.end_time = timezone.now()
+            self.booking.save()
+
+        with freeze_time("2014-10-20 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        self.assertEqual(len(outbox), 1)
+
+        with freeze_time("2014-10-24 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        self.assertEqual(len(outbox), 2)
