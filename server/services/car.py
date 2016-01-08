@@ -71,16 +71,16 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
-def get_average_price(cars, discount_factor=1):
-    if cars.count() <= 1:
+def get_average_price(cars):
+    if not cars.count():
         return None
 
-    recommendable_cars = cars.order_by('weekly_rent')[:cars.count() / 2]
+    recommendable_cars = cars.order_by('weekly_rent')[:(cars.count() + 1) / 2]
     price = 0
     for car in recommendable_cars:
         price += car.weekly_rent
-    average_price = price * Decimal(discount_factor) / Decimal(recommendable_cars.count())
-    return average_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
+    average_price = price / Decimal(recommendable_cars.count())
+    return average_price
 
 
 def recommended_rent(car):
@@ -88,22 +88,24 @@ def recommended_rent(car):
     convinced_price_cars = match_cars.filter(
         booking__checkout_time__isnull=False,
     )
-    if convinced_price_cars.count() > 1:
-       return get_average_price(convinced_price_cars)
+    if convinced_price_cars.count():
+        return get_average_price(convinced_price_cars)
 
     attractive_price_cars = match_cars.filter(
         booking__isnull=False,
         booking__checkout_time__isnull=True,
         booking__incomplete_time__isnull=True,
     )
-    if attractive_price_cars.count() > 1:
-       return get_average_price(attractive_price_cars)
+    if attractive_price_cars.count():
+        return get_average_price(attractive_price_cars)
 
     listable_price_cars = match_cars.filter(
         booking__isnull=True,
     )
+    # only one listable price is not convicing, we would like to have at least 2 prices
     if listable_price_cars.count() > 1:
-       return get_average_price(listable_price_cars, 0.9)
+        discount_price = get_average_price(listable_price_cars) * Decimal(0.9)
+        return discount_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
 
     return None
 

@@ -70,7 +70,7 @@ class CarRecommendedRentTest(TestCase):
     def _create_booking(self, booking_type, rent):
         return getattr(factories, booking_type).create(car=self._create_car(rent))
 
-    def test_convicted_price_cars(self):
+    def test_convinced_price_cars(self):
         self._create_booking('ReservedBooking', 500)
         self._create_booking('RequestedBooking', 600)
         self._create_booking('AcceptedBooking', 700)
@@ -84,7 +84,7 @@ class CarRecommendedRentTest(TestCase):
         self.car.save()
         self.assertEqual(self.car.weekly_rent, Decimal(400))
 
-    def test_attractive_price_cars(self):
+    def test_two_attractive_price_cars(self):
         self._create_booking('Booking', 450)
         self._create_booking('Booking', 550)
 
@@ -92,7 +92,14 @@ class CarRecommendedRentTest(TestCase):
         self.car.save()
         self.assertEqual(self.car.weekly_rent, Decimal(450))
 
-    def test_listable_price_cars(self):
+    def test_one_attractive_price_car(self):
+        self._create_booking('Booking', 450)
+
+        self.car.shift = models.Car.SHIFT_FULL_TIME
+        self.car.save()
+        self.assertEqual(self.car.weekly_rent, Decimal(450))
+
+    def test_two_listable_price_cars(self):
         self._create_car(500)
         self._create_car(600)
 
@@ -100,10 +107,18 @@ class CarRecommendedRentTest(TestCase):
         self.car.save()
         self.assertEqual(self.car.weekly_rent, Decimal(450))
 
+    def test_one_listable_price_cars(self):
+        self._create_car(500)
+
+        self.car.shift = models.Car.SHIFT_FULL_TIME
+        self.car.save()
+        self.assertEqual(self.car.weekly_rent, None)
+
     def test_no_similar_cars(self):
         factories.BookableCar.create(
             make_model=factories.MakeModel.create(make='Fake', model="Test"),
             year=self.car.year,
+            weekly_rent=Decimal(500),
         )
 
         self.car.shift = models.Car.SHIFT_FULL_TIME
