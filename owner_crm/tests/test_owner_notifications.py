@@ -559,8 +559,7 @@ class TestOwnerExtendRentalNotifications(TestCase):
     def _create_booking_and_change_end_time(self, booking_type):
         with freeze_time("2014-10-10 9:00:00"):
             booking = getattr(server.factories, booking_type).create()
-        booking.end_time = timezone.now()
-        booking.save()
+        booking_service.set_end_time(booking, timezone.now())
         return booking
 
     def test_end_time_changed(self):
@@ -596,8 +595,7 @@ class TestOwnerExtendRentalNotifications(TestCase):
 
     def test_more_than_one_email(self):
         booking = self._create_booking_and_change_end_time('BookedBooking')
-        booking.end_time = timezone.now()
-        booking.save()
+        booking_service.set_end_time(booking, timezone.now())
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)

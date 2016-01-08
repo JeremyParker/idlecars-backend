@@ -96,6 +96,9 @@ def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
 
+def is_active(booking):
+    return booking.incomplete_time == None and booking.refund_time == None and \
+        booking.return_time == None and booking.pickup_time != None
 
 def filter_visible(booking_queryset):
     ''' Can this booking be seen in the Driver app '''
@@ -379,18 +382,6 @@ def cron_job():
     invoice_service.cron_payments(filter_active(Booking.objects.all()))
 
 
-def is_active_booking(booking):
-    return booking.incomplete_time == None and booking.refund_time == None and \
-        booking.return_time == None and booking.pickup_time != None
-
-
-def pre_save(modified_booking, orig):
-    if is_active_booking(modified_booking) and is_active_booking(orig) and orig.end_time \
-        and modified_booking.end_time and modified_booking.end_time != orig.end_time:
-
-        notification.send('owner_notifications.ExtendedRental', modified_booking)
-
-
 def start_time_display(booking):
     def _format_date(date):
         return date.strftime('%b %d')
@@ -454,6 +445,8 @@ def set_end_time(booking, end_time):
             month=end_time.month,
             day=end_time.day,
         )
+        if is_active(booking):
+            notification.send('owner_notifications.ExtendedRental', booking)
     else:
         booking.end_time = end_time
 
