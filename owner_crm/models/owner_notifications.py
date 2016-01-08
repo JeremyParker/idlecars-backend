@@ -662,6 +662,7 @@ receive payments until that date'.format(
             'TEXT': text,
             'template_name': 'no_button_no_image',
             'subject': 'The {} rental was extended'.format(kwargs['car_plate']),
+            'sms_body': sms_body,
         }
 
 
