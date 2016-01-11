@@ -155,6 +155,21 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
+            'FirstReturnReminder': {
+                'argument': 'booked_booking',
+                'email_result': 'returned',
+                'sms_body': 'overdue',
+            },
+            'SecondReturnReminder': {
+                'argument': 'booked_booking',
+                'email_result': 'returned',
+                'sms_body': 'overdue',
+            },
+            'ThirdReturnReminder': {
+                'argument': 'booked_booking',
+                'email_result': 'returned',
+                'sms_body': 'recover',
+            },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',

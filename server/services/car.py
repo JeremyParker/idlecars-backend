@@ -42,15 +42,6 @@ def filter_booking_in_progress(queryset):
     return queryset.filter(id__in=[b.car.id for b in in_progress_bookings])
 
 
-def similar_cars(car):
-    return Car.objects.filter(
-        make_model=car.make_model,
-        year=car.year,
-        shift=car.shift,
-        medallion=car.medallion,
-    )
-
-
 def has_booking_in_progress(car):
     in_progress_bookings = car_helpers._filter_booking_in_progress(Booking.objects.all())
     return car.id in [b.car.id for b in in_progress_bookings]
@@ -84,14 +75,20 @@ def get_average_price(cars):
 
 
 def recommended_rent(car):
-    match_cars = similar_cars(car)
-    convinced_price_cars = match_cars.filter(
+    similar_cars = Car.objects.filter(
+        make_model=car.make_model,
+        year=car.year,
+        shift=car.shift,
+        medallion=car.medallion,
+        weekly_rent__isnull=False,
+    )
+    convinced_price_cars = similar_cars.filter(
         booking__checkout_time__isnull=False,
     )
     if convinced_price_cars.count():
         return get_average_price(convinced_price_cars)
 
-    attractive_price_cars = match_cars.filter(
+    attractive_price_cars = similar_cars.filter(
         booking__isnull=False,
         booking__checkout_time__isnull=True,
         booking__incomplete_time__isnull=True,
@@ -99,7 +96,7 @@ def recommended_rent(car):
     if attractive_price_cars.count():
         return get_average_price(attractive_price_cars)
 
-    listable_price_cars = match_cars.filter(
+    listable_price_cars = similar_cars.filter(
         booking__isnull=True,
     )
     # only one listable price is not convicing, we would like to have at least 2 prices
