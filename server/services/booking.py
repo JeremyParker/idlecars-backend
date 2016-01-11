@@ -18,6 +18,7 @@ CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call 
 INSURANCE_APPROVAL_ERROR = 'Sorry, your rental can\'t be approved at this time.'
 INSURANCE_REJECT_ERROR = 'Sorry, your rental can\'t be rejected at this time.'
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
+RETURN_ERROR = 'Sorry, your rental can\'t be returned at the time.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are other cars you can rent.'
 
@@ -344,6 +345,17 @@ def pickup(booking):
     notification.send('owner_notifications.PickupConfirmation', rent_payment)
 
     return booking
+
+
+def can_return(booking):
+    return booking.get_state() == Booking.ACTIVE
+
+
+def booking_return(booking):
+    if not can_return(booking):
+        raise ServiceError(RETURN_ERROR)
+    booking.return_time = timezone.now()
+    booking.save()
 
 
 def _booking_updates():

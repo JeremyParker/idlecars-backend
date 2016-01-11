@@ -126,7 +126,7 @@ class TextCarState(TestCase):
         booking = factories.BookedBooking.create(car=car, end_time=end_time)
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Rented until {}'.format(end_time.strftime('%b %d')))
-        self.assertEqual(0, len(serializer_data['state_buttons']))
+        self.assertEqual(1, len(serializer_data['state_buttons']))
 
     def test_busy(self):
         car = factories.BookableCar.create(next_available_date=None)

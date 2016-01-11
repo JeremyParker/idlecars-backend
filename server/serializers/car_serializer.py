@@ -188,7 +188,11 @@ class CarCreateSerializer(ModelSerializer):
                     # TODO
                     # 'label': 'Contact the driver',
                     # 'function_key': 'ContactDriver',
-                # }
+                # },
+                    {
+                        'label': 'Car has been returned',
+                        'function_key': 'CarReturned',
+                    }
                 ]
             }
         elif not car.next_available_date:

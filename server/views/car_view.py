@@ -69,6 +69,8 @@ class CarViewSet(
                 car_service.insurance(car=self.get_object(), approved=True)
             elif request.data['insurance'] == 'rejected':
                 car_service.insurance(car=self.get_object(), approved=False)
+        if 'return' in request.data:
+            car_service.car_return(car=self.get_object())
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
