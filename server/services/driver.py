@@ -269,6 +269,17 @@ def _send_pickup_reminder(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
+def _late_notice(delay_hours, reminder_name):
+    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
+    remindable_bookings = active_bookings.filter(
+        end_time__lte=timezone.now() - datetime.timedelta(hours=delay_hours),
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(throttled_bookings, reminder_name)
+
+
 def process_signup_notifications():
     _signup_reminder(
         delay_days=7,
@@ -349,3 +360,7 @@ def process_extend_notifications():
     for booking in throttled_bookings:
         notification.send('driver_notifications.ExtendReminder', booking)
     throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')
+
+def process_late_notice():
+    _late_notice(delay_hours=12, reminder_name='FirstLateNotice')
+    _late_notice(delay_hours=24, reminder_name='SecondLateNotice')

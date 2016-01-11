@@ -166,6 +166,16 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'extend',
                 'email_result': 'ends',
             },
+            'FirstLateNotice': {
+                'argument': 'booked_booking',
+                'sms_result': '12 hours ago',
+                'email_result': 'ended',
+            },
+            'SecondLateNotice': {
+                'argument': 'booked_booking',
+                'sms_result': '24 hours ago',
+                'email_result': 'return',
+            },
             'PasswordReset': {
                 'argument': 'password_reset',
                 'sms_result': 'password',

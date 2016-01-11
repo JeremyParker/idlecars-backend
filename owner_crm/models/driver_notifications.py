@@ -826,6 +826,49 @@ will return it, or go to your booking page and click “Change End Date” to ex
         }
 
 
+class FirstLateNotice(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental was due back 12 hours ago. Please contact the owner and \
+let them know when you will return the car or we will have to report the car stolen to the local \
+authorities'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ended 12 hours ago hours ago. Please contact the owner and let them
+        know when you will return the car or we will have to report the car stolen to the local
+        authorities.'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ended 12 hours ago',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your rental ended 12 hours ago',
+            'sms_body': sms_body,
+        }
+
+
+class SecondLateNotice(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental was due back 24 hours ago. If you do not return the car \
+soon we will have to report the car stolen to the local authorities.'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ended 12 hours ago hours ago. Please contact the owner and let them
+        know when you will return the car or we will have to report the car stolen to the local
+        authorities.'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ended 24 hours ago',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Please return your {}'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
 class PasswordReset(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \
