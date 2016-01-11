@@ -643,6 +643,82 @@ class InsuranceTooSlow(notification.OwnerNotification):
         }
 
 
+class FirstReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? Their rental is 6 hours overdue.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 6 hours ago hours ago. We are attempting to
+        contact the driver, but have provided their phone number so you can contact them as
+        well.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
+        }
+
+
+class SecondReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? Their rental is 12 hours overdue.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 12 hours ago hours ago. We are attempting to
+        contact the driver, but have provided their phone number so you can contact them as well. We
+        let them know that we will contact the authorities if they do not return the car.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
+        }
+
+
+class ThirdReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? If not we will help you recover \
+the car.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 48 hours ago hours ago. Please let us know if
+        the driver returned the car, or we will contact the local authorities and report it
+        stolen.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
+        }
+
+
 class AccountCreated(notification.OwnerNotification):
     def get_context(self, **kwargs):
         return {
