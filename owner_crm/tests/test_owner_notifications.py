@@ -553,3 +553,67 @@ class TestOwnerPickupNotifications(TestCase):
             outbox[1].subject,
             '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
         )
+
+
+class TestLateBookingNotifications(TestCase):
+    @freeze_time("2014-10-10 9:00:00")
+    def setUp(self):
+        self.booking = server.factories.BookedBooking.create(
+            end_time=timezone.now() + timedelta(days=10)
+        )
+
+    def test_late_notice(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            owner_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Has {} returned their car?'.format(self.booking.driver.full_name()),
+        )
+
+        with freeze_time("2014-10-21 9:01:00"):
+            owner_service.process_late_notice()
+
+        self.assertEqual(len(outbox), 2)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Has {} returned their car?'.format(self.booking.driver.full_name()),
+        )
+
+        with freeze_time("2014-10-22 9:01:00"):
+            owner_service.process_late_notice()
+
+        self.assertEqual(len(outbox), 3)
+
+        self.assertEqual(
+            outbox[2].subject,
+            'Has {} returned their car?'.format(self.booking.driver.full_name()),
+        )
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-20 20:59:00"):
+            owner_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            owner_service.process_late_notice()
+            owner_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_after_returning(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            self.booking.return_time = timezone.now()
+            self.booking.save()
+            owner_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
