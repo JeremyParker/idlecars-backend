@@ -366,11 +366,22 @@ def on_return(booking):
     pass
 
 
+def can_confirm_return(booking):
+    return booking.get_state() == Booking.RETURNED
+
+
 def return_confirm(booking):
-    if not can_confirm_return():
+    if not can_confirm_return(booking):
         raise ServiceError(RETURN_CONFIRM_ERROR)
     booking.refund_time = timezone.now()
     booking.save()
+    deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
+    payment_service.void(deposit_payment)
+    on_payment_void(booking)
+
+
+def on_payment_void(booking):
+    pass
 
 
 def _booking_updates():
