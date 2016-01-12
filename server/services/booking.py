@@ -376,8 +376,9 @@ def return_confirm(booking):
     booking.refund_time = timezone.now()
     booking.save()
     deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
-    payment_service.void(deposit_payment)
-    on_payment_void(booking)
+    if deposit_payment:
+        payment_service.void(deposit_payment)
+        on_payment_void(booking)
 
 
 def on_payment_void(booking):
