@@ -356,6 +356,13 @@ def booking_return(booking):
         raise ServiceError(RETURN_ERROR)
     booking.return_time = timezone.now()
     booking.save()
+    on_return(booking)
+    return booking
+
+
+def on_return(booking):
+    # notification.send('owner_notifications.ReturnConfirm', booking)
+    pass
 
 
 def _booking_updates():

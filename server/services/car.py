@@ -174,8 +174,8 @@ def insurance(car, approved=False):
         booking_service.reject(booking)
 
 
-def car_return(car):
+def return_confirmation(car):
     from . import booking as booking_service
     bookings = Booking.objects.filter(car=car)
     booking = booking_service.filter_active(bookings).first()
-    booking_service.booking_return(booking)
+    booking_service.return_confirmation(booking)
