@@ -70,7 +70,7 @@ class CarViewSet(
             elif request.data['insurance'] == 'rejected':
                 car_service.insurance(car=self.get_object(), approved=False)
         if 'return_confirmation' in request.data:
-            car_service.return_confirmation(car=self.get_object())
+            car_service.return_confirm(car=self.get_object())
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:

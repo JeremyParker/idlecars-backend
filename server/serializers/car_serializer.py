@@ -188,12 +188,16 @@ class CarCreateSerializer(ModelSerializer):
                     # TODO
                     # 'label': 'Contact the driver',
                     # 'function_key': 'ContactDriver',
-                # },
-                    {
-                        'label': 'Car has been returned',
-                        'function_key': 'CarReturned',
-                    }
+                # }
                 ]
+            }
+        elif booking_service.filter_returned(car.booking_set.all()):
+            return {
+                'state_string': 'Driver claimed returned',
+                'buttons': [{
+                    'label': 'Return confirmation',
+                    'function_key': 'ReturnConfirm',
+                }]
             }
         elif not car.next_available_date:
             return {
