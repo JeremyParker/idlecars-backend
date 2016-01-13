@@ -16,7 +16,7 @@ from owner_crm.models import notification
 
 class OnboardingReminderBase(notification.OnboardingOwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi {}, We\'re Idle Cars. Are you looking to rent your car. Why don’t you list \
+        sms_body = 'Hi {}, We\'re idlecars. Are you looking to rent your car. Why don’t you list \
 your car with us for free. List your car at {}'.format(
             kwargs['onboarding_owner_name'],
             kwargs['owner_app_url']
@@ -397,7 +397,7 @@ us know where they are in the process: {}'.format(
 
 class FirstOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi {}, it’s Idle Cars. {} will contact you soon to arrange the pickup of your \
+        sms_body = 'Hi {}, it’s idlecars. {} will contact you soon to arrange the pickup of your \
 {} ({}). Before they drive off with the car, make sure you receive a text message that their payment \
 was received.'.format(
             kwargs['user_first_name'],
