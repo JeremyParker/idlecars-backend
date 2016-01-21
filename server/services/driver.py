@@ -67,14 +67,14 @@ def is_converted_driver(driver):
 
 def assign_credit_code(driver):
     credit_service.create_invite_code(
-        invitee_amount=75,
-        invitor_amount=25,
+        invitee_amount=10,
+        invitor_amount=10,
         customer=driver.auth_user.customer,
     )
 
 
 def assign_inactive_credit(driver):
-    credit = Decimal('50.00')
+    credit = Decimal('10.00')
     customer = driver.auth_user.customer
     customer.app_credit += credit
     customer.save()
