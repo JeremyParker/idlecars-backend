@@ -277,7 +277,10 @@ def link_bank_account(owner, params):
     _strip_dict(params, valid_schema)
 
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
-    success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(params)
+    success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(
+        params,
+        owner.merchant_id,
+    )
     if success:
         add_merchant_id_to_owner(merchant_account_id, owner)
         return [], []
