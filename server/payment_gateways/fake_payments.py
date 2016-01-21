@@ -15,7 +15,7 @@ def confirm_endpoint(challenge):
     return {'success': True}
 
 
-def link_bank_account(braintree_params):
+def link_bank_account(braintree_params, merchant_account_id=None):
     global most_recent_request_data
     most_recent_request_data = braintree_params
     if not 'tos_accepted' in braintree_params.keys() or not braintree_params['tos_accepted']:
@@ -25,7 +25,7 @@ def link_bank_account(braintree_params):
             ['tos_accepted'],
             ['Terms Of Service needs to be accepted. Applicant tos_accepted required.'],
         )
-    return True, 'test_submerchant_account_id', [], []
+    return True, merchant_account_id or 'test_submerchant_account_id', [], []
 
 
 def add_payment_method(payment_method, nonce):
