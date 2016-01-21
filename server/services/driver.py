@@ -13,7 +13,6 @@ from owner_crm.services import throttle_service, notification
 
 import server.models
 import server.services.booking
-import server.services.experiment
 from server.services import ServiceError
 
 
@@ -67,18 +66,17 @@ def is_converted_driver(driver):
 
 
 def assign_credit_code(driver):
-    invitee, invitor = server.services.experiment.get_referral_rewards(driver)
     credit_service.create_invite_code(
-        invitee_amount=invitee,
-        invitor_amount=invitor,
+        invitee_amount=75,
+        invitor_amount=25,
         customer=driver.auth_user.customer,
     )
 
 
 def assign_inactive_credit(driver):
-    credit = server.services.experiment.get_inactive_credit(driver)
+    credit = Decimal('50.00')
     customer = driver.auth_user.customer
-    customer.app_credit += Decimal(credit)
+    customer.app_credit += credit
     customer.save()
     return credit
 
@@ -101,7 +99,6 @@ def on_newly_converted(driver):
     # whoever invited them gets app credit
     success, invitor_customer = credit_service.reward_invitor_for(driver.auth_user.customer)
     if success:
-        server.services.experiment.referral_reward_converted(invitor_customer)
         try:
             invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
             notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
