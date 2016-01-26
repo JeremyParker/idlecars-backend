@@ -373,6 +373,7 @@ def can_confirm_return(booking):
 def return_confirm(booking):
     if not can_confirm_return(booking):
         raise ServiceError(RETURN_CONFIRM_ERROR)
+
     deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
     if deposit_payment:
         payment_service.void(deposit_payment)
@@ -383,6 +384,7 @@ def return_confirm(booking):
 
 
 def on_payment_void(booking):
+    # we need to send driver email
     pass
 
 
