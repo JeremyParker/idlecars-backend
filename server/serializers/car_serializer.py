@@ -191,6 +191,14 @@ class CarCreateSerializer(ModelSerializer):
                 # }
                 ]
             }
+        elif booking_service.filter_returned(car.booking_set.all()):
+            return {
+                'state_string': 'Returned. Waiting for confirmation & refund',
+                'buttons': [{
+                    'label': 'Confirm and refund any deposit',
+                    'function_key': 'ReturnConfirm',
+                }]
+            }
         elif not car.next_available_date:
             return {
                 'state_string': 'Not listed.',

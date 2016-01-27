@@ -18,6 +18,8 @@ CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call 
 INSURANCE_APPROVAL_ERROR = 'Sorry, your rental can\'t be approved at this time.'
 INSURANCE_REJECT_ERROR = 'Sorry, your rental can\'t be rejected at this time.'
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
+RETURN_ERROR = 'Sorry, something went wrong. Please reload the page and try again.'
+RETURN_CONFIRM_ERROR = 'The driver must indicate that they have returned the car before you can return the deposit.'
 CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are other cars you can rent.'
 
@@ -348,6 +350,47 @@ def pickup(booking):
     notification.send('owner_notifications.PickupConfirmation', rent_payment)
 
     return booking
+
+
+def booking_return(booking):
+    if not booking or booking.get_state() != Booking.ACTIVE:
+        raise ServiceError(RETURN_ERROR)
+
+    booking.return_time = timezone.now()
+    booking.save()
+    on_return(booking)
+    return booking
+
+
+def on_return(booking):
+    # TODO - notification.send('owner_notifications.ReturnConfirm', booking)
+    pass
+
+
+def return_confirm(booking):
+    '''
+    The owner can confirm that the car was returned and can refund the deposit.
+    '''
+    if not booking or booking.get_state() != Booking.RETURNED:
+        raise ServiceError(RETURN_CONFIRM_ERROR)
+
+    deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
+    if deposit_payment:
+        payment_service.refund(deposit_payment)
+        on_payment_refunded(booking)
+
+    booking.refund_time = timezone.now()
+
+    # make sure the booking has ended, so the driver doesn't keep getting charged
+    if booking.end_time > booking.refund_time:
+        booking.end_time = booking.refund_time
+
+    booking.save()
+
+
+def on_payment_refunded(booking):
+    # TODO - we need to send driver email
+    pass
 
 
 def _booking_updates():

@@ -431,6 +431,18 @@ class BookingServiceTest(TestCase):
             'Your {} rental has canceled.'.format(new_booking.car.display_name())
         )
 
+    def test_booking_return(self):
+        booking = factories.BookedBooking.create()
+        self.assertEqual(1, booking_service.filter_active(models.Booking.objects.all()).count())
+        booking_service.booking_return(booking)
+        self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
+
+    def test_no_active_no_return(self):
+        booking = factories.AcceptedBooking.create()
+        with self.assertRaises(Exception):
+            booking_service.booking_return(booking)
+        self.assertEqual(0, booking_service.filter_returned(models.Booking.objects.all()).count())
+
     def test_correct_start_time(self):
         driver = factories.Driver.create()
         new_booking = booking_service.create_booking(self.car, driver)
