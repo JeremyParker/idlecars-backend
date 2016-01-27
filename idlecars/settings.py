@@ -49,7 +49,6 @@ INSTALLED_APPS = (
     'website',
     'owner_crm',
     'unsubscribes',
-    'experiments',
     'bt_hooks',
     'django_nose',
     'djrill',
@@ -231,7 +230,7 @@ IDLECARS_CUSTOMER_ID = os.getenv('IDLECARS_CUSTOMER_ID', '32418355') # for Brain
 IDLECARS_PAYMENT_TOKEN = os.getenv('IDLECARS_PAYMENT_TOKEN', 'gwtbsw') # for Braintree
 
 # TODO - move these to a config service
-TAKE_RATE = '0.059'
+TAKE_RATE = '0.079'
 STALENESS_LIMIT = 3
 SIGNUP_CREDIT = 50
 INVITOR_CREDIT = 50

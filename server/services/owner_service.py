@@ -160,9 +160,27 @@ def _pickup_reminder(delay_hours, reminder_name):
         notification.send('owner_notifications.'+reminder_name, booking)
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
+
 def process_pickup_reminder():
     _pickup_reminder(reminder_name='FirstOwnerPickupReminder', delay_hours=1)
     _pickup_reminder(reminder_name='SecondOwnerPickupReminder', delay_hours=12)
+
+
+def _late_notice(delay_hours, reminder_name):
+    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
+    remindable_bookings = booking_service.filter_active(Booking.objects.all()).filter(
+        end_time__lte=reminder_threshold,
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('owner_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(throttled_bookings, reminder_name)
+
+
+def process_late_notice():
+    _late_notice(delay_hours=12, reminder_name='FirstReturnReminder')
+    _late_notice(delay_hours=24, reminder_name='SecondReturnReminder')
+    _late_notice(delay_hours=48, reminder_name='ThirdReturnReminder')
 
 
 def _account_reminder(delay_hours, reminder_name):
@@ -259,7 +277,10 @@ def link_bank_account(owner, params):
     _strip_dict(params, valid_schema)
 
     gateway = payment_gateways.get_gateway(settings.PAYMENT_GATEWAY_NAME)
-    success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(params)
+    success, merchant_account_id, error_fields, error_msg = gateway.link_bank_account(
+        params,
+        owner.merchant_id,
+    )
     if success:
         add_merchant_id_to_owner(merchant_account_id, owner)
         return [], []

@@ -1,6 +1,8 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from decimal import Decimal, ROUND_DOWN
+
 from django.utils import timezone
 
 from idlecars import model_helpers
@@ -60,6 +62,51 @@ def get_image_url(car):
     return make_model_service.get_image_url(car.make_model, car.pk)
 
 
+def get_average_price(cars):
+    if not cars.count():
+        return None
+
+    recommendable_cars = cars.order_by('weekly_rent')[:(cars.count() + 1) / 2]
+    price = 0
+    for car in recommendable_cars:
+        price += car.weekly_rent
+    average_price = price / Decimal(recommendable_cars.count())
+    return average_price
+
+
+def recommended_rent(car):
+    similar_cars = Car.objects.filter(
+        make_model=car.make_model,
+        year=car.year,
+        shift=car.shift,
+        medallion=car.medallion,
+        weekly_rent__isnull=False,
+    )
+    convinced_price_cars = similar_cars.filter(
+        booking__checkout_time__isnull=False,
+    )
+    if convinced_price_cars.count():
+        return get_average_price(convinced_price_cars)
+
+    attractive_price_cars = similar_cars.filter(
+        booking__isnull=False,
+        booking__checkout_time__isnull=True,
+        booking__incomplete_time__isnull=True,
+    )
+    if attractive_price_cars.count():
+        return get_average_price(attractive_price_cars)
+
+    listable_price_cars = similar_cars.filter(
+        booking__isnull=True,
+    )
+    # only one listable price is not convicing, we would like to have at least 2 prices
+    if listable_price_cars.count() > 1:
+        discount_price = get_average_price(listable_price_cars) * Decimal(0.9)
+        return discount_price.quantize(Decimal('1'), rounding=ROUND_DOWN)
+
+    return None
+
+
 def create_car(owner, plate):
     car_info = Car(plate=plate)
     try:
@@ -97,6 +144,9 @@ def pre_save(modified_car, orig):
 
     if orig.last_known_mileage != modified_car.last_known_mileage:
         modified_car.last_mileage_update = timezone.now()
+
+    if not orig.shift and modified_car.shift and not modified_car.weekly_rent:
+        modified_car.weekly_rent = recommended_rent(modified_car)
 
     # if we're setting the cost for the first time, set a default solo deposit
     if modified_car.weekly_rent and not orig.weekly_rent:

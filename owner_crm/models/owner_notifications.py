@@ -16,7 +16,7 @@ from owner_crm.models import notification
 
 class OnboardingReminderBase(notification.OnboardingOwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi {}, We\'re Idle Cars. Are you looking to rent your car. Why don’t you list \
+        sms_body = 'Hi {}, We\'re idlecars. Are you looking to rent your car. Why don’t you list \
 your car with us for free. List your car at {}'.format(
             kwargs['onboarding_owner_name'],
             kwargs['owner_app_url']
@@ -397,18 +397,22 @@ us know where they are in the process: {}'.format(
 
 class FirstOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Thank you for adding {} on the insurance for your car {} {}. They will contact \
-you soon to arrange pickup. Before they start driving make sure they click the blue “Pay and Drive” \
-button so you receive the first week’s payment.'.format(
+        sms_body = 'Hi {}, it’s idlecars. {} will contact you soon to arrange the pickup of your \
+{} ({}). Before they drive off with the car, make sure you receive a text message that their payment \
+was received.'.format(
+            kwargs['user_first_name'],
             kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_plate'],
         )
-        text = '''Thank you for adding {} to the {} {}’s insurance policy. They will call you soon to
+        text = '''Thank you for adding {} to the {} ({})’s insurance policy. They will call you soon to
         schedule a time to pick up the car.
         <br /><br />
-        Upon pick up, make sure the driver goes into their booking page to click the blue “Pay and
-        Drive” button to make sure your receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        When they pick up the car, make sure you receive a text message or email indicating that
+        the driver has paid for the rental.
+        <br /><br />
+        To do this, the driver will click the blue “Pay and Drive” button to make sure you receive
+        their first week’s payment – THEY WILL NOT PAY IN CASH!
         <br /><br />
         When they click “Pay and Drive”, you will be paid the first week’s rent and we will put the
         deposit in an escrow account to be used for any damages to the car.
@@ -434,12 +438,13 @@ button so you receive the first week’s payment.'.format(
 
 class SecondOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Remember, when {} picks up your car to remind them to click the blue “Pay and \
-Drive” button so and to provide them will the required documentation.'.format(
+        sms_body = 'Hi {}. when {} picks up your car, make sure you receive a text/email that the \
+payment was processed to make sure you receive your rental payment.'.format(
+            kwargs['user_first_name'],
             kwargs['driver_full_name'],
         )
-        text = '''Just a reminder - when {} picks up the {} {} that they click the blue “Pay and Drive”
-        you receive their first week’s payment – THEY WILL NOT PAY IN CASH!
+        text = '''Just a reminder - when {} picks up the {} ({}) make sure you receive a text message
+        or email indicating that the driver has paid for the rental before letting them drive.
         <br /><br />
         Also, make sure you provide the driver with these documents so they can register for a
         rideshare service:
@@ -667,6 +672,82 @@ receive payments until that date'.format(
                 kwargs['booking_end_time'].strftime('%b %d'),
             ),
             'sms_body': sms_body,
+        }
+
+
+class FirstReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? Their rental is 6 hours overdue.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 6 hours ago hours ago. We are attempting to
+        contact the driver, but have provided their phone number so you can contact them as
+        well.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
+        }
+
+
+class SecondReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? Their rental is 12 hours overdue.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 12 hours ago hours ago. We are attempting to
+        contact the driver, but have provided their phone number so you can contact them as well. We
+        let them know that we will contact the authorities if they do not return the car.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
+        }
+
+
+class ThirdReturnReminder(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Has {} returned the {}, plate number {}? If not we will help you recover \
+the car.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+        text = '''{}’s rental ended for the {} ({}) 48 hours ago hours ago. Please let us know if
+        the driver returned the car, or we will contact the local authorities and report it
+        stolen.'''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Has {} returned their car?'.format(kwargs['driver_full_name']),
+            'sms_body': text,
         }
 
 

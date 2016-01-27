@@ -12,10 +12,13 @@ from django.core.management import call_command
 
 import credit.factories
 import server.factories
+from idlecars import sms_service
+
 from server.models import Booking
 from server.services import driver as driver_service
 from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
+from owner_crm import factories as owner_crm_factories
 
 
 ''' Tests the cron job that sends delayed notifications to drivers '''
@@ -551,4 +554,222 @@ class TestDriverPickupNotifications(TestCase):
             outbox[1].subject,
             'Your {} rental – how to pay and drive'.format(booking.car.display_name()),
         )
+
+
+class TestPaymentFailedNotifications(TestCase):
+    def setUp(self):
+        from owner_crm.models import Campaign
+        campaign = owner_crm_factories.Campaign.create(
+            name='driver_notifications.PaymentFailed',
+            preferred_medium=Campaign.SMS_MEDIUM,
+        )
+
+    def test_only_failed_payment_bookings_send_sms(self):
+        sms_service.test_reset()
+        server.factories.BookedBooking.create()
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        self.assertEqual(
+            sms_service.test_get_outbox()[0]['to'],
+            '+1{}'.format(failed_booking.driver.phone_number())
+        )
+        sms_service.test_reset()
+
+    def test_no_sms_twice_in_24_hours(self):
+        sms_service.test_reset()
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        driver_service.process_payment_failure_notifications()
+        driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        sms_service.test_reset()
+
+    def test_every_24_hours(self):
+        sms_service.test_reset()
+        with freeze_time("2014-10-10 9:00:00"):
+            failed_booking = server.factories.BookedBooking.create()
+            server.factories.FailedPayment.create(booking=failed_booking)
+
+        with freeze_time("2014-10-10 9:00:00"):
+            driver_service.process_payment_failure_notifications()
+        with freeze_time("2014-10-11 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 2)
+        sms_service.test_reset()
+
+    def test_no_sms_after_repay(self):
+        sms_service.test_reset()
+        with freeze_time("2014-10-10 9:00:00"):
+            failed_booking = server.factories.BookedBooking.create()
+            server.factories.FailedPayment.create(booking=failed_booking)
+
+        with freeze_time("2014-10-10 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+        with freeze_time("2014-10-10 10:00:00"):
+            server.factories.SettledPayment.create(booking=failed_booking)
+        with freeze_time("2014-10-11 9:00:01"):
+            driver_service.process_payment_failure_notifications()
+
+        self.assertEqual(len(sms_service.test_get_outbox()), 1)
+        sms_service.test_reset()
+
+    def test_no_sms_but_email(self):
+        failed_booking = server.factories.BookedBooking.create()
+        server.factories.FailedPayment.create(booking=failed_booking)
+
+        failed_booking.driver.sms_enabled = False
+        failed_booking.driver.save()
+
+        driver_service.process_payment_failure_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Your {} rental payment had failed.'.format(failed_booking.car.display_name()),
+        )
+
+
+class TestExtendBookingNotifications(TestCase):
+    def setUp(self):
+        self._create_booking('BookedBooking')
+
+    @freeze_time("2014-10-10 9:00:00")
+    def _create_booking(self, booking_type):
+        self.booking = getattr(server.factories, booking_type).create(
+            end_time=timezone.now() + datetime.timedelta(days=10)
+        )
+
+    def test_expiring_booking(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Your rental ends in 24 hours',
+        )
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_after_end_time(self):
+        with freeze_time("2014-10-20 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-18 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_for_non_active_bookings(self):
+        self._create_booking('Booking')
+        self._create_booking('ReservedBooking')
+        self._create_booking('RequestedBooking')
+        self._create_booking('AcceptedBooking')
+        self._create_booking('ReturnedBooking')
+        self._create_booking('RefundedBooking')
+        self._create_booking('IncompleteBooking')
+
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_end_time_extended(self):
+        with freeze_time("2014-10-19 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        with freeze_time("2014-10-25 9:00:00"):
+            self.booking.end_time = timezone.now()
+            self.booking.save()
+
+        with freeze_time("2014-10-20 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        self.assertEqual(len(outbox), 1)
+
+        with freeze_time("2014-10-24 10:00:00"):
+            driver_service.process_extend_notifications()
+
+        self.assertEqual(len(outbox), 2)
+
+
+class TestLateBookingNotifications(TestCase):
+    @freeze_time("2014-10-10 9:00:00")
+    def setUp(self):
+        self.booking = server.factories.BookedBooking.create(
+            end_time=timezone.now() + datetime.timedelta(days=10)
+        )
+
+    def test_late_notice(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            driver_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+        self.assertEqual(
+            outbox[0].subject,
+            'Your rental ended 12 hours ago',
+        )
+
+        with freeze_time("2014-10-21 9:01:00"):
+            driver_service.process_late_notice()
+
+        self.assertEqual(len(outbox), 2)
+
+        self.assertEqual(
+            outbox[1].subject,
+            'Please return your {}'.format(self.booking.car.display_name()),
+        )
+
+    def test_no_email_early(self):
+        with freeze_time("2014-10-20 20:59:00"):
+            driver_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_twice(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            driver_service.process_late_notice()
+            driver_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+
+    def test_no_email_after_returning(self):
+        with freeze_time("2014-10-20 21:01:00"):
+            self.booking.return_time = timezone.now()
+            self.booking.save()
+            driver_service.process_late_notice()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
 

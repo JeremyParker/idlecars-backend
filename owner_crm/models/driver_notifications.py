@@ -739,6 +739,26 @@ class PaymentReceipt(notification.DriverNotification):
         }
 
 
+class PaymentFailed(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, your payment for the {} failed. We will try to charge your card again in \
+8 hours. Please make sure you have the funds available.'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your payment for the {} failed. We will try to charge your card again in 8 hours.
+        Please make sure you have the funds available.'''.format(kwargs['car_name'])
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
 class SomeoneElseBooked(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'While we were waiting for you to finish uploading your documents, \
@@ -772,6 +792,80 @@ class BookingCanceled(notification.DriverNotification):
             'template_name': 'one_button_one_image',
             'subject': 'Confirmation: Your rental has been canceled.',
             'sms_body': body + ' Tap here: {}'.format(kwargs['car_listing_url']),
+        }
+
+
+class ExtendReminder(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental is due back in 24 hours. Either notify the owner that you \
+will return it, or go to your booking page and click “Change End Date” to extend your rental.'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ends in 24 hours, so you either have to schedule a drop-off or extend
+        the duration of your rental. <br /><br />
+
+        How to extend your rental:
+        <ul><li> Go to your booking page </li>
+        <li> Click “Change End Date” </li>
+        <li> Choose a new end date for your rental </li></ul>
+        <br />
+        How to drop off your car:
+        <ul><li>  Call the owner to schedule the drop-off </li>
+        <li> Drop off the car on that specific time and date </li></ul>'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ends in 24 hours',
+            'TEXT': text,
+            'CTA_LABEL': 'My rental',
+            'CTA_URL': kwargs['bookings_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Your rental ends in 24 hours',
+            'sms_body': sms_body,
+        }
+
+
+class FirstLateNotice(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental was due back 12 hours ago. Please contact the owner and \
+let them know when you will return the car or we will have to report the car stolen to the local \
+authorities'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ended 12 hours ago hours ago. Please contact the owner and let them
+        know when you will return the car or we will have to report the car stolen to the local
+        authorities.'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ended 12 hours ago',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your rental ended 12 hours ago',
+            'sms_body': sms_body,
+        }
+
+
+class SecondLateNotice(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        sms_body = 'Hi {}, Your {} rental was due back 24 hours ago. If you do not return the car \
+soon we will have to report the car stolen to the local authorities.'.format(
+            kwargs['driver_first_name'],
+            kwargs['car_name'],
+        )
+        text = '''Your rental ended 12 hours ago hours ago. Please contact the owner and let them
+        know when you will return the car or we will have to report the car stolen to the local
+        authorities.'''
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your rental ended 24 hours ago',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Please return your {}'.format(kwargs['car_name']),
+            'sms_body': sms_body,
         }
 
 

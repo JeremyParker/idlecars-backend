@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 from sodapy import Socrata
 import dateutil.parser
 import pytz
@@ -52,17 +53,17 @@ def _copy_fhv_fields(car, tlc_data):
 
 def _copy_medallion_fields(car, tlc_data):
     car.found_in_tlc = True
-    car.last_updated = _localtime(tlc_data['last_updated_date'])
     car.active_in_tlc = True
-    car.year = int(tlc_data['model_year'])
-    car.base = tlc_data['agent_name']
-    car.base_number = tlc_data['agent_number']
-    car.base_address = tlc_data['agent_address']
-    car.base_telephone_number = parse_phone_number(tlc_data['agent_telephone_number'])
+    car.last_updated = _localtime(tlc_data.get('last_updated_date', ''))
+    car.year = int(tlc_data.get('model_year', ''))
+    car.base = tlc_data.get('agent_name', '')
+    car.base_number = tlc_data.get('agent_number', '')
+    car.base_address = tlc_data.get('agent_address', '')
+    car.base_telephone_number = parse_phone_number(tlc_data.get('agent_telephone_number', ''))
     # car.base_type = Car.BASE_TYPE_LIVERY if tlc_data['base_type'] == 'LIVERY' else Car.BASE_TYPE_PARATRANS
-    car.registrant_name = tlc_data['name']
+    car.registrant_name = tlc_data.get('name', '')
     # car.expiration_date = _localtime(tlc_data['expiration_date'])
-    car.vehicle_vin_number = tlc_data['vehicle_vin_number']
+    car.vehicle_vin_number = tlc_data.get('vehicle_vin_number', '')
     car.medallion = True
 
 

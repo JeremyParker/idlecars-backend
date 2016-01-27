@@ -23,8 +23,11 @@ def lookup_vin_data(car):
             model=model_name,
         )
 
-    if vin_data['categories']['market'].lower() == 'hybrid':
-        car.hybrid = True
+    try:
+        if vin_data['categories']['market'].lower() == 'hybrid':
+            car.hybrid = True
+    except KeyError:
+        pass
 
 
 def _request_vin_data(vin):

@@ -70,7 +70,7 @@ class Car(models.Model):
         (SHIFT_DAY, 'Day shift (5am-5pm)'),
         (SHIFT_NIGHT, 'Night shift (5pm-5am)'),
     ]
-    shift = models.IntegerField(choices=SHIFT_CHOICES, default=SHIFT_FULL_TIME)
+    shift = models.IntegerField(choices=SHIFT_CHOICES, default=SHIFT_UNKNOWN)
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _00_unknown='Unknown',

@@ -13,7 +13,6 @@ from owner_crm.services import throttle_service, notification
 
 import server.models
 import server.services.booking
-import server.services.experiment
 from server.services import ServiceError
 
 
@@ -67,18 +66,17 @@ def is_converted_driver(driver):
 
 
 def assign_credit_code(driver):
-    invitee, invitor = server.services.experiment.get_referral_rewards(driver)
     credit_service.create_invite_code(
-        invitee_amount=invitee,
-        invitor_amount=invitor,
+        invitee_amount=10,
+        invitor_amount=10,
         customer=driver.auth_user.customer,
     )
 
 
 def assign_inactive_credit(driver):
-    credit = server.services.experiment.get_inactive_credit(driver)
+    credit = Decimal('10.00')
     customer = driver.auth_user.customer
-    customer.app_credit += Decimal(credit)
+    customer.app_credit += credit
     customer.save()
     return credit
 
@@ -101,7 +99,6 @@ def on_newly_converted(driver):
     # whoever invited them gets app credit
     success, invitor_customer = credit_service.reward_invitor_for(driver.auth_user.customer)
     if success:
-        server.services.experiment.referral_reward_converted(invitor_customer)
         try:
             invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
             notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
@@ -269,6 +266,17 @@ def _send_pickup_reminder(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
+def _late_notice(delay_hours, reminder_name):
+    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
+    remindable_bookings = active_bookings.filter(
+        end_time__lte=timezone.now() - datetime.timedelta(hours=delay_hours),
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.'+reminder_name, booking)
+    throttle_service.mark_sent(throttled_bookings, reminder_name)
+
+
 def process_signup_notifications():
     _signup_reminder(
         delay_days=7,
@@ -320,3 +328,36 @@ def process_insurance_notifications():
 def process_pickup_notifications():
     _send_pickup_reminder(delay_hours=1, reminder_name='FirstPickupReminder')
     _send_pickup_reminder(delay_hours=6, reminder_name='SecondPickupReminder')
+
+
+def process_payment_failure_notifications():
+    all_bookings = server.models.Booking.objects.all()
+    remindable_bookings = server.services.booking.filter_active(all_bookings).filter(
+        payment__status=server.models.Payment.DECLINED,
+    )
+
+    skip_bookings = []
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'PaymentFailed', 24)
+    for booking in throttled_bookings.prefetch_related('payment_set'):
+        if not booking.payment_set.order_by('created_time').last().error_message:
+            skip_bookings.append(booking.pk)
+            continue
+
+        notification.send('driver_notifications.PaymentFailed', booking)
+    throttle_service.mark_sent(throttled_bookings.exclude(pk__in=skip_bookings), 'PaymentFailed')
+
+
+def process_extend_notifications():
+    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
+    remindable_bookings = active_bookings.filter(
+        end_time__lte=timezone.now() + datetime.timedelta(hours=24),
+        end_time__gt=timezone.now(),
+    )
+    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 25)
+    for booking in throttled_bookings:
+        notification.send('driver_notifications.ExtendReminder', booking)
+    throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')
+
+def process_late_notice():
+    _late_notice(delay_hours=12, reminder_name='FirstLateNotice')
+    _late_notice(delay_hours=24, reminder_name='SecondLateNotice')

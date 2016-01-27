@@ -130,16 +130,22 @@ def parse_webhook_notification(bt_signature, bt_payload):
     return braintree.WebhookNotification.parse(bt_signature, bt_payload)
 
 
-def link_bank_account(braintree_params):
+def link_bank_account(braintree_params, merchant_account_id=None):
     '''
     Returns success (bool), 'account_id', [error_fields], [error_messages]
     '''
     _configure_braintree()
 
     braintree_params['funding']['destination'] = braintree.MerchantAccount.FundingDestination.Bank
-    braintree_params['master_merchant_account_id'] = settings.MASTER_MERCHANT_ACCOUNT_ID
 
-    response = braintree.MerchantAccount.create(braintree_params)
+    # if sub-merchant already has an account on Braintree, just update their info.
+    if merchant_account_id:
+        braintree_params.pop('tos_accepted', None)
+        response = braintree.MerchantAccount.update(merchant_account_id, braintree_params)
+    else:
+        braintree_params['master_merchant_account_id'] = settings.MASTER_MERCHANT_ACCOUNT_ID
+        response = braintree.MerchantAccount.create(braintree_params)
+
     success = getattr(response, 'is_success', False)
     if success:
         account = response.merchant_account.id if response.merchant_account else ''
