@@ -375,6 +375,11 @@ def escrow(payment):
 
 
 def refund(payment):
+    if not payment.amount:
+        payment.status = models.Payment.REFUNDED
+        payment.error_message = ''
+        return payment
+
     _configure_braintree()
     if payment.transaction_id:
         response = _execute_transaction_request(payment, 'refund', payment.transaction_id)

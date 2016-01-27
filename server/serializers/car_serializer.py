@@ -193,9 +193,9 @@ class CarCreateSerializer(ModelSerializer):
             }
         elif booking_service.filter_returned(car.booking_set.all()):
             return {
-                'state_string': 'Returned. Waiting for refund',
+                'state_string': 'Returned. Waiting for confirmation & refund',
                 'buttons': [{
-                    'label': 'Confirm and refurnd deposit',
+                    'label': 'Confirm and refund any deposit',
                     'function_key': 'ReturnConfirm',
                 }]
             }

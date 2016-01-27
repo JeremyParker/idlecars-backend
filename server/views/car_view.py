@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from server.models import Car, Owner
 from server.services import car as car_service
+from server.services import ServiceError
 from server.serializers import CarSerializer, CarCreateSerializer
 from server.permissions import OwnsCar, IsAuthenticatedOwner
 
@@ -70,7 +71,10 @@ class CarViewSet(
             elif request.data['insurance'] == 'rejected':
                 car_service.insurance(car=self.get_object(), approved=False)
         if 'return_confirmation' in request.data:
-            car_service.return_confirm(car=self.get_object())
+            try:
+                car_service.return_confirm(car=self.get_object())
+            except ServiceError as e:
+                return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:

@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from server.services import car as car_service
+from server.services import ServiceError
 from server import factories, models
 
 
@@ -124,3 +125,10 @@ class CarRecommendedRentTest(TestCase):
         self.car.shift = models.Car.SHIFT_FULL_TIME
         self.car.save()
         self.assertEqual(self.car.weekly_rent, None)
+
+
+class CarRefundTest(TestCase):
+    def test_return_no_returnable_booking(self):
+        car = factories.BookableCar.create()
+        with self.assertRaises(ServiceError):
+            car_service.return_confirm(car)

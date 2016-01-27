@@ -126,6 +126,10 @@ def escrow(payment):
     return _execute('escrow', payment)
 
 
+def refund(payment):
+    return _execute('refund', payment)
+
+
 # TODO - this function and the one for payment_method should probably be moved to wherever the
 # Braintree abstaction is.
 def _braintree_link(transaction_id):
