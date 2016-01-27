@@ -643,6 +643,38 @@ class InsuranceTooSlow(notification.OwnerNotification):
         }
 
 
+class ExtendedRental(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = '{} has extended the rental ({}) until {}. You will continue to \
+receive payments until that date'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_plate'],
+            kwargs['booking_end_time'].strftime('%b %d'),
+        )
+        text = '''{} has extended the rental of your {} ({}) <br /><br />
+        New Return Date: {} <br /><br />
+        You will continue to receive payments until that date, when the driver will return the car.
+        '''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+            kwargs['booking_end_time'].strftime('%b %d'),
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Your rental has been extended',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'The rental for your {} ({}) was extended until {}'.format(
+                kwargs['car_name'],
+                kwargs['car_plate'],
+                kwargs['booking_end_time'].strftime('%b %d'),
+            ),
+            'sms_body': sms_body,
+        }
+
+
 class FirstReturnReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
         sms_body = 'Has {} returned the {}, plate number {}? Their rental is 6 hours overdue.'.format(

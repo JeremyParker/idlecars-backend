@@ -155,6 +155,11 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
+            'ExtendedRental': {
+                'argument': 'booked_booking',
+                'email_result': self.booked_booking.end_time.strftime('%b %d'),
+                'sms_body': self.booked_booking.end_time.strftime('%b %d'),
+            },
             'FirstReturnReminder': {
                 'argument': 'booked_booking',
                 'email_result': 'returned',
