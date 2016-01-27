@@ -575,7 +575,11 @@ class TestOwnerExtendRentalNotifications(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'The {} rental was extended'.format(booking.car.plate),
+            'The rental for your {} ({}) was extended until {}'.format(
+                booking.car.display_name(),
+                booking.car.plate,
+                booking.end_time.strftime('%b %d'),
+            ),
         )
 
     def test_no_email_at_booking_creation(self):

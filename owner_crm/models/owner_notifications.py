@@ -644,24 +644,28 @@ class ExtendedRental(notification.OwnerNotification):
 receive payments until that date'.format(
             kwargs['driver_full_name'],
             kwargs['car_plate'],
-            kwargs['booking_end_time'],
+            kwargs['booking_end_time'].strftime('%b %d'),
         )
-        text = '''{} had extended the rental of the {} ({}) <br /><br />
+        text = '''{} has extended the rental of your {} ({}) <br /><br />
         New Return Date: {} <br /><br />
-        You will continue to receive payments until that date when they return the car.
+        You will continue to receive payments until that date, when the driver will return the car.
         '''.format(
             kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_plate'],
-            kwargs['booking_end_time'],
+            kwargs['booking_end_time'].strftime('%b %d'),
         )
 
         return {
             'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'The {} rental was extended'.format(kwargs['car_plate']),
+            'HEADLINE': 'Your rental has been extended',
             'TEXT': text,
             'template_name': 'no_button_no_image',
-            'subject': 'The {} rental was extended'.format(kwargs['car_plate']),
+            'subject': 'The rental for your {} ({}) was extended until {}'.format(
+                kwargs['car_name'],
+                kwargs['car_plate'],
+                kwargs['booking_end_time'].strftime('%b %d'),
+            ),
             'sms_body': sms_body,
         }
 

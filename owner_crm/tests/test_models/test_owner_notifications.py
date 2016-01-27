@@ -157,8 +157,8 @@ class OwnerNotificationTest(TestCase):
             },
             'ExtendedRental': {
                 'argument': 'booked_booking',
-                'email_result': 'extended',
-                'sms_body': 'extended',
+                'email_result': self.booked_booking.end_time.strftime('%b %d'),
+                'sms_body': self.booked_booking.end_time.strftime('%b %d'),
             },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',

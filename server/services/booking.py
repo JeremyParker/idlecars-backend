@@ -73,11 +73,13 @@ def filter_refunded(booking_queryset):
         refund_time__isnull=False,
     )
 
+
 # TODO: unit test this
 def filter_incomplete(booking_queryset):
     return booking_queryset.filter(
         incomplete_time__isnull=False,
     )
+
 
 def processing_bookings(booking_queryset):
     active_bookings = filter_active(booking_queryset)
@@ -86,19 +88,18 @@ def processing_bookings(booking_queryset):
     reserved_bookings = filter_reserved(booking_queryset)
     return active_bookings | accepted_bookings | requested_bookings | reserved_bookings
 
+
 def post_pending_bookings(booking_queryset):
     filtered_processing_bookings = processing_bookings(booking_queryset)
     returned_bookings = filter_returned(booking_queryset)
     refunded_bookings = filter_refunded(booking_queryset)
     return filtered_processing_bookings | returned_bookings | refunded_bookings
 
+
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
     return not booking.return_time and not booking.incomplete_time
 
-def is_active(booking):
-    return booking.incomplete_time == None and booking.refund_time == None and \
-        booking.return_time == None and booking.pickup_time != None
 
 def filter_visible(booking_queryset):
     ''' Can this booking be seen in the Driver app '''
@@ -445,7 +446,7 @@ def set_end_time(booking, end_time):
             month=end_time.month,
             day=end_time.day,
         )
-        if is_active(booking):
+        if booking.get_state() == Booking.ACTIVE:
             notification.send('owner_notifications.ExtendedRental', booking)
     else:
         booking.end_time = end_time
