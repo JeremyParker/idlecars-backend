@@ -393,5 +393,6 @@ def refund(payment):
             payment.status = models.Payment.REFUNDED
             payment.error_message = ''
         else:
+            # TODO - handle if the payment wasn't settled into escrow yet. It needs to be voided.
             payment.error_message, payment.notes = _parse_error(response)
     return payment
