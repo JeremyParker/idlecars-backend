@@ -5,6 +5,7 @@ import datetime
 
 from django.utils import timezone
 from django.conf import settings
+from django.db import DatabaseError, transaction
 
 from owner_crm.services import notification
 
@@ -314,35 +315,54 @@ def pickup(booking):
     Warning: this method might change the booking even if it's unsuccessful. Caller should
     reload the object before relying on its data.
     '''
-    if not can_pickup(booking):
-        raise ServiceError(PICKUP_ERROR)
+    with transaction.atomic():
+        try:
+            # we have to re-fetch the booking so we can make sure we have a lock on the db row.
+            safe_booking = Booking.objects.select_for_update(nowait=True).filter(pk=booking.pk).get()
+            if not can_pickup(safe_booking):
+                raise ServiceError(PICKUP_ERROR)
 
-    # NB: we don't save() the booking unless successful...
-    booking.pickup_time = timezone.now().replace(microsecond=0)
-    booking.end_time = calculate_end_time(booking, booking.pickup_time)
+            booking.pickup_time=timezone.now().replace(microsecond=0)
 
-    deposit_payment = invoice_service.find_deposit_payment(booking) or \
-        invoice_service.make_deposit_payment(booking)
+            # this acts as a flag to prevent re-entry
+            safe_booking.pickup_time=booking.pickup_time
+            safe_booking.save()
 
-    if deposit_payment.error_message:
-        raise ServiceError(deposit_payment.error_message)
+        except DatabaseError:
+            # if the row is already locked, bail but don't show the user an error.
+            raise ServiceError('')
 
-    # pre-authorize the payment for the first week's rent
-    rent_payment = invoice_service.create_next_rent_payment(booking)
-    rent_payment = payment_service.pre_authorize(rent_payment)
-    if rent_payment.status != Payment.PRE_AUTHORIZED:
-        raise ServiceError(rent_payment.error_message)
+    try:
+        # NB: we don't save() the booking unless successful...
+        booking.end_time = calculate_end_time(booking, booking.pickup_time)
 
-    # hold the deposit in escrow for the duration of the rental
-    if deposit_payment.status is not Payment.HELD_IN_ESCROW:
-        deposit_payment = payment_service.escrow(deposit_payment)
-    if deposit_payment.status != Payment.HELD_IN_ESCROW:
-        raise ServiceError(deposit_payment.error_message)
+        deposit_payment = invoice_service.find_deposit_payment(booking) or \
+            invoice_service.make_deposit_payment(booking)
 
-    # take payment for the first week's rent
-    rent_payment = payment_service.settle(rent_payment)
-    if rent_payment.status != Payment.SETTLED:
-        raise ServiceError(rent_payment.error_message)
+        if deposit_payment.error_message:
+            raise ServiceError(deposit_payment.error_message)
+
+        # pre-authorize the payment for the first week's rent
+        rent_payment = invoice_service.create_next_rent_payment(booking)
+        rent_payment = payment_service.pre_authorize(rent_payment)
+        if rent_payment.status != Payment.PRE_AUTHORIZED:
+            raise ServiceError(rent_payment.error_message)
+
+        # hold the deposit in escrow for the duration of the rental
+        if deposit_payment.status is not Payment.HELD_IN_ESCROW:
+            deposit_payment = payment_service.escrow(deposit_payment)
+        if deposit_payment.status != Payment.HELD_IN_ESCROW:
+            raise ServiceError(deposit_payment.error_message)
+
+        # take payment for the first week's rent
+        rent_payment = payment_service.settle(rent_payment)
+        if rent_payment.status != Payment.SETTLED:
+            raise ServiceError(rent_payment.error_message)
+
+    except ServiceError as e:
+        # unlock the row and allow pickup() to be attempted again
+        Booking.objects.filter(pk=booking.pk).update(pickup_time=None)
+        raise e
 
     booking.save()
 

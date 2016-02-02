@@ -167,11 +167,19 @@ def _get_urls_params(pseudo_argument):
     }
 
 def _get_credit_params(credit_code):
-    return {
-        'credit_amount_invitee': credit_code.credit_amount,
-        'credit_amount_invitor': credit_code.invitor_credit_amount,
-        'credit_code': credit_code.credit_code,
-    }
+    if credit_code:
+        return {
+            'credit_amount_invitee': credit_code.credit_amount,
+            'credit_amount_invitor': credit_code.invitor_credit_amount,
+            'credit_code': credit_code.credit_code,
+        }
+    else:
+        return {
+            'credit_amount_invitee': 0,
+            'credit_amount_invitor': 0,
+            'credit_code': '',
+        }
+
 
 def _get_onboarding_owner_params(onboarding_owner):
     return {
