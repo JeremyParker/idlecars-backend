@@ -186,11 +186,6 @@ class DriverNotificationTest(TestCase):
                 'sms_result': 'refunded',
                 'email_result': 'refunded',
             },
-            'ReturnConfirmed': {
-                'argument': 'refunded_booking',
-                'sms_result': 'confirmed',
-                'email_result': 'confirmed',
-            },
             'PasswordReset': {
                 'argument': 'password_reset',
                 'sms_result': 'password',

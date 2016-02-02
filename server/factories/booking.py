@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
 from server.factories import BookableCar, ApprovedDriver, BaseLetterDriver, PaymentMethodDriver
-from server.factories import Payment, PreAuthorizedPayment, SettledPayment
+from server.factories import Payment, PreAuthorizedPayment, HeldInEscrowPayment, SettledPayment
 from server import models
 
 class Booking(Factory):
@@ -56,8 +56,10 @@ class BookedBooking(AcceptedBooking):
 
     @post_generation
     def payment(self, create, count, **kwargs):
-        for p in self.payment_set.all():
-            p.status = Payment.HELD_IN_ESCROW
+        HeldInEscrowPayment.create(
+            booking=self,
+            amount=self.car.deposit,
+        )
         SettledPayment.create(
             booking=self,
             amount=self.car.deposit,

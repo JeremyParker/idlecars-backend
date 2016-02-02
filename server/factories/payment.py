@@ -20,6 +20,10 @@ class PreAuthorizedPayment(Payment):
     status = models.Payment.PRE_AUTHORIZED
 
 
+class HeldInEscrowPayment(Payment):
+    status = models.Payment.HELD_IN_ESCROW
+
+
 class SettledPayment(PreAuthorizedPayment):
     status = models.Payment.SETTLED
 
