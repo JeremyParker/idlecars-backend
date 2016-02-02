@@ -383,8 +383,7 @@ def booking_return(booking):
 
 
 def on_return(booking):
-    # TODO - notification.send('owner_notifications.ReturnConfirm', booking)
-    pass
+    notification.send('owner_notifications.ConfirmReturned', booking)
 
 
 def return_confirm(booking):

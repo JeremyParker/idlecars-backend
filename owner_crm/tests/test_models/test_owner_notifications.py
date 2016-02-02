@@ -160,6 +160,11 @@ class OwnerNotificationTest(TestCase):
                 'email_result': self.booked_booking.end_time.strftime('%b %d'),
                 'sms_body': self.booked_booking.end_time.strftime('%b %d'),
             },
+            'ConfirmReturned': {
+                'argument': 'booked_booking',
+                'email_result': 'returned',
+                'sms_body': 'returned',
+            },
             'FirstReturnReminder': {
                 'argument': 'booked_booking',
                 'email_result': 'returned',

@@ -675,6 +675,28 @@ receive payments until that date'.format(
         }
 
 
+class ConfirmReturned(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = '{} claimed that your car has been returned. Please click {} to confirm and refund \
+any deposit to the driver'.format(kwargs['car_name'], kwargs['car_owner_details_url'])
+        text = '''{} claimed that your car has been returned. Please click below to refund the driver\'s
+        deposit or contact the driver at {}'''.format(
+            kwargs['driver_full_name'],
+            kwargs['driver_phone_number'],
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Has your {} been returned?'.format(kwargs['car_name']),
+            'TEXT': text,
+            'CTA_LABEL': 'Confirm and refund any deposit',
+            'CTA_URL': kwargs['car_owner_details_url'],
+            'template_name': 'one_button_no_image',
+            'subject': 'Has your {} been returned?'.format(kwargs['car_name']),
+            'sms_body': sms_body,
+        }
+
+
 class FirstReturnReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
         sms_body = 'Has {} returned the {}, plate number {}? Their rental is 6 hours overdue.'.format(
