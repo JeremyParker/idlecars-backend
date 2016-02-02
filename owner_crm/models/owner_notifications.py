@@ -16,7 +16,7 @@ from owner_crm.models import notification
 
 class OnboardingReminderBase(notification.OnboardingOwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi {}, We\'re Idle Cars. Are you looking to rent your car. Why don’t you list \
+        sms_body = 'Hi {}, We\'re idlecars. Are you looking to rent your car. Why don’t you list \
 your car with us for free. List your car at {}'.format(
             kwargs['onboarding_owner_name'],
             kwargs['owner_app_url']
@@ -397,7 +397,7 @@ us know where they are in the process: {}'.format(
 
 class FirstOwnerPickupReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Hi {}, it’s Idle Cars. {} will contact you soon to arrange the pickup of your \
+        sms_body = 'Hi {}, it’s idlecars. {} will contact you soon to arrange the pickup of your \
 {} ({}). Before they drive off with the car, make sure you receive a text message that their payment \
 was received.'.format(
             kwargs['user_first_name'],
@@ -640,6 +640,38 @@ class InsuranceTooSlow(notification.OwnerNotification):
             '''.format(kwargs['car_name'], kwargs['driver_full_name']),
             'template_name': 'no_button_no_image',
             'subject': 'Your {} rental has been canceled'.format(kwargs['car_name']),
+        }
+
+
+class ExtendedRental(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        sms_body = '{} has extended the rental ({}) until {}. You will continue to \
+receive payments until that date'.format(
+            kwargs['driver_full_name'],
+            kwargs['car_plate'],
+            kwargs['booking_end_time'].strftime('%b %d'),
+        )
+        text = '''{} has extended the rental of your {} ({}) <br /><br />
+        New Return Date: {} <br /><br />
+        You will continue to receive payments until that date, when the driver will return the car.
+        '''.format(
+            kwargs['driver_full_name'],
+            kwargs['car_name'],
+            kwargs['car_plate'],
+            kwargs['booking_end_time'].strftime('%b %d'),
+        )
+
+        return {
+            'FNAME': kwargs['user_first_name'] or None,
+            'HEADLINE': 'Your rental has been extended',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'The rental for your {} ({}) was extended until {}'.format(
+                kwargs['car_name'],
+                kwargs['car_plate'],
+                kwargs['booking_end_time'].strftime('%b %d'),
+            ),
+            'sms_body': sms_body,
         }
 
 

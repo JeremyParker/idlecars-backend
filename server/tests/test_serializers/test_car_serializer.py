@@ -128,6 +128,14 @@ class TextCarState(TestCase):
         self.assertEqual(serializer_data['state_string'], 'Rented until {}'.format(end_time.strftime('%b %d')))
         self.assertEqual(0, len(serializer_data['state_buttons']))
 
+    def test_returned_booking(self):
+        car = factories.BookableCar.create()
+        end_time = timezone.now() + datetime.timedelta(days=7)
+        booking = factories.ReturnedBooking.create(car=car, end_time=end_time)
+        serializer_data = serializers.CarSerializer(car).data
+        self.assertEqual(serializer_data['state_string'], 'Returned. Waiting for confirmation & refund')
+        self.assertEqual(1, len(serializer_data['state_buttons']))
+
     def test_busy(self):
         car = factories.BookableCar.create(next_available_date=None)
         serializer_data = serializers.CarSerializer(car).data

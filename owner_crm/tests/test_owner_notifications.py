@@ -555,6 +555,54 @@ class TestOwnerPickupNotifications(TestCase):
         )
 
 
+class TestOwnerExtendRentalNotifications(TestCase):
+    def _create_booking_and_change_end_time(self, booking_type):
+        with freeze_time("2014-10-10 9:00:00"):
+            booking = getattr(server.factories, booking_type).create()
+        booking_service.set_end_time(booking, timezone.now())
+        return booking
+
+    def test_end_time_changed(self):
+        booking = self._create_booking_and_change_end_time('BookedBooking')
+        self._create_booking_and_change_end_time('Booking')
+        self._create_booking_and_change_end_time('ReservedBooking')
+        self._create_booking_and_change_end_time('RequestedBooking')
+        self._create_booking_and_change_end_time('ReturnedBooking')
+        self._create_booking_and_change_end_time('RefundedBooking')
+        self._create_booking_and_change_end_time('IncompleteBooking')
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'The rental for your {} ({}) was extended until {}'.format(
+                booking.car.display_name(),
+                booking.car.plate,
+                booking.end_time.strftime('%b %d'),
+            ),
+        )
+
+    def test_no_email_at_booking_creation(self):
+        booking = server.factories.BookedBooking.create()
+        self.assertTrue(booking.end_time != None)
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_no_email_at_end_time_to_None(self):
+        booking = server.factories.BookedBooking.create()
+        booking.end_time = None
+        booking.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
+
+    def test_more_than_one_email(self):
+        booking = self._create_booking_and_change_end_time('BookedBooking')
+        booking_service.set_end_time(booking, timezone.now())
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
 class TestLateBookingNotifications(TestCase):
     @freeze_time("2014-10-10 9:00:00")
     def setUp(self):

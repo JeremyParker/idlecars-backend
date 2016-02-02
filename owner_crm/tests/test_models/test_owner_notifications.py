@@ -49,23 +49,23 @@ class OwnerNotificationTest(TestCase):
         self.notification_spec = {
             'OnboardingReminderBase': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'Idle Cars',
+                'sms_result': 'idlecars',
             },
             'FirstOnboardingReminder': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'Idle Cars',
+                'sms_result': 'idlecars',
             },
             'SecondOnboardingReminder': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'Idle Cars',
+                'sms_result': 'idlecars',
             },
             'ThirdOnboardingReminder': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'Idle Cars',
+                'sms_result': 'idlecars',
             },
             'FourthOnboardingReminder': {
                 'argument': 'onboarding_owner',
-                'sms_result': 'Idle Cars',
+                'sms_result': 'idlecars',
             },
             'RenewalEmail': {
                 'argument': 'car',
@@ -154,6 +154,11 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
+            },
+            'ExtendedRental': {
+                'argument': 'booked_booking',
+                'email_result': self.booked_booking.end_time.strftime('%b %d'),
+                'sms_body': self.booked_booking.end_time.strftime('%b %d'),
             },
             'FirstReturnReminder': {
                 'argument': 'booked_booking',
