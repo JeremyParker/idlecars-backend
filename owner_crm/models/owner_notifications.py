@@ -677,10 +677,11 @@ receive payments until that date'.format(
 
 class ConfirmReturned(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = '{} claimed that your car has been returned. Please click {} to confirm and refund \
+        sms_body = '{} says your car has been returned. Please click {} to confirm and refund \
 any deposit to the driver'.format(kwargs['car_name'], kwargs['car_owner_details_url'])
-        text = '''{} claimed that your car has been returned. Please click below to refund the driver\'s
-        deposit or contact the driver at {}'''.format(
+        text = '''{} says your car has been returned. Please click below to confirm that the car \
+        has been returned in good condition, and refund the driver\'s deposit. If your car has not been \
+        returned, or if there is a problem, please contact the driver at {}'''.format(
             kwargs['driver_full_name'],
             kwargs['driver_phone_number'],
         )
