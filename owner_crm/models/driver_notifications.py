@@ -869,6 +869,39 @@ soon we will have to report the car stolen to the local authorities.'.format(
         }
 
 
+class DepositRefunded(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = '''Nice! the owner confirmed that the {} has been returned and your deposit {} has been
+        refunded, IdleCars is looking forward to serve you next time!'''.format(
+            kwargs['car_name'],
+            kwargs['payment_cash_amount'],
+        )
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your deposit has been refunded.',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your deposit has been refunded.',
+            'sms_body': text,
+        }
+
+
+class ReturnConfirmed(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = '''Nice! the owner confirmed that the {} has been returned, IdleCars is looking
+        forward to serve you next time!'''.format(kwargs['car_name'])
+
+        return {
+            'FNAME': kwargs['driver_first_name'] or None,
+            'HEADLINE': 'Your return has been confirmed.',
+            'TEXT': text,
+            'template_name': 'no_button_no_image',
+            'subject': 'Your return has been confirmed.',
+            'sms_body': text,
+        }
+
+
 class PasswordReset(notification.DriverNotification):
     def get_context(self, **kwargs):
         text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \

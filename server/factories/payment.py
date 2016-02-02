@@ -29,3 +29,6 @@ class FailedPayment(Payment):
     transaction_id = 'some_transaction_id'
     status = models.Payment.DECLINED
     error_message = 'This transaction was declined for some reason.'
+
+class RefundedPayment(PreAuthorizedPayment):
+    status = models.Payment.VOIDED
