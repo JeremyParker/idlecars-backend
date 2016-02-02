@@ -437,11 +437,21 @@ class BookingServiceTest(TestCase):
         booking_service.booking_return(booking)
         self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
 
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Has your {} been returned?'.format(booking.car.display_name())
+        )
+
     def test_no_active_no_return(self):
         booking = factories.AcceptedBooking.create()
         with self.assertRaises(Exception):
             booking_service.booking_return(booking)
         self.assertEqual(0, booking_service.filter_returned(models.Booking.objects.all()).count())
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 0)
 
     def test_correct_start_time(self):
         driver = factories.Driver.create()

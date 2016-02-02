@@ -363,7 +363,7 @@ def booking_return(booking):
 
 
 def on_return(booking):
-    notification.send('owner_notifications.ConfirmReturn', booking)
+    notification.send('owner_notifications.ConfirmReturned', booking)
 
 
 def return_confirm(booking):
