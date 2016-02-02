@@ -473,8 +473,9 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'Your return has been confirmed'
+            'Your return has been confirmed.'
         )
+        self.assertTrue('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])
 
     def test_return_confirmed_without_deposit(self):
         booking = factories.ReturnedBooking.create()
@@ -489,5 +490,6 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'Your return has been confirmed'
+            'Your return has been confirmed.'
         )
+        self.assertFalse('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])
