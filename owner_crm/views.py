@@ -29,10 +29,10 @@ class PasswordResetSetupView(views.APIView):
         phone_number = serializer.validated_data['phone_number']
         password_reset = password_reset_service.create(phone_number)
         if password_reset:
-            try:
-                owner = password_reset.auth_user.owner_set.first()
+            owner = password_reset.auth_user.owner_set.first()
+            if owner:
                 notification.send('owner_notifications.PasswordReset', password_reset)
-            except Owner.DoesNotExist:
+            else:
                 driver = password_reset.auth_user.driver
                 notification.send('driver_notifications.PasswordReset', password_reset)
 
