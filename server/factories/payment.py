@@ -20,6 +20,10 @@ class PreAuthorizedPayment(Payment):
     status = models.Payment.PRE_AUTHORIZED
 
 
+class HeldInEscrowPayment(Payment):
+    status = models.Payment.HELD_IN_ESCROW
+
+
 class SettledPayment(PreAuthorizedPayment):
     status = models.Payment.SETTLED
 
@@ -29,3 +33,6 @@ class FailedPayment(Payment):
     transaction_id = 'some_transaction_id'
     status = models.Payment.DECLINED
     error_message = 'This transaction was declined for some reason.'
+
+class RefundedPayment(PreAuthorizedPayment):
+    status = models.Payment.VOIDED

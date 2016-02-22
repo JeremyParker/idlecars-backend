@@ -472,3 +472,34 @@ class BookingServiceTest(TestCase):
         # make sure the driver sees the rental starts 'on pickup' once they're approved
         new_booking.pickup_time = datetime.datetime(2015, 8, 18, 8, 15, 12, 0, timezone.get_current_timezone())
         self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 18')
+
+    def test_return_confirmed_with_deposit(self):
+        booking = factories.ReturnedBooking.create()
+        self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
+        booking_service.return_confirm(booking)
+        self.assertEqual(1, booking_service.filter_refunded(models.Booking.objects.all()).count())
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Your return has been confirmed.'
+        )
+        self.assertTrue('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])
+
+    def test_return_confirmed_without_deposit(self):
+        booking = factories.ReturnedBooking.create()
+        deposit = booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW).first()
+        deposit.amount = 0
+        deposit.save()
+        self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
+        booking_service.return_confirm(booking)
+        self.assertEqual(1, booking_service.filter_refunded(models.Booking.objects.all()).count())
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 1)
+        self.assertEqual(
+            outbox[0].subject,
+            'Your return has been confirmed.'
+        )
+        self.assertFalse('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])

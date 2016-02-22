@@ -33,7 +33,7 @@ class DriverNotificationTest(TestCase):
         self.requested_booking = server_factories.RequestedBooking.create(car=car)
         self.accepted_booking = server_factories.AcceptedBooking.create(car=car)
         self.booked_booking = server_factories.BookedBooking.create(car=car)
-
+        self.refunded_booking = server_factories.RefundedBooking.create(car=car)
         self.password_reset = crm_factories.PasswordReset.create(auth_user=auth_user)
 
         self.settled_payment = server_factories.SettledPayment.create(
@@ -41,6 +41,11 @@ class DriverNotificationTest(TestCase):
             amount=car.weekly_rent,
             invoice_start_time=timezone.now(),
             invoice_end_time=timezone.now() + datetime.timedelta(days=7),
+        )
+
+        self.refunded_payment = server_factories.RefundedPayment.create(
+            booking=self.booked_booking,
+            amount=car.weekly_rent,
         )
 
         sms_service.test_reset()
@@ -175,6 +180,11 @@ class DriverNotificationTest(TestCase):
                 'argument': 'booked_booking',
                 'sms_result': '24 hours ago',
                 'email_result': 'return',
+            },
+            'DepositRefunded': {
+                'argument': 'refunded_payment',
+                'sms_result': 'refunded',
+                'email_result': 'refunded',
             },
             'PasswordReset': {
                 'argument': 'password_reset',

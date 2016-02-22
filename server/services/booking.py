@@ -396,7 +396,7 @@ def return_confirm(booking):
     deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
     if deposit_payment:
         payment_service.refund(deposit_payment)
-        on_payment_refunded(booking)
+        on_payment_refunded(deposit_payment)
 
     booking.refund_time = timezone.now()
 
@@ -407,9 +407,8 @@ def return_confirm(booking):
     booking.save()
 
 
-def on_payment_refunded(booking):
-    # TODO - we need to send driver email
-    pass
+def on_payment_refunded(payment):
+    notification.send('driver_notifications.DepositRefunded', payment)
 
 
 def _booking_updates():

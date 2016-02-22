@@ -6,7 +6,7 @@ from owner import Owner, PendingOwner, BankAccountOwner, DeclinedOwner
 from make_model import MakeModel, MakeModelWithImage, MakeModelWithImages
 from car import Car, ClaimedCar, BookableCar, CarExpiredListing, CompleteCar
 from driver import Driver, CompletedDriver, PaymentMethodDriver, ApprovedDriver, BaseLetterDriver
-from payment import Payment, PreAuthorizedPayment, SettledPayment, FailedPayment
+from payment import Payment, PreAuthorizedPayment, HeldInEscrowPayment, SettledPayment, FailedPayment, RefundedPayment
 from booking import Booking, ReservedBooking, RequestedBooking, AcceptedBooking, BookedBooking
 from booking import ReturnedBooking, RefundedBooking, IncompleteBooking
 from rideshare_flavor_factory import RideshareFlavorFactory
