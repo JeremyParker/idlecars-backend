@@ -119,24 +119,11 @@ def on_car_missed(car):
         _make_booking_incomplete(conflicting_booking, Booking.REASON_MISSED)
 
 
-def on_docs_approved(driver):
-    if not driver.base_letter:
-        bookings = Booking.objects.filter(driver=driver)
+def on_all_docs_uploaded(driver):
+    if not filter_pending(Booking.objects.filter(driver=driver)):
+        notification.send('driver_notifications.DocsApprovedNoBooking', driver)
 
-        if bookings:
-            latest_booking = bookings.order_by('created_time').last()
-            notification.send('street_team_notifications.RequestBaseLetter', latest_booking)
-        else:
-            notification.send('driver_notifications.DocsApprovedNoBooking', driver)
-
-
-def on_base_letter_approved(driver):
     reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
-    pending_bookings = filter_pending(Booking.objects.filter(driver=driver))
-
-    for booking in pending_bookings:
-        notification.send('driver_notifications.BaseLetterApprovedNoCheckout', booking)
-
     for booking in reserved_bookings:
         request_insurance(booking)
 
@@ -280,11 +267,9 @@ def checkout(booking):
         for conflicting_booking in conflicting_pending_bookings:
             conflicting_booking = someone_else_booked(conflicting_booking)
 
-        if booking.driver.documentation_approved and booking.driver.base_letter:
-            return request_insurance(booking)
+        request_insurance(booking)
 
         notification.send('driver_notifications.CheckoutReceipt', booking)
-
     return booking
 
 

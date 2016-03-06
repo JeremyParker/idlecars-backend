@@ -30,7 +30,6 @@ class DriverAdmin(ReverseModelAdmin):
         'phone_number',
         'email',
         'all_docs_uploaded',
-        'documentation_approved',
         'date_joined',
     ]
     list_filter = [
@@ -46,13 +45,10 @@ class DriverAdmin(ReverseModelAdmin):
     fieldsets = (
         ('Documentation', {
             'fields': (
-                ('documentation_approved'),
                 ('driver_license_image', 'dmv_link'),
                 ('fhv_license_image', 'fhv_link'),
                 ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
-                ('base_letter_rejected'),
-                ('base_letter','base_letter_link'),
             )
         }),
         ('None', {
@@ -73,7 +69,6 @@ class DriverAdmin(ReverseModelAdmin):
         'fhv_link',
         'dd_link',
         'poa_link',
-        'base_letter_link',
         'app_credit',
         'braintree_customer_id',
     ]
@@ -110,11 +105,6 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)
     poa_link.short_description = ''
     poa_link.allow_tags = True
-
-    def base_letter_link(self, instance):
-        return '<a href={} target="new">View Image</a>'.format(instance.base_letter)
-    base_letter_link.short_description = ''
-    base_letter_link.allow_tags = True
 
     def invited_by(self, instance):
         return instance.auth_user.customer.invitor_code

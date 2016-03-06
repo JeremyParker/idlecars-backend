@@ -8,7 +8,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from idlecars import email, app_routes_driver, app_routes_owner
+from idlecars import email, app_routes_driver, app_routes_owner, fields
 from server.services import car as car_service
 
 from owner_crm.models import notification
@@ -125,18 +125,22 @@ Check your email to see more on how Idlecars works.'
 
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        headline = '{} has booked your {}, with license plate {}'.format(
-            kwargs['driver_full_name'],
+        headline = '{} has booked your {} with license plate {}.'.format(
+            kwargs['driver_full_name'] or 'A driver',
             kwargs['car_name'],
             kwargs['car_plate'],
         )
 
         # TODO(JP) track gender of driver and customize this email text
         text = '''
-            {} has booked your car and has paid the ${} deposit.
-            Please have them added to the insurance policy today to ensure that they can start driving tomorrow.
-            All of their documents are included in this email.
-        '''.format(kwargs['driver_first_name'], kwargs['car_deposit'])
+            {} has booked your car and has paid the ${} deposit. Please have them added to the
+            insurance policy today to ensure that they can start driving as soon as possible.
+            All of their documents are included in this email. If you require any additional
+            information for insurance, please reach out to the driver at {}.'''.format(
+                kwargs['driver_full_name'] or 'A driver',
+                kwargs['car_deposit'],
+                fields.format_phone_number(kwargs['driver_phone_number']),
+            )
 
         context = {
             'PREVIEW': headline,
@@ -159,13 +163,12 @@ class NewBookingEmail(notification.OwnerNotification):
             'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                 kwargs['address_proof_image']
             ),
-            'IMAGE_5_URL': kwargs['base_letter_sample_url'],
-            'TEXT5': 'Base letter <a href="{}">(click here to download)</a>'.format(
-                kwargs['base_letter']
-            ),
-            'TEXT6': 'Questions? Call us at ' + settings.IDLECARS_PHONE_NUMBER,
+            'TEXT5': 'Questions? Need more documentation? Please call {} at {}.'.format(
+                    kwargs['driver_first_name'] or 'the driver',
+                    fields.format_phone_number(kwargs['driver_phone_number']),
+                ),
             'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
-            'template_name': 'no_button_five_images',
+            'template_name': 'no_button_four_images',
             'sms_body': headline + ' An email has been sent to {} with more information.'.format(
                 kwargs['user_email']
             )

@@ -93,6 +93,5 @@ class Driver(models.Model):
             orig = Driver.objects.get(pk=self.pk)
             self = server.services.driver.pre_save(self, orig)
             super(Driver, self).save(*args, **kwargs)
-            server.services.driver.post_save(self, orig)
         else:
             super(Driver, self).save(*args, **kwargs)
