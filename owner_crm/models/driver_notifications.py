@@ -6,7 +6,7 @@ from django import template as django_template
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from idlecars import email
+from idlecars import email, fields
 
 from owner_crm.models import notification
 
@@ -154,7 +154,7 @@ you refer your friends with this code: {}.'.format(
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
         subject = 'Welcome to idlecars, {driver_full_name}!'.format(**kwargs)
-        headline = 'Your documents have been reviewed and approved.'
+        headline = 'Your documents have been received.'
         text = 'You are now ready to rent any car on idlecars with one tap!'
         cta_url = kwargs['car_listing_url']
 
@@ -167,31 +167,6 @@ class DocsApprovedNoBooking(notification.DriverNotification):
             'subject': subject,
             'template_name': 'one_button_no_image',
             'sms_body': subject + ' ' + headline + ' ' + text + ' Tap here to rent a car now: ' + cta_url
-        }
-
-
-class BaseLetterApprovedNoCheckout(notification.DriverNotification):
-    def get_context(self, **kwargs):
-        template_data = {'CAR_NAME': kwargs['car_name']}
-        body = render_to_string("base_letter_approved_no_checkout.jade", template_data, django_template.Context(autoescape=False))
-
-        return {
-            # TODO: I think we don't need `or None` because it return '', and '' looks the same as None to drivers
-            'FNAME': kwargs['driver_first_name'] or None,
-            'TEXT': body,
-            'CTA_LABEL': 'Reserve now',
-            'CTA_URL': kwargs['bookings_url'],
-            'HEADLINE': 'Your {} is waiting'.format(kwargs['car_name']),
-            'CAR_IMAGE_URL': kwargs['car_image_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Don\'t forget to reserve your {}!'.format(kwargs['car_name']),
-            'sms_body': 'We are ready to submit all documents to get you on the insurance for your \
-{}. We\'re just waiting on your credit card. Don’t worry, your card won\'t be charged until \
-you pick up your car. We just need to put a hold on the card to verify that the card is valid and the \
-funds are available. Tap here to enter your card information and reserve your car: {}'.format(
-                kwargs['car_name'],
-                kwargs['bookings_url']
-            ),
         }
 
 
@@ -420,12 +395,12 @@ class AwaitingInsuranceEmail(notification.DriverNotification):
             'TEXT': body,
             'CTA_LABEL': 'See your rental',
             'CTA_URL': kwargs['bookings_url'],
-            'HEADLINE': 'Your documents have been reviewed and approved',
+            'HEADLINE': 'Your documents have been submitted for insurance approval',
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Congratulations! Your documents have been submitted!',
             'sms_body': 'Hi {}, Your documents have been \
-pre-approved and submitted to the owner for final insurance approval of the {} you reserved! You \
+submitted to the owner for final insurance approval of the {} you reserved! You \
 should be ready to drive within 24-48 hours! Hang tight!'.format(kwargs['driver_first_name'], kwargs['car_name'])
         }
 
@@ -567,16 +542,16 @@ there are plenty more great cars available. '
 
 class CheckoutReceipt(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = '''
-            We put a hold of ${} on your credit card for the {} you booked. You will not be charged until
-            you inspect, approve, and pick up your car. Once you approve the car in the app, the hold on
-            your card will be processed, and your card will be charged for the first rental payment of ${}.
-            '''.format(
+        text = '''We put a hold of ${} on your credit card. You will not be charged until \
+you inspect and approve the car in the app. When you pick up the car, the deposit will be \
+processed, and your card will be charged for the first week's rent. Your documents have \
+been submitted to the owner for insurance approval. You will be notified in 24-48 hours when \
+you are approved. If you have questions please contact {} at {}.'''.format(
                 kwargs['car_deposit'],
-                kwargs['car_name'],
-                kwargs['booking_next_payment_amount'],
+                kwargs['owner_name'],
+                fields.format_phone_number(kwargs['owner_phone_number']),
             )
-        subject = 'Your {} was successfully reserved'.format(kwargs['car_name'])
+        subject = 'Your {} was successfully reserved.'.format(kwargs['car_name'])
         return {
             'FNAME': kwargs['driver_first_name'] or None,
             'HEADLINE': 'Your {} was successfully reserved'.format(kwargs['car_name']),

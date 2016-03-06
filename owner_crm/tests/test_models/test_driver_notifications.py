@@ -11,10 +11,9 @@ from django.conf import settings
 from owner_crm.services import notification
 from owner_crm.models import Campaign, driver_notifications
 from owner_crm import factories as crm_factories
-
 from idlecars import factories as idlecars_factories
 from server import factories as server_factories
-from idlecars import sms_service
+from idlecars import sms_service, fields
 
 
 class DriverNotificationTest(TestCase):
@@ -71,11 +70,6 @@ class DriverNotificationTest(TestCase):
                 'sms_result': settings.DRIVER_APP_URL + '/#/listing',
                 'email_result': self.approved_driver.full_name(),
             },
-            'BaseLetterApprovedNoCheckout': {
-                'argument': 'pending_booking',
-                'sms_result': settings.DRIVER_APP_URL + '/#/account/bookings',
-                'email_result': self.pending_booking.car.display_name(),
-            },
             'FirstDocumentsReminderBooking': {
                 'argument': 'pending_booking',
                 'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
@@ -123,7 +117,7 @@ class DriverNotificationTest(TestCase):
             },
             'AwaitingInsuranceEmail': {
                 'argument': 'requested_booking',
-                'sms_result': 'pre-approved',
+                'sms_result': 'submitted',
                 'email_result': 'submitted',
             },
             'FirstInsuranceNotification': {
@@ -142,9 +136,14 @@ class DriverNotificationTest(TestCase):
                 'email_result': self.requested_booking.car.display_name(),
             },
             'CheckoutReceipt': {
-                'argument': 'reserved_booking',
-                'sms_result': 'hold of $500 on your credit card',
-                'email_result': self.reserved_booking.car.display_name(),
+                'argument': 'requested_booking',
+                'sms_result': 'If you have questions please contact {} at {}'.format(
+                        self.requested_booking.car.owner.name(),
+                        fields.format_phone_number(self.requested_booking.car.owner.phone_number()),
+                    ),
+                'email_result': 'Your {} was successfully reserved'.format(
+                        self.requested_booking.car.display_name(),
+                    ),
             },
             'FirstPickupReminder': {
                 'argument': 'accepted_booking',

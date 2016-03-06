@@ -37,25 +37,13 @@ def documents_changed(original, modified):
 
 
 def pre_save(modified_driver, orig):
-    if documents_changed(orig, modified_driver):
-        modified_driver.documentation_approved = False
-        if modified_driver.all_docs_uploaded():
-            notification.send('ops_notifications.DocumentsUploaded', modified_driver)
-
-    if modified_driver.documentation_approved and not orig.documentation_approved:
+    if documents_changed(orig, modified_driver) and modified_driver.all_docs_uploaded():
         assign_credit_code(modified_driver)
-        server.services.booking.on_docs_approved(modified_driver)
+        server.services.booking.on_all_docs_uploaded(modified_driver)
 
+        # this is just informative. No action is required by ops.
+        notification.send('ops_notifications.DocumentsUploaded', modified_driver)
     return modified_driver
-
-
-def post_save(modified_driver, orig):
-    if modified_driver.base_letter and not orig.base_letter:
-        server.services.booking.on_base_letter_approved(modified_driver)
-
-    if modified_driver.base_letter_rejected and not orig.base_letter_rejected:
-        #TODO: do something after driver fails to get base letter
-        driver_notifications.base_letter_rejected(modified_driver)
 
 
 def is_converted_driver(driver):

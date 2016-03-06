@@ -11,39 +11,6 @@ from server import models, services
 from server.admin.payment import PaymentInline
 
 
-class WaitingOnFilter(admin.SimpleListFilter):
-    '''
-    Filter to show who each booking is waiting on
-    '''
-    title = 'waiting on'
-    parameter_name = 'waiting'
-
-    def lookups(self, request, model_admin):
-        return [
-            ('us', 'waiting on us'),
-            # ('driver', 'waiting on driver'),
-            # ('owner', 'waiting on owner'),
-        ]
-
-    def queryset(self, request, queryset):
-        if self.value() == 'us':
-            return queryset.filter(
-                Q(
-                    incomplete_time__isnull=True,           # not incomplete
-                    checkout_time__isnull=False,            # they've checked out
-                    driver__documentation_approved=False,   # but their docs aren't approved
-                ) | Q(
-                    incomplete_time__isnull=True,           # not incomplete
-                    checkout_time__isnull=False,            # they've checked out
-                    driver__documentation_approved=True,    # docs ARE approved
-                    driver__base_letter__isnull=True,       # base letter is required
-                    requested_time__isnull=True,            # elimintate old bookings
-                )
-            )
-        else:
-            return queryset
-
-
 class BookingStateFilter(admin.SimpleListFilter):
     '''
     Filter to show bookings in different states
@@ -75,7 +42,7 @@ class BookingAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('state', 'driver_docs_uploaded',),
-                ('driver_link', 'driver_phone', 'driver_email', 'driver_docs_approved'),
+                ('driver_link', 'driver_phone', 'driver_email',),
                 ('car', 'car_link', 'car_plate',),
                 ('weekly_rent', 'service_percentage', 'effective_service_percentage',),
                 ('owner_link', 'owner_phone', 'owner_email',),
@@ -114,7 +81,6 @@ class BookingAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         BookingStateFilter,
-        WaitingOnFilter,
         'incomplete_reason',
     ]
 
@@ -133,7 +99,6 @@ class BookingAdmin(admin.ModelAdmin):
         'driver_link',
         'driver_phone',
         'driver_email',
-        'driver_docs_approved',
         'created_time',
         # 'checkout_time',
         # 'requested_time',
@@ -231,11 +196,6 @@ class BookingAdmin(admin.ModelAdmin):
             return instance.driver.email()
         else:
             return None
-
-    def driver_docs_approved(self, instance):
-        return instance.driver.documentation_approved
-    driver_docs_approved.short_description = 'docs approved'
-    driver_docs_approved.boolean = True
 
     def queryset(self, request):
         return super(BookingAdmin, self).queryset(request).select_related(

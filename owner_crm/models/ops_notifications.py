@@ -16,7 +16,7 @@ class DocumentsUploaded(notification.OpsNotification):
         return {
             'FNAME': 'dudes',
             'HEADLINE': 'Driver Docs uploaded!',
-            'TEXT': 'Someone with the number {} uploaded all thier docs. Please see if they\'re legit'.format(
+            'TEXT': 'Someone with the number {} uploaded all thier docs. No action is required'.format(
                 kwargs['driver_phone_number']
             ),
             'CTA_LABEL': 'Check \'em out',
