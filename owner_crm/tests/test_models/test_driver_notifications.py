@@ -183,7 +183,7 @@ class DriverNotificationTest(TestCase):
             'DepositRefunded': {
                 'argument': 'refunded_payment',
                 'sms_result': 'refunded',
-                'email_result': 'refunded',
+                'email_result': 'confirmed',
             },
             'PasswordReset': {
                 'argument': 'password_reset',
@@ -290,7 +290,7 @@ class DriverNotificationTest(TestCase):
                         notification.send(campaign_name, argument)
 
                     self.assertEqual(len(mail.outbox), 1)
-                    # print mail.outbox[0].subject + ' --------------- ' + campaign_name
+                    print mail.outbox[0].subject + ' --------------- ' + campaign_name
                     self.assertTrue(spec['email_result'] in mail.outbox[0].subject)
 
                     # manually reset outbox
