@@ -11,7 +11,7 @@ HEAP_APP_ID = '3053705704'
 DRIVER_APP_URL = 'http://app.idlecars.com'
 OWNER_APP_URL = 'http://owner.idlecars.com'
 
-ALLOWED_HOSTS = ['www.idlecars.com']
+ALLOWED_HOSTS = ['alltaxi.herokuapp.com']
 
 # Allow cross origin requests from these domains
 CORS_ORIGIN_WHITELIST = (
