@@ -8,8 +8,8 @@ from settings import *
 # heap analytics tracking for production
 HEAP_APP_ID = '3053705704'
 
-DRIVER_APP_URL = 'http://app.idlecars.com'
-OWNER_APP_URL = 'http://owner.idlecars.com'
+DRIVER_APP_URL = 'http://app.alltaxi.com.s3-website-us-east-1.amazonaws.com'
+OWNER_APP_URL = 'http://owner.alltaxi.com.s3-website-us-east-1.amazonaws.com'
 
 ALLOWED_HOSTS = ['alltaxi.herokuapp.com']
 
