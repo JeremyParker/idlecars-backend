@@ -229,7 +229,7 @@ IDLECARS_PAYMENT_TOKEN = os.getenv('IDLECARS_PAYMENT_TOKEN', 'gwtbsw') # for Bra
 
 # TODO - move these to a config service
 TAKE_RATE = '0.079'
-STALENESS_LIMIT = 3
+STALENESS_LIMIT = 14
 SIGNUP_CREDIT = 50
 INVITOR_CREDIT = 50
 
