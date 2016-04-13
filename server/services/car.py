@@ -139,8 +139,9 @@ def pre_save(modified_car, orig):
     if orig.last_known_mileage != modified_car.last_known_mileage:
         modified_car.last_mileage_update = timezone.now()
 
-    if not orig.shift and modified_car.shift and not modified_car.weekly_rent:
-        modified_car.weekly_rent = recommended_rent(modified_car)
+    # Note: uncomment this to enable price recommendations.
+    # if not orig.shift and modified_car.shift and not modified_car.weekly_rent:
+    #     modified_car.weekly_rent = recommended_rent(modified_car)
 
     # if we're setting the cost for the first time, set a default solo deposit
     if modified_car.weekly_rent and not orig.weekly_rent:
