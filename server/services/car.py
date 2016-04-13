@@ -143,10 +143,11 @@ def pre_save(modified_car, orig):
     # if not orig.shift and modified_car.shift and not modified_car.weekly_rent:
     #     modified_car.weekly_rent = recommended_rent(modified_car)
 
+    # Note: uncomment this to enable deposit recommendations.
     # if we're setting the cost for the first time, set a default solo deposit
-    if modified_car.weekly_rent and not orig.weekly_rent:
-        if not orig.deposit and not modified_car.deposit:
-            modified_car.deposit = modified_car.weekly_rent / 4
+    # if modified_car.weekly_rent and not orig.weekly_rent:
+    #     if not orig.deposit and not modified_car.deposit:
+    #         modified_car.deposit = modified_car.weekly_rent / 4
 
     # if we're setting the car to unavailable, cancel any oustanding bookings
     if orig.next_available_date and not modified_car.next_available_date:
