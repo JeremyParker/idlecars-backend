@@ -11,7 +11,6 @@ def backfill_make_models(apps, schema_editor):
         {'make': 'Toyota', 'model': 'Camry'},
         {'make': 'Toyota', 'model': 'Rav 4'},
         {'make': 'Toyota', 'model': 'Highlander'},
-        {'make': 'Toyota', 'model': 'Highlander'},
         {'make': 'Nissan', 'model': 'NV-200'},
         {'make': 'Nissan', 'model': 'NV-200 WAV'},
         {'make': 'Ford', 'model': 'C-Max'},
