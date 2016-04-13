@@ -32,7 +32,7 @@ def lookup_vin_data(car):
 
 def _request_vin_data(vin):
     session = requests.Session()
-    uri = 'https://api.edmunds.com/api/vehicle/v2/vins/' + vin + '?fmt=json&api_key=buuk4a4thjmy2qtbgyrgaqkq'
+    uri = 'https://api.edmunds.com/api/vehicle/v2/vins/' + vin + '?fmt=json&api_key=srqpb2wgab7yky57d7nf785s'
     response = session.get(uri)
     if response.status_code != 200:
         raise Car.DoesNotExist
