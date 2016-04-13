@@ -25,6 +25,8 @@ QUEUE_IMPLEMENTATION = 'RealQueue'
 SMS_IMPLEMENTATION = 'TwilioRestClient'
 TLC_DATA_IMPLEMENTATION = 'Socrata'
 
+# We're not using SSL at the moment. No payments happening.
+SSLIFY_DISABLE = True
 CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
 SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
 
