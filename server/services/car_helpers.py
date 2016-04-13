@@ -34,7 +34,7 @@ def _filter_data_complete(queryset):
         ).exclude(
             Q(min_lease='_00_unknown') |
             Q(plate='') |
-            Q(base='') |
+            # Q(base='') |
             # TODO - put these back in when we're looking up zipcode in the owner portal
             # Q(owner__city='') |
             # Q(owner__state_code='') |
@@ -47,15 +47,14 @@ def is_data_complete(car):
     this checks the same logic as above for an individual car
     '''
     return car.owner and car.make_model and car.year and car.weekly_rent and car.deposit != None \
-        and car.plate and car.base and car.owner.zipcode \
-        and car.base and car.min_lease != '_00_unknown'
+        and car.plate and car.owner.zipcode and car.min_lease != '_00_unknown'
         # and car.owner.city and car.owner.state_code \
 
 
 def _filter_bookable(queryset):
     '''
     return cars that aren't busy through elsewhere, don't have a booking
-    in progress, and the owner's bank account details are approved.
+    in progress.
     '''
     # TODO - we probably need to optimize this, or at least cache it
     active_bookings = _filter_booking_in_progress(Booking.objects.all())
@@ -63,7 +62,6 @@ def _filter_bookable(queryset):
     return queryset.filter(
         next_available_date__isnull=False,
         next_available_date__lt=next_available_date_threshold,
-        owner__merchant_account_state=Owner.BANK_ACCOUNT_APPROVED,
     ).exclude(
         id__in=booked_car_ids
     )
