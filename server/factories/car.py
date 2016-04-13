@@ -54,8 +54,6 @@ class CarExpiredListing(BookableCar):
 class CompleteCar(BookableCar):
     ''' creates a car with all optional fields filled in '''
     hybrid = True
-    exterior_color = LazyAttribute(lambda o: random.choice(range(5)))
-    interior_color = LazyAttribute(lambda o: random.choice(range(5)))
     last_known_mileage = LazyAttribute(lambda o: random.randint(10000, 80000))
     last_mileage_update = LazyAttribute(lambda o: faker.date_time_this_month())
     insurance = SubFactory(Insurance)
