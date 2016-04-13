@@ -67,12 +67,10 @@ class CarAdmin(admin.ModelAdmin):
         'last_status_update',
         'plate',
         'shift',
-        'medallion',
     ]
     list_filter = [
         CarStaleListFilter,
         'owner__rating',
-        'medallion',
         NoPlateFilter,
     ]
     search_fields = [
