@@ -125,12 +125,6 @@ def create_car(owner, plate):
         # TODO - maybe we alert ops that this car needs to be looked up?
         pass
 
-    try:
-        tlc_data_service.lookup_insurance_data(car)
-    except Car.DoesNotExist:
-        # TODO - maybe we alert ops that this car needs to be looked up?
-        pass
-
     car.next_available_date = timezone.now()
     car.last_status_update = timezone.now()
     car.owner = owner

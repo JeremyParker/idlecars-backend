@@ -140,7 +140,6 @@ class CarCreateTest(CarAPITest):
         # make sure we filled in the stuff we were supposed to fill in
         self.assertIsNotNone(response.data['name'])
         self.assertIsNotNone(response.data['base'])
-        self.assertIsNotNone(response.data['insurance'])
         self.assertIsNotNone(response.data['listing_link'])
         self.assertIsNotNone(response.data['next_available_date'])
 

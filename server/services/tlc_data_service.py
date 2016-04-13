@@ -110,26 +110,6 @@ def lookup_car_data(car):
         _lookup_medallion_data(car)
 
 
-def lookup_insurance_data(car):
-    '''
-    Looks up the insurance information based on the VIN of the car.
-    '''
-    url = INSURANCE_RESOURCE + '?$q=' + car.plate
-    response_list = _get_resource(url)
-    if not response_list:
-        return
-
-    insurance_code = response_list[0]['automobile_insurance_code']
-    try:
-        car.insurance = Insurance.objects.get(insurance_code=insurance_code)
-    except Insurance.DoesNotExist:
-        car.insurance = Insurance.objects.create(
-            insurance_code=insurance_code,
-            insurer_name='Unknown Insurer with TLC ID {}'.format(insurance_code)
-        )
-    car.insurance_policy_number = response_list[0]['automobile_insurance_policy_number']
-
-
 def _get_real_plate(resource):
     ''' For testing, we can retrieve the first car out of the database to use its plate
     for the requests that follow. This ensures that we get a "found" result. '''

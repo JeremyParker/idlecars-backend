@@ -16,7 +16,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
             self._run_test('test_lookup_car')
             self._run_test('test_lookup_tlc_car')
-            self._run_test('test_lookup_insurance')
 
     def _run_test(self, test_name):
         func = getattr(self, test_name)
@@ -32,9 +31,3 @@ class Command(BaseCommand):
         new_car = factories.Car.build(plate=tlc_data_service.get_real_yellow_plate())
         tlc_data_service.lookup_car_data(new_car)
         assert(new_car.registrant_name != None)
-
-    def test_lookup_insurance(self):
-        new_car = factories.Car.build(plate=tlc_data_service.get_real_fhv_plate())
-        tlc_data_service.lookup_insurance_data(new_car)
-        if new_car.insurance: # the insurance might not be found
-            assert(new_car.insurance_policy_number)
