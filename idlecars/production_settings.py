@@ -15,10 +15,8 @@ ALLOWED_HOSTS = ['alltaxi.herokuapp.com']
 
 # Allow cross origin requests from these domains
 CORS_ORIGIN_WHITELIST = (
-    'app.idlecars.com',
-    'app.idlecars.com.s3-website-us-east-1.amazonaws.com',
-    'owner.idlecars.com',
-    'owner.idlecars.com.s3-website-us-east-1.amazonaws.com',
+    'app.alltaxi.com.s3-website-us-east-1.amazonaws.com',
+    'owner.alltaxi.com.s3-website-us-east-1.amazonaws.com',
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
