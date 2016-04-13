@@ -44,7 +44,7 @@ INSTALLED_APPS = (
     'credit',
     'rest_framework',
     'rest_framework.authtoken',
-    'website',
+    # 'website',
     'owner_crm',
     'unsubscribes',
     'bt_hooks',
@@ -194,7 +194,7 @@ STREET_TEAM_EMAIL = 'test@idlecars.com'
 TLC_DATA_IMPLEMENTATION = 'TestClient' #'Socrata'
 SOCRATA_APP_TOKEN = os.getenv('SOCRATA_APP_TOKEN', 'comes from environment')
 SOCRATA_PASSWORD = os.getenv('SOCRATA_PASSWORD', 'comes from environment')
-SOCRATA_USERNAME = 'jeremy@idlecars.com'
+SOCRATA_USERNAME = 'alltaxi@jeremyparker.org'
 
 # default to the FakeQueue, so we can run tests sychronously. Replace with RealQueue to use rq.
 QUEUE_IMPLEMENTATION = 'FakeQueue'

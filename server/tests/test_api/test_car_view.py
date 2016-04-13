@@ -272,7 +272,7 @@ class CarUpdateTest(CarAPITest):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
             current_value = response.data[field]
-            if field in tlc_data_service.fhv_fields + read_only_fields:
+            if field in tlc_data_service.tlc_fields + read_only_fields:
                 # values didn't change for the read-only fields
                 self.assertEqual(current_value, original_value)
             else:

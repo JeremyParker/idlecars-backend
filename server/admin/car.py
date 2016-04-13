@@ -58,27 +58,6 @@ class NoPlateFilter(admin.SimpleListFilter):
             return queryset.filter(plate='')
 
 
-class InsuranceFilter(admin.SimpleListFilter):
-    title = 'Insurance'
-    parameter_name = 'insurance'
-
-    def lookups(self, request, model_admin):
-        lookups = []
-        list_of_insurances = models.Insurance.objects.all()
-        for ins in list_of_insurances:
-            lookups.append((
-                ins.pk,
-                ins.insurer_name,
-            ))
-        return tuple(lookups)
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(insurance_id=self.value())
-        else:
-            return queryset
-
-
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
@@ -87,13 +66,11 @@ class CarAdmin(admin.ModelAdmin):
         'owner_rating',
         'last_status_update',
         'plate',
-        'insurance',
         'shift',
         'medallion',
     ]
     list_filter = [
         CarStaleListFilter,
-        InsuranceFilter,
         'owner__rating',
         'medallion',
         NoPlateFilter,
@@ -108,9 +85,7 @@ class CarAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('make_model', 'hybrid', 'year', 'plate',),
-                ('medallion', 'exterior_color', 'interior_color'),
                 ('owner', 'owner_link', 'owner_rating'),
-                ('insurance', 'insurance_link', 'insurance_policy_number'),
                 ('last_known_mileage', 'last_mileage_update'),
                 ('effective_status', 'last_status_update', 'next_available_date',),
                 ('shift', 'weekly_rent', 'deposit'),
@@ -131,7 +106,6 @@ class CarAdmin(admin.ModelAdmin):
     )
     readonly_fields = [
         'owner_link',
-        'insurance_link',
         'last_mileage_update',
         'owner_rating',
         'effective_status',
@@ -163,13 +137,6 @@ class CarAdmin(admin.ModelAdmin):
         else:
             return None
     owner_link.short_description = 'Owner'
-
-    def insurance_link(self, instance):
-        if instance.insurance:
-            return link(instance.insurance, instance.insurance.__unicode__())
-        else:
-            return None
-    insurance_link.short_description = 'Insurance'
 
     def owner_rating(self, instance):
         if instance.owner and instance.owner.rating:

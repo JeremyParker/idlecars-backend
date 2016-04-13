@@ -10,17 +10,15 @@ from django.conf import settings
 from django.utils import timezone
 
 from idlecars.fields import parse_phone_number
-from server.models import Car, MakeModel, Insurance
+from server.models import Car, MakeModel
 from server.tests.test_services.fake_tlc_data import TestClient
 
 
 TLC_DOMAIN = 'data.cityofnewyork.us'
-FHV_VEHICLE_RESOURCE = '8wbx-tsch'
 MEDALLION_VEHICLE_RESOURCE = 'rhe8-mgbb'
-INSURANCE_RESOURCE = 'cw8b-zbc3'
 
 
-fhv_fields = [
+tlc_fields = [
     'found_in_tlc',
     'last_updated',
     'active_in_tlc',
@@ -29,26 +27,26 @@ fhv_fields = [
     'base_number',
     'base_address',
     'base_telephone_number',
-    'base_type',
     'registrant_name',
-    'expiration_date',
     'vehicle_vin_number',
 ]
 
-
-def _copy_fhv_fields(car, tlc_data):
-    car.found_in_tlc = True
-    car.last_updated = _localtime(tlc_data['last_time_updated'])
-    car.active_in_tlc = True if tlc_data['active'] == 'YES' else False
-    car.year = int(tlc_data['vehicle_year'])
-    car.base = tlc_data['base_name']
-    car.base_number = tlc_data['base_number']
-    car.base_address = tlc_data['base_address']
-    car.base_telephone_number = parse_phone_number(tlc_data['base_telephone_number'])
-    car.base_type = Car.BASE_TYPE_LIVERY if tlc_data['base_type'] == 'LIVERY' else Car.BASE_TYPE_PARATRANS
-    car.registrant_name = tlc_data['name']
-    car.expiration_date = _localtime(tlc_data['expiration_date'])
-    car.vehicle_vin_number = tlc_data['vehicle_vin_number']
+# FIELDS RETURNED BY SOCRATA API
+# 'agent_address': '54-11 QUEENS BOULEVARD WOODSIDE NY 11377',
+# 'agent_name': 'TAXIFLEET MANAGEMENT LLC',
+# 'agent_number': '307',
+# 'agent_telephone_number': '(718)779-5000',
+# 'current_status': 'CUR',
+# 'dmv_license_plate_number': '3A15A',
+# 'last_updated_date': '2015-02-27T00:00:00',
+# 'last_updated_time': '13:20',
+# 'license_number': '3A15',
+# 'medallion_type': 'NAMED DRIVER',
+# 'model_year': '2012',
+# 'name': 'THERMILDOR, JELON',
+# 'type': 'MEDALLION',
+# 'vehicle_type': 'HYB',
+# 'vehicle_vin_number': '4T1BD1FK3CU050119'
 
 
 def _copy_medallion_fields(car, tlc_data):
@@ -60,9 +58,7 @@ def _copy_medallion_fields(car, tlc_data):
     car.base_number = tlc_data.get('agent_number', '')
     car.base_address = tlc_data.get('agent_address', '')
     car.base_telephone_number = parse_phone_number(tlc_data.get('agent_telephone_number', ''))
-    # car.base_type = Car.BASE_TYPE_LIVERY if tlc_data['base_type'] == 'LIVERY' else Car.BASE_TYPE_PARATRANS
     car.registrant_name = tlc_data.get('name', '')
-    # car.expiration_date = _localtime(tlc_data['expiration_date'])
     car.vehicle_vin_number = tlc_data.get('vehicle_vin_number', '')
     car.medallion = True
 
@@ -83,19 +79,7 @@ def _get_resource(url):
     return response_list
 
 
-def _lookup_fhv_data(car):
-    '''
-    Looks up the given car in the TLC database, and fills in details. If the car's plate
-    doesn't exist in the db, we raise a Car.DoesNotExist.
-    '''
-    url = FHV_VEHICLE_RESOURCE + '?dmv_license_plate_number=' + car.plate
-    response_list = _get_resource(url)
-    if not response_list:
-        raise Car.DoesNotExist
-    _copy_fhv_fields(car, response_list[0])
-
-
-def _lookup_medallion_data(car):
+def lookup_car_data(car):
     url = MEDALLION_VEHICLE_RESOURCE + '?dmv_license_plate_number=' + car.plate + '&$limit=1'
     response_list = _get_resource(url)
     if not response_list:
@@ -103,24 +87,10 @@ def _lookup_medallion_data(car):
     _copy_medallion_fields(car, response_list[0])
 
 
-def lookup_car_data(car):
-    try:
-        _lookup_fhv_data(car)
-    except Car.DoesNotExist:
-        _lookup_medallion_data(car)
-
-
-def _get_real_plate(resource):
+def _get_real_plate():
     ''' For testing, we can retrieve the first car out of the database to use its plate
     for the requests that follow. This ensures that we get a "found" result. '''
-    url = resource + '?$limit=1'
+    url = MEDALLION_VEHICLE_RESOURCE + '?$limit=1'
     response_list = _get_resource(url)
     return response_list[0]['dmv_license_plate_number']
 
-
-def get_real_tlc_plate():
-    return _get_real_plate(FHV_VEHICLE_RESOURCE)
-
-
-def get_real_yellow_plate():
-    return _get_real_plate(MEDALLION_VEHICLE_RESOURCE)

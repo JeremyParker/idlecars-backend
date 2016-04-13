@@ -117,7 +117,7 @@ def create_car(owner, plate):
     car, is_new = Car.objects.get_or_create(plate=car_info.plate)
     if not is_new and car.owner:
         raise CarDuplicateException()
-    model_helpers.copy_fields(car_info, car, tlc_data_service.fhv_fields)
+    model_helpers.copy_fields(car_info, car, tlc_data_service.tlc_fields)
 
     try:
         vin_data_service.lookup_vin_data(car)

@@ -16,7 +16,7 @@ class CarCreateTest(TestCase):
         self.plate = 'A REAL PLATE'
 
         # note: this MakeModel depends on the fake data we got from tlc lookup
-        self.make_model = factories.MakeModel.create(make='Chevrolet', model="Camaro")
+        self.make_model = factories.MakeModel.create(make='Toyota', model="Camry Hybrid")
 
     def test_create_success(self):
         new_car = car_service.create_car(self.owner, self.plate)
@@ -57,7 +57,7 @@ class CarRecommendedRentTest(TestCase):
     def setUp(self):
         self.owner = factories.BankAccountOwner.create(state_code='NY')
         self.plate = 'A REAL PLATE'
-        self.make_model = factories.MakeModel.create(make='Chevrolet', model="Camaro")
+        self.make_model = factories.MakeModel.create(make='Toyota', model="Camry Hybrid")
 
         self.car = car_service.create_car(self.owner, self.plate)
 

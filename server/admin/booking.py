@@ -75,7 +75,6 @@ class BookingAdmin(admin.ModelAdmin):
         'car_link',
         'owner_link',
         'car_cost',
-        'car_insurance',
         'service_percentage',
         'end_time',
     ]
@@ -92,7 +91,6 @@ class BookingAdmin(admin.ModelAdmin):
         'car_plate',
         'car_cost',
         'effective_service_percentage',
-        'car_insurance',
         'owner_link',
         'owner_phone',
         'owner_email',
@@ -181,10 +179,6 @@ class BookingAdmin(admin.ModelAdmin):
         return instance.service_percentage or instance.car.owner.effective_service_percentage
     effective_service_percentage.short_description = 'Effective take rate'
 
-    def car_insurance(self, instance):
-        return instance.car.insurance
-    car_insurance.admin_order_field = 'car__insurance'
-
     def driver_phone(self, instance):
         if instance.driver:
             return fields.format_phone_number(instance.driver.phone_number())
@@ -203,7 +197,6 @@ class BookingAdmin(admin.ModelAdmin):
             'car',
             'car__owner',
             'car__make_model',
-            'car__insurance',
         )
 
 
