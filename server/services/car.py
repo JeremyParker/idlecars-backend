@@ -16,10 +16,6 @@ class CarTLCException(Exception):
     pass
 
 
-class CarDuplicateException(Exception):
-    pass
-
-
 def filter_live(queryset):
     return car_helpers._filter_not_stale(
         car_helpers._filter_data_complete(
@@ -114,9 +110,7 @@ def create_car(owner, plate):
     except Car.DoesNotExist:
         raise CarTLCException
 
-    car, is_new = Car.objects.get_or_create(plate=car_info.plate)
-    if not is_new and car.owner:
-        raise CarDuplicateException()
+    car = Car.objects.create(plate=car_info.plate)
     model_helpers.copy_fields(car_info, car, tlc_data_service.tlc_fields)
 
     try:

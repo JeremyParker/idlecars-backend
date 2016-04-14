@@ -16,9 +16,6 @@ from server.serializers import CarSerializer, CarCreateSerializer
 from server.permissions import OwnsCar, IsAuthenticatedOwner
 
 CAR_NOT_FOUND = 'Sorry, this license plate isn\'t in the TLC database. Please check your plate number and try again.'
-CAR_ALREADY_REGISTERED = 'This car is already registered with idlecars. Please call for support at {}'.format(
-    settings.IDLECARS_PHONE_NUMBER
-)
 
 class CarViewSet(
     mixins.CreateModelMixin,
@@ -55,8 +52,6 @@ class CarViewSet(
             return super(CarViewSet, self).create(request, *args, **kwargs)
         except car_service.CarTLCException:
             return Response({'_app_notifications': [CAR_NOT_FOUND]}, status.HTTP_400_BAD_REQUEST)
-        except car_service.CarDuplicateException:
-            return Response({'_app_notifications': [CAR_ALREADY_REGISTERED]}, status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         owner = Owner.objects.get(auth_users=self.request.user)

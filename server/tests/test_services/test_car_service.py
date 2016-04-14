@@ -40,13 +40,13 @@ class CarCreateTest(TestCase):
 
     def test_create_existing_with_other_owner(self):
         car = factories.ClaimedCar.create(plate=self.plate)
-        with self.assertRaises(car_service.CarDuplicateException):
-            new_car = car_service.create_car(self.owner, self.plate)
+        # make sure this doesn't throw an exception
+        new_car = car_service.create_car(self.owner, self.plate)
 
     def test_create_existing_my_car(self):
         car = factories.ClaimedCar.create(plate=self.plate, owner=self.owner)
-        with self.assertRaises(car_service.CarDuplicateException):
-            new_car = car_service.create_car(self.owner, self.plate)
+        # make sure this doesn't throw an exception
+        new_car = car_service.create_car(self.owner, self.plate)
 
     def test_create_not_in_tlc_db(self):
         with self.assertRaises(car_service.CarTLCException):

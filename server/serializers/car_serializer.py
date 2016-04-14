@@ -73,8 +73,9 @@ class CarCreateSerializer(ModelSerializer):
        )
 
     def update(self, instance, validated_data):
-        if 'owner' in validated_data and car_service.has_booking_in_progress(instance):
-            raise ValidationError('This car has a booking in progress so it cannot be deleted.')
+        if 'owner' in validated_data:
+            if car_service.has_booking_in_progress(instance):
+                raise ValidationError('A driver is associated with this shift. Remove the driver, then delete.')
         return super(CarCreateSerializer, self).update(instance, validated_data)
 
     def get_name(self, obj):

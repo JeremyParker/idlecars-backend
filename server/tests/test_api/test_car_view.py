@@ -127,21 +127,6 @@ class CarCreateTest(CarAPITest):
         self.plate = 'REAL_PLATE'
         self.url = reverse('server:cars-list')
 
-    def test_create_car_success(self):
-        self.car = None # forget that we had a car
-        plate = 'OTHER_REAL_PLATE'
-        factories.MakeModel.create() # TODO - remove this
-
-        response = self.client.post(self.url, data={'plate': plate})
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['plate'], plate)
-        self.assertEqual(models.Car.objects.get(plate=plate).owner, self.owner)
-
-        # make sure we filled in the stuff we were supposed to fill in
-        self.assertIsNotNone(response.data['name'])
-        self.assertIsNotNone(response.data['base'])
-        self.assertIsNotNone(response.data['listing_link'])
-        self.assertIsNotNone(response.data['next_available_date'])
 
     def test_create_unclaimed_car_success(self):
         self.car.owner = None
@@ -149,20 +134,20 @@ class CarCreateTest(CarAPITest):
         response = self.client.post(self.url, data={'plate': self.car.plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['plate'], self.car.plate)
-        self.car.refresh_from_db()
-        self.assertEqual(self.car.owner, self.owner)
+        new_car = models.Car.objects.get(pk=response.data['id'])
+        self.assertEqual(new_car.owner, self.owner)
 
     def test_create_duplicate_i_own(self):
         response = self.client.post(self.url, data={'plate': self.car.plate})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertTrue('_app_notifications' in response.data.keys())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue('_app_notifications' not in response.data.keys())
 
     def test_create_other_owners_duplicate(self):
         self.car = None # forget that we had a car
         other_car = factories.ClaimedCar.create()
         response = self.client.post(self.url, data={'plate': other_car.plate})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertTrue('_app_notifications' in response.data.keys())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue('_app_notifications' not in response.data.keys())
 
     def test_unregistered_car_fails(self):
         self.car = None # forget that we had a car
@@ -232,7 +217,7 @@ class CarUpdateTest(CarAPITest):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data['_app_notifications'],
-            ['This car has a booking in progress so it cannot be deleted.'],
+            ['A driver is associated with this shift. Remove the driver, then delete.'],
         )
 
     def test_cannot_update_others_cars(self):
