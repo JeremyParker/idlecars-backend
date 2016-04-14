@@ -396,39 +396,6 @@ def on_payment_refunded(payment):
     notification.send('driver_notifications.DepositRefunded', payment)
 
 
-def _booking_updates():
-    ''' Update the state of bookings based on the passing of time '''
-    checkout_age_limit = timezone.now() - datetime.timedelta(hours=72) # TODO: from config
-    docs_age_limit = timezone.now() - datetime.timedelta(hours=48) # TODO: from config
-    old_pending_bookings = filter_pending(Booking.objects.all()).filter(
-        created_time__lte=docs_age_limit,
-    )
-    for booking in old_pending_bookings:
-        try:
-            # if they're still pending after 72 hours they must have uploaded their docs
-            if booking.created_time < checkout_age_limit:
-                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW_CC)
-            elif not booking.driver.all_docs_uploaded():
-                _make_booking_incomplete(booking, Booking.REASON_DRIVER_TOO_SLOW_DOCS)
-
-        except ServiceError:
-            pass  # TODO: ops will get an email about the payment failure, and
-
-    expired_bookings = filter_requested(Booking.objects.all()).filter(
-        requested_time__lte=timezone.now() - datetime.timedelta(hours=72), # TODO: from config
-    )
-    for booking in expired_bookings:
-        try:
-            _make_booking_incomplete(booking, Booking.REASON_OWNER_TOO_SLOW)
-        except ServiceError:
-            pass  # ops will get an email about the payment failure, and
-
-
-def cron_job():
-    _booking_updates()
-    invoice_service.cron_payments(filter_active(Booking.objects.all()))
-
-
 def start_time_display(booking):
     def _format_date(date):
         return date.strftime('%b %d')

@@ -103,59 +103,31 @@ class TestDriverDocsNotifications(TestCase):
         #TODO: time should be from settings
         with freeze_time("2014-10-10 11:00:00"):
             driver_service.process_document_notifications()
-            call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'first_documents_reminder'
         )
         with freeze_time("2014-10-11 10:00:00"):
             driver_service.process_document_notifications()
-            call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'second_documents_reminder'
         )
         with freeze_time("2014-10-11 22:00:00"):
             driver_service.process_document_notifications()
-            call_command('cron_job')
         with freeze_time("2014-10-12 10:00:00"):
             driver_service.process_document_notifications()
-            call_command('cron_job')
         test_message.verify_throttled_on_driver(
             self.booking.driver,
             'third_documents_reminder'
         )
-        with freeze_time("2014-10-13 10:00:00"):
-            driver_service.process_document_notifications()
-            call_command('cron_job')
 
         from django.core.mail import outbox
         '''
         We should have sent:
         - 3 Timed document reminders based on sign-up time for driver without docs
-        - 2 Driver notification when the drivers' bookings expired
         '''
-        self.assertEqual(len(outbox), 5)
-
-        self.assertEqual(
-            outbox[3].subject,
-            'Your rental has been cancelled because we don\'t have your driver documents.'
-        )
-        self.assertEqual(
-            outbox[4].subject,
-            'Your {} rental has been cancelled because you never checked out.'.format(
-                other_booking.car.display_name()
-            )
-        )
-
-        # each booking should have been set to the correct INCOMPLETE reason
-        self.booking.refresh_from_db()
-        self.assertEqual(self.booking.get_state(), Booking.INCOMPLETE)
-        self.assertEqual(self.booking.incomplete_reason, Booking.REASON_DRIVER_TOO_SLOW_DOCS)
-
-        other_booking.refresh_from_db()
-        self.assertEqual(other_booking.get_state(), Booking.INCOMPLETE)
-        self.assertEqual(other_booking.incomplete_reason, Booking.REASON_DRIVER_TOO_SLOW_CC)
+        self.assertEqual(len(outbox), 3)
 
 
 class TestDriverCreditNotifications(TestCase):

@@ -104,38 +104,3 @@ def create_next_rent_payment(booking):
         invoice_start_time=start_time,
         invoice_end_time=end_time,
     )
-
-
-def cron_payments(active_bookings_qs):
-    payment_lead_time_hours = 2  # TODO - get this out of a config system
-    pay_time = timezone.now() + datetime.timedelta(hours=payment_lead_time_hours)
-
-    for booking in active_bookings_qs.prefetch_related('payment_set'):
-        relevant_end_time = min(booking.end_time, pay_time)
-        existing_payments = booking.payment_set.filter(
-            invoice_end_time__isnull=False,
-            invoice_end_time__gte=relevant_end_time,
-            status=Payment.SETTLED,
-        )
-        if existing_payments.exists():
-            continue
-
-        # check if we failed wihtin that past N hours. If so, skip for now.
-        if booking.payment_set.filter(
-            invoice_end_time__isnull=False,
-            invoice_end_time__gte=relevant_end_time,
-            status=Payment.DECLINED,
-            created_time__gte=timezone.now() - datetime.timedelta(hours=8)
-        ):
-            continue
-
-        try:
-            payment = create_next_rent_payment(booking)
-            payment = payment_service.settle(payment)
-            if payment.error_message:
-                print payment.error_message
-                print payment.notes
-                continue
-        except Exception as e:
-            print e
-            notification.send('ops_notifications.PaymentJobFailed', booking, e)

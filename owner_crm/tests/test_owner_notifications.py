@@ -318,7 +318,6 @@ class TestOwnerInsuranceNotifications(TestCase):
 
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
                 'first_morning_insurance_reminder'
@@ -326,11 +325,9 @@ class TestOwnerInsuranceNotifications(TestCase):
 
         with freeze_time(timezone.datetime(2014, 10, 11, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
                 'second_morning_insurance_reminder'
@@ -338,19 +335,15 @@ class TestOwnerInsuranceNotifications(TestCase):
 
         with freeze_time(timezone.datetime(2014, 10, 12, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 18, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         '''
             - message to owner: first morning reminder
@@ -359,11 +352,9 @@ class TestOwnerInsuranceNotifications(TestCase):
             - message to owner: second afternoon reminder
             - message to owner: third morning reminder
             - message to owner: third afternoon reminder
-            - message to owner: insurance too slow reminder
-            - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 8)
+        self.assertEqual(len(outbox), 6)
 
     def test_reminder_emails_afternoon_until_failure(self):
         tz = timezone.get_current_timezone()
@@ -372,18 +363,15 @@ class TestOwnerInsuranceNotifications(TestCase):
         with freeze_time(timezone.datetime(2014, 10, 10, 13, tzinfo=tz)):
 
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
                 'first_afternoon_insurance_reminder'
             )
         with freeze_time(timezone.datetime(2014, 10, 11, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 11, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
             test_message.verify_throttled_on_owner(
                 self.booking.car.owner,
                 'second_afternoon_insurance_reminder'
@@ -391,15 +379,12 @@ class TestOwnerInsuranceNotifications(TestCase):
 
         with freeze_time(timezone.datetime(2014, 10, 12, 10, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 12, 13, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         with freeze_time(timezone.datetime(2014, 10, 13, 0, tzinfo=tz)):
             owner_service.process_insurance_reminder()
-            call_command('cron_job')
 
         '''
             - message to owner: first afternoon reminder
@@ -407,11 +392,9 @@ class TestOwnerInsuranceNotifications(TestCase):
             - message to owner: second afternoon reminder
             - message to owner: second morning reminder
             - message to owner: third afternoon reminder
-            - message to owner: insurance too slow reminder
-            - message to driver: insurance failed reminder
         '''
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 7)
+        self.assertEqual(len(outbox), 5)
 
 
 class TestOwnerPickupNotifications(TestCase):
