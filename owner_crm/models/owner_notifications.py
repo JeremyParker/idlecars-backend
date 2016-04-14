@@ -14,34 +14,6 @@ from server.services import car as car_service
 from owner_crm.models import notification
 
 
-class OnboardingReminderBase(notification.OnboardingOwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Hi {}, We\'re idlecars. Are you looking to rent your car. Why don’t you list \
-your car with us for free. List your car at {}'.format(
-            kwargs['onboarding_owner_name'],
-            kwargs['owner_app_url']
-        )
-        return {
-            'sms_body': sms_body,
-        }
-
-
-class FirstOnboardingReminder(OnboardingReminderBase):
-    pass
-
-
-class SecondOnboardingReminder(OnboardingReminderBase):
-    pass
-
-
-class ThirdOnboardingReminder(OnboardingReminderBase):
-    pass
-
-
-class FourthOnboardingReminder(OnboardingReminderBase):
-    pass
-
-
 def _get_car_listing_links(owner):
     links = ''
     for car in car_service.filter_live(owner.cars.all()):
@@ -82,9 +54,7 @@ listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_d
 class PendingNotification(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = '''Someone is interested in your {} with plates {}. They are still in the process
-        of submitting their documents and entering their payment information, but we will send
-        you everything as soon as possible. <br /><br />
-
+        of submitting their documents, but we will send you everything as soon as possible. <br /><br />
         If this shift is no longer available, please click below to de-list the shift from our
         marketplace.'''.format(
             kwargs['car_name'],
@@ -103,8 +73,6 @@ class PendingNotification(notification.OwnerNotification):
 
 class SignupConfirmation(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = 'Welcome to Idlecars! Thank you for creating a car owner account! \
-Check your email to see more on how Idlecars works.'
         text = render_to_string(
             "owner_signup.jade",
             {},
@@ -113,13 +81,12 @@ Check your email to see more on how Idlecars works.'
 
         return {
             'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Welcome to Idlecars',
+            'HEADLINE': 'Welcome to All Taxi',
             'TEXT': text,
             'CTA_LABEL': 'Go to your Account',
             'CTA_URL': kwargs['owner_app_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Welcome to your Idlecars owner account',
-            'sms_body': sms_body,
+            'subject': 'Welcome to your All Taxi owner account',
         }
 
 
@@ -166,8 +133,10 @@ class NewBookingEmail(notification.OwnerNotification):
                     kwargs['driver_first_name'] or 'the driver',
                     fields.format_phone_number(kwargs['driver_phone_number']),
                 ),
+            'CTA_LABEL': 'Accept/Reject Diver',
+            'CTA_URL': kwargs['car_owner_details_url'],
             'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
-            'template_name': 'no_button_four_images',
+            'template_name': 'one_button_four_images',
             'sms_body': headline + ' An email has been sent to {} with more information.'.format(
                 kwargs['user_email']
             )

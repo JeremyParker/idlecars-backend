@@ -60,7 +60,7 @@ class OwnerServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'Welcome to your Idlecars owner account',
+            'Welcome to your All Taxi owner account',
         )
 
 

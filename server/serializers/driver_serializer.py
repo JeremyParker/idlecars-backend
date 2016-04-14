@@ -79,11 +79,12 @@ class DriverSerializer(ModelSerializer):
         if 'password' in validated_data:
             raise PermissionDenied()
 
-        if 'invitor_code' in validated_data and validated_data['invitor_code']:
-            try:
-                driver_service.redeem_code(instance, validated_data['invitor_code'])
-            except ServiceError as e:
-                raise ValidationError(e.message)
+        # All Taxi isn't doing a referral credit program at launch.
+        # if 'invitor_code' in validated_data and validated_data['invitor_code']:
+        #     try:
+        #         driver_service.redeem_code(instance, validated_data['invitor_code'])
+        #     except ServiceError as e:
+        #         raise ValidationError(e.message)
 
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)

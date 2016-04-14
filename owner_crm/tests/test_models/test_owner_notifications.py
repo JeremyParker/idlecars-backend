@@ -47,26 +47,6 @@ class OwnerNotificationTest(TestCase):
         sms_service.test_reset()
 
         self.notification_spec = {
-            'OnboardingReminderBase': {
-                'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
-            },
-            'FirstOnboardingReminder': {
-                'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
-            },
-            'SecondOnboardingReminder': {
-                'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
-            },
-            'ThirdOnboardingReminder': {
-                'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
-            },
-            'FourthOnboardingReminder': {
-                'argument': 'onboarding_owner',
-                'sms_result': 'idlecars',
-            },
             'RenewalEmail': {
                 'argument': 'car',
                 'sms_result': app_routes_owner.car_details_url(self.car),

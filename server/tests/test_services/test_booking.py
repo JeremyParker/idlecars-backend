@@ -49,7 +49,7 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 0)
 
     def test_create_booking_docs_approved(self):
-        driver = factories.ApprovedDriver.create()
+        driver = factories.Driver.create()
         new_booking = booking_service.create_booking(self.car, driver)
         self.assertEqual(new_booking.driver, driver)
         self.assertEqual(new_booking.car, self.car)
@@ -84,7 +84,6 @@ class BookingServiceTest(TestCase):
             outbox[1].subject,
             'Congratulations! Your documents have been submitted!'
         )
-        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
         # an email to the driver - checkout receipt
         self.assertEqual(outbox[2].merge_vars.keys()[0], booking.driver.email())
@@ -92,6 +91,7 @@ class BookingServiceTest(TestCase):
             outbox[2].subject,
             'Your {} was successfully reserved.'.format(booking.car.display_name()),
         )
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_checkout_all_docs_uploaded(self):
         new_booking = self._checkout_completed_driver()
@@ -226,44 +226,18 @@ class BookingServiceTest(TestCase):
         self._check_payments_after_pickup(new_booking)
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 3)
+        self.assertEqual(len(outbox), 2)
 
         # a pickup confirmation to driver
         self.assertEqual(
-            outbox[1].subject,
+            outbox[0].subject,
             'You are ready to drive!',
         )
 
         # a pickup confirmation to owner
         self.assertEqual(
-            outbox[2].subject,
-            '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
-        )
-
-    def test_pickup_with_a_invitor(self):
-        invitor = factories.ApprovedDriver.create()
-        invitee = factories.ApprovedDriver.create()
-        invitee.auth_user.customer.invitor_code = invitor.auth_user.customer.invite_code
-        invitee.save()
-
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=invitee)
-
-        # pick up the car
-        new_booking = booking_service.pickup(new_booking)
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 4)
-
-        referral_credit_amount = invitee.auth_user.customer.invite_code.invitor_credit_amount
-        self.assertEqual(
-            outbox[0].subject,
-            'Receive ${} for each friend you refer to Idlecars'.format(referral_credit_amount),
-        )
-        # a credit received notification for the invitor at invitee's pickup
-        invitor_credit_amount = invitor.auth_user.customer.invite_code.invitor_credit_amount
-        self.assertEqual(
             outbox[1].subject,
-            'You just received ${}.00 of Idlecars rental credit'.format(invitor_credit_amount),
+            '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
         )
 
     def test_repeated_driver_pickup(self):

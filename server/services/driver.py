@@ -82,7 +82,7 @@ def redeem_code(driver, code_string):
 
 def on_newly_converted(driver):
     # we tell the driver they can now invite their friends
-    notification.send('driver_notifications.ReferFriends', driver)
+    # notification.send('driver_notifications.ReferFriends', driver)
 
     # whoever invited them gets app credit
     success, invitor_customer = credit_service.reward_invitor_for(driver.auth_user.customer)
