@@ -116,7 +116,7 @@ class CarCreateSerializer(ModelSerializer):
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
             return {
-                'state_string': 'Waiting for information',
+                'state_string': 'Waiting for information. Tap here.',
                 'buttons': [
                     # {
                     #     'label': 'Complete this listing',
@@ -124,35 +124,17 @@ class CarCreateSerializer(ModelSerializer):
                     # }
                 ]
             }
-        elif car.owner and not car.owner.merchant_account_state or \
-            car.owner.merchant_account_state == Owner.BANK_ACCOUNT_DECLINED:
+        elif not car.next_available_date:
             return {
-                'state_string': 'Waiting for direct deposit information',
+                'state_string': 'Not listed.',
                 'buttons': [{
-                    'label': 'Add bank details',
-                    'function_key': 'AddBankLink',
+                    'label': 'List this shift',
+                    'function_key': 'Relist',
                 }]
             }
-        elif car.owner and car.owner.merchant_account_state == Owner.BANK_ACCOUNT_PENDING:
-            if car.next_available_date:
-                return {
-                    'state_string': 'Waiting for bank account approval.',
-                    'buttons': [{
-                        'label': 'Remove listing',
-                        'function_key': 'RemoveListing',
-                    }]
-                }
-            else:
-                return {
-                    'state_string': 'Not listed.',
-                    'buttons': [{
-                        'label': 'List this car',
-                        'function_key': 'Relist',
-                    }]
-                }
         elif booking_service.filter_requested(car.booking_set.all()):
             return {
-                'state_string': 'Booked. Waiting for insurance approval.',
+                'state_string': 'Requested. Waiting for approval.',
                 'buttons': [
                     {
                         'label': 'The driver is approved',
@@ -163,7 +145,7 @@ class CarCreateSerializer(ModelSerializer):
                         'function_key': 'RejectInsurance',
                     },
                     {
-                        'label': 'This car is no longer available',
+                        'label': 'This shift is no longer available',
                         'function_key': 'RemoveListing',
                     },
                 ]
@@ -203,7 +185,7 @@ class CarCreateSerializer(ModelSerializer):
             return {
                 'state_string': 'Not listed.',
                 'buttons': [{
-                    'label': 'List this car',
+                    'label': 'List this shift',
                     'function_key': 'Relist',
                 }]
             }
@@ -227,7 +209,7 @@ class CarCreateSerializer(ModelSerializer):
                 'state_string': 'Not listed. Busy until {}.'.format(car.next_available_date.strftime('%b %d')),
                 'buttons': [
                     {
-                        'label': 'List this car',
+                        'label': 'List this shift',
                         'function_key': 'Relist',
                     },
                     {

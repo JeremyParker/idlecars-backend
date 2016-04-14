@@ -184,7 +184,7 @@ class TestOwnerPendingBookingNotifications(TestCase):
 class TestOwnerAccountNotification(TestCase):
     def test_no_car_no_email(self):
         with freeze_time("2014-10-10 11:00:00"):
-            complete_owner = server.factories.PendingOwner.create()
+            complete_owner = server.factories.Owner.create()
 
         owner_service.process_account_reminder()
 
@@ -194,20 +194,18 @@ class TestOwnerAccountNotification(TestCase):
     @freeze_time("2014-10-11 12:00:00")
     def test_only_incomplete_owners_get_reminder(self):
         with freeze_time("2014-10-10 11:00:00"):
-            missing_zipcode_owner = server.factories.BankAccountOwner.create()
+            missing_zipcode_owner = server.factories.Owner.create()
             missing_zipcode_owner.zipcode = ''
             missing_zipcode_owner.save()
-            missing_bank_account_owner = server.factories.Owner.create()
-            complete_owner = server.factories.PendingOwner.create()
+            complete_owner = server.factories.Owner.create()
 
             server.factories.ClaimedCar.create(owner=missing_zipcode_owner)
-            server.factories.ClaimedCar.create(owner=missing_bank_account_owner)
             server.factories.ClaimedCar.create(owner=complete_owner)
 
         owner_service.process_account_reminder()
 
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
+        self.assertEqual(len(outbox), 1)
 
         self.assertEqual(
             outbox[0].subject,
@@ -215,14 +213,14 @@ class TestOwnerAccountNotification(TestCase):
         )
 
         self.assertFalse(
-            complete_owner.email() in [outbox[1].merge_vars.keys()[0], outbox[0].merge_vars.keys()[0]]
+            complete_owner.email() in [outbox[0].merge_vars.keys()[0]]
         )
 
     @freeze_time("2014-10-11 12:00:00")
     def test_no_email_twice(self):
         with freeze_time("2014-10-10 11:00:00"):
-            missing_bank_account_owner = server.factories.Owner.create()
-            server.factories.ClaimedCar.create(owner=missing_bank_account_owner)
+            owner = server.factories.Owner.create(zipcode='')
+            server.factories.ClaimedCar.create(owner=owner)
 
         owner_service.process_account_reminder()
         owner_service.process_account_reminder()
@@ -231,8 +229,8 @@ class TestOwnerAccountNotification(TestCase):
         self.assertEqual(len(outbox), 1)
 
     def test_no_email_early(self):
-        missing_bank_account_owner = server.factories.Owner.create()
-        server.factories.ClaimedCar.create(owner=missing_bank_account_owner)
+        owner = server.factories.Owner.create()
+        server.factories.ClaimedCar.create(owner=owner)
 
         owner_service.process_account_reminder()
 
@@ -241,8 +239,8 @@ class TestOwnerAccountNotification(TestCase):
 
     def test_second_reminder(self):
         with freeze_time("2014-10-10 11:00:00"):
-            missing_bank_account_owner = server.factories.Owner.create()
-            server.factories.ClaimedCar.create(owner=missing_bank_account_owner)
+            owner = server.factories.Owner.create(zipcode='')
+            server.factories.ClaimedCar.create(owner=owner)
 
         owner_service.process_account_reminder()
 

@@ -9,7 +9,6 @@ import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.db.models import Q
 
 from owner_crm.services import password_reset_service, throttle_service, notification
 from owner_crm.models import driver_notifications, owner_notifications, ops_notifications
@@ -55,10 +54,7 @@ def _renewable_cars():
 
 
 def filter_incomplete(queryset):
-    return queryset.filter(
-        Q(zipcode='') |
-        Q(merchant_id='')
-    )
+    return queryset.filter(zipcode='')
 
 
 def process_renewal_reminder():

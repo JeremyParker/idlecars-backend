@@ -60,34 +60,14 @@ class TextCarState(TestCase):
     def test_data_incomplete(self):
         car = factories.Car.create()
         serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'Waiting for information')
+        self.assertEqual(serializer_data['state_string'], 'Waiting for information. Tap here.')
         self.assertEqual(0, len(serializer_data['state_buttons']))
         # TODO - put this back in when the client can go to required field
         # self.assertEqual(1, len(serializer_data['state_buttons']))
         # self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Complete this listing')
         # self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'GoRequiredField')
 
-    def test_no_bank_deets(self):
-        car = factories.ClaimedCar.create(status=Car.STATUS_AVAILABLE)
-        serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'Waiting for direct deposit information')
-        self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Add bank details')
-        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'AddBankLink')
-
-    def test_bank_pending_available(self):
-        owner = factories.PendingOwner.create()
-        car = factories.ClaimedCar.create(
-            owner=owner,
-            next_available_date=timezone.now(),
-        )
-        serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'Waiting for bank account approval.')
-        self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'Remove listing')
-        self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'RemoveListing')
-
-    def test_bank_pending_busy(self):
+    def test__busy(self):
         owner = factories.PendingOwner.create()
         car = factories.ClaimedCar.create(
             owner=owner,
@@ -96,7 +76,7 @@ class TextCarState(TestCase):
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Not listed.')
         self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this shift')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
 
     def test_reserved(self):
@@ -104,13 +84,13 @@ class TextCarState(TestCase):
         booking = factories.RequestedBooking.create(car=car)
 
         serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'Booked. Waiting for insurance approval.')
+        self.assertEqual(serializer_data['state_string'], 'Requested. Waiting for approval.')
         self.assertEqual(3, len(serializer_data['state_buttons']))
         self.assertEqual(serializer_data['state_buttons'][0]['label'], 'The driver is approved')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'ApproveInsurance')
         self.assertEqual(serializer_data['state_buttons'][1]['label'], 'The driver was rejected from the insurance')
         self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RejectInsurance')
-        self.assertEqual(serializer_data['state_buttons'][2]['label'], 'This car is no longer available')
+        self.assertEqual(serializer_data['state_buttons'][2]['label'], 'This shift is no longer available')
         self.assertEqual(serializer_data['state_buttons'][2]['function_key'], 'RemoveListing')
 
     def test_accepted(self):
@@ -141,7 +121,7 @@ class TextCarState(TestCase):
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(serializer_data['state_string'], 'Not listed.')
         self.assertEqual(1, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this shift')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
 
     def test_stale(self):
@@ -181,7 +161,7 @@ class TextCarState(TestCase):
             serializer_data['state_string']
         )
         self.assertEqual(2, len(serializer_data['state_buttons']))
-        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this car')
+        self.assertEqual(serializer_data['state_buttons'][0]['label'], 'List this shift')
         self.assertEqual(serializer_data['state_buttons'][0]['function_key'], 'Relist')
         self.assertEqual(serializer_data['state_buttons'][1]['label'], 'Change availability')
         self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'GoNextAvailableDate')
