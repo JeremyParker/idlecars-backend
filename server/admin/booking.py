@@ -27,7 +27,6 @@ class BookingStateFilter(admin.SimpleListFilter):
             return queryset
         return {
             models.Booking.PENDING: services.booking.filter_pending(queryset),
-            models.Booking.RESERVED: services.booking.filter_reserved(queryset),
             models.Booking.REQUESTED: services.booking.filter_requested(queryset),
             models.Booking.ACCEPTED: services.booking.filter_accepted(queryset),
             models.Booking.ACTIVE: services.booking.filter_active(queryset),
@@ -64,7 +63,6 @@ class BookingAdmin(admin.ModelAdmin):
         ('Notes', {
             'fields': (
                 'notes',
-                'deprecated_state',
             ),
         }),
     )
@@ -107,7 +105,6 @@ class BookingAdmin(admin.ModelAdmin):
         # 'incomplete_time',
         # 'incomplete_reason',
         # 'refund_time',
-        'deprecated_state',
     ]
     search_fields = [
         'driver__auth_user__username',
