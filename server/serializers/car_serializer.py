@@ -117,14 +117,10 @@ class CarCreateSerializer(ModelSerializer):
         if not car_helpers.is_data_complete(car):
             return {
                 'state_string': 'Waiting for information. Tap here.',
-                'buttons': [
-                    # {
-                    #     'label': 'Complete this listing',
-                    #     'function_key': 'GoRequiredField',
-                    # }
-                ]
+                'buttons': []
             }
-        elif not car.next_available_date:
+
+        if not car.next_available_date:
             return {
                 'state_string': 'Not listed.',
                 'buttons': [{
@@ -132,16 +128,17 @@ class CarCreateSerializer(ModelSerializer):
                     'function_key': 'Relist',
                 }]
             }
-        elif booking_service.filter_requested(car.booking_set.all()):
+
+        if booking_service.filter_requested(car.booking_set.all()):
             return {
-                'state_string': 'Requested. Waiting for approval.',
+                'state_string': 'Requested. Check your email for documentation.',
                 'buttons': [
                     {
-                        'label': 'The driver is approved',
+                        'label': 'Add this driver',
                         'function_key': 'ApproveInsurance',
                     },
                     {
-                        'label': 'The driver was rejected from the insurance',
+                        'label': 'Don\'t add this driver',
                         'function_key': 'RejectInsurance',
                     },
                     {
@@ -150,46 +147,18 @@ class CarCreateSerializer(ModelSerializer):
                     },
                 ]
             }
-        elif booking_service.filter_accepted(car.booking_set.all()):
+
+        active_bookings = booking_service.filter_returned(car.booking_set.all())
+        if active_bookings:
             return {
-                'state_string': 'Booked. The driver will contact you to arrange pickup.',
-                'buttons': [
-                # {
-                    # TODO
-                    # 'label': 'Contact the driver',
-                    # 'function_key': 'ContactDriver',
-                # }
-                ]
-            }
-        elif booking_service.filter_active(car.booking_set.all()):
-            b = booking_service.filter_active(car.booking_set.all()).first()
-            return {
-                'state_string': 'Rented until {}'.format(b.end_time.strftime('%b %d')),
-                'buttons': [
-                # {
-                    # TODO
-                    # 'label': 'Contact the driver',
-                    # 'function_key': 'ContactDriver',
-                # }
-                ]
-            }
-        elif booking_service.filter_returned(car.booking_set.all()):
-            return {
-                'state_string': 'Returned. Waiting for confirmation & refund',
+                'state_string': 'Rented to {}'.format(active_bookings.first().driver.admin_display()),
                 'buttons': [{
-                    'label': 'Confirm and refund any deposit',
+                    'label': 'Remove this driver',
                     'function_key': 'ReturnConfirm',
                 }]
             }
-        elif not car.next_available_date:
-            return {
-                'state_string': 'Not listed.',
-                'buttons': [{
-                    'label': 'List this shift',
-                    'function_key': 'Relist',
-                }]
-            }
-        elif car_helpers.is_stale(car):
+
+        if car_helpers.is_stale(car):
             return {
                 'state_string': 'Listing expired.',
                 'buttons': [
@@ -203,10 +172,11 @@ class CarCreateSerializer(ModelSerializer):
                     }
                 ]
             }
-        elif car.next_available_date > car_helpers.next_available_date_threshold:
+
+        if car.next_available_date > car_helpers.next_available_date_threshold:
             # NOTE: This should result in the same logic as car_helpers.filter_bookable()
             return {
-                'state_string': 'Not listed. Busy until {}.'.format(car.next_available_date.strftime('%b %d')),
+                'state_string': 'Not listed. Will be listed on {}.'.format(car.next_available_date.strftime('%b %d')),
                 'buttons': [
                     {
                         'label': 'List this shift',
@@ -218,26 +188,28 @@ class CarCreateSerializer(ModelSerializer):
                     },
                 ]
             }
-        else:
-            listing_expiration_date = car.last_status_update + datetime.timedelta(
-                days=settings.STALENESS_LIMIT
-            )
-            result = {
-                'state_string': 'Listed. This listing expires {}'.format(
-                    listing_expiration_date.strftime('%b %d')
-                ),
-                'buttons': [{
-                    'label': 'Remove listing',
-                    'function_key': 'RemoveListing',
-                }]
-            }
-            # if the last update time was more than two hours ago, let them refresh it again
-            if car.last_status_update < timezone.now() - datetime.timedelta(hours=2):
-                result['buttons'].insert(0, {
-                    'label': 'Extend this listing',
-                    'function_key': 'RenewListing',
-                })
-            return result
+
+        # If no other cases evaluated to true...
+        listing_expiration_date = car.last_status_update + datetime.timedelta(
+            days=settings.STALENESS_LIMIT
+        )
+        result = {
+            'state_string': 'Listed. This listing expires {}'.format(
+                listing_expiration_date.strftime('%b %d')
+            ),
+            'buttons': [{
+                'label': 'Remove listing',
+                'function_key': 'RemoveListing',
+            }]
+        }
+        # if the last update time was more than two hours ago, let them refresh it again
+        if car.last_status_update < timezone.now() - datetime.timedelta(hours=2):
+            result['buttons'].insert(0, {
+                'label': 'Extend this listing',
+                'function_key': 'RenewListing',
+            })
+        return result
+
 
 class CarSerializer(CarCreateSerializer):
     class Meta(CarCreateSerializer.Meta):
