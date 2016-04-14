@@ -281,11 +281,6 @@ def process_credit_notifications():
     _inactive_coupon_reminder(delay_days=14)
 
 
-def process_credit_card_notifications():
-    _credit_card_reminder(delay_hours=24, reminder_name='FirstCCReminder')
-    _credit_card_reminder(delay_hours=48, reminder_name='SecondCCReminder')
-
-
 def process_referral_notifications():
     _inactive_referral_reminder(delay_days=21)
 

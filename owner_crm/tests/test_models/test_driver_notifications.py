@@ -105,16 +105,6 @@ class DriverNotificationTest(TestCase):
                 'sms_result': settings.DRIVER_APP_URL + '/#/listings',
                 'email_result': self.pending_booking.car.display_name(),
             },
-            'FirstCCReminder': {
-                'argument': 'pending_booking',
-                'sms_result': 'credit card',
-                'email_result': 'credit card',
-            },
-            'SecondCCReminder': {
-                'argument': 'pending_booking',
-                'sms_result': 'canceled soon',
-                'email_result': 'canceled soon',
-            },
             'AwaitingInsuranceEmail': {
                 'argument': 'requested_booking',
                 'sms_result': 'submitted',
