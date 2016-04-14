@@ -9,3 +9,14 @@ class MakeModelAdmin(admin.ModelAdmin):
     'make',
     'model',
     ]
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'make',
+                'model',
+                'image_filename',
+                'image_filenames',
+            )
+        }),
+    )
