@@ -179,23 +179,6 @@ def process_late_notice():
     _late_notice(delay_hours=48, reminder_name='ThirdReturnReminder')
 
 
-def _account_reminder(delay_hours, reminder_name):
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
-    remindable_owners = filter_incomplete(Owner.objects.all()).filter(
-        auth_users__date_joined__lte=reminder_threshold,
-        cars__isnull=False,
-    )
-    throttled_owners = throttle_service.throttle(remindable_owners, reminder_name)
-    for owner in throttled_owners:
-        notification.send('owner_notifications.'+reminder_name, owner)
-    throttle_service.mark_sent(throttled_owners, reminder_name)
-
-
-def process_account_reminder():
-    _account_reminder(delay_hours=24, reminder_name='FirstAccountReminder')
-    _account_reminder(delay_hours=48, reminder_name='SecondAccountReminder')
-
-
 def create(auth_user):
     new_owner = Owner.objects.create()
     new_owner.auth_users.add(auth_user)
