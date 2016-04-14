@@ -399,8 +399,3 @@ class OpsNotification(Notification):
             'phone_number': settings.OPS_PHONE_NUMBER,
             'sms_enabled': True
         }]
-
-
-class StreetTeamNotification(Notification):
-    def get_all_receivers(self):
-        return [{'email_address': settings.STREET_TEAM_EMAIL, 'sms_enabled': False}]

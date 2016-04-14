@@ -159,10 +159,7 @@ def create_booking(car, driver):
     - car: an existing car object
     - driver: the driver making the booking
     '''
-    booking = Booking.objects.create(car=car, driver=driver,)
-    if booking.driver.documentation_approved and not booking.driver.base_letter:
-        notification.send('street_team_notifications.RequestBaseLetter', booking)
-    return booking
+    return Booking.objects.create(car=car, driver=driver,)
 
 
 def can_cancel(booking):

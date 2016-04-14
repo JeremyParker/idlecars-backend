@@ -189,7 +189,6 @@ EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'test@idlecars.com'
 OPS_EMAIL = 'test@idlecars.com'
 OPS_PHONE_NUMBER = '6469021306'
-STREET_TEAM_EMAIL = 'test@idlecars.com'
 
 TLC_DATA_IMPLEMENTATION = 'TestClient' #'Socrata'
 SOCRATA_APP_TOKEN = os.getenv('SOCRATA_APP_TOKEN', 'comes from environment')
