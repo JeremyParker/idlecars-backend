@@ -66,7 +66,7 @@ class OwnerServiceTest(TestCase):
 
 class OwnerAccountTest(TestCase):
     def setUp(self):
-        self.owner = factories.BankAccountOwner.create()
+        self.owner = factories.Owner.create()
 
     def test_owner_account_declined(self):
         owner_service.update_account_state(

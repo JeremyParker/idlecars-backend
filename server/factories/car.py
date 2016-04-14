@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import Owner, BankAccountOwner, MakeModel, Insurance
+from server.factories import Owner, Owner, MakeModel, Insurance
 from server import models
 
 
@@ -43,7 +43,7 @@ class ClaimedCar(Car):
 
 
 class BookableCar(ClaimedCar):
-    owner = SubFactory(BankAccountOwner)
+    owner = SubFactory(Owner)
 
 
 class CarExpiredListing(BookableCar):

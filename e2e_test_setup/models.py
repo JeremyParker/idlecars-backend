@@ -171,10 +171,10 @@ class E2ETestSetup():
         self.owner_has_two_cars = server.factories.Owner.create(company_name='Test')
         self.owner_has_two_cars.auth_users.add(self.user_has_two_cars)
 
-        self.owner_has_bank_link = server.factories.BankAccountOwner.create()
+        self.owner_has_bank_link = server.factories.Owner.create()
         self.owner_has_bank_link.auth_users.add(self.user_has_bank_link)
 
-        self.owner_has_requested_booking = server.factories.BankAccountOwner.create()
+        self.owner_has_requested_booking = server.factories.Owner.create()
         self.owner_has_requested_booking.auth_users.add(self.user_has_requested_booking)
 
     def _setup_drivers(self):

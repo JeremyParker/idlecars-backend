@@ -22,7 +22,7 @@ class TestCronPayments(TestCase):
     @freeze_time("2014-10-10 9:55:00")
     def setUp(self):
         self.driver = factories.PaymentMethodDriver.create(documentation_approved=True)
-        self.owner = factories.BankAccountOwner.create()
+        self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(owner=self.owner)
 
         self.booking = factories.AcceptedBooking.create(

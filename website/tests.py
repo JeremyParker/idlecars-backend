@@ -1,7 +1,7 @@
-from rest_framework.test import APITestCase, APIClient
+# from rest_framework.test import APITestCase, APIClient
 
-from django.core.urlresolvers import reverse
-from .models import UserMessage
+# from django.core.urlresolvers import reverse
+# from .models import UserMessage
 
 # Create your tests here.
 

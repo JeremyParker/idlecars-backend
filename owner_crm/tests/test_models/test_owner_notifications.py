@@ -25,7 +25,7 @@ class OwnerNotificationTest(TestCase):
             name='onboarding_owner',
         )
         self.owner = server_factories.Owner.create()
-        self.bank_account_owner = server_factories.BankAccountOwner.create()
+        self.bank_account_owner = server_factories.Owner.create()
 
         self.car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create()

@@ -17,7 +17,7 @@ def _get_listing_queryset():
 
 class ListingTest(TestCase):
     def setUp(self):
-        owner = factories.BankAccountOwner.create(state_code='NY')
+        owner = factories.Owner.create(state_code='NY')
         self.car = factories.BookableCar.create(
             owner=owner,
             status='available',
