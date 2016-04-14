@@ -136,8 +136,6 @@ def cron_payments(active_bookings_qs):
                 print payment.error_message
                 print payment.notes
                 continue
-            notification.send('driver_notifications.PaymentReceipt', payment)
-            notification.send('owner_notifications.PaymentReceipt', payment)
         except Exception as e:
             print e
             notification.send('ops_notifications.PaymentJobFailed', booking, e)

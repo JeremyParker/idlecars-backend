@@ -223,10 +223,6 @@ class DriverNotificationTest(TestCase):
                 'argument': 'requested_booking',
                 'email_result': 'Sorry',
             },
-            'PaymentReceipt': {
-                'argument': 'settled_payment',
-                'email_result': 'Received',
-            },
             'SomeoneElseBooked': {
                 'argument': 'pending_booking',
                 'email_result': 'Someone else',

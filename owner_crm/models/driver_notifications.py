@@ -622,52 +622,6 @@ give you the keys to start driving. Please contact us if there are any issues.'.
         }
 
 
-class PaymentReceipt(notification.DriverNotification):
-    def get_context(self, **kwargs):
-        text = '''
-            Your weekly rental fee has been paid. <br />
-            Driver: {} <br />
-            Car: {} <br /><br />
-
-            Invoice Period: {} - {} <br />
-            Rental Amount: ${} <br />
-        '''
-        if kwargs['payment_credit_amount'] > 0:
-            text += '''
-                Driver Credit: ${} <br />
-                Payment Amount: ${} <br />
-            '''.format(
-                kwargs['payment_credit_amount'],
-                kwargs['payment_cash_amount'],
-            )
-
-        if kwargs['booking_next_payment_amount'] > 0:
-            text += 'Your next payment of ${} will occur on {} <br />'.format(
-                kwargs['booking_next_payment_amount'],
-                kwargs['booking_invoice_end_time'].strftime('%b %d'),
-            )
-        else:
-            text += 'This is your last payment. <br />'
-
-        text += 'Your rental will end on {}. <br /><br />Thank you for using idlecars.'
-        text = text.format(
-            kwargs['driver_first_name'],
-            kwargs['car_name'],
-            kwargs['payment_invoice_start_time'].strftime('%b %d'),
-            kwargs['payment_invoice_end_time'].strftime('%b %d'),
-            kwargs ['payment_total_amount'],
-            kwargs['booking_end_time'].strftime('%b %d'),
-        )
-
-        return {
-            'FNAME': kwargs['driver_first_name'] or None,
-            'HEADLINE': 'Payment Received: {} Booking'.format(kwargs['car_name']),
-            'TEXT': text,
-            'template_name': 'no_button_no_image',
-            'subject': 'Payment Received: {} Booking'.format(kwargs['car_name']),
-        }
-
-
 class PaymentFailed(notification.DriverNotification):
     def get_context(self, **kwargs):
         sms_body = 'Hi {}, your payment for the {} failed. We will try to charge your card again in \

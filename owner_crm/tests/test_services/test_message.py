@@ -62,25 +62,6 @@ class NotificationServiceTest(TestCase):
         self.assertEqual(sms['to'], '+1{}'.format(self.driver.phone_number()))
         self.assertIsNotNone(sms['body'])
 
-    def test_send_sms_with_no_sms_context_sends_email(self):
-        car = server_factories.BookableCar.create(weekly_rent=500)
-        self.booked_booking = server_factories.BookedBooking.create(car=car)
-        self.settled_payment = server_factories.SettledPayment.create(
-            booking=self.booked_booking,
-            amount=car.weekly_rent,
-            invoice_start_time=timezone.now(),
-            invoice_end_time=timezone.now() + datetime.timedelta(days=7),
-        )
-
-        campaign_name = 'driver_notifications.PaymentReceipt'
-        campaign = crm_factories.SmsCampaign.create(name=campaign_name)
-        notification_service.send(campaign_name, self.settled_payment)
-
-        self.assertEqual(len(sms_service.test_get_outbox()), 0) # we didn't send an SMS
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
     def test_send_both_sends_both(self):
         driver = server_factories.Driver.create()
         campaign_name = 'driver_notifications.FirstDocumentsReminderDriver'

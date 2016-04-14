@@ -141,10 +141,6 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'pending_booking',
                 'email_result': 'interested',
             },
-            'PaymentReceipt': {
-                'argument': 'settled_payment',
-                'email_result': 'receipt',
-            },
             'BookingCanceled': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
