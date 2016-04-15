@@ -42,7 +42,7 @@ class CreateBookingTest(APITestCase):
 
     def test_fail_when_car_is_booked(self):
         other_driver = factories.BaseLetterDriver.create()
-        existing_booking = factories.ReservedBooking.create(car=self.car, driver=other_driver)
+        existing_booking = factories.RequestedBooking.create(car=self.car, driver=other_driver)
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['_app_notifications'], [services.booking.UNAVAILABLE_CAR_ERROR])
@@ -145,43 +145,31 @@ class BookingStepTest(APITestCase):
     Test that the booking shows the correct steps at the correct times as it
     transitions through all states
     '''
-    def _driver_adds_payment_method(self):
-        # client adds a payment_method. Don't do this here 'cause we're not testing driver API
-        self.driver.braintree_customer_id = 'fake_customer_id'
-        self.driver.save()
-        factories.PaymentMethod.create(driver=self.driver)
+    def setUp(self):
+        self.car = factories.BookableCar.create()
+
+    def _setup_client(self):
+        self.client = APIClient()
+        token = Token.objects.get(user__username=self.driver.auth_user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        response = self.client.post(
+            reverse('server:bookings-list'),
+            data={'car': self.car.pk, 'driver': self.driver.pk},
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.booking = models.Booking.objects.get(pk=response.data['id'])
+        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
 
     def test_new_driver_starts(self):
         self.driver = factories.Driver.create()
-        token = Token.objects.get(user__username=self.driver.auth_user.username)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.booking = factories.Booking.create(driver=self.driver)
-        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
+        self._setup_client()
         self._pending_no_docs()
-
-    def test_complete_driver_starts(self):
-        self.driver = factories.CompletedDriver.create()
-        token = Token.objects.get(user__username=self.driver.auth_user.username)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.booking = factories.Booking.create(driver=self.driver)
-        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-        self._pending_with_docs()
-
-    def test_approved_driver_starts(self):
-        self.driver = factories.ApprovedDriver.create()
-        token = Token.objects.get(user__username=self.driver.auth_user.username)
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.booking = factories.Booking.create(driver=self.driver)
-        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-        self._pending_docs_approved()
 
     def _pending_no_docs(self):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['step'], 2)
-        self.assertTrue(response.data['start_time_estimated'])
 
         # driver uploads their documents
         self.driver.driver_license_image = 'some image'
@@ -189,108 +177,24 @@ class BookingStepTest(APITestCase):
         self.driver.address_proof_image = 'some image'
         self.driver.defensive_cert_image = 'some image'
         self.driver.save()
-        self._pending_with_docs()
+        self._requested()
 
-    def _pending_with_docs(self):
+    def test_complete_driver_starts(self):
+        self.driver = factories.CompletedDriver.create()
+        self._setup_client()
+        self._requested()
+
+    def _requested(self):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['step'], 3)
-        self.assertTrue(response.data['start_time_estimated'])
-        self._driver_adds_payment_method()
-
-        checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
-        checkout_response = self.client.post(checkout_url, data={})
-        self.assertEqual(checkout_response.status_code, status.HTTP_201_CREATED)
-        self.booking.refresh_from_db()
-        self._checked_out_docs_unapproved()
-
-    def _pending_docs_approved(self):
-        response = self.client.get(self.url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['step'], 3)
-        self.assertTrue(response.data['start_time_estimated'])
-
-        self._driver_adds_payment_method()
-
-        checkout_url = reverse('server:bookings-checkout', args=(self.booking.pk,))
-        checkout_response = self.client.post(checkout_url, data={})
-        self.assertEqual(checkout_response.status_code, status.HTTP_201_CREATED)
-        self.booking.refresh_from_db()
-        self._checked_out_docs_approved()
-
-    def _checked_out_docs_unapproved(self):
-        response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['step'], 4)
-        self.assertTrue(response.data['start_time_estimated'])
-
-        # next, the docs get approved...
-        self.driver.documentation_approved = True
-        self.driver.save()
-        self._checked_out_docs_approved()
-
-    def _checked_out_docs_approved(self):
-        response = self.client.get(self.url, format='json')
-        self.assertEqual(response.data['step'], 4)
-        self.assertTrue(response.data['start_time_estimated'])
 
         # next, the insurance gets accepted
         self.booking.approval_time = timezone.now()
         self.booking.save()
-        self._accepted_booking()
-
-    def _accepted_booking(self):
-        response = self.client.get(self.url, format='json')
-        self.assertEqual(response.data['step'], 4)
-        self.assertFalse(response.data['start_time_estimated'])
-
-        # next the driver picks up the car
-        pickup_url = reverse('server:bookings-pickup', args=(self.booking.pk,))
-        pickup_response = self.client.post(pickup_url, data={})
-        self.assertEqual(pickup_response.status_code, status.HTTP_201_CREATED)
         self._in_progress_booking()
 
     def _in_progress_booking(self):
+        # NOTE: state = RETURNED
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['step'], 5)
-        self.assertFalse(response.data['start_time_estimated'])
-
-
-class ReservedBookingDetailsTest(APITestCase):
-    def setUp(self):
-        self.booking = factories.ReservedBooking.create()
-
-        self.client = APIClient()
-        # Include an appropriate `Authorization:` header on all requests.
-        token = Token.objects.get(user__username=self.booking.driver.auth_user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-
-    def test_next_rent_payment(self):
-        response = self.client.get(self.url, format='json')
-        start_time = self.booking.checkout_time + datetime.timedelta(days=2)
-        self.assertEqual(
-            response.data['next_payment'],
-            {
-                'amount': self.booking.car.weekly_rent,
-                'start_time': start_time.strftime('%b %d'),
-                'credit': 0,
-            }
-        )
-
-    def test_next_rent_payment_with_credit(self):
-        self.booking.driver.auth_user.customer.app_credit = decimal.Decimal('50.00')
-        self.booking.driver.auth_user.customer.save()
-        response = self.client.get(self.url, format='json')
-        start_time = self.booking.checkout_time + datetime.timedelta(days=2)
-        self.assertEqual(
-            response.data['next_payment'],
-            {
-                'amount': self.booking.car.weekly_rent - 50,
-                'start_time': start_time.strftime('%b %d'),
-                'credit': 50,
-            }
-        )
-
-    def test_next_rent_payment_partial_week(self):
-        pass
-        # TODO

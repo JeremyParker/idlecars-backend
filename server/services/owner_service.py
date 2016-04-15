@@ -74,7 +74,6 @@ def process_pending_booking_reminder():
     reminder_threshold = timezone.now() - datetime.timedelta(hours=24)
     remindable_bookings = booking_service.filter_pending(Booking.objects.all()).filter(
         created_time__lte=reminder_threshold,
-        driver__paymentmethod__isnull=True,
     )
     throttled_bookings = throttle_service.throttle(remindable_bookings, 'PendingNotification')
     for booking in throttled_bookings:

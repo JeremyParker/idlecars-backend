@@ -13,7 +13,6 @@ class Driver(Factory):
     class Meta:
         model = 'server.Driver'
     documentation_approved = False
-    base_letter_rejected = False
     auth_user = SubFactory(AuthUser, password='password')
 
 

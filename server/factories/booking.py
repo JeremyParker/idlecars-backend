@@ -27,23 +27,7 @@ class Booking(Factory):
     ))
 
 
-class ReservedBooking(Booking):
-    checkout_time = LazyAttribute(lambda o: timezone.now())
-    driver = SubFactory(PaymentMethodDriver)
-
-    # checkout locks in the price and service_percentage
-    weekly_rent = SelfAttribute('car.weekly_rent')
-    service_percentage = Decimal('0.085')
-
-    @post_generation
-    def payment(self, create, count, **kwargs):
-        PreAuthorizedPayment.create(
-            booking=self,
-            amount=self.car.deposit,
-        )
-
-
-class RequestedBooking(ReservedBooking):
+class RequestedBooking(Booking):
     requested_time = LazyAttribute(lambda o: timezone.now())
 
 

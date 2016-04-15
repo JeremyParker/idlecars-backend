@@ -43,29 +43,6 @@ class DriverServiceTest(TestCase):
             setattr(self.driver, doc, 'http://whatever.com')
         self.driver.save()
 
-    def _validate_booking_emails(self, new_booking):
-        # the driver should now have an invite code
-        self.assertTrue(self.driver.auth_user.customer.invite_code)
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
-
-    def _validate_no_booking_email(self):
-        self.driver.documentation_approved = True
-        self.driver.save()
-
-        # the driver should now have an invite code
-        self.assertTrue(self.driver.auth_user.customer.invite_code)
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        self.assertEqual(outbox[0].merge_vars.keys()[0], self.driver.email())
-        self.assertEqual(
-            outbox[0].subject,
-            'Welcome to idlecars, {}!'.format(self.driver.full_name())
-        )
-
     def test_docs_uploaded_no_booking(self):
         self._set_all_docs()
 
@@ -94,11 +71,7 @@ class DriverServiceTest(TestCase):
 
         # we sent one informational email to ops
         from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            'Uploaded documents from {}'.format(self.driver.phone_number())
-        )
+        self.assertEqual(len(outbox), 3)
 
     def test_redeem_credit(self):
         code = credit_factories.CreditCode.create(credit_amount=50)

@@ -126,6 +126,9 @@ def someone_else_booked(booking):
 
 
 def request_insurance(booking):
+    booking.requested_time = timezone.now()
+    booking.save()
+
     # cancel other conflicting in-progress bookings and notify those drivers
     conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
     for conflicting_booking in conflicting_pending_bookings:
@@ -133,8 +136,7 @@ def request_insurance(booking):
 
     notification.send('owner_notifications.NewBookingEmail', booking)
     notification.send('driver_notifications.AwaitingInsuranceEmail', booking)
-    booking.requested_time = timezone.now()
-    booking.save()
+
     return booking
 
 

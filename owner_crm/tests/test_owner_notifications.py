@@ -32,7 +32,6 @@ class TestOwnerPendingBookingNotifications(TestCase):
     def test_only_required_bookings_send_emails(self):
         with freeze_time("2014-10-10 11:00:00"):
             good_booking = server.factories.Booking.create(driver=self.driver)
-            server.factories.Booking.create()
             server.factories.RequestedBooking.create(driver=self.driver)
             server.factories.AcceptedBooking.create(driver=self.driver)
             server.factories.BookedBooking.create(driver=self.driver)

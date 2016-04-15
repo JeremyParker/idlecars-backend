@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from decimal import Decimal
 
 from django.utils import timezone
 from django.conf import settings
@@ -120,15 +121,12 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_step(self, obj):
         state = obj.get_state()
-        if state == Booking.ACTIVE:
+        if state in [Booking.RETURNED, Booking.ACTIVE, Booking.ACCEPTED]:
             return 5
-        elif state in [Booking.RESERVED, Booking.REQUESTED, Booking.ACCEPTED]:
+        elif state in [Booking.REQUESTED]:
             return 4
         elif state == Booking.PENDING:
-            if obj.driver.all_docs_uploaded():
-                return 3
-            else:
-                return 2
+            return 2
         return None
 
     def get_step_display_count(self, obj):
@@ -143,36 +141,30 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
                 'step_subtitle': 'You must upload your documents to rent this car',
             },
             3: {
-                'step_title': 'Reserve your car',
-                'step_subtitle': 'Put down the deposit to reserve your car',
+                'step_title': 'This step is skipped',
+                'step_subtitle': 'No step to see here',
             },
             4: {
-                'step_title': 'Pick up your car',
-                'step_subtitle': "Your insurance has been approved. Arrange to pick up your car.",
+                'step_title': 'Your request has been submitted',
+                'step_subtitle': "The owner will contact you when you are approved and added to the car.",
             },
             5: {
                 'step_title': 'Rental in progress',
-                'step_subtitle': 'Trouble with your car? Call idlecars: ' + settings.IDLECARS_PHONE_NUMBER,
+                'step_subtitle': 'You have been added to your car',
             }
         }
         step = self.get_step(obj)
         ret = step_details[step]
-
-        # differentiate between step 4 requested, and step 4 ready for pickup
-        if 4 == step and not obj.get_state() == Booking.ACCEPTED:
-            ret.update({
-                'step_subtitle': 'As soon as you are approved on the insurance you can pick up your car',
-            })
         return ret
 
     def get_next_payment(self,obj):
-        if obj.get_state() == Booking.ACTIVE:
-            fee, amount, credit_amount, start_time, end_time = invoice_service.calculate_next_rent_payment(obj)
-        else:
-            fee, amount, credit_amount, start_time, end_time = booking_service.estimate_next_rent_payment(obj)
-        if start_time:
-            start_time = start_time.strftime('%b %d')
-        return {'amount':amount, 'start_time': start_time, 'credit': credit_amount}
+        # if obj.get_state() == Booking.ACTIVE:
+        #     fee, amount, credit_amount, start_time, end_time = invoice_service.calculate_next_rent_payment(obj)
+        # else:
+        #     fee, amount, credit_amount, start_time, end_time = booking_service.estimate_next_rent_payment(obj)
+        # if start_time:
+        #     start_time = start_time.strftime('%b %d')
+        return {'amount': Decimal('0.00'), 'start_time': None, 'credit': Decimal('0.00')}
 
     def get_start_time_display(self, obj):
         return booking_service.start_time_display(obj)

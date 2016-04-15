@@ -31,7 +31,7 @@ class ListingTest(TestCase):
         self.assertTrue(car_helpers.is_data_complete(self.car))
 
     def test_car_filtered_if_booking_in_progress(self):
-        factories.ReservedBooking.create(car=self.car)
+        factories.RequestedBooking.create(car=self.car)
         self.assertEqual(len(_get_listing_queryset()), 0)
 
     def test_car_filtered_if_booking_booked(self):
