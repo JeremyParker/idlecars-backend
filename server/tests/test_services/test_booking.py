@@ -55,16 +55,6 @@ class BookingServiceTest(TestCase):
         self.assertEqual(new_booking.car, self.car)
         self.assertEqual(new_booking.get_state(), models.Booking.PENDING)
 
-    def _checkout_completed_driver(self):
-        driver = factories.PaymentMethodDriver.create()
-        new_booking = factories.Booking.create(car=self.car, driver=driver)
-        new_booking = booking_service.checkout(new_booking)
-        self.assertEqual(new_booking.get_state(), models.Booking.REQUESTED)
-        self.assertEqual(len(new_booking.payment_set.all()), 1)
-        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.PRE_AUTHORIZED)), 1)
-        self.assertEqual(new_booking.payment_set.last().amount, new_booking.car.deposit)
-        return new_booking
-
     def _validate_requested_messages(self, booking, outbox):
         '''
         Validate that the right messages were sent when a booking has been requested.
@@ -93,11 +83,6 @@ class BookingServiceTest(TestCase):
         )
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
-    def test_checkout_all_docs_uploaded(self):
-        new_booking = self._checkout_completed_driver()
-        from django.core.mail import outbox
-        self._validate_requested_messages(new_booking, outbox)
-        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def _validate_missed_plus_requested_msgs(self, new_booking, other_booking, outbox):
         self.assertEqual(len(outbox), 4)
@@ -110,36 +95,6 @@ class BookingServiceTest(TestCase):
         )
 
         self._validate_requested_messages(new_booking, outbox[1:])
-
-    def test_checkout_before_other_checks_out(self):
-        # set up the other driver, and create a booking for them
-        other_driver = factories.CompletedDriver.create()
-        other_booking = factories.Booking.create(car=self.car, driver=other_driver)
-
-        new_booking = self._checkout_completed_driver()
-
-        other_booking.refresh_from_db()
-        self.assertEqual(other_booking.get_state(), models.Booking.INCOMPLETE)
-        self.assertEqual(other_booking.incomplete_reason, models.Booking.REASON_ANOTHER_BOOKED_CC)
-
-        from django.core.mail import outbox
-        self._validate_missed_plus_requested_msgs(new_booking, other_booking, outbox)
-        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
-
-    def test_checkout_before_other_uploads_docs(self):
-        # set up the other driver, and create a booking for them
-        other_driver = factories.Driver.create()
-        other_booking = factories.Booking.create(car=self.car, driver=other_driver)
-
-        new_booking = self._checkout_completed_driver()
-
-        other_booking.refresh_from_db()
-        self.assertEqual(other_booking.get_state(), models.Booking.INCOMPLETE)
-        self.assertEqual(other_booking.incomplete_reason, models.Booking.REASON_ANOTHER_BOOKED_DOCS)
-
-        from django.core.mail import outbox
-        self._validate_missed_plus_requested_msgs(new_booking, other_booking, outbox)
-        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_on_insurance_approved(self):
         booking = factories.RequestedBooking.create()
@@ -228,7 +183,6 @@ class BookingServiceTest(TestCase):
     def test_cancel_requested_booking(self):
         approved_driver = factories.BaseLetterDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
-        new_booking = booking_service.checkout(new_booking)
         booking_service.cancel(new_booking)
 
         # make sure the pre-authorized payment got voided

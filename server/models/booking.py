@@ -28,7 +28,7 @@ class Booking(models.Model):
 
     #state transition times
     created_time = models.DateTimeField(auto_now_add=True)              # PENDING
-    checkout_time = models.DateTimeField(null=True, blank=True)         # RESERVED <-- going away
+    checkout_time = models.DateTimeField(null=True, blank=True)         # RESERVED <-- deprecated
     requested_time = models.DateTimeField(null=True, blank=True)        # REQUESTED
     approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED <-- going away
     pickup_time = models.DateTimeField(null=True, blank=True)           # ACTIVE <-- going away
@@ -106,8 +106,6 @@ class Booking(models.Model):
             return Booking.ACCEPTED
         elif self.requested_time:
             return Booking.REQUESTED
-        elif self.checkout_time:
-            return Booking.RESERVED
         else:
             return Booking.PENDING
 
@@ -138,7 +136,6 @@ class Booking(models.Model):
         # check that all the date/times of events make sense
         max_time = timezone.make_aware(timezone.datetime.max, timezone.get_default_timezone())
         times = [
-            self.checkout_time or max_time,
             self.requested_time or max_time,
             self.approval_time or max_time,
             self.pickup_time or max_time,

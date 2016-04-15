@@ -21,19 +21,11 @@ INSURANCE_REJECT_ERROR = 'Sorry, your rental can\'t be rejected at this time.'
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
 RETURN_ERROR = 'Sorry, something went wrong. Please reload the page and try again.'
 RETURN_CONFIRM_ERROR = 'The driver must indicate that they have returned the car before you can return the deposit.'
-CHECKOUT_ERROR = 'Sorry, your rental can\'t be checked out at this time'
 UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are other cars you can rent.'
 
 
 def filter_pending(booking_queryset):
     return booking_queryset.filter(
-        checkout_time__isnull=True,
-        incomplete_time__isnull=True,
-    )
-
-def filter_reserved(booking_queryset):
-    return booking_queryset.filter(
-        checkout_time__isnull=False,
         requested_time__isnull=True,
         incomplete_time__isnull=True,
     )
@@ -88,8 +80,7 @@ def processing_bookings(booking_queryset):
     active_bookings = filter_active(booking_queryset)
     accepted_bookings = filter_accepted(booking_queryset)
     requested_bookings = filter_requested(booking_queryset)
-    reserved_bookings = filter_reserved(booking_queryset)
-    return active_bookings | accepted_bookings | requested_bookings | reserved_bookings
+    return active_bookings | accepted_bookings | requested_bookings
 
 
 def post_pending_bookings(booking_queryset):
@@ -110,10 +101,9 @@ def filter_visible(booking_queryset):
 
 
 def on_car_missed(car):
-    # cancel other bookings on this car
+    # cancel other bookings on this car when the owner says the car is no longer available.
     conflicting_bookings = []
     conflicting_bookings.extend(filter_pending(Booking.objects.filter(car=car)))
-    conflicting_bookings.extend(filter_reserved(Booking.objects.filter(car=car)))
     conflicting_bookings.extend(filter_requested(Booking.objects.filter(car=car)))
     for conflicting_booking in conflicting_bookings:
         _make_booking_incomplete(conflicting_booking, Booking.REASON_MISSED)
@@ -123,7 +113,7 @@ def on_all_docs_uploaded(driver):
     if not filter_pending(Booking.objects.filter(driver=driver)):
         notification.send('driver_notifications.DocsApprovedNoBooking', driver)
 
-    reserved_bookings = filter_reserved(Booking.objects.filter(driver=driver))
+    reserved_bookings = filter_pending(Booking.objects.filter(driver=driver))
     for booking in reserved_bookings:
         request_insurance(booking)
 
@@ -136,6 +126,11 @@ def someone_else_booked(booking):
 
 
 def request_insurance(booking):
+    # cancel other conflicting in-progress bookings and notify those drivers
+    conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
+    for conflicting_booking in conflicting_pending_bookings:
+        conflicting_booking = someone_else_booked(conflicting_booking)
+
     notification.send('owner_notifications.NewBookingEmail', booking)
     notification.send('driver_notifications.AwaitingInsuranceEmail', booking)
     booking.requested_time = timezone.now()
@@ -144,6 +139,7 @@ def request_insurance(booking):
 
 
 def on_insurance_approved(booking):
+    # TODO:alltaxi - send an email to All Taxi with documents and instructions
     notification.send('driver_notifications.InsuranceApproved', booking)
 
 
@@ -159,7 +155,12 @@ def create_booking(car, driver):
     - car: an existing car object
     - driver: the driver making the booking
     '''
-    return Booking.objects.create(car=car, driver=driver,)
+    booking = Booking.objects.create(car=car, driver=driver,)
+
+    if driver.all_docs_uploaded():
+        booking = request_insurance(booking)
+
+    return booking
 
 
 def can_cancel(booking):
@@ -217,8 +218,6 @@ def estimate_next_rent_payment(booking):
     on an estimated pickup time
     '''
     assert not booking.pickup_time
-    if not booking.checkout_time:
-        return (None, None, None, None, None)
 
     estimated_pickup_time = estimate_pickup_time(booking)
     estimated_end_time = calculate_end_time(booking, estimated_pickup_time)
@@ -227,47 +226,6 @@ def estimate_next_rent_payment(booking):
         estimated_pickup_time,
         estimated_end_time
     )
-
-
-def can_checkout(booking):
-    # TODO - check that the car is still available (may have been a race to book)
-    # TODO - check the owner's bank creds are OK
-    if not booking.driver.all_docs_uploaded():
-        return False
-    if booking.get_state() != Booking.PENDING:
-        return False
-    if not booking.driver.braintree_customer_id:
-        return False
-    if not booking.driver.paymentmethod_set.exists():
-        return False
-    return True
-
-
-def checkout(booking):
-    if not can_checkout(booking):
-        raise ServiceError(CHECKOUT_ERROR)
-
-    payment = invoice_service.make_deposit_payment(booking)
-    if payment.error_message:
-        raise ServiceError(payment.error_message)
-
-    if payment.status == Payment.PRE_AUTHORIZED:
-        booking.checkout_time = timezone.now()
-
-        # lock-in pricing details by copying them to the booking
-        booking.weekly_rent = booking.car.weekly_rent
-        booking.service_percentage = booking.car.owner.effective_service_percentage
-        booking.save()
-
-        # cancel other conflicting in-progress bookings and notify those drivers
-        conflicting_pending_bookings = filter_pending(Booking.objects.filter(car=booking.car))
-        for conflicting_booking in conflicting_pending_bookings:
-            conflicting_booking = someone_else_booked(conflicting_booking)
-
-        request_insurance(booking)
-
-        notification.send('driver_notifications.CheckoutReceipt', booking)
-    return booking
 
 
 def is_requested(booking):
@@ -410,8 +368,6 @@ def estimate_pickup_time(booking):
     assert not booking.pickup_time  # if there's a pickup_time, then start_time is known.
     if booking.approval_time:
         pickup_date = booking.approval_time + datetime.timedelta(days=1)
-    elif booking.checkout_time:
-        pickup_date = booking.checkout_time + datetime.timedelta(days=2)
     else:
         pickup_date = timezone.now() + datetime.timedelta(days=2)
 
