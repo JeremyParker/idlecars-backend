@@ -26,6 +26,11 @@ UNAVAILABLE_CAR_ERROR = 'Sorry, that car is unavailable right now. Here are othe
 
 def filter_pending(booking_queryset):
     return booking_queryset.filter(
+        requested_time__isnull=True,
+        approval_time__isnull=True,
+        incomplete_time__isnull=True,
+    )
+
 def filter_requested(booking_queryset):
     return booking_queryset.filter(
         requested_time__isnull=False,
