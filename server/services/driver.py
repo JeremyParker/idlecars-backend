@@ -308,28 +308,6 @@ def process_insurance_notifications():
     _insurance_notification(delay_hours=48, reminder_name='SecondInsuranceNotification')
 
 
-def process_pickup_notifications():
-    _send_pickup_reminder(delay_hours=1, reminder_name='FirstPickupReminder')
-    _send_pickup_reminder(delay_hours=6, reminder_name='SecondPickupReminder')
-
-
-def process_payment_failure_notifications():
-    all_bookings = server.models.Booking.objects.all()
-    remindable_bookings = server.services.booking.filter_active(all_bookings).filter(
-        payment__status=server.models.Payment.DECLINED,
-    )
-
-    skip_bookings = []
-    throttled_bookings = throttle_service.throttle(remindable_bookings, 'PaymentFailed', 24)
-    for booking in throttled_bookings.prefetch_related('payment_set'):
-        if not booking.payment_set.order_by('created_time').last().error_message:
-            skip_bookings.append(booking.pk)
-            continue
-
-        notification.send('driver_notifications.PaymentFailed', booking)
-    throttle_service.mark_sent(throttled_bookings.exclude(pk__in=skip_bookings), 'PaymentFailed')
-
-
 def process_extend_notifications():
     active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
     remindable_bookings = active_bookings.filter(
@@ -340,7 +318,3 @@ def process_extend_notifications():
     for booking in throttled_bookings:
         notification.send('driver_notifications.ExtendReminder', booking)
     throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')
-
-def process_late_notice():
-    _late_notice(delay_hours=12, reminder_name='FirstLateNotice')
-    _late_notice(delay_hours=24, reminder_name='SecondLateNotice')

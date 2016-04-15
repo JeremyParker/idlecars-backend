@@ -151,12 +151,6 @@ def _late_notice(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
-def process_late_notice():
-    _late_notice(delay_hours=12, reminder_name='FirstReturnReminder')
-    _late_notice(delay_hours=24, reminder_name='SecondReturnReminder')
-    _late_notice(delay_hours=48, reminder_name='ThirdReturnReminder')
-
-
 def create(auth_user):
     new_owner = Owner.objects.create()
     new_owner.auth_users.add(auth_user)

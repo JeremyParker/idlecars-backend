@@ -33,7 +33,6 @@ class TestOwnerPendingBookingNotifications(TestCase):
         with freeze_time("2014-10-10 11:00:00"):
             good_booking = server.factories.Booking.create(driver=self.driver)
             server.factories.Booking.create()
-            server.factories.ReservedBooking.create(driver=self.driver)
             server.factories.RequestedBooking.create(driver=self.driver)
             server.factories.AcceptedBooking.create(driver=self.driver)
             server.factories.BookedBooking.create(driver=self.driver)
@@ -184,7 +183,6 @@ class TestOwnerInsuranceNotifications(TestCase):
         tz = timezone.get_current_timezone()
         with freeze_time(timezone.datetime(2014, 10, 11, 18, 00, 00, tzinfo=tz)):
             server.factories.Booking.create()
-            server.factories.ReservedBooking.create()
             server.factories.AcceptedBooking.create()
             server.factories.BookedBooking.create()
             server.factories.ReturnedBooking.create()
@@ -290,7 +288,6 @@ class TestOwnerPickupNotifications(TestCase):
     def test_only_accepted_bookings_has_reminder(self):
         with freeze_time("2014-10-10 9:55:00"):
             server.factories.Booking.create()
-            server.factories.ReservedBooking.create()
             server.factories.RequestedBooking.create()
             server.factories.BookedBooking.create()
             server.factories.ReturnedBooking.create()
@@ -359,7 +356,6 @@ class TestOwnerExtendRentalNotifications(TestCase):
     def test_end_time_changed(self):
         booking = self._create_booking_and_change_end_time('BookedBooking')
         self._create_booking_and_change_end_time('Booking')
-        self._create_booking_and_change_end_time('ReservedBooking')
         self._create_booking_and_change_end_time('RequestedBooking')
         self._create_booking_and_change_end_time('ReturnedBooking')
         self._create_booking_and_change_end_time('RefundedBooking')
@@ -397,65 +393,3 @@ class TestOwnerExtendRentalNotifications(TestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
-class TestLateBookingNotifications(TestCase):
-    @freeze_time("2014-10-10 9:00:00")
-    def setUp(self):
-        self.booking = server.factories.BookedBooking.create(
-            end_time=timezone.now() + timedelta(days=10)
-        )
-
-    def test_late_notice(self):
-        with freeze_time("2014-10-20 21:01:00"):
-            owner_service.process_late_notice()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-        self.assertEqual(
-            outbox[0].subject,
-            'Has {} returned their car?'.format(self.booking.driver.full_name()),
-        )
-
-        with freeze_time("2014-10-21 9:01:00"):
-            owner_service.process_late_notice()
-
-        self.assertEqual(len(outbox), 2)
-
-        self.assertEqual(
-            outbox[1].subject,
-            'Has {} returned their car?'.format(self.booking.driver.full_name()),
-        )
-
-        with freeze_time("2014-10-22 9:01:00"):
-            owner_service.process_late_notice()
-
-        self.assertEqual(len(outbox), 3)
-
-        self.assertEqual(
-            outbox[2].subject,
-            'Has {} returned their car?'.format(self.booking.driver.full_name()),
-        )
-
-    def test_no_email_early(self):
-        with freeze_time("2014-10-20 20:59:00"):
-            owner_service.process_late_notice()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
-
-    def test_no_email_twice(self):
-        with freeze_time("2014-10-20 21:01:00"):
-            owner_service.process_late_notice()
-            owner_service.process_late_notice()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-    def test_no_email_after_returning(self):
-        with freeze_time("2014-10-20 21:01:00"):
-            self.booking.return_time = timezone.now()
-            self.booking.save()
-            owner_service.process_late_notice()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)

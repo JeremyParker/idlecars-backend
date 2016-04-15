@@ -31,24 +31,24 @@ def _get_payment_params(payment):
     }
 
 def _get_booking_params(booking):
-    if booking.pickup_time:
-        from server.services import invoice_service
-        (
-            booking_payment_fee,
-            next_payment_amount,
-            next_credit_amount,
-            invoice_start_time,
-            invoice_end_time,
-        ) = invoice_service.calculate_next_rent_payment(booking)
-    else:
-        from server.services import booking as booking_service
-        (
-            booking_payment_fee,
-            next_payment_amount,
-            next_credit_amount,
-            invoice_start_time,
-            invoice_end_time,
-        ) = booking_service.estimate_next_rent_payment(booking)
+    # if booking.pickup_time:
+    #     from server.services import invoice_service
+    #     (
+    #         booking_payment_fee,
+    #         next_payment_amount,
+    #         next_credit_amount,
+    #         invoice_start_time,
+    #         invoice_end_time,
+    #     ) = invoice_service.calculate_next_rent_payment(booking)
+    # else:
+    #     from server.services import booking as booking_service
+    #     (
+    #         booking_payment_fee,
+    #         next_payment_amount,
+    #         next_credit_amount,
+    #         invoice_start_time,
+    #         invoice_end_time,
+    #     ) = booking_service.estimate_next_rent_payment(booking)
 
     return {
         'booking_state': booking.get_state(),

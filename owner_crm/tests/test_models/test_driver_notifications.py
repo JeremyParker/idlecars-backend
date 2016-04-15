@@ -28,7 +28,6 @@ class DriverNotificationTest(TestCase):
 
         car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create(car=car)
-        self.reserved_booking = server_factories.ReservedBooking.create(car=car)
         self.requested_booking = server_factories.RequestedBooking.create(car=car)
         self.accepted_booking = server_factories.AcceptedBooking.create(car=car)
         self.booked_booking = server_factories.BookedBooking.create(car=car)
