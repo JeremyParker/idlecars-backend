@@ -64,11 +64,6 @@ def _get_booking_params(booking):
         'booking_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
         ),
-        'booking_next_payment_amount': next_payment_amount,
-        'booking_next_credit_amount': next_credit_amount,
-        'booking_payment_fee': booking_payment_fee,
-        'booking_invoice_start_time': invoice_start_time,
-        'booking_invoice_end_time': invoice_end_time,
     }
 
 def _get_car_params(car):
