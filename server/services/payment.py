@@ -77,8 +77,6 @@ def _execute(function, payment):
     func = getattr(gateway, function)
     payment = func(payment)
     payment.save()
-    if payment.error_message:
-        notification.send('ops_notifications.PaymentFailed', payment)
     return payment
 
 

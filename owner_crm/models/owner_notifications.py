@@ -390,29 +390,16 @@ payment was processed to make sure you receive your rental payment.'.format(
 class PickupConfirmation(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = '''
-            You have received a payment of ${} from {} for the {}
+            You have received a payment from {} for the {}
             You can now give them the keys to drive.
             <br />
             Their credit card has been charged and you will receive the payment within 48 hours. The security
             deposit of ${} has also been placed in escrow for you.
         '''.format(
-            kwargs['payment_total_amount'],
             kwargs['driver_full_name'],
             kwargs['car_name'],
             kwargs['car_deposit']
         )
-
-        if kwargs['payment_idlecars_supplement'] > 0 and kwargs['payment_cash_amount'] > 0:
-            text += '''
-                Due to an Idlecars promotion we are covering a portion of the driver’s rent.
-                This will cause the payment to come in two separate deposits at the same time: <br />
-                Payment 1: ${} <br />
-                Payment 2: ${} <br />
-                <br />
-            '''.format(
-                kwargs['payment_cash_amount'],
-                kwargs['payment_idlecars_supplement'],
-            )
 
         return {
             'FNAME': kwargs['user_first_name'] or None,
@@ -420,10 +407,9 @@ class PickupConfirmation(notification.OwnerNotification):
             'TEXT': text,
             'template_name': 'no_button_no_image',
             'subject': '{} has paid you for the {}'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'sms_body': 'You have received a payment of ${} from {} for the {} You can now give them \
+            'sms_body': 'You have received a payment from {} for the {} You can now give them \
 the keys to drive. Their credit card has been charged and you will receive the payment within 48 hours. \
 The security deposit of ${} has also been placed in escrow for you.'.format(
-                kwargs['payment_total_amount'],
                 kwargs['driver_full_name'],
                 kwargs['car_name'],
                 kwargs['car_deposit']

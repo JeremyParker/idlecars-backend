@@ -34,18 +34,6 @@ class DriverNotificationTest(TestCase):
         self.refunded_booking = server_factories.RefundedBooking.create(car=car)
         self.password_reset = crm_factories.PasswordReset.create(auth_user=auth_user)
 
-        self.settled_payment = server_factories.SettledPayment.create(
-            booking=self.booked_booking,
-            amount=car.weekly_rent,
-            invoice_start_time=timezone.now(),
-            invoice_end_time=timezone.now() + datetime.timedelta(days=7),
-        )
-
-        self.refunded_payment = server_factories.RefundedPayment.create(
-            booking=self.booked_booking,
-            amount=car.weekly_rent,
-        )
-
         sms_service.test_reset()
 
         self.notification_spec = {
@@ -145,7 +133,7 @@ class DriverNotificationTest(TestCase):
                 'email_result': 'pay and drive',
             },
             'PickupConfirmation': {
-                'argument': 'settled_payment',
+                'argument': 'refunded_booking',
                 'sms_result': 'Success!',
                 'email_result': 'ready to drive',
             },
@@ -169,10 +157,10 @@ class DriverNotificationTest(TestCase):
                 'sms_result': '24 hours ago',
                 'email_result': 'return',
             },
-            'DepositRefunded': {
-                'argument': 'refunded_payment',
-                'sms_result': 'refunded',
-                'email_result': 'confirmed',
+            'DriverRemoved': {
+                'argument': 'refunded_booking',
+                'sms_result': self.refunded_booking.car.display_name(),
+                'email_result': self.refunded_booking.car.display_name(),
             },
             'PasswordReset': {
                 'argument': 'password_reset',
@@ -230,10 +218,6 @@ class DriverNotificationTest(TestCase):
                 'argument': 'password_reset',
                 'email_result': 'password',
             },
-            'PaymentFailed': {
-                'argument': 'accepted_booking',
-                'sms_result': 'failed',
-            },
         }
 
     def test_driver_notifications(self):
@@ -259,7 +243,7 @@ class DriverNotificationTest(TestCase):
                     else:
                         notification.send(campaign_name, argument)
 
-                    # print sms_service.test_get_outbox()[0]['body'] + ' --------------- ' + campaign_name
+                    # print campaign_name
                     self.assertEqual(len(sms_service.test_get_outbox()), 1)
                     self.assertTrue(spec['sms_result'] in sms_service.test_get_outbox()[0]['body'])
                     sms_service.test_reset()

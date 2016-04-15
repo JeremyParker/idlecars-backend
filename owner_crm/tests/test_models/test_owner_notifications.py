@@ -32,16 +32,10 @@ class OwnerNotificationTest(TestCase):
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
         self.accepted_booking = server_factories.AcceptedBooking.create(car=self.car)
         self.booked_booking = server_factories.BookedBooking.create(car=self.car)
+        self.returned_booking = server_factories.ReturnedBooking.create(car=self.car)
 
         self.password_reset = crm_factories.PasswordReset.create(
             auth_user=self.bank_account_owner.auth_users.first()
-        )
-
-        self.settled_payment = server_factories.SettledPayment.create(
-            booking=self.booked_booking,
-            amount=self.car.weekly_rent,
-            invoice_start_time=timezone.now(),
-            invoice_end_time=timezone.now() + datetime.timedelta(days=7),
         )
 
         sms_service.test_reset()
@@ -113,9 +107,9 @@ class OwnerNotificationTest(TestCase):
                 'sms_result': 'picks up',
             },
             'PickupConfirmation': {
-                'argument': 'settled_payment',
+                'argument': 'returned_booking',
                 'email_result': 'paid',
-                'sms_result': self.settled_payment.booking.driver.full_name()
+                'sms_result': self.returned_booking.driver.full_name()
             },
             'PendingNotification': {
                 'argument': 'pending_booking',

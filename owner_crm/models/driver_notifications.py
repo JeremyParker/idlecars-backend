@@ -604,13 +604,10 @@ go to your booking page click the blue “Pay and Drive” button.'.format(kwarg
 
 class PickupConfirmation(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = 'Success! Your card has been charged {} for the {} booking. \
-You have used ${} of Idlecars credit. \
+        text = 'Success! Your card has been charged for the {} booking. \
 The owner will receive a notification that the payment was processed and should \
 give you the keys to start driving. Please contact us if there are any issues.'.format(
-                kwargs['payment_cash_amount'],
                 kwargs['car_name'],
-                kwargs['payment_credit_amount'],
             )
         return {
             'FNAME': kwargs['driver_first_name'] or None,
@@ -619,26 +616,6 @@ give you the keys to start driving. Please contact us if there are any issues.'.
             'template_name': 'no_button_no_image',
             'subject': 'You are ready to drive!',
             'sms_body': text,
-        }
-
-
-class PaymentFailed(notification.DriverNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Hi {}, your payment for the {} failed. We will try to charge your card again in \
-8 hours. Please make sure you have the funds available.'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-        )
-        text = '''Your payment for the {} failed. We will try to charge your card again in 8 hours.
-        Please make sure you have the funds available.'''.format(kwargs['car_name'])
-
-        return {
-            'FNAME': kwargs['driver_first_name'] or None,
-            'HEADLINE': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
-            'TEXT': text,
-            'template_name': 'no_button_no_image',
-            'subject': 'Your {} rental payment had failed.'.format(kwargs['car_name']),
-            'sms_body': sms_body,
         }
 
 
@@ -752,23 +729,19 @@ soon we will have to report the car stolen to the local authorities.'.format(
         }
 
 
-class DepositRefunded(notification.DriverNotification):
+class DriverRemoved(notification.DriverNotification):
     def get_context(self, **kwargs):
-        text = '''Nice! the owner confirmed that the {} has been returned, IdleCars is looking
-        forward to serve you next time!'''.format(
+        text = '''The owner has removed you from their {}. We look \
+forward to serving you next time!'''.format(
             kwargs['car_name'],
-            kwargs['payment_cash_amount'],
         )
-
-        if kwargs['payment_cash_amount']:
-            text += 'Also, your deposit ${} has been refunded'.format(kwargs['payment_cash_amount'])
 
         return {
             'FNAME': kwargs['driver_first_name'] or None,
-            'HEADLINE': 'Your return has been cofirmed.',
+            'HEADLINE': 'Your request has been approved.',
             'TEXT': text,
             'template_name': 'no_button_no_image',
-            'subject': 'Your return has been confirmed.',
+            'subject': 'You\'re removed from the {}.'.format(kwargs['car_name']),
             'sms_body': text,
         }
 

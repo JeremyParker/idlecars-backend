@@ -375,22 +375,13 @@ def return_confirm(booking):
     if not booking or booking.get_state() != Booking.RETURNED:
         raise ServiceError(RETURN_CONFIRM_ERROR)
 
-    deposit_payment = booking.payment_set.filter(status=Payment.HELD_IN_ESCROW).first()
-    if deposit_payment:
-        payment_service.refund(deposit_payment)
-        on_payment_refunded(deposit_payment)
-
     booking.refund_time = timezone.now()
-
-    # make sure the booking has ended, so the driver doesn't keep getting charged
-    if booking.end_time > booking.refund_time:
-        booking.end_time = booking.refund_time
-
+    on_driver_removed(booking)
     booking.save()
 
 
-def on_payment_refunded(payment):
-    notification.send('driver_notifications.DepositRefunded', payment)
+def on_driver_removed(payment):
+    notification.send('driver_notifications.DriverRemoved', payment)
 
 
 def start_time_display(booking):

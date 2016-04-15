@@ -12,44 +12,7 @@ from owner_crm.models import Campaign
 from owner_crm.services import campaign_service
 
 
-def _get_payment_params(payment):
-    return {
-        'payment': payment,
-        'payment_cash_amount': payment.amount,
-        'payment_credit_amount': payment.credit_amount,
-        'payment_total_amount': payment.amount + payment.credit_amount,
-        'payment_idlecars_supplement': payment.idlecars_supplement,
-        'payment_invoice_description': payment.invoice_description(),
-        'payment_invoice_start_time': payment.invoice_start_time,
-        'payment_invoice_end_time': payment.invoice_end_time,
-        'payment_service_fee': payment.service_fee,
-        'payment_status': payment.status,
-        'payment_notes': payment.notes,
-        'payment_admin_link': 'https://www.idlecars.com{}'.format(
-            reverse('admin:server_payment_change', args=(payment.pk,))
-        ),
-    }
-
 def _get_booking_params(booking):
-    # if booking.pickup_time:
-    #     from server.services import invoice_service
-    #     (
-    #         booking_payment_fee,
-    #         next_payment_amount,
-    #         next_credit_amount,
-    #         invoice_start_time,
-    #         invoice_end_time,
-    #     ) = invoice_service.calculate_next_rent_payment(booking)
-    # else:
-    #     from server.services import booking as booking_service
-    #     (
-    #         booking_payment_fee,
-    #         next_payment_amount,
-    #         next_credit_amount,
-    #         invoice_start_time,
-    #         invoice_end_time,
-    #     ) = booking_service.estimate_next_rent_payment(booking)
-
     return {
         'booking_state': booking.get_state(),
         'booking_weekly_rent': booking.weekly_rent,
@@ -234,13 +197,6 @@ class Notification(object):
                 '_get_owner_params': 'self.argument.car.owner',
                 '_get_urls_params': 'None',
             },
-            'Payment': {
-                '_get_payment_params': 'self.argument',
-                '_get_booking_params': 'self.argument.booking',
-                '_get_driver_params': 'self.argument.booking.driver',
-                '_get_car_params': 'self.argument.booking.car',
-                '_get_owner_params': 'self.argument.booking.car.owner',
-            },
             'UserMessage': {
                 '_get_message_params': 'self.argument',
             },
@@ -274,7 +230,6 @@ class Notification(object):
             'Driver': ['driver', 'urls'],
             'Owner': ['owner', 'urls'],
             'Booking': ['booking', 'driver', 'car', 'owner', 'urls'],
-            'Payment': ['booking', 'driver', 'car', 'owner', 'payment'],
             'UserMessage': ['message'],
             'Car': ['car', 'owner'],
             'PasswordReset': ['password_reset', 'urls'],
@@ -333,8 +288,6 @@ class DriverNotification(Notification):
             driver = self.argument
         elif clas == 'Booking':
             driver = self.argument.driver
-        elif clas == 'Payment':
-            driver = self.argument.booking.driver
         elif clas == 'PasswordReset':
             driver = self.argument.auth_user.driver
         else:
@@ -360,8 +313,6 @@ class OwnerNotification(Notification):
             users = self.argument.auth_users.all()
         elif clas == 'Booking':
             users = self.argument.car.owner.auth_users.all()
-        elif clas == 'Payment':
-            users = self.argument.booking.car.owner.auth_users.all()
         elif clas == 'Car':
             users = self.argument.owner.auth_users.all()
         elif clas == 'PasswordReset':

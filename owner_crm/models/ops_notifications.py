@@ -26,27 +26,6 @@ class DocumentsUploaded(notification.OpsNotification):
         }
 
 
-class PaymentFailed(notification.OpsNotification):
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': 'peeps',
-            'HEADLINE': 'A payment failed',
-            'TEXT': 'the driver with phone {} had a payment fail for {}. The server response was:<br>{}'.format(
-                kwargs['driver_phone_number'],
-                kwargs['payment_invoice_description'],
-                kwargs['payment_notes'],
-            ),
-            'CTA_LABEL': 'Payment details',
-            'CTA_URL': kwargs['payment_admin_link'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Payment {} for a {} ({}) failed.'.format(
-                kwargs['payment'],
-                kwargs['car_name'],
-                kwargs['car_plate'],
-            ),
-        }
-
-
 class PaymentJobFailed(notification.OpsNotification):
     def __init__(self, campaign_name, argument, *args):
         super(PaymentJobFailed, self).__init__(campaign_name, argument)

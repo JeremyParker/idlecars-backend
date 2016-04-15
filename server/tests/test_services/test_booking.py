@@ -209,101 +209,6 @@ class BookingServiceTest(TestCase):
             'Sorry, someone else rented out the car you wanted.'
         )
 
-    def _check_payments_after_pickup(self, new_booking):
-        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW)), 1)
-        self.assertEqual(len(new_booking.payment_set.filter(status=models.Payment.SETTLED)), 1)
-        first_week_rent_payment = new_booking.payment_set.filter(status=models.Payment.SETTLED)[0]
-        self.assertEqual(first_week_rent_payment.amount, new_booking.weekly_rent)
-
-    def test_pickup_without_invitor(self):
-        driver = factories.ApprovedDriver.create()
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver)
-
-        # pick up the car
-        new_booking = booking_service.pickup(new_booking)
-
-        self.assertEqual(new_booking.get_state(), models.Booking.ACTIVE)
-        self._check_payments_after_pickup(new_booking)
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
-
-        # a pickup confirmation to driver
-        self.assertEqual(
-            outbox[0].subject,
-            'You are ready to drive!',
-        )
-
-        # a pickup confirmation to owner
-        self.assertEqual(
-            outbox[1].subject,
-            '{} has paid you for the {}'.format(new_booking.driver.full_name(), new_booking.car.display_name()),
-        )
-
-    def test_repeated_driver_pickup(self):
-        invitor = factories.ApprovedDriver.create()
-        invitee = factories.ApprovedDriver.create()
-        invitee.auth_user.customer.invitor_code = invitor.auth_user.customer.invite_code
-        invitee.save()
-
-        old_booking = factories.ReturnedBooking.create(car=self.car, driver=invitee)
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=invitee)
-
-        new_booking = booking_service.pickup(new_booking)
-
-        from django.core.mail import outbox
-        # repeated driver don't receiver refer friends email and invitor does not get more credit
-        self.assertEqual(len(outbox), 2)
-
-    def test_pickup_six_sevenths_bug(self):
-        self.car.min_lease = '_02_one_week'
-        self.car.save()
-
-        driver = factories.ApprovedDriver.create()
-        new_booking = factories.AcceptedBooking.create(
-            car=self.car,
-            driver=driver,
-        )
-
-        # simulate using the app to set the end time to the min rental period
-        today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        new_booking.end_time = today + timezone.timedelta(days=new_booking.car.minimum_rental_days())
-        new_booking = booking_service.pickup(new_booking)
-
-        self._check_payments_after_pickup(new_booking)
-
-
-    def test_pickup_after_failure(self):
-        self.car.min_lease = '_02_one_week'
-        self.car.save()
-        driver = factories.ApprovedDriver.create()
-
-        new_booking = factories.AcceptedBooking.create(car=self.car, driver=driver, end_time=None)
-        self.assertEqual(new_booking.get_state(), models.Booking.ACCEPTED)
-        self.assertEqual(len(new_booking.payment_set.all()), 1)
-        self.assertEqual(new_booking.payment_set.first().status, models.Payment.PRE_AUTHORIZED)
-
-        # fail to pick up the car
-        next_response = (models.Payment.DECLINED, 'This transaction was declined for some reason.',)
-        gateway = payment_gateways.get_gateway('fake').next_payment_response.append(next_response)
-        with self.assertRaises(booking_service.ServiceError):
-            new_booking = booking_service.pickup(new_booking)
-        new_booking.refresh_from_db()  # make sure our local copy is fresh. pickup() changed it.
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            'Payment {} for a {} failed.'.format(new_booking.payment_set.last(), new_booking.car)
-        )
-
-        # make sure there's a declined payment in there
-        self.assertTrue(models.Payment.DECLINED in [p.status for p in new_booking.payment_set.all()])
-
-        # successfully pick up the car
-        new_booking = booking_service.pickup(new_booking)
-        self._check_payments_after_pickup(new_booking)
-
 
     def test_cancel_pending_booking(self):
         driver = factories.Driver.create()
@@ -394,7 +299,7 @@ class BookingServiceTest(TestCase):
         new_booking.pickup_time = datetime.datetime(2015, 8, 18, 8, 15, 12, 0, timezone.get_current_timezone())
         self.assertEqual(booking_service.start_time_display(new_booking), 'Aug 18')
 
-    def test_return_confirmed_with_deposit(self):
+    def test_removed_from_car(self):
         booking = factories.ReturnedBooking.create()
         self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
         booking_service.return_confirm(booking)
@@ -404,23 +309,5 @@ class BookingServiceTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertEqual(
             outbox[0].subject,
-            'Your return has been confirmed.'
+            'You\'re removed from the {}.'.format(booking.car.display_name())
         )
-        self.assertTrue('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])
-
-    def test_return_confirmed_without_deposit(self):
-        booking = factories.ReturnedBooking.create()
-        deposit = booking.payment_set.filter(status=models.Payment.HELD_IN_ESCROW).first()
-        deposit.amount = 0
-        deposit.save()
-        self.assertEqual(1, booking_service.filter_returned(models.Booking.objects.all()).count())
-        booking_service.return_confirm(booking)
-        self.assertEqual(1, booking_service.filter_refunded(models.Booking.objects.all()).count())
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            'Your return has been confirmed.'
-        )
-        self.assertFalse('deposit' in outbox[0].merge_vars[booking.driver.email()]['TEXT'])
