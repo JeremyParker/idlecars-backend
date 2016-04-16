@@ -22,19 +22,20 @@ class ListingTest(APITestCase):
             hybrid=False,
             min_lease='_03_two_weeks',
             weekly_rent=100,
+            shift_details = 'Weekends Only',
         )
 
     def _get_expected_representation(self, car):
         ''' returns the expected API response for a given car '''
-        listing_features = '{} minimum ∙ Available {} ∙ {}, {}'
-        booked_features = '{} minimum rental ∙ {}, {}'
+        listing_features = 'Available {} ∙ {}, {}'
+        booked_features = '{}, {}'
         tomorrow = timezone.now() + datetime.timedelta(days=1)
-        expected = OrderedDict(
+        expected = dict(
             [
                 ('id', car.pk),
                 ('name', '{} {}'.format(car.year, car.make_model)),
                 ('listing_features', listing_features.format(
-                        models.Car.MIN_LEASE_CHOICES[car.min_lease],
+                        # models.Car.MIN_LEASE_CHOICES[car.min_lease],
                         '{d.month}/{d.day}'.format(d = tomorrow),
                         car.owner.city,
                         car.owner.state_code,
@@ -43,11 +44,11 @@ class ListingTest(APITestCase):
                 ('headline_features',
                     [
                         'Available {d.month}/{d.day}'.format(d = tomorrow),
-                        '{} minimum rental'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
+                        # '{} minimum rental'.format(models.Car.MIN_LEASE_CHOICES[car.min_lease]),
                         '${} deposit'.format(car.deposit),
                     ]
                 ),
-                ('shift', {'description': '24/7', 'split_shift': False}),
+                ('shift', {'description': '24/7 {}'.format(car.shift_details), 'split_shift': False}),
                 ('certifications',
                     [
                         'Base registration verified',
@@ -70,8 +71,7 @@ class ListingTest(APITestCase):
                 ('cost_time', 'a day'),
                 ('cost_bucket', ['cheap']),
                 ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['cheap'], 'work_with': []}),
-                ('booked_features', booked_features.format(
-                        models.Car.MIN_LEASE_CHOICES[car.min_lease],
+                ('booked_features', '{}, {}'.format(
                         car.owner.city,
                         car.owner.state_code,
                     )
@@ -98,7 +98,7 @@ class ListingTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         rep = self._get_expected_representation(self.car)
-        self.assertEqual([rep], response.data)
+        self.assertEqual(dict(rep), response.data[0])
 
     def test_get_cars_sorted(self):
         for _ in range(20):
@@ -113,7 +113,7 @@ class ListingTest(APITestCase):
 
     def _assert_car_details(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self._get_expected_representation(self.car))
+        self.assertEqual(dict(response.data), self._get_expected_representation(self.car))
 
     def test_get_live_car(self):
         url = reverse('server:listings-detail', args=(self.car.pk,))
@@ -150,4 +150,5 @@ class ListingTest(APITestCase):
         expected['details'][2] = ['Exterior color', 'Black']
         expected['details'][3] = ['Interior color', 'Black']
 
-        self.assertEqual(response.data, expected)
+        for exp, actual in zip(sorted(expected.iteritems()), sorted(dict(response.data).iteritems())):
+            self.assertEqual(exp, actual)

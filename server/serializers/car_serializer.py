@@ -43,6 +43,7 @@ class CarCreateSerializer(ModelSerializer):
             'listing_link',
 
             'shift',
+            'shift_details',
             'shift_display',
             'weekly_rent',
             'deposit',
@@ -112,7 +113,10 @@ class CarCreateSerializer(ModelSerializer):
         return '{} day'.format(days) + ('s' if days-1 else '')
 
     def get_shift_display(self, obj):
-        return Car.SHIFT_CHOICES[obj.shift][1]
+        return '{} {}'.format(
+            Car.SHIFT_CHOICES[obj.shift][1],
+            obj.shift_details
+        )
 
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):

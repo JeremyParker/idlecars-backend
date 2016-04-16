@@ -64,13 +64,16 @@ class Car(models.Model):
     SHIFT_FULL_TIME = 1
     SHIFT_DAY = 2
     SHIFT_NIGHT = 3
+    SHIFT_OTHER = 4
     SHIFT_CHOICES = [
         (SHIFT_UNKNOWN, 'Unknown'),
         (SHIFT_FULL_TIME, '24/7'),
-        (SHIFT_DAY, 'Day shift (5am-5pm)'),
-        (SHIFT_NIGHT, 'Night shift (5pm-5am)'),
+        (SHIFT_DAY, 'Day shift'),
+        (SHIFT_NIGHT, 'Night shift'),
+        (SHIFT_OTHER, ''),
     ]
     shift = models.IntegerField(choices=SHIFT_CHOICES, default=SHIFT_UNKNOWN)
+    shift_details = models.CharField(max_length=128, blank=True, null=False, default='')
 
     MIN_LEASE_CHOICES = model_helpers.Choices(
         _00_unknown='Unknown',

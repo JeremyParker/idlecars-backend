@@ -69,16 +69,14 @@ class ListingSerializer(ModelSerializer):
         return '{} {}'.format(obj.year, obj.make_model)
 
     def get_listing_features(self, obj):
-        return '{} minimum ∙ Available {} ∙ {}, {}'.format(
-            Car.MIN_LEASE_CHOICES[obj.min_lease],
+        return 'Available {} ∙ {}, {}'.format(
             self._available_string(obj),
             obj.owner.city,
             obj.owner.state_code,
         )
 
     def get_booked_features(self, obj):
-        return '{} minimum rental ∙ {}, {}'.format(
-            Car.MIN_LEASE_CHOICES[obj.min_lease],
+        return '{}, {}'.format(
             obj.owner.city,
             obj.owner.state_code,
         )
@@ -86,7 +84,7 @@ class ListingSerializer(ModelSerializer):
     def get_headline_features(self, obj):
         return [
             'Available {}'.format(self._available_string(obj)),
-            '{} minimum rental'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
+            # '{} minimum rental'.format(Car.MIN_LEASE_CHOICES[obj.min_lease]),
             '${} deposit'.format(obj.deposit),
         ]
 
@@ -146,7 +144,10 @@ class ListingSerializer(ModelSerializer):
     def get_shift(self, obj):
         return {
             'split_shift': obj.is_split_shift(),
-            'description': Car.SHIFT_CHOICES[obj.shift][1],
+            'description': '{} {}'.format(
+                Car.SHIFT_CHOICES[obj.shift][1],
+                obj.shift_details,
+            ),
         }
 
     def _available_string(self, obj):

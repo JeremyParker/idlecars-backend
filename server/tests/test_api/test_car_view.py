@@ -162,12 +162,12 @@ class CarUpdateTest(CarAPITest):
         self.car.save()
 
         url = reverse('server:cars-detail', args=(self.car.pk,))
-        data = {'weekly_rent': 350}
+        data = {'shift_details': 'This car is only available Mondays.'}
         response = self.client.patch(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.car.refresh_from_db()
-        self.assertEqual(self.car.weekly_rent, Decimal('350'))
+        self.assertEqual(self.car.shift_details, 'This car is only available Mondays.')
 
     def test_can_unclaim_car(self):
         url = reverse('server:cars-detail', args=(self.car.pk,))
