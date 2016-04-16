@@ -114,7 +114,7 @@ class CarCreateSerializer(ModelSerializer):
 
     def get_shift_display(self, obj):
         return '{} {}'.format(
-            Car.SHIFT_CHOICES[obj.shift][1],
+            obj.shift_display(),
             obj.shift_details
         )
 

@@ -38,40 +38,17 @@ class CarStaleListFilter(admin.SimpleListFilter):
             return services.car.filter_booking_in_progress(queryset)
 
 
-class NoPlateFilter(admin.SimpleListFilter):
-    '''
-    Filter to show cars based on if we have the plate for the car.
-    '''
-    title = 'plate'
-    parameter_name = 'plate'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('yes', 'yes'),
-            ('no', 'no'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'yes':
-            return queryset.exclude(plate='')
-        elif self.value() == 'no':
-            return queryset.filter(plate='')
-
-
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
         'weekly_rent',
         'owner_link',
-        'owner_rating',
         'last_status_update',
         'plate',
         'shift',
     ]
     list_filter = [
         CarStaleListFilter,
-        'owner__rating',
-        NoPlateFilter,
     ]
     search_fields = [
         'make_model__model',
@@ -86,10 +63,8 @@ class CarAdmin(admin.ModelAdmin):
                 ('owner', 'owner_link', 'owner_rating'),
                 ('last_known_mileage', 'last_mileage_update'),
                 ('effective_status', 'last_status_update', 'next_available_date',),
-                ('shift', 'weekly_rent', 'deposit'),
-                'min_lease',
+                ('shift', 'shift_details', 'weekly_rent', 'deposit'),
                 'notes',
-                'work_with',
             )
         }),
         ('TLC data', {

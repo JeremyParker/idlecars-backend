@@ -21,13 +21,13 @@ admin.site.register(models.Car, CarAdmin)
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.MakeModel, MakeModelAdmin)
 admin.site.register(models.Driver, DriverAdmin)
-admin.site.register(models.Insurance)
-admin.site.register(models.Payment, PaymentAdmin)
-admin.site.register(models.PaymentMethod, PaymentMethodAdmin)
-admin.site.register(models.RideshareFlavor, RideshareFlavorAdmin)
-admin.site.register(models.BraintreeRequest)
-admin.site.register(models.OnboardingOwner, OnboardingOwnerAdmin)
+# admin.site.register(models.Insurance)
+# admin.site.register(models.Payment, PaymentAdmin)
+# admin.site.register(models.PaymentMethod, PaymentMethodAdmin)
+# admin.site.register(models.RideshareFlavor, RideshareFlavorAdmin)
+# admin.site.register(models.BraintreeRequest)
+# admin.site.register(models.OnboardingOwner, OnboardingOwnerAdmin)
 
-admin.site.site_header = "idlecars operations"
+admin.site.site_header = "All Taxi Operations"
 admin.site.site_title = ''
 admin.site.index_title = ''

@@ -8,7 +8,7 @@ from idlecars.reverse_admin import ReverseModelAdmin
 
 from server import models
 from server.admin.booking import BookingForDriverInline
-from server.admin.payment_method import PaymentMethodInline
+# from server.admin.payment_method import PaymentMethodInline
 
 
 class DriverAdmin(ReverseModelAdmin):
@@ -72,7 +72,7 @@ class DriverAdmin(ReverseModelAdmin):
         'app_credit',
         'braintree_customer_id',
     ]
-    inlines = [BookingForDriverInline, PaymentMethodInline,]
+    inlines = [BookingForDriverInline,]
     change_form_template = "change_form_inlines_at_top.html"
 
     def queryset(self, request):

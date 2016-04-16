@@ -158,6 +158,9 @@ class Car(models.Model):
                 pass
         return None
 
+    def shift_display(self):
+        return Car.SHIFT_CHOICES[self.shift][1]
+
     def effective_status(self):
         if not self.next_available_date:
             return 'Busy'

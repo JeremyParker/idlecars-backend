@@ -33,7 +33,7 @@ class Booking(models.Model):
     approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED
     pickup_time = models.DateTimeField(null=True, blank=True)           # ACTIVE <-- deprecated
     return_time = models.DateTimeField(null=True, blank=True)           # RETURNED <-- deprecated
-    refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
+    refund_time = models.DateTimeField(null=True, blank=True, verbose_name='Removal time') # REFUNDED
     incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
 
     REASON_ANOTHER_BOOKED_DOCS = 1

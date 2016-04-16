@@ -41,21 +41,17 @@ class BookingAdmin(admin.ModelAdmin):
                 ('state', 'driver_docs_uploaded',),
                 ('driver_link', 'driver_phone', 'driver_email',),
                 ('car', 'car_link', 'car_plate',),
-                ('weekly_rent', 'service_percentage', 'effective_service_percentage',),
+                ('car_shift', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
             ),
         }),
         ('State History', {
             'fields': (
                 ('created_time',),
-                ('checkout_time',),
                 ('requested_time',),
                 ('approval_time',),
-                ('pickup_time',),
-                ('end_time',),
-                ('return_time',),
-                ('incomplete_time', 'incomplete_reason',),
                 ('refund_time',),
+                ('incomplete_time', 'incomplete_reason',),
             ),
         }),
         ('Notes', {
@@ -64,14 +60,14 @@ class BookingAdmin(admin.ModelAdmin):
             ),
         }),
     )
-    inlines = [PaymentInline]
+    # inlines = [PaymentInline]
     list_display = [
         'created_time',
         'driver_link',
         'car_link',
+        'car_shift',
         'owner_link',
         'car_cost',
-        'service_percentage',
         'end_time',
     ]
     list_filter = [
@@ -80,13 +76,14 @@ class BookingAdmin(admin.ModelAdmin):
     ]
 
     readonly_fields = [
+        'car',
         'state',
         'driver_docs_uploaded',
         'driver',
         'car_link',
+        'car_shift',
         'car_plate',
         'car_cost',
-        'effective_service_percentage',
         'owner_link',
         'owner_phone',
         'owner_email',
@@ -162,17 +159,14 @@ class BookingAdmin(admin.ModelAdmin):
             return None
     car_plate.short_description = 'Plate'
 
+
+    def car_shift(self, instance):
+        return '{} {}'.format(instance.car.shift_display(), instance.car.shift_details)
+
     def car_cost(self, instance):
-        if instance.weekly_rent:
-            return '${}'.format(instance.weekly_rent)
-        else:
-            return '${}'.format(instance.car.weekly_rent)
+        return instance.car.weekly_rent
     car_cost.short_description = 'Rent'
     car_cost.admin_order_field = 'car__weekly_rent'
-
-    def effective_service_percentage(self, instance):
-        return instance.service_percentage or instance.car.owner.effective_service_percentage
-    effective_service_percentage.short_description = 'Effective take rate'
 
     def driver_phone(self, instance):
         if instance.driver:

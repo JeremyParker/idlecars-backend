@@ -44,5 +44,5 @@ class CreditCodeAdmin(admin.ModelAdmin):
         'redeem_count',
     ]
 
-admin.site.register(models.CreditCode, CreditCodeAdmin)
-admin.site.register(models.Customer, CustomerAdmin)
+# admin.site.register(models.CreditCode, CreditCodeAdmin)
+# admin.site.register(models.Customer, CustomerAdmin)
