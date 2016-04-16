@@ -17,7 +17,7 @@ staleness_threshold = timezone.now() - datetime.timedelta(days=settings.STALENES
 def _filter_booking_in_progress(booking_queryset):
     return booking_queryset.filter(
         requested_time__isnull=False,
-        return_time__isnull=True,
+        refund_time__isnull=True,
         incomplete_time__isnull=True,
 )
 

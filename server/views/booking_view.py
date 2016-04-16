@@ -50,21 +50,3 @@ class BookingViewSet(
             return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
         except ServiceError as booking_error:
             return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
-
-    @detail_route(methods=['post'], permission_classes=[OwnsBooking])
-    def pickup(self, request, pk=None):
-        booking = self.get_object()
-        try:
-            booking = booking_service.pickup(booking)
-            return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
-        except ServiceError as booking_error:
-            return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)
-
-    @detail_route(methods=['post'], permission_classes=[OwnsBooking])
-    def booking_return(self, request, pk=None):
-        booking = self.get_object()
-        try:
-            booking = booking_service.booking_return(booking)
-            return Response(self.get_serializer(booking).data, HTTP_201_CREATED)
-        except ServiceError as booking_error:
-            return Response({'_app_notifications': [booking_error.message]}, HTTP_400_BAD_REQUEST)

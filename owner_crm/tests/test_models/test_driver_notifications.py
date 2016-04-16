@@ -29,8 +29,7 @@ class DriverNotificationTest(TestCase):
         car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create(car=car)
         self.requested_booking = server_factories.RequestedBooking.create(car=car)
-        self.accepted_booking = server_factories.AcceptedBooking.create(car=car)
-        self.booked_booking = server_factories.BookedBooking.create(car=car)
+        self.returned_booking = server_factories.ReturnedBooking.create(car=car)
         self.refunded_booking = server_factories.RefundedBooking.create(car=car)
         self.password_reset = crm_factories.PasswordReset.create(auth_user=auth_user)
 
@@ -122,38 +121,23 @@ class DriverNotificationTest(TestCase):
                         self.requested_booking.car.display_name(),
                     ),
             },
-            'FirstPickupReminder': {
-                'argument': 'accepted_booking',
-                'sms_result': 'scheduled the pickup',
-                'email_result': 'to pickup',
-            },
-            'SecondPickupReminder': {
-                'argument': 'accepted_booking',
-                'sms_result': 'scheduled the pickup',
-                'email_result': 'pay and drive',
-            },
-            'PickupConfirmation': {
-                'argument': 'refunded_booking',
-                'sms_result': 'Success!',
-                'email_result': 'ready to drive',
-            },
             'BookingCanceled': {
                 'argument': 'pending_booking',
                 'sms_result': 'canceled',
                 'email_result': 'canceled',
             },
             'ExtendReminder': {
-                'argument': 'booked_booking',
+                'argument': 'returned_booking',
                 'sms_result': 'extend',
                 'email_result': 'ends',
             },
             'FirstLateNotice': {
-                'argument': 'booked_booking',
+                'argument': 'returned_booking',
                 'sms_result': '12 hours ago',
                 'email_result': 'ended',
             },
             'SecondLateNotice': {
-                'argument': 'booked_booking',
+                'argument': 'returned_booking',
                 'sms_result': '24 hours ago',
                 'email_result': 'return',
             },
@@ -199,11 +183,11 @@ class DriverNotificationTest(TestCase):
                 'email_result': 'Share',
             },
             'InsuranceRejected': {
-                'argument': 'accepted_booking',
+                'argument': 'requested_booking',
                 'email_result': 'insurance',
             },
             'InsuranceFailed': {
-                'argument': 'accepted_booking',
+                'argument': 'requested_booking',
                 'email_result': 'unable',
             },
             'CarRentedElsewhere': {

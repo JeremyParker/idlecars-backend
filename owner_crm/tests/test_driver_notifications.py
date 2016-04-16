@@ -190,13 +190,6 @@ program in the foreseeable future.
 #         from django.core.mail import outbox
 #         self.assertEqual(len(outbox), 1)
 
-#     def test_no_credit_email_with_accepted_booking(self):
-#         server.factories.AcceptedBooking.create(driver=self.rich_driver)
-#         driver_service.process_credit_notifications()
-
-#         from django.core.mail import outbox
-#         self.assertEqual(len(outbox), 1)
-
 #     def test_no_credit_email_with_requested_booking(self):
 #         server.factories.RequestedBooking.create(driver=self.rich_driver)
 #         driver_service.process_credit_notifications()
@@ -308,8 +301,6 @@ class TestDriverSignupNotifications(TestCase):
     @freeze_time("2014-10-17 9:00:00")
     def test_no_email_with_post_pending_booking(self):
         server.factories.RequestedBooking.create()
-        server.factories.AcceptedBooking.create()
-        server.factories.BookedBooking.create()
         server.factories.ReturnedBooking.create()
         server.factories.RefundedBooking.create()
         driver_service.process_signup_notifications()
@@ -342,8 +333,6 @@ class TestDriverInsuranceNotifications(TestCase):
         with freeze_time("2014-10-17 9:00:00"):
             good_booking = server.factories.RequestedBooking.create()
             server.factories.Booking.create()
-            server.factories.AcceptedBooking.create()
-            server.factories.BookedBooking.create()
             server.factories.ReturnedBooking.create()
             server.factories.RefundedBooking.create()
             server.factories.IncompleteBooking.create()

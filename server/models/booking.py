@@ -30,9 +30,9 @@ class Booking(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)              # PENDING
     checkout_time = models.DateTimeField(null=True, blank=True)         # RESERVED <-- deprecated
     requested_time = models.DateTimeField(null=True, blank=True)        # REQUESTED
-    approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED <-- going away
-    pickup_time = models.DateTimeField(null=True, blank=True)           # ACTIVE <-- going away
-    return_time = models.DateTimeField(null=True, blank=True)           # RETURNED
+    approval_time = models.DateTimeField(null=True, blank=True)         # ACCEPTED
+    pickup_time = models.DateTimeField(null=True, blank=True)           # ACTIVE <-- deprecated
+    return_time = models.DateTimeField(null=True, blank=True)           # RETURNED <-- deprecated
     refund_time = models.DateTimeField(null=True, blank=True)           # REFUNDED
     incomplete_time = models.DateTimeField(null=True, blank=True)       # INCOMPLETE
 
@@ -72,10 +72,7 @@ class Booking(models.Model):
     incomplete_reason = models.IntegerField(choices=REASON, null=True, blank=True)
 
     PENDING = 1
-    RESERVED = 2
     REQUESTED = 3
-    ACCEPTED = 4
-    ACTIVE = 5
     RETURNED = 6
     REFUNDED = 7
     INCOMPLETE = 8
@@ -84,12 +81,9 @@ class Booking(models.Model):
 
     STATES = {
         PENDING: 'Pending - booking has been created but not reserved yet',
-        RESERVED: 'Reserved - deposit paid, not requested (waiting for doc review)',
         REQUESTED: 'Requested - waiting for owner/insurance',
-        ACCEPTED: 'Accepted - waiting for driver to pick up the car',
-        ACTIVE: 'Active - car is in the driver\'s possession and on the road',
-        RETURNED: 'Returned - driver returned the car but hasn\'t got deposit back',
-        REFUNDED: 'Refunded - car was returned and driver got their deposit back',
+        RETURNED: 'Accepted - Owner has approved the driver to get on the car',
+        REFUNDED: 'Finished - the owner requested that the driver be removed from the car',
         INCOMPLETE: 'Incomplete - this rental didn\'t happen for some reason (see reason field)',
     }
 
@@ -98,12 +92,8 @@ class Booking(models.Model):
             return Booking.INCOMPLETE
         elif self.refund_time:
             return Booking.REFUNDED
-        elif self.return_time:
-            return Booking.RETURNED
-        elif self.pickup_time:
-            return Booking.ACTIVE
         elif self.approval_time:
-            return Booking.ACCEPTED
+            return Booking.RETURNED
         elif self.requested_time:
             return Booking.REQUESTED
         else:
@@ -124,9 +114,6 @@ class Booking(models.Model):
             if self.approval_time and not orig.approval_time:
                 booking_service.on_insurance_approved(self)
 
-            if self.return_time and not orig.return_time:
-                booking_service.on_returned(self)
-
             if self.incomplete_time:
                 if not self.incomplete_reason:
                     raise ValidationError('To set a booking to incomplete, also select a reason')
@@ -138,8 +125,6 @@ class Booking(models.Model):
         times = [
             self.requested_time or max_time,
             self.approval_time or max_time,
-            self.pickup_time or max_time,
-            self.return_time or max_time,
             self.refund_time or max_time,
         ]
         for earlier, later in zip(times[:-1], times[1:]):

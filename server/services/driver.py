@@ -148,7 +148,7 @@ def _inactive_coupon_reminder(delay_days):
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveCredit')
     skip_drivers = []
     for driver in throttled_drivers:
-        if server.services.booking.processing_bookings(driver.booking_set):
+        if server.services.booking.filter_requested(driver.booking_set):
             skip_drivers.append(driver.pk)
             continue
 
@@ -166,7 +166,7 @@ def _inactive_referral_reminder(delay_days):
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'InactiveReferral')
     skip_drivers = []
     for driver in throttled_drivers:
-        if server.services.booking.processing_bookings(driver.booking_set) or \
+        if server.services.booking.filter_requested(driver.booking_set) or \
             is_converted_driver(driver):
             skip_drivers.append(driver.pk)
             continue
@@ -188,7 +188,7 @@ def _credit_reminder(delay_days):
     throttled_drivers = throttle_service.throttle(remindable_drivers, 'UseYourCredit')
     skip_drivers = []
     for driver in throttled_drivers:
-        if server.services.booking.processing_bookings(driver.booking_set):
+        if server.services.booking.filter_requested(driver.booking_set):
             skip_drivers.append(driver.pk)
             continue
 
@@ -242,29 +242,6 @@ def _insurance_notification(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
-def _send_pickup_reminder(delay_hours, reminder_name):
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=delay_hours)
-    accepted_bookings = server.services.booking.filter_accepted(server.models.Booking.objects.all())
-    remindable_bookings = accepted_bookings.filter(
-        approval_time__lte=reminder_threshold,
-    )
-    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
-    for booking in throttled_bookings:
-        notification.send('driver_notifications.'+reminder_name, booking)
-    throttle_service.mark_sent(throttled_bookings, reminder_name)
-
-
-def _late_notice(delay_hours, reminder_name):
-    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
-    remindable_bookings = active_bookings.filter(
-        end_time__lte=timezone.now() - datetime.timedelta(hours=delay_hours),
-    )
-    throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)
-    for booking in throttled_bookings:
-        notification.send('driver_notifications.'+reminder_name, booking)
-    throttle_service.mark_sent(throttled_bookings, reminder_name)
-
-
 def process_signup_notifications():
     _signup_reminder(
         delay_days=7,
@@ -306,15 +283,3 @@ def process_document_notifications():
 def process_insurance_notifications():
     _insurance_notification(delay_hours=24, reminder_name='FirstInsuranceNotification')
     _insurance_notification(delay_hours=48, reminder_name='SecondInsuranceNotification')
-
-
-def process_extend_notifications():
-    active_bookings = server.services.booking.filter_active(server.models.Booking.objects.all())
-    remindable_bookings = active_bookings.filter(
-        end_time__lte=timezone.now() + datetime.timedelta(hours=24),
-        end_time__gt=timezone.now(),
-    )
-    throttled_bookings = throttle_service.throttle(remindable_bookings, 'ExtendReminder', 25)
-    for booking in throttled_bookings:
-        notification.send('driver_notifications.ExtendReminder', booking)
-    throttle_service.mark_sent(throttled_bookings, 'ExtendReminder')

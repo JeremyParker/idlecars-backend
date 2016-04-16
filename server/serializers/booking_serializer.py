@@ -112,8 +112,8 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return instance
 
     def get_car(self, obj):
-        # if the booking is in the ACCEPTED state, use a custom serializer with contact info
-        if obj.get_state() == Booking.ACCEPTED:
+        # if the booking is in the RETURNED state, use a custom serializer with contact info
+        if obj.get_state() == Booking.RETURNED:
             serializer = listing_serializer.ListingPickupSerializer
         else:
             serializer = listing_serializer.ListingSerializer
@@ -121,7 +121,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 
     def get_step(self, obj):
         state = obj.get_state()
-        if state in [Booking.RETURNED, Booking.ACTIVE, Booking.ACCEPTED]:
+        if state == Booking.RETURNED:
             return 5
         elif state in [Booking.REQUESTED]:
             return 4

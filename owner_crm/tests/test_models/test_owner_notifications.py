@@ -30,8 +30,6 @@ class OwnerNotificationTest(TestCase):
         self.car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create()
         self.requested_booking = server_factories.RequestedBooking.create(car=self.car)
-        self.accepted_booking = server_factories.AcceptedBooking.create(car=self.car)
-        self.booked_booking = server_factories.BookedBooking.create(car=self.car)
         self.returned_booking = server_factories.ReturnedBooking.create(car=self.car)
 
         self.password_reset = crm_factories.PasswordReset.create(
@@ -96,21 +94,6 @@ class OwnerNotificationTest(TestCase):
                 'email_result': self.requested_booking.driver.full_name(),
                 'sms_result': self.requested_booking.car.display_name(),
             },
-            'FirstOwnerPickupReminder': {
-                'argument': 'accepted_booking',
-                'email_result': 'pickup',
-                'sms_result': 'pickup',
-            },
-            'SecondOwnerPickupReminder': {
-                'argument': 'accepted_booking',
-                'email_result': 'pickup',
-                'sms_result': 'picks up',
-            },
-            'PickupConfirmation': {
-                'argument': 'returned_booking',
-                'email_result': 'paid',
-                'sms_result': self.returned_booking.driver.full_name()
-            },
             'PendingNotification': {
                 'argument': 'pending_booking',
                 'email_result': 'interested',
@@ -125,30 +108,10 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
-            'ExtendedRental': {
-                'argument': 'booked_booking',
-                'email_result': self.booked_booking.end_time.strftime('%b %d'),
-                'sms_body': self.booked_booking.end_time.strftime('%b %d'),
-            },
             'ConfirmReturned': {
-                'argument': 'booked_booking',
+                'argument': 'returned_booking',
                 'email_result': 'returned',
                 'sms_body': 'returned',
-            },
-            'FirstReturnReminder': {
-                'argument': 'booked_booking',
-                'email_result': 'returned',
-                'sms_body': 'overdue',
-            },
-            'SecondReturnReminder': {
-                'argument': 'booked_booking',
-                'email_result': 'returned',
-                'sms_body': 'overdue',
-            },
-            'ThirdReturnReminder': {
-                'argument': 'booked_booking',
-                'email_result': 'returned',
-                'sms_body': 'recover',
             },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',

@@ -35,13 +35,12 @@ class ListingTest(TestCase):
         self.assertEqual(len(_get_listing_queryset()), 0)
 
     def test_car_filtered_if_booking_booked(self):
-        factories.BookedBooking.create(car=self.car)
+        factories.ReturnedBooking.create(car=self.car)
         self.assertEqual(len(_get_listing_queryset()), 0)
 
     def test_car_shows_if_no_booking_in_progress(self):
         models.Booking.objects.all().delete()  # make sure there are no bookings on our car
         factories.Booking.create(car = self.car)            # PENDING
-        factories.ReturnedBooking.create(car = self.car)    # RETURNED
         factories.RefundedBooking.create(car = self.car)    # REFUNDED
         factories.IncompleteBooking.create(car = self.car)  # INCOMPLETE
         self.assertEqual(len(_get_listing_queryset()), 1)

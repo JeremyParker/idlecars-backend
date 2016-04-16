@@ -33,8 +33,6 @@ class TestOwnerPendingBookingNotifications(TestCase):
         with freeze_time("2014-10-10 11:00:00"):
             good_booking = server.factories.Booking.create(driver=self.driver)
             server.factories.RequestedBooking.create(driver=self.driver)
-            server.factories.AcceptedBooking.create(driver=self.driver)
-            server.factories.BookedBooking.create(driver=self.driver)
             server.factories.ReturnedBooking.create(driver=self.driver)
             server.factories.RefundedBooking.create(driver=self.driver)
             server.factories.IncompleteBooking.create(driver=self.driver)
@@ -182,8 +180,6 @@ class TestOwnerInsuranceNotifications(TestCase):
         tz = timezone.get_current_timezone()
         with freeze_time(timezone.datetime(2014, 10, 11, 18, 00, 00, tzinfo=tz)):
             server.factories.Booking.create()
-            server.factories.AcceptedBooking.create()
-            server.factories.BookedBooking.create()
             server.factories.ReturnedBooking.create()
             server.factories.RefundedBooking.create()
             server.factories.IncompleteBooking.create()
@@ -277,118 +273,3 @@ class TestOwnerInsuranceNotifications(TestCase):
         '''
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 5)
-
-
-class TestOwnerPickupNotifications(TestCase):
-    @freeze_time("2014-10-10 9:55:00")
-    def setUp(self):
-        self.accepted_booking = server.factories.AcceptedBooking.create()
-
-    def test_only_accepted_bookings_has_reminder(self):
-        with freeze_time("2014-10-10 9:55:00"):
-            server.factories.Booking.create()
-            server.factories.RequestedBooking.create()
-            server.factories.BookedBooking.create()
-            server.factories.ReturnedBooking.create()
-            server.factories.RefundedBooking.create()
-            server.factories.IncompleteBooking.create()
-
-        with freeze_time("2014-10-10 11:00:00"):
-            owner_service.process_pickup_reminder()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
-        )
-
-    def test_no_email_twice(self):
-        with freeze_time("2014-10-10 11:00:00"):
-            owner_service.process_pickup_reminder()
-            owner_service.process_pickup_reminder()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-
-    def test_no_email_early(self):
-        with freeze_time("2014-10-10 10:00:00"):
-            owner_service.process_pickup_reminder()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
-
-    def test_no_email_after_pickup(self):
-        with freeze_time("2014-10-10 11:00:00"):
-            self.accepted_booking.pickup_time = timezone.now()
-            self.accepted_booking.save()
-            owner_service.process_pickup_reminder()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
-
-    def test_second_reminder(self):
-        with freeze_time("2014-10-10 10:00:00"):
-            owner_service.process_pickup_reminder()
-        with freeze_time("2014-10-10 22:00:00"):
-            owner_service.process_pickup_reminder()
-
-        '''
-            - message to owner: first pickup reminder
-            - message to owner: second pickup reminder
-        '''
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)
-        self.assertEqual(
-            outbox[1].subject,
-            '{} will schedule pickup soon'.format(self.accepted_booking.driver.full_name()),
-        )
-
-
-class TestOwnerExtendRentalNotifications(TestCase):
-    def _create_booking_and_change_end_time(self, booking_type):
-        with freeze_time("2014-10-10 9:00:00"):
-            booking = getattr(server.factories, booking_type).create()
-        booking_service.set_end_time(booking, timezone.now())
-        return booking
-
-    def test_end_time_changed(self):
-        booking = self._create_booking_and_change_end_time('BookedBooking')
-        self._create_booking_and_change_end_time('Booking')
-        self._create_booking_and_change_end_time('RequestedBooking')
-        self._create_booking_and_change_end_time('ReturnedBooking')
-        self._create_booking_and_change_end_time('RefundedBooking')
-        self._create_booking_and_change_end_time('IncompleteBooking')
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            'The rental for your {} ({}) was extended until {}'.format(
-                booking.car.display_name(),
-                booking.car.plate,
-                booking.end_time.strftime('%b %d'),
-            ),
-        )
-
-    def test_no_email_at_booking_creation(self):
-        booking = server.factories.BookedBooking.create()
-        self.assertTrue(booking.end_time != None)
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
-
-    def test_no_email_at_end_time_to_None(self):
-        booking = server.factories.BookedBooking.create()
-        booking.end_time = None
-        booking.save()
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 0)
-
-    def test_more_than_one_email(self):
-        booking = self._create_booking_and_change_end_time('BookedBooking')
-        booking_service.set_end_time(booking, timezone.now())
-
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 2)

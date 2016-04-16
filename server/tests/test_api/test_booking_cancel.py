@@ -38,7 +38,7 @@ class CancelBookingTest(APITestCase):
 
     def test_cannot_cancel_booked_booking(self):
         # set the booking to "Booked"
-        self.booking = factories.BookedBooking.create(driver=self.driver)
+        self.booking = factories.ReturnedBooking.create(driver=self.driver)
         url = reverse('server:bookings-cancelation', args=(self.booking.pk,))
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -28,8 +28,6 @@ class BookingStateFilter(admin.SimpleListFilter):
         return {
             models.Booking.PENDING: services.booking.filter_pending(queryset),
             models.Booking.REQUESTED: services.booking.filter_requested(queryset),
-            models.Booking.ACCEPTED: services.booking.filter_accepted(queryset),
-            models.Booking.ACTIVE: services.booking.filter_active(queryset),
             models.Booking.RETURNED: services.booking.filter_returned(queryset),
             models.Booking.REFUNDED: services.booking.filter_refunded(queryset),
             models.Booking.INCOMPLETE: services.booking.filter_incomplete(queryset),

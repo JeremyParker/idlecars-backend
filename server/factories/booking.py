@@ -31,37 +31,8 @@ class RequestedBooking(Booking):
     requested_time = LazyAttribute(lambda o: timezone.now())
 
 
-class AcceptedBooking(RequestedBooking):
+class ReturnedBooking(RequestedBooking):
     approval_time = LazyAttribute(lambda o: timezone.now())
-
-
-class BookedBooking(AcceptedBooking):
-    pickup_time = LazyAttribute(lambda o: timezone.now())
-
-    @post_generation
-    def payment(self, create, count, **kwargs):
-        HeldInEscrowPayment.create(
-            booking=self,
-            amount=self.car.deposit,
-        )
-        SettledPayment.create(
-            booking=self,
-            amount=self.car.deposit,
-            invoice_start_time=LazyAttribute(lambda o: timezone.now()),
-            invoice_end_time=LazyAttribute(lambda o: (timezone.now()+ datetime.timedelta(days=7)))
-        )
-
-    @post_generation
-    def update_end_time(self, create, count, **kwargs):
-        self.end_time = self.end_time.replace(
-            hour=self.pickup_time.hour,
-            minute=self.pickup_time.minute,
-            second=self.pickup_time.second,
-        )
-
-
-class ReturnedBooking(BookedBooking):
-    return_time = LazyAttribute(lambda o: timezone.now())
 
 
 class RefundedBooking(ReturnedBooking):

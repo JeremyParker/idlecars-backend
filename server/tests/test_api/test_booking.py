@@ -57,7 +57,7 @@ class CreateBookingTest(APITestCase):
 
     def test_fail_when_driver_has_booked_booking(self):
         other_car = factories.BookableCar.create()
-        existing_booking = factories.BookedBooking.create(car=other_car, driver=self.driver)
+        existing_booking = factories.ReturnedBooking.create(car=other_car, driver=self.driver)
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['_app_notifications'], ['You have a conflicting rental.'])
@@ -99,7 +99,7 @@ class ListBookingTest(APITestCase):
             self.assertEqual(booking_data['car']['id'], self.booking.car.pk)
 
     def test_get_booking_list_one_pending_one_booked(self):
-        booking2 = factories.BookedBooking.create(driver=self.driver)
+        booking2 = factories.ReturnedBooking.create(driver=self.driver)
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
@@ -114,30 +114,6 @@ class ListBookingTest(APITestCase):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
-
-
-class UpdateBookingTest(APITestCase):
-    def setUp(self):
-        self.booking = factories.Booking.create(
-            end_time=datetime.datetime(2014, 12, 15, 14, 12, 31, tzinfo=timezone.get_current_timezone())
-        )
-
-        self.client = APIClient()
-        # Include an appropriate `Authorization:` header on all requests.
-        token = Token.objects.get(user__username=self.booking.driver.auth_user.username)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        self.url = reverse('server:bookings-detail', args=(self.booking.pk,))
-
-    def test_set_end_time(self):
-        data = {'end_time': [2016, 0, 1]}  # happy new year
-        response = self.client.patch(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.booking = models.Booking.objects.get(id=self.booking.pk)
-        expected_end = datetime.datetime(2016, 1, 1, 14, 12, 31, tzinfo=timezone.get_current_timezone())
-        self.assertEqual(
-            self.booking.end_time.astimezone(timezone.get_current_timezone()),
-            expected_end
-        )
 
 
 class BookingStepTest(APITestCase):

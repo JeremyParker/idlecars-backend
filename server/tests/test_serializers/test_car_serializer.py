@@ -79,8 +79,7 @@ class TextCarState(TestCase):
 
     def test_returned_booking(self):
         car = factories.BookableCar.create()
-        end_time = timezone.now() + datetime.timedelta(days=7)
-        booking = factories.ReturnedBooking.create(car=car, end_time=end_time)
+        booking = factories.ReturnedBooking.create(car=car)
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(
             serializer_data['state_string'],

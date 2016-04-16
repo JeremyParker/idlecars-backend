@@ -38,28 +38,11 @@ def filter_requested(booking_queryset):
         incomplete_time__isnull=True,
     )
 
-# TODO: unit test this
-def filter_accepted(booking_queryset):
-    return booking_queryset.filter(
-        approval_time__isnull=False,
-        pickup_time__isnull=True,
-        incomplete_time__isnull=True,
-    )
-
-def filter_active(booking_queryset):
-    return booking_queryset.filter(
-        incomplete_time__isnull=True,
-        refund_time__isnull=True,
-        return_time__isnull=True,
-        pickup_time__isnull=False,
-    )
-
-# TODO: unit test this
 def filter_returned(booking_queryset):
     return booking_queryset.filter(
-        incomplete_time__isnull=True,
+        approval_time__isnull=False,
         refund_time__isnull=True,
-        return_time__isnull=False,
+        incomplete_time__isnull=True,
     )
 
 # TODO: unit test this
@@ -77,28 +60,21 @@ def filter_incomplete(booking_queryset):
     )
 
 
-def processing_bookings(booking_queryset):
-    active_bookings = filter_active(booking_queryset)
-    accepted_bookings = filter_accepted(booking_queryset)
-    requested_bookings = filter_requested(booking_queryset)
-    return active_bookings | accepted_bookings | requested_bookings
-
-
 def post_pending_bookings(booking_queryset):
-    filtered_processing_bookings = processing_bookings(booking_queryset)
+    requested_bookings = filter_requested(booking_queryset)
     returned_bookings = filter_returned(booking_queryset)
     refunded_bookings = filter_refunded(booking_queryset)
-    return filtered_processing_bookings | returned_bookings | refunded_bookings
+    return requested_bookings | returned_bookings | refunded_bookings
 
 
 def is_visible(booking):
     ''' Can this booking be seen in the Driver app '''
-    return not booking.return_time and not booking.incomplete_time
+    return not booking.refund_time and not booking.incomplete_time
 
 
 def filter_visible(booking_queryset):
     ''' Can this booking be seen in the Driver app '''
-    return booking_queryset.filter(return_time__isnull=True, incomplete_time__isnull=True)
+    return booking_queryset.filter(refund_time__isnull=True, incomplete_time__isnull=True)
 
 
 def on_car_missed(car):
@@ -144,11 +120,6 @@ def request_insurance(booking):
 def on_insurance_approved(booking):
     # TODO:alltaxi - send an email to All Taxi with documents and instructions
     notification.send('driver_notifications.InsuranceApproved', booking)
-
-
-def on_returned(booking):
-    # TODO - issue a refund and email all parties
-    pass
 
 
 def create_booking(car, driver):
@@ -249,10 +220,6 @@ def reject(booking):
     _make_booking_incomplete(booking, Booking.REASON_OWNER_REJECTED)
 
 
-def can_pickup(booking):
-    return booking.get_state() == Booking.ACCEPTED
-
-
 def pickup(booking):
     '''
     Warning: this method might change the booking even if it's unsuccessful. Caller should
@@ -262,9 +229,6 @@ def pickup(booking):
         try:
             # we have to re-fetch the booking so we can make sure we have a lock on the db row.
             safe_booking = Booking.objects.select_for_update(nowait=True).filter(pk=booking.pk).get()
-            if not can_pickup(safe_booking):
-                raise ServiceError(PICKUP_ERROR)
-
             booking.pickup_time=timezone.now().replace(microsecond=0)
 
             # this acts as a flag to prevent re-entry
@@ -309,24 +273,7 @@ def pickup(booking):
 
     booking.save()
 
-    notification.send('driver_notifications.PickupConfirmation', rent_payment)
-    notification.send('owner_notifications.PickupConfirmation', rent_payment)
-
     return booking
-
-
-def booking_return(booking):
-    if not booking or booking.get_state() != Booking.ACTIVE:
-        raise ServiceError(RETURN_ERROR)
-
-    booking.return_time = timezone.now()
-    booking.save()
-    on_return(booking)
-    return booking
-
-
-def on_return(booking):
-    notification.send('owner_notifications.ConfirmReturned', booking)
 
 
 def return_confirm(booking):
@@ -400,16 +347,17 @@ def calculate_end_time(booking, pickup_time):
 
 # TODO: move this up to the API
 def set_end_time(booking, end_time):
-    if booking.end_time:
-        booking.end_time = booking.end_time.replace(
-            year=end_time.year,
-            month=end_time.month,
-            day=end_time.day,
-        )
-        if booking.get_state() == Booking.ACTIVE:
-            notification.send('owner_notifications.ExtendedRental', booking)
-    else:
-        booking.end_time = end_time
-
-    booking.save()
     return booking
+    # if booking.end_time:
+    #     booking.end_time = booking.end_time.replace(
+    #         year=end_time.year,
+    #         month=end_time.month,
+    #         day=end_time.day,
+    #     )
+    #     if booking.get_state() == Booking.ACTIVE:
+    #         notification.send('owner_notifications.ExtendedRental', booking)
+    # else:
+    #     booking.end_time = end_time
+
+    # booking.save()
+    # return booking
