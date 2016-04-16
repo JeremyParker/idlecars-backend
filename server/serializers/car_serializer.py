@@ -113,10 +113,7 @@ class CarCreateSerializer(ModelSerializer):
         return '{} day'.format(days) + ('s' if days-1 else '')
 
     def get_shift_display(self, obj):
-        return '{} {}'.format(
-            obj.shift_display(),
-            obj.shift_details
-        )
+        return obj.shift_display()
 
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
