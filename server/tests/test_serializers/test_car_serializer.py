@@ -60,7 +60,7 @@ class TextCarState(TestCase):
     def test_data_incomplete(self):
         car = factories.Car.create()
         serializer_data = serializers.CarSerializer(car).data
-        self.assertEqual(serializer_data['state_string'], 'Waiting for information. Tap here.')
+        self.assertEqual(serializer_data['state_string'], 'Waiting for information.')
         self.assertEqual(0, len(serializer_data['state_buttons']))
 
     def test_requested(self):

@@ -20,7 +20,7 @@ class TestListingSerializer(TestCase):
         make_model = factories.MakeModel.create(image_filenames=filename)
         car = factories.BookableCar.create(make_model=make_model)
 
-        expected = 'https://s3.amazonaws.com/images.idlecars.com/' + filename
+        expected = 'https://e062aa70f155542638848b75d5d43e15fbc73a56.googledrive.com/host/0B1HbewCnXlPic3JEb3B6dHEycTg/' + filename
         self.assertEqual(self._image_url_for(car), expected)
 
     def _image_url_for(self, car):
