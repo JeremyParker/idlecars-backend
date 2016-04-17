@@ -163,7 +163,7 @@ class BookingStepTest(APITestCase):
     def _requested(self):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['step'], 4)
+        self.assertEqual(response.data['step'], 3)
 
         # next, the insurance gets accepted
         self.booking.approval_time = timezone.now()
@@ -173,4 +173,4 @@ class BookingStepTest(APITestCase):
     def _in_progress_booking(self):
         # NOTE: state = RETURNED
         response = self.client.get(self.url, format='json')
-        self.assertEqual(response.data['step'], 5)
+        self.assertEqual(response.data['step'], 4)

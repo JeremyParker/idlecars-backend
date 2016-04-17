@@ -68,8 +68,8 @@ class Car(models.Model):
     SHIFT_CHOICES = [
         (SHIFT_UNKNOWN, 'Unknown'),
         (SHIFT_FULL_TIME, '24/7'),
-        (SHIFT_DAY, 'Day shift'),
-        (SHIFT_NIGHT, 'Night shift'),
+        (SHIFT_DAY, 'Day Shift'),
+        (SHIFT_NIGHT, 'Night Shift'),
         (SHIFT_OTHER, ''),
     ]
     shift = models.IntegerField(choices=SHIFT_CHOICES, default=SHIFT_UNKNOWN)

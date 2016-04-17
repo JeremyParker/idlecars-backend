@@ -296,12 +296,10 @@ def start_time_display(booking):
     def _format_date(date):
         return date.strftime('%b %d')
 
-    if booking.pickup_time:
-        return _format_date(booking.pickup_time)
-    elif booking.approval_time:
-        return 'on pickup'
+    if booking.requested_time:
+        return _format_date(booking.requested_time)
     else:
-        return _format_date(estimate_pickup_time(booking))
+        return "Not requested"
 
 
 def first_valid_end_time(booking):

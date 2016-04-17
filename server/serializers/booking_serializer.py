@@ -122,15 +122,15 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
     def get_step(self, obj):
         state = obj.get_state()
         if state == Booking.RETURNED:
-            return 5
-        elif state in [Booking.REQUESTED]:
             return 4
+        elif state in [Booking.REQUESTED]:
+            return 3
         elif state == Booking.PENDING:
             return 2
         return None
 
     def get_step_display_count(self, obj):
-        return 4
+        return 3
 
     def get_step_details(self, obj):
         if not booking_service.is_visible(obj):
@@ -141,14 +141,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
                 'step_subtitle': 'You must upload your documents to rent this car',
             },
             3: {
-                'step_title': 'This step is skipped',
-                'step_subtitle': 'No step to see here',
-            },
-            4: {
                 'step_title': 'Your request has been submitted',
                 'step_subtitle': "The owner will contact you when you are approved and added to the car.",
             },
-            5: {
+            4: {
                 'step_title': 'Rental in progress',
                 'step_subtitle': 'You have been added to your car',
             }
@@ -188,10 +184,10 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         def _format_date(date):
             return date.strftime('%b %d')
 
-        if booking.end_time:
-            return _format_date(booking.end_time)
+        if booking.approval_time:
+            return _format_date(booking.approval_time)
         else:
-            return _format_date(booking_service.estimate_end_time(booking))
+            return 'Not approved'
 
     def get_paid_payments(self, booking):
         paid_payments = booking.payment_set.filter(status=Payment.SETTLED)
