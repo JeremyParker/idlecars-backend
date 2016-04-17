@@ -34,7 +34,6 @@ def send_sync(**kwargs):
     '''
     Send an email on this thread.
     '''
-    print kwargs
     msg = setup_email(**kwargs)
     _send_now(msg)
     return msg

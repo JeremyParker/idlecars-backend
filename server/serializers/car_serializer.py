@@ -118,7 +118,7 @@ class CarCreateSerializer(ModelSerializer):
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
             return {
-                'state_string': 'Waiting for information. Tap here.',
+                'state_string': 'Waiting for information.',
                 'buttons': []
             }
 

@@ -18,10 +18,25 @@ class Driver(models.Model):
 
     sms_enabled = models.BooleanField(default=True)
 
-    driver_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
-    fhv_license_image = model_helpers.StrippedCharField(max_length=300, blank=True)
-    address_proof_image = model_helpers.StrippedCharField(max_length=300, blank=True)
-    defensive_cert_image = model_helpers.StrippedCharField(max_length=300, blank=True)
+    driver_license_image = model_helpers.StrippedCharField(
+        max_length=300,
+        blank=True,
+    )
+    fhv_license_image = model_helpers.StrippedCharField(
+        max_length=300,
+        blank=True,
+        verbose_name="Hack License",
+    )
+    address_proof_image = model_helpers.StrippedCharField(
+        max_length=300,
+        blank=True,
+        verbose_name="Motor Vehicle Record (MVR)",
+    )
+    defensive_cert_image = model_helpers.StrippedCharField(
+        max_length=300,
+        blank=True,
+        verbose_name="Social Security Card",
+    )
 
     base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
     base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
@@ -63,7 +78,7 @@ class Driver(models.Model):
         return bool(
             self.driver_license_image and
             self.fhv_license_image and
-            self.address_proof_image and
+            # self.address_proof_image and
             self.defensive_cert_image
         )
 
