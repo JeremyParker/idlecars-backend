@@ -13,4 +13,4 @@ def get_image_url(make_model, key=0):
     images = make_model.image_filenames.split(',')
     ix = key % len(images)
 
-    return 'https://s3.amazonaws.com/images.idlecars.com/{}'.format(images[ix].strip())
+    return 'https://e062aa70f155542638848b75d5d43e15fbc73a56.googledrive.com/host/0B1HbewCnXlPic3JEb3B6dHEycTg/{}'.format(images[ix].strip())

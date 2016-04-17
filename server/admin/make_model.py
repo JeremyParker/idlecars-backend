@@ -15,7 +15,6 @@ class MakeModelAdmin(admin.ModelAdmin):
             'fields': (
                 'make',
                 'model',
-                'image_filename',
                 'image_filenames',
             )
         }),
