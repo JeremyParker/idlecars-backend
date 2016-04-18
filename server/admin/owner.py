@@ -17,12 +17,10 @@ class CarInline(admin.TabularInline):
         'detail_link',
         'make_model',
         'year',
-        'status',
         'next_available_date',
         'shift',
         'weekly_rent',
         'deposit',
-        'min_lease',
     ]
     readonly_fields = ['detail_link']
     def detail_link(self, instance):
@@ -73,31 +71,19 @@ class OwnerAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('sms_enabled'),
-                ('split_shift', 'rating'),
-                ('merchant_id', 'merchant_account_state',),
-                ('service_percentage', 'effective_service_percentage',),
                 'notes',
                 'company_name',
                 'address1',
                 'address2',
                 ('city', 'state_code', 'zipcode'),
-                'auth_users',
             )
         }),
     )
-    readonly_fields = ['sms_enabled', 'merchant_id', 'merchant_account_state', 'effective_service_percentage',]
-    if settings.DEBUG:
-        readonly_fields = ['merchant_id', 'effective_service_percentage',]
-
     list_display = [
         'link_name',
-        'rating',
         'phone_number',
         'email',
-        'cars_available',
-        'total_cars',
-        'merchant_account_state',
+        'shifts_listed',
     ]
     search_fields = [
         # TDOO - free ourselves from user_account alltogether
@@ -116,8 +102,5 @@ class OwnerAdmin(admin.ModelAdmin):
         return instance.__unicode__()
     link_name.short_description = "Name"
 
-    def cars_available(self, instance):
-        return instance.cars.filter(status='available').count()
-
-    def total_cars(self, instance):
+    def shifts_listed(self, instance):
         return instance.cars.count()

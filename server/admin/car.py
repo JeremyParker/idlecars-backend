@@ -41,11 +41,11 @@ class CarStaleListFilter(admin.SimpleListFilter):
 class CarAdmin(admin.ModelAdmin):
     list_display = [
         'description',
-        'weekly_rent',
         'owner_link',
         'last_status_update',
         'plate',
         'shift',
+        'weekly_rent',
     ]
     list_filter = [
         CarStaleListFilter,

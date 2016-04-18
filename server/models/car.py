@@ -14,6 +14,10 @@ from . import Owner, MakeModel, Insurance
 
 
 class Car(models.Model):
+    class Meta:
+        verbose_name = 'Shift'
+        verbose_name_plural = 'Shifts'
+
     owner = models.ForeignKey(Owner, blank=True, null=True, related_name='cars')
 
     # NOTE: don't use status for anything.

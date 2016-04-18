@@ -38,8 +38,8 @@ class BookingAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('state', 'driver_docs_uploaded',),
-                ('driver_link', 'driver_phone', 'driver_email',),
+                ('state',),
+                ('driver_link', 'driver_phone', 'driver_email', 'driver_docs_uploaded',),
                 ('car', 'car_link', 'car_plate',),
                 ('car_shift', 'car_cost',),
                 ('owner_link', 'owner_phone', 'owner_email',),
@@ -67,12 +67,9 @@ class BookingAdmin(admin.ModelAdmin):
         'car_link',
         'car_shift',
         'owner_link',
-        'car_cost',
-        'end_time',
     ]
     list_filter = [
         BookingStateFilter,
-        'incomplete_reason',
     ]
 
     readonly_fields = [
@@ -106,6 +103,7 @@ class BookingAdmin(admin.ModelAdmin):
         'driver__auth_user__email',
         'driver__auth_user__first_name',
         'driver__auth_user__last_name',
+        'car__plate',
     ]
 
     def state(self, instance):
@@ -137,6 +135,7 @@ class BookingAdmin(admin.ModelAdmin):
             return instance.driver.all_docs_uploaded()
         return False
     driver_docs_uploaded.short_description = "Docs uploaded"
+    driver_docs_uploaded.boolean = True
 
     def driver_link(self, instance):
         if instance.driver:
