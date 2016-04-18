@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'django_nose',
     'djrill',
     'django_extensions',
+    'addition',
 )
 
 MIDDLEWARE_CLASSES = (

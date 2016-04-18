@@ -7,6 +7,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 from server import models
 from server.serializers import OwnerSerializer
@@ -50,6 +51,12 @@ class OwnerViewSet(
         except models.Owner.DoesNotExist:
             owner = owner_service.create(auth_user=user)
         serializer.instance = owner
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super(OwnerViewSet, self).update(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'])
     def bank_link(self, request, pk=None):

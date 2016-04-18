@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/', include('server.urls', namespace='server')),
     url(r'^api/', include('owner_crm.urls', namespace='owner_crm')),
+    url(r'^api/', include('addition.urls', namespace='addition')),
 
     url(r'^admin/', include('unsubscribes.urls', namespace='unsubscribes')),
     url(r'^admin/', include(admin.site.urls)),
