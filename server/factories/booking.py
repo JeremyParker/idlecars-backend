@@ -9,7 +9,7 @@ from factory import SubFactory, SelfAttribute, post_generation
 from django.utils import timezone
 
 from idlecars.factory_helpers import Factory, faker
-from server.factories import BookableCar, ApprovedDriver, BaseLetterDriver, PaymentMethodDriver
+from server.factories import BookableCar, CompletedDriver, CompletedDriver, CompletedDriver
 from server.factories import Payment, PreAuthorizedPayment, HeldInEscrowPayment, SettledPayment
 from server import models
 
@@ -18,7 +18,7 @@ class Booking(Factory):
         model = 'server.Booking'
 
     car = SubFactory(BookableCar)
-    driver = SubFactory(BaseLetterDriver)
+    driver = SubFactory(CompletedDriver)
     end_time = LazyAttribute(lambda o: (timezone.now() + datetime.timedelta(days=7 * 6)).replace(
         hour = 0,
         minute = 0,

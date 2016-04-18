@@ -136,10 +136,10 @@ program in the foreseeable future.
 # class TestDriverCreditNotifications(TestCase):
 #     @freeze_time("2014-10-10 9:55:00")
 #     def setUp(self):
-#         self.poor_driver = server.factories.ApprovedDriver.create()
+#         self.poor_driver = server.factories.CompletedDriver.create()
 
 #         # rich driver signed up with a credit code, but hasn't spend the credit yet.
-#         self.rich_driver = server.factories.ApprovedDriver.create()
+#         self.rich_driver = server.factories.CompletedDriver.create()
 #         self.rich_driver.auth_user.customer.invitor_code = credit.factories.CreditCode.create()
 #         self.rich_driver.auth_user.customer.invitor_credited = False
 #         self.rich_driver.auth_user.customer.app_credit = Decimal('50.00')
@@ -211,7 +211,7 @@ program in the foreseeable future.
 # class TestDriverReferralNotifications(TestCase):
 #     @freeze_time("2014-10-10 8:55:00")
 #     def setUp(self):
-#         self.driver = server.factories.ApprovedDriver.create()
+#         self.driver = server.factories.CompletedDriver.create()
 
 #     def test_inactive_driver_gets_reminder(self):
 #         driver_service.process_referral_notifications()

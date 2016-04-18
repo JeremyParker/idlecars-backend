@@ -77,14 +77,14 @@
 #         )
 
 #         luxy = server.factories.MakeModel.create(make='Venus', model='Xtravaganza', lux_level=1)
-#         server.factories.ClaimedCar.create(
+#         server.factories.BookableCar.create(
 #             make_model=luxy,
 #             weekly_rent=500,
 #             owner=self.owner_has_two_cars,
 #         )
 
 #         benz = server.factories.MakeModel.create(make='Benz', model='C350', lux_level=1)
-#         self.benz = server.factories.ClaimedCar.create(
+#         self.benz = server.factories.BookableCar.create(
 #             make_model=benz,
 #             owner=self.owner_has_two_cars
 #         )
@@ -200,7 +200,7 @@
 #             defensive_cert_image=defensive_cert_image,
 #             address_proof_image=driver_license_image
 #         )
-#         self.driver_insurance_approved = server.factories.ApprovedDriver.create(
+#         self.driver_insurance_approved = server.factories.CompletedDriver.create(
 #             auth_user=self.user_insurance_approved,
 #             driver_license_image=driver_license_image,
 #             fhv_license_image=fhv_license_image,

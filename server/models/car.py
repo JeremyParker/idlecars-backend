@@ -92,7 +92,7 @@ class Car(models.Model):
     min_lease = model_helpers.ChoiceField(
         choices=MIN_LEASE_CHOICES,
         max_length=32,
-        default='_00_unknown',
+        default='_01_no_min',
     )
 
     def minimum_rental_days(self):

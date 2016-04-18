@@ -170,7 +170,7 @@ class BookingServiceTest(TestCase):
         )
 
     def test_cancel_requested_booking(self):
-        approved_driver = factories.BaseLetterDriver.create()
+        approved_driver = factories.CompletedDriver.create()
         new_booking = booking_service.create_booking(self.car, approved_driver)
         booking_service.cancel(new_booking)
 

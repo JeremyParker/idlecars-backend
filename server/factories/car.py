@@ -21,29 +21,24 @@ class Car(Factory):
     class Meta:
         model = 'server.Car'
 
-    status = LazyAttribute(lambda o: random.choice(['available', 'unknown', 'busy']))
     make_model = SubFactory(MakeModel)
     year = LazyAttribute(lambda o: random.randint(2000, 2016))
     plate = LazyAttribute(lambda o: ''.join(
         [random.choice(string.ascii_uppercase + string.digits) for i in range(8)]
     ))
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
-    base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
+    # base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
     shift = models.Car.SHIFT_FULL_TIME
 
-class ClaimedCar(Car):
+
+class BookableCar(Car):
     ''' car that an owner has claimed and filled in details for '''
     owner = SubFactory(Owner)
     weekly_rent = LazyAttribute(lambda o: Decimal(random.randint(8, 16) * 50))
     deposit = SelfAttribute('weekly_rent')
-    min_lease = '_02_one_week'
     next_available_date = LazyAttribute(
         lambda o: timezone.now() - datetime.timedelta(days=random.randint(1, 10))
     )
-
-
-class BookableCar(ClaimedCar):
-    owner = SubFactory(Owner)
 
 
 class CarExpiredListing(BookableCar):

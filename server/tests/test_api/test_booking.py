@@ -41,7 +41,7 @@ class CreateBookingTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_fail_when_car_is_booked(self):
-        other_driver = factories.BaseLetterDriver.create()
+        other_driver = factories.CompletedDriver.create()
         existing_booking = factories.RequestedBooking.create(car=self.car, driver=other_driver)
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

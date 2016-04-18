@@ -22,9 +22,9 @@ class DriverNotificationTest(TestCase):
 
         self.driver = server_factories.Driver.create(auth_user=auth_user)
         self.complete_driver = server_factories.CompletedDriver.create()
-        self.payment_method_driver = server_factories.PaymentMethodDriver.create()
-        self.approved_driver = server_factories.ApprovedDriver.create()
-        self.base_letter_driver = server_factories.BaseLetterDriver.create()
+        self.payment_method_driver = server_factories.CompletedDriver.create()
+        self.approved_driver = server_factories.CompletedDriver.create()
+        self.base_letter_driver = server_factories.CompletedDriver.create()
 
         car = server_factories.BookableCar.create(weekly_rent=500)
         self.pending_booking = server_factories.Booking.create(car=car)

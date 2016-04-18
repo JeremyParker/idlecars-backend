@@ -32,7 +32,7 @@ def verify_throttled_on_owner(owner, campaign):
 class NotificationServiceTest(TestCase):
     def setUp(self):
         sms_service.test_reset() # need to reset the sms outbox between every test
-        self.driver = server_factories.BaseLetterDriver.create()
+        self.driver = server_factories.CompletedDriver.create()
         self.campaign_name = 'driver_notifications.DocsApprovedNoBooking'
 
     def test_notification_create_campaign(self):

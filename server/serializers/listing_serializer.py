@@ -99,7 +99,7 @@ class ListingSerializer(ModelSerializer):
     def get_details(self, obj):
         details = [
             ['Location', ', '.join(l for l in [obj.owner.city, obj.owner.state_code] if l)],
-            ['TLC Base', obj.base or 'Pending verification'],
+            ['TLC Base', obj.base],
         ]
         if obj.interior_color is not None:
             details = [['Interior color', Car.COLOR_CHOICES[obj.interior_color][1]],] + details

@@ -24,16 +24,7 @@ class CompletedDriver(Driver):
     documentation_approved = False
 
 
-class PaymentMethodDriver(CompletedDriver):
-    @post_generation
-    def payment_method(self, create, count, **kwargs):
-        self.braintree_customer_id = 'fake_customer_id'
-        from server.factories.payment_method import PaymentMethod
-        kwargs['driver'] = self
-        payment_method = make_item(create, PaymentMethod, **kwargs)
-
-
-class ApprovedDriver(PaymentMethodDriver):
+class CompletedDriver(CompletedDriver):
     documentation_approved = True
 
     @post_generation
@@ -43,5 +34,5 @@ class ApprovedDriver(PaymentMethodDriver):
         customer.save()
 
 
-class BaseLetterDriver(ApprovedDriver):
+class CompletedDriver(CompletedDriver):
     base_letter = LazyAttribute(lambda o: faker.url())

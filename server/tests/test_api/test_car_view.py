@@ -144,7 +144,7 @@ class CarCreateTest(CarAPITest):
 
     def test_create_other_owners_duplicate(self):
         self.car = None # forget that we had a car
-        other_car = factories.ClaimedCar.create()
+        other_car = factories.BookableCar.create()
         response = self.client.post(self.url, data={'plate': other_car.plate})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue('_app_notifications' not in response.data.keys())
@@ -221,7 +221,7 @@ class CarUpdateTest(CarAPITest):
         )
 
     def test_cannot_update_others_cars(self):
-        other_car = factories.ClaimedCar.create()
+        other_car = factories.BookableCar.create()
         url = reverse('server:cars-detail', args=(other_car.pk,))
         response = self.client.patch(url, {'weekly_rent': 350}, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

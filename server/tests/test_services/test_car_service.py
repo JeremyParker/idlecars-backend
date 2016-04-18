@@ -39,12 +39,12 @@ class CarCreateTest(TestCase):
         self.assertEqual(new_car.owner, self.owner)
 
     def test_create_existing_with_other_owner(self):
-        car = factories.ClaimedCar.create(plate=self.plate)
+        car = factories.BookableCar.create(plate=self.plate)
         # make sure this doesn't throw an exception
         new_car = car_service.create_car(self.owner, self.plate)
 
     def test_create_existing_my_car(self):
-        car = factories.ClaimedCar.create(plate=self.plate, owner=self.owner)
+        car = factories.BookableCar.create(plate=self.plate, owner=self.owner)
         # make sure this doesn't throw an exception
         new_car = car_service.create_car(self.owner, self.plate)
 
