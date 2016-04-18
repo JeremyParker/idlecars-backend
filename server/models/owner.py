@@ -63,7 +63,13 @@ class Owner(models.Model):
     notes = models.TextField(blank=True)
 
     sms_enabled = models.BooleanField(default=True)
-
+    social = models.CharField(blank=True, max_length=4, verbose_name='Last 4 of SSN',
+        validators=[
+            RegexValidator(r'^[0-9]+$', 'Only numbers are allowed in a zip code.', 'Invalid zip'),
+            MinLengthValidator(4),
+            MaxLengthValidator(4),
+        ],
+    )
     def default_user(self):
         users = self.auth_users.all()
         if users.count() == 1:

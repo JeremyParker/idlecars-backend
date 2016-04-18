@@ -59,6 +59,7 @@ class OwnerSerializer(ModelSerializer):
             'city',
             'state_code',
             'zipcode',
+            'social',
             'bank_account_state',
         )
         read_only_fields = ('id', 'auth_users', 'bank_account_state')
