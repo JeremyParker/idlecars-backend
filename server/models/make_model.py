@@ -10,7 +10,7 @@ class MakeModel(models.Model):
     image_filename = models.CharField(max_length=128, blank=True)
     image_filenames = models.TextField(
         blank=True,
-        help_text="Comma separated list of car image filenames. Each name must exist on our Amazon S3 bucket",
+        help_text="Comma separated list of car image filenames. Each name must exist on our Google driver folder",
     )
 
     LUX_LEVEL_CHOICES = [
