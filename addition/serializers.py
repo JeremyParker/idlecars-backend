@@ -11,6 +11,7 @@ class AdditionSerializer(ModelSerializer):
         model = models.Addition
         fields = (
             'id',
+            'plate',
             'phone_number',
             'email',
             'first_name',

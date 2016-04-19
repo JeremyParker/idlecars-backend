@@ -21,17 +21,14 @@ class AdditionCreateTest(APITestCase):
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.url = reverse('addition:additions-list')
-        self.data = {'phone_number': '(123) 123-1234'}
+        self.data = {'plate': '1A10'}
 
     def test_create_addition_success(self):
-        """ Ensure we can create a new booking object. """
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # self.assertEqual(response.data['car'], self.car.pk)
-        # self.assertEqual(response.data['driver'], self.driver.pk)
+        self.assertEqual(response.data['plate'], '1A10')
 
     def test_create_addition_fail_not_logged_in(self):
-        """ Ensure we can't book if not logged in"""
         self.client.credentials()
         response = self.client.post(self.url, self.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

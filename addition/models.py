@@ -13,7 +13,7 @@ does NOT create a Driver account, and has nothing to do with existing Driver ins
 '''
 class Addition(models.Model):
     owner = models.ForeignKey(server_models.Owner, blank=True, null=True, related_name='additions')
-    plate = models.CharField(max_length=24, blank=True)
+    plate = models.CharField(max_length=24, blank=True, verbose_name="Medallion")
 
     phone_number = models.CharField(max_length=40, blank=True)
     email = models.EmailField(_('email address'), blank=True)
