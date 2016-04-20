@@ -19,7 +19,6 @@ from server.services import ServiceError
 doc_fields_and_names = {
     'driver_license_image': 'your Drivers License',
     'fhv_license_image': 'your TLC License',
-    'defensive_cert_image': 'your Defensive Driving certificate',
     'address_proof_image': 'a bill with your address on it',
 }
 
@@ -125,8 +124,7 @@ def _get_remindable_drivers(delay_hours):
     ).filter(
         Q(driver_license_image__exact='') |
         Q(fhv_license_image__exact='') |
-        Q(address_proof_image__exact='') |
-        Q(defensive_cert_image__exact='')
+        Q(address_proof_image__exact='')
     )
 
 
@@ -208,8 +206,7 @@ def _credit_card_reminder(delay_hours, reminder_name):
     ).exclude(
         Q(driver__driver_license_image__exact='') |
         Q(driver__fhv_license_image__exact='') |
-        Q(driver__address_proof_image__exact='') |
-        Q(driver__defensive_cert_image__exact='')
+        Q(driver__address_proof_image__exact='')
     )
     remindable_bookings = server.services.booking.filter_pending(filtered_bookings)
     throttled_bookings = throttle_service.throttle(remindable_bookings, reminder_name)

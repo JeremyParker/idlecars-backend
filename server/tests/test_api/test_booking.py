@@ -152,7 +152,6 @@ class BookingStepTest(APITestCase):
         self.driver.driver_license_image = 'some image'
         self.driver.fhv_license_image = 'some image'
         self.driver.address_proof_image = 'some image'
-        self.driver.defensive_cert_image = 'some image'
         self.driver.save()
         self._requested()
 

@@ -37,7 +37,6 @@ class DriverSerializer(ModelSerializer):
             'driver_license_image',
             'fhv_license_image',
             'address_proof_image',
-            'defensive_cert_image',
             'all_docs_uploaded',
 
             # stuff from auth_user TOOD - remove User fields
@@ -91,7 +90,6 @@ class DriverSerializer(ModelSerializer):
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)
         instance.address_proof_image = validated_data.get('address_proof_image', instance.address_proof_image)
-        instance.defensive_cert_image = validated_data.get('defensive_cert_image', instance.defensive_cert_image)
         instance.sms_enabled = validated_data.get('sms_enabled', instance.sms_enabled)
         instance.save()
 

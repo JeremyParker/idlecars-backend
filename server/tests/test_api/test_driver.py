@@ -120,7 +120,6 @@ class DriverUpdateTest(AuthenticatedDriverTest):
             'address_proof_image': "",
             'all_docs_uploaded': False,
             'client_display': "1112220987",
-            'defensive_cert_image': "",
             'driver_license_image': "",
             'fhv_license_image': "",
             'id': 201,

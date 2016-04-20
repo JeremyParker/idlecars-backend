@@ -70,7 +70,6 @@ def _get_driver_params(driver):
         'driver_license_image': driver.driver_license_image,
         'fhv_license_image': driver.fhv_license_image,
         'address_proof_image': driver.address_proof_image,
-        'defensive_cert_image': driver.defensive_cert_image,
         'base_letter': driver.base_letter,
         'driver_admin_link': 'https://www.idlecars.com{}'.format(
             reverse('admin:server_driver_change', args=(driver.pk,))

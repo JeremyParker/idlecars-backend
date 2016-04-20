@@ -121,12 +121,8 @@ class NewBookingEmail(notification.OwnerNotification):
             'TEXT2': 'FHV/Hack License <a href="{}">(click here to download)</a>'.format(
                 kwargs['fhv_license_image']
             ),
-            'IMAGE_3_URL': kwargs['defensive_cert_image'],
-            'TEXT3': 'Defensive Driving Certificate <a href="{}">(click here to download)</a>'.format(
-                kwargs['defensive_cert_image']
-            ),
-            'IMAGE_4_URL': kwargs['address_proof_image'],
-            'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
+            'IMAGE_3_URL': kwargs['address_proof_image'],
+            'TEXT3': 'MVR <a href="{}">(click here to download)</a>'.format(
                 kwargs['address_proof_image']
             ),
             'TEXT5': 'The driver\'s social security number is {}.<br>Questions? Need more documentation? Please call {} at {}.'.format(
@@ -137,7 +133,7 @@ class NewBookingEmail(notification.OwnerNotification):
             'CTA_LABEL': 'Accept/Reject Diver',
             'CTA_URL': kwargs['car_owner_details_url'],
             'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
-            'template_name': 'one_button_four_images',
+            'template_name': 'one_button_three_images',
             'sms_body': headline + ' An email has been sent to {} with more information.'.format(
                 kwargs['user_email']
             )

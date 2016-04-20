@@ -48,7 +48,6 @@ class DriverAdmin(ReverseModelAdmin):
             'fields': (
                 ('driver_license_image', 'dmv_link'),
                 ('fhv_license_image', 'fhv_link'),
-                ('defensive_cert_image', 'dd_link'),
                 ('address_proof_image', 'poa_link'),
             )
         }),
@@ -67,7 +66,6 @@ class DriverAdmin(ReverseModelAdmin):
         'full_name',
         'dmv_link',
         'fhv_link',
-        'dd_link',
         'poa_link',
         'app_credit',
         'braintree_customer_id',
@@ -95,11 +93,6 @@ class DriverAdmin(ReverseModelAdmin):
         return '<a href={} target="new">View Image</a>'.format(instance.fhv_license_image)
     fhv_link.short_description = ''
     fhv_link.allow_tags = True
-
-    def dd_link(self, instance):
-        return '<a href={} target="new">View Image</a>'.format(instance.defensive_cert_image)
-    dd_link.short_description = ''
-    dd_link.allow_tags = True
 
     def poa_link(self, instance):
         return '<a href={} target="new">View Image</a>'.format(instance.address_proof_image)

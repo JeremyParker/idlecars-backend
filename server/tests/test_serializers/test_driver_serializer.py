@@ -16,7 +16,6 @@ class TestDriverSerializer(TestCase):
             driver_license_image='taco.jpg',
             fhv_license_image='taco.jpg',
             address_proof_image='taco.jpg',
-            defensive_cert_image='taco.jpg',
         )
 
         self.assertTrue(serializers.DriverSerializer(driver).data['all_docs_uploaded'])
