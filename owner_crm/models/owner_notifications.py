@@ -129,7 +129,8 @@ class NewBookingEmail(notification.OwnerNotification):
             'TEXT4': 'Proof of address <a href="{}">(click here to download)</a>'.format(
                 kwargs['address_proof_image']
             ),
-            'TEXT5': 'Questions? Need more documentation? Please call {} at {}.'.format(
+            'TEXT5': 'The driver\'s social security number is {}.<br>Questions? Need more documentation? Please call {} at {}.'.format(
+                    kwargs['driver_ssn'],
                     kwargs['driver_first_name'] or 'the driver',
                     fields.format_phone_number(kwargs['driver_phone_number']),
                 ),

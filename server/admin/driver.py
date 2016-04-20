@@ -41,6 +41,7 @@ class DriverAdmin(ReverseModelAdmin):
         'auth_user__username',
         'auth_user__email',
         'braintree_customer_id',
+        'ssn',
     ]
     fieldsets = (
         ('Documentation', {
@@ -53,9 +54,8 @@ class DriverAdmin(ReverseModelAdmin):
         }),
         ('None', {
             'fields': (
-                ('sms_enabled'),
-                ('date_joined', 'invited_by', ),
-                ('app_credit', 'braintree_customer_id',),
+                ('ssn'),
+                ('date_joined',),
                 ('notes'),
             ),
         }),

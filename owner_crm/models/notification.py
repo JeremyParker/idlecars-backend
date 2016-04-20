@@ -77,6 +77,7 @@ def _get_driver_params(driver):
         ),
         'missing_docs_list': ', '.join(driver_service.get_missing_docs(driver)),
         'missing_docs_html': _missing_documents_html(driver),
+        'driver_ssn': driver.ssn,
     }
 
 

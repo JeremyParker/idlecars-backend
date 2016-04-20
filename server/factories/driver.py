@@ -1,11 +1,13 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+import random
+import string
+
 from factory import SubFactory, LazyAttribute, post_generation
 
 from idlecars.factory_helpers import Factory, faker, make_item
 from idlecars.factories import AuthUser
-
 from credit.factories import CreditCode
 
 
@@ -17,22 +19,9 @@ class Driver(Factory):
 
 
 class CompletedDriver(Driver):
+    ssn = LazyAttribute(lambda o: ''.join([random.choice(string.digits) for i in range(9)]))
     driver_license_image = LazyAttribute(lambda o: faker.url())
     fhv_license_image = LazyAttribute(lambda o: faker.url())
     address_proof_image = LazyAttribute(lambda o: faker.url())
     defensive_cert_image = LazyAttribute(lambda o: faker.url())
     documentation_approved = False
-
-
-class CompletedDriver(CompletedDriver):
-    documentation_approved = True
-
-    @post_generation
-    def invite_code(self, create, count, **kwargs):
-        customer = self.auth_user.customer
-        customer.invite_code = CreditCode.create()
-        customer.save()
-
-
-class CompletedDriver(CompletedDriver):
-    base_letter = LazyAttribute(lambda o: faker.url())
