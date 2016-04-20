@@ -28,6 +28,8 @@ class CarCreateSerializer(ModelSerializer):
     interior_color = CarColorField(required=False, allow_null=True,)
     exterior_color = CarColorField(required=False, allow_null=True,)
 
+    requested_driver = SerializerMethodField()
+
     class Meta:
         model = Car
         fields = (
@@ -54,6 +56,8 @@ class CarCreateSerializer(ModelSerializer):
             'exterior_color',
             'interior_color',
             'last_known_mileage',
+
+            'requested_driver',
         )
         read_only_fields = (
             'id',
@@ -114,6 +118,13 @@ class CarCreateSerializer(ModelSerializer):
 
     def get_shift_display(self, obj):
         return obj.shift_display()
+
+    def get_requested_driver(self, obj):
+        booking = booking_service.filter_requested(obj.booking_set.all()).first()
+        if booking:
+            return [booking.driver.id]
+        else:
+            return []
 
     def _get_state_values(self, car):
         if not car_helpers.is_data_complete(car):
