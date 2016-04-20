@@ -131,24 +131,44 @@ class CarCreateSerializer(ModelSerializer):
                 }]
             }
 
-        if booking_service.filter_requested(car.booking_set.all()):
-            return {
-                'state_string': 'Requested. Check your email for documentation.',
-                'buttons': [
-                    {
-                        'label': 'Add this driver',
-                        'function_key': 'ApproveInsurance',
-                    },
-                    {
-                        'label': 'Don\'t add this driver',
-                        'function_key': 'RejectInsurance',
-                    },
-                    {
-                        'label': 'This shift is no longer available',
-                        'function_key': 'RemoveListing',
-                    },
-                ]
-            }
+        booking = booking_service.filter_requested(car.booking_set.all()).first()
+        if booking:
+            if booking.driver.address_proof_image:
+                return {
+                    'state_string': 'Requested. Check your email for documentation.',
+                    'buttons': [
+                        {
+                            'label': 'Add this driver',
+                            'function_key': 'ApproveInsurance',
+                        },
+                        {
+                            'label': 'Don\'t add this driver',
+                            'function_key': 'RejectInsurance',
+                        },
+                        {
+                            'label': 'This shift is no longer available',
+                            'function_key': 'RemoveListing',
+                        },
+                    ]
+                }
+            else:
+                return {
+                    'state_string': 'Requested. Check your email for documentation.',
+                    'buttons': [
+                        {
+                            'label': 'Add this driver MVR',
+                            'function_key': 'ApproveAndUploadMVR',
+                        },
+                        {
+                            'label': 'Don\'t add this driver',
+                            'function_key': 'RejectInsurance',
+                        },
+                        {
+                            'label': 'This shift is no longer available',
+                            'function_key': 'RemoveListing',
+                        },
+                    ]
+                }
 
         active_bookings = booking_service.filter_returned(car.booking_set.all())
         if active_bookings:
