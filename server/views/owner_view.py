@@ -56,6 +56,11 @@ class OwnerViewSet(
         if 'upload_driver_doc' in request.data:
             doc = request.data['upload_driver_doc']
             owner_service.upload_driver_doc(owner=self.get_object(), doc=doc)
+        if 'authorize_mvr' in request.data:
+            owner_service.authorize_mvr(
+                owner=self.get_object(),
+                driver_id=request.data['authorize_mvr'],
+            )
         try:
             return super(OwnerViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:

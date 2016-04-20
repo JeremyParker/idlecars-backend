@@ -359,3 +359,8 @@ def set_end_time(booking, end_time):
 
     # booking.save()
     # return booking
+
+
+def on_authorized_mvr(booking):
+    # we need to apprise all taxi about this booking
+    pass
