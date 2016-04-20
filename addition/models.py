@@ -12,6 +12,8 @@ Addition represents a request that an owner makes to add a driver to one of thei
 does NOT create a Driver account, and has nothing to do with existing Driver instances.
 '''
 class Addition(models.Model):
+    created_time = models.DateTimeField(auto_now_add=True)
+
     owner = models.ForeignKey(server_models.Owner, blank=True, null=True, related_name='additions')
     plate = models.CharField(max_length=24, blank=True, verbose_name="Medallion")
 
