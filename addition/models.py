@@ -61,6 +61,7 @@ class Addition(models.Model):
             self.email and
             self.first_name and
             self.last_name and
+            self.ssn and
             self.driver_license_image and
             self.fhv_license_image and
             (self.address_proof_image or self.mvr_authorized)
