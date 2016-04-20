@@ -225,3 +225,14 @@ def invite_legacy_owner(phone_number):
     owner = Owner.objects.get(auth_users=auth_user)
     password_reset_service.invite_owner(auth_user)
     return auth_user
+
+
+def upload_driver_doc(owner, doc):
+    from server.models import Driver
+    from . import driver as driver_service
+    driver = Driver.objects.get(id=doc['driver_id'])
+    booking = booking_service.filter_requested(driver.booking_set.all()).first()
+    if booking and booking.car.owner == owner:
+        driver_service.update_doc(driver=driver, doc_name=doc['doc_name'], file_url=doc['file_url'])
+        # this approve booking should not be here, but it works for now
+        booking_service.approve(booking)
