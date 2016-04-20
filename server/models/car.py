@@ -38,7 +38,7 @@ class Car(models.Model):
     hybrid = models.BooleanField(default=False, null=False, verbose_name="This car is a hybrid")
     YEARS = [(y, unicode(y)) for y in range(2016, 1995, -1)]
     year = models.IntegerField(choices=YEARS, blank=True, null=True)
-    plate = models.CharField(max_length=24, blank=True)
+    plate = models.CharField(max_length=24, blank=True, verbose_name="Medallion")
 
     # TLC data
     medallion = models.BooleanField(default=False)

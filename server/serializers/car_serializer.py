@@ -170,7 +170,12 @@ class CarCreateSerializer(ModelSerializer):
                             'label': 'Add this driver MVR',
                             'function_key': 'ApproveAndUploadMVR',
                         },
-                        {
+                        # if we want the 'authorize MVR' button to appear on the same page, uncomment this
+                        # {
+                        #     'label': 'Let All Taxi to Upload MVR',
+                        #     'function_key': 'ApproveInsurance',
+                        # },
+                         {
                             'label': 'Don\'t add this driver',
                             'function_key': 'RejectInsurance',
                         },
