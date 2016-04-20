@@ -20,6 +20,9 @@ class Addition(models.Model):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
 
+    # Did the owner authorize All Taxi to run an MVR for this driver?
+    mvr_authorized = models.DateTimeField(null=True, blank=True)
+
     driver_license_image = model_helpers.StrippedCharField(
         max_length=300,
         blank=True,
@@ -62,7 +65,7 @@ class Addition(models.Model):
             self.last_name and
             self.driver_license_image and
             self.fhv_license_image and
-            self.defensive_cert_image
+            (self.defensive_cert_image or self.mvr_authorized)
         )
 
     # TODO - hook this up to send an email

@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 from __future__ import unicode_literals
 
+from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -34,6 +35,11 @@ class AdditionViewSet(
         return Addition.objects.all()
 
     def update(self, request, *args, **kwargs):
+        if 'mvr_authorized' in request.data:
+            addition = self.get_object()
+            addition.mvr_authorized=timezone.now()
+            addition.save()
+
         try:
             return super(AdditionViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
