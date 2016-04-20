@@ -54,3 +54,11 @@ class AdditionUpdateTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.addition.refresh_from_db()
         self.assertEqual(self.addition.first_name, 'Marvin')
+
+    def test_authorize_mvr(self):
+        url = reverse('addition:additions-detail', args=(self.addition.pk,))
+        response = self.client.patch(url, {'mvr_authorized': None}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.addition.refresh_from_db()
+        self.assertIsNotNone(self.addition.mvr_authorized)
