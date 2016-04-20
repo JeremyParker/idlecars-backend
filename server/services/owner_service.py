@@ -236,3 +236,12 @@ def upload_driver_doc(owner, doc):
         driver_service.update_doc(driver=driver, doc_name=doc['doc_name'], file_url=doc['file_url'])
         # this approve booking should not be here, but it works for now
         booking_service.approve(booking)
+
+
+def authorize_mvr(owner, driver_id):
+    from server.models import Driver
+    driver = Driver.objects.get(id=driver_id)
+    booking = booking_service.filter_requested(driver.booking_set.all()).first()
+    if booking and booking.car.owner == owner:
+        booking_service.approve(booking)
+        booking_service.on_authorized_mvr(booking)
