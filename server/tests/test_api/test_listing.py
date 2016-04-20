@@ -63,7 +63,7 @@ class ListingTest(APITestCase):
                             car.owner.city,
                             car.owner.state_code,
                         )],
-                        ['TLC Base', car.base]
+                        ['Agent', car.base]
                     ]
                 ),
                 ('deposit', '${}'.format(car.deposit)),
