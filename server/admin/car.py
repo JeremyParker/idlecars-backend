@@ -44,7 +44,7 @@ class CarAdmin(admin.ModelAdmin):
         'owner_link',
         'last_status_update',
         'plate',
-        'shift',
+        'shift_details',
         'weekly_rent',
     ]
     list_filter = [
@@ -62,8 +62,9 @@ class CarAdmin(admin.ModelAdmin):
                 ('make_model', 'hybrid', 'year', 'plate',),
                 ('owner', 'owner_link', 'owner_rating'),
                 ('last_known_mileage', 'last_mileage_update'),
+                ('shift_details',),
+                ('weekly_rent', 'deposit',),
                 ('effective_status', 'last_status_update', 'next_available_date',),
-                ('shift', 'shift_details', 'weekly_rent', 'deposit'),
                 'notes',
             )
         }),

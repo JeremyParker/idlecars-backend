@@ -151,7 +151,7 @@ class Car(models.Model):
     insurance_policy_number = models.CharField(max_length=32, blank=True, null=True)
 
     def is_split_shift(self):
-        return self.shift != Car.SHIFT_FULL_TIME
+        return False
 
     def display_mileage(self):
         # TODO(JP): have this change with time based on past data?

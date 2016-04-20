@@ -160,7 +160,7 @@ class BookingAdmin(admin.ModelAdmin):
 
 
     def car_shift(self, instance):
-        return '{} {}'.format(instance.car.shift_display(), instance.car.shift_details)
+        return instance.car.shift_details
 
     def car_cost(self, instance):
         return instance.car.weekly_rent

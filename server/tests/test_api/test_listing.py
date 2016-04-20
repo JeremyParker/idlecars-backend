@@ -48,7 +48,7 @@ class ListingTest(APITestCase):
                         '${} deposit'.format(car.deposit),
                     ]
                 ),
-                ('shift', {'description': '24/7 {}'.format(car.shift_details), 'split_shift': False}),
+                ('shift', {'description': car.shift_details, 'split_shift': False}),
                 ('certifications',
                     [
                         'Base registration verified',
@@ -68,7 +68,7 @@ class ListingTest(APITestCase):
                 ),
                 ('deposit', '${}'.format(car.deposit)),
                 ('cost_str', ['14', '29']), # this number base on car.weekly_rent, which is $100 in the test
-                ('cost_time', 'a day'),
+                ('cost_time', 'a shift'),
                 ('cost_bucket', ['cheap']),
                 ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['cheap'], 'work_with': []}),
                 ('booked_features', '{}, {}'.format(

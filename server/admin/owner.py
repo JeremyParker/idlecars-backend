@@ -18,7 +18,7 @@ class CarInline(admin.TabularInline):
         'make_model',
         'year',
         'next_available_date',
-        'shift',
+        'shift_details',
         'weekly_rent',
         'deposit',
     ]

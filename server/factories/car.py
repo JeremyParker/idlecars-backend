@@ -28,7 +28,7 @@ class Car(Factory):
     ))
     hybrid = LazyAttribute(lambda o: random.choice([True, False]))
     # base = LazyAttribute(lambda o: ' '.join(faker.words(nb=3)).title())
-    shift = models.Car.SHIFT_FULL_TIME
+    shift = models.Car.SHIFT_UNKNOWN
 
 
 class BookableCar(Car):
