@@ -40,7 +40,7 @@ class AdditionUpdateTest(APITestCase):
         self.owner = server_factories.Owner.create()
         self.addition = models.Addition.objects.create(
             owner=self.owner,
-            plate='REAL_PLATE',
+            plate='REAL_MEDALLION',
         )
 
         self.client = APIClient()

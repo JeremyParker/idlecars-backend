@@ -32,12 +32,6 @@ def _filter_data_complete(queryset):
             weekly_rent__isnull=False,
             deposit__isnull=False,
         ).exclude(
-            # Q(min_lease='_00_unknown') |
-            Q(plate='') |
-            # Q(base='') |
-            # TODO - put these back in when we're looking up zipcode in the owner portal
-            # Q(owner__city='') |
-            # Q(owner__state_code='') |
             Q(owner__zipcode='')
         )
 
@@ -46,10 +40,7 @@ def is_data_complete(car):
     '''
     this checks the same logic as above for an individual car
     '''
-    return car.owner and car.make_model and car.year and car.weekly_rent and car.deposit != None \
-        and car.plate and car.owner.zipcode
-        # and car.min_lease != '_00_unknown'
-        # and car.owner.city and car.owner.state_code \
+    return car.owner and car.make_model and car.year and car.weekly_rent and car.deposit != None and car.owner.zipcode
 
 
 def _filter_bookable(queryset):

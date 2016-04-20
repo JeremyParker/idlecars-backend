@@ -14,7 +14,7 @@ img_5_url = 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6e
 merge_vars = {
     'no_button_no_image': {u'reynolds.tremaine@gmail.com': {u'FNAME': u'Davian',
                                   u'HEADLINE': u'Payment received for your 2012 Schmitt Walker',
-                                  u'TEXT': u'\n        You have received a payment through idlecars. <br />\n        Invoice Period: Oct 10 - Oct 12 <br />\n        Payment Amount: $214.29\n        For your 2012 Schmitt Walker with license plate FYSXY1J6 <br />\n        From Driver: Olar Weimann <br />\n        <br /><br /><br />\n    This is the last payment. The driver should contact you to arrange dropoff.<br />\n        This booking will end on: Oct 12 <br /><br />\n        As always, if you have any questions, please call us at 1-844-IDLECAR (1-844-435-3227).\n    '}},
+                                  u'TEXT': u'\n        You have received a payment through idlecars. <br />\n        Invoice Period: Oct 10 - Oct 12 <br />\n        Payment Amount: $214.29\n        For your 2012 Schmitt Walker with medallion FYSXY1J6 <br />\n        From Driver: Olar Weimann <br />\n        <br /><br /><br />\n    This is the last payment. The driver should contact you to arrange dropoff.<br />\n        This booking will end on: Oct 12 <br /><br />\n        As always, if you have any questions, please call us at 1-844-IDLECAR (1-844-435-3227).\n    '}},
     'one_button_one_image': {
         'jeremy@idlecars.com': {
             'FNAME': 'Bob',

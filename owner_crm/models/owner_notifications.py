@@ -44,7 +44,7 @@ class RenewalEmail(notification.OwnerNotification):
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Your {} listing is about to expire.'.format(kwargs['car_name']),
-            'sms_body': 'The listing for your {} with license plate {} is about to expire. \
+            'sms_body': 'The listing for your {} with medallion {} is about to expire. \
 Is it still available? Please tap here to extend or remove your \
 listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_details_url'])
         }
@@ -92,7 +92,7 @@ class SignupConfirmation(notification.OwnerNotification):
 
 class NewBookingEmail(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        headline = '{} wants to rent your {} with license plate {}.'.format(
+        headline = '{} wants to rent your {} with medallion {}.'.format(
             kwargs['driver_full_name'] or 'A driver',
             kwargs['car_name'],
             kwargs['car_plate'],
@@ -206,7 +206,7 @@ know: {}'.format(
 
 class ThirdMorningInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = '{}’s booking of the {} with plate {} will be cancelled soon. Click below to \
+        sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click below to \
 let us know where they are in the process: {}'.format(
             kwargs['driver_full_name'],
             kwargs['car_name'],
@@ -292,7 +292,7 @@ know: {}'.format(
 
 class ThirdAfternoonInsuranceReminder(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        sms_body = '{}’s booking of the {} with plate {} will be cancelled soon. Click here to let \
+        sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click here to let \
 us know where they are in the process: {}'.format(
             kwargs['driver_full_name'],
             kwargs['car_name'],
@@ -319,7 +319,7 @@ us know where they are in the process: {}'.format(
 
 class BookingCanceled(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        headline = '{} has decided not to rent your {}, with license plate {}'.format(
+        headline = '{} has decided not to rent your {}, with medallion {}'.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],
             kwargs['car_plate'],
@@ -346,7 +346,7 @@ already re-listed your car on the site so we can find you another driver as soon
 
 class DriverRejected(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        headline = '{} has decided not to rent your {}, with license plate {}'.format(
+        headline = '{} has decided not to rent your {}, with medallion {}'.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],
             kwargs['car_plate'],

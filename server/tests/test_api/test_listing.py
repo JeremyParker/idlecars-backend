@@ -128,7 +128,7 @@ class ListingTest(APITestCase):
 
     def test_get_unlistable_car(self):
         # make it so this car has incomplete information, so it can't be shown at all
-        self.car.plate = ''
+        self.car.weekly_rent = None
         self.car.save()
         url = reverse('server:listings-detail', args=(self.car.pk,))
         response = self.client.get(url, format='json')

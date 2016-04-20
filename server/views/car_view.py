@@ -15,7 +15,7 @@ from server.services import ServiceError
 from server.serializers import CarSerializer, CarCreateSerializer
 from server.permissions import OwnsCar, IsAuthenticatedOwner
 
-CAR_NOT_FOUND = 'Sorry, this license plate isn\'t in the TLC database. Please check your plate number and try again.'
+CAR_NOT_FOUND = 'Sorry, this medallion isn\'t in the TLC database. Please check your medallion number and try again.'
 
 class CarViewSet(
     mixins.CreateModelMixin,

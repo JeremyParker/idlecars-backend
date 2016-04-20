@@ -156,7 +156,7 @@ class BookingAdmin(admin.ModelAdmin):
             return instance.car.plate
         else:
             return None
-    car_plate.short_description = 'Plate'
+    car_plate.short_description = 'Medallion'
 
 
     def car_shift(self, instance):

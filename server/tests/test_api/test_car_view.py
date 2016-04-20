@@ -56,7 +56,7 @@ class CarAPITest(APITestCase):
         self.owner = factories.Owner.create()
         self.car = factories.BookableCar.create(
             owner=self.owner,
-            plate='REAL_PLATE', # TODO - add this plate to the TLC db
+            plate='REAL_MEDALLION', # TODO - add this plate to the TLC db
         )
         self.client = APIClient()
         token = Token.objects.get(user__username=self.owner.auth_users.last().username)
@@ -99,7 +99,7 @@ class CarDetailsTest(CarAPITest):
         # make an incomplete car (not a BookableCar)
         car = factories.Car.create(
             owner=self.owner,
-            plate='OTHER_REAL_PLATE',
+            plate='OTHER_REAL_MEDALLION',
             weekly_rent=None,
             deposit=None,
         )
@@ -124,7 +124,7 @@ class CarDetailsTest(CarAPITest):
 class CarCreateTest(CarAPITest):
     def setUp(self):
         super(CarCreateTest, self).setUp()
-        self.plate = 'REAL_PLATE'
+        self.plate = 'REAL_MEDALLION'
         self.url = reverse('server:cars-list')
 
 

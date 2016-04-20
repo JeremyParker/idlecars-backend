@@ -24,6 +24,6 @@ class Command(BaseCommand):
         print '.'
 
     def test_lookup_car(self):
-        new_car = factories.Car.build(plate=tlc_data_service._get_real_plate())
+        new_car = factories.Car.build(plate=tlc_data_service._get_real_medallion())
         tlc_data_service.lookup_car_data(new_car)
         assert(new_car.registrant_name != None)

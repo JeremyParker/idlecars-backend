@@ -80,17 +80,17 @@ def _get_resource(url):
 
 
 def lookup_car_data(car):
-    url = MEDALLION_VEHICLE_RESOURCE + '?dmv_license_plate_number=' + car.plate + '&$limit=1'
+    url = MEDALLION_VEHICLE_RESOURCE + '?license_number=' + car.plate + '&$limit=1'
     response_list = _get_resource(url)
     if not response_list:
         raise Car.DoesNotExist
     _copy_medallion_fields(car, response_list[0])
 
 
-def _get_real_plate():
+def _get_real_medallion():
     ''' For testing, we can retrieve the first car out of the database to use its plate
     for the requests that follow. This ensures that we get a "found" result. '''
     url = MEDALLION_VEHICLE_RESOURCE + '?$limit=1'
     response_list = _get_resource(url)
-    return response_list[0]['dmv_license_plate_number']
+    return response_list[0]['license_number']
 
