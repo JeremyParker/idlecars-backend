@@ -116,10 +116,10 @@ class DriverUpdateTest(AuthenticatedDriverTest):
 
     def test_update_username_with_full_me(self):
         data = {
+            'ssn': '123456789',
             'address_proof_image': "",
             'all_docs_uploaded': False,
             'client_display': "1112220987",
-            'defensive_cert_image': "",
             'driver_license_image': "",
             'fhv_license_image': "",
             'id': 201,
@@ -142,6 +142,13 @@ class DriverUpdateTest(AuthenticatedDriverTest):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self._driver_reloaded().driver_license_image, 'newurl')
+
+    def test_update_ssn(self):
+        data = {'ssn': '123456789',}
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.driver.refresh_from_db()
+        self.assertEqual(self.driver.ssn, '123456789')
 
     # def test_redeem_bad_referral_code(self):
     #     response = self.client.patch(self.url, {'invitor_code': 'BADCODE'})

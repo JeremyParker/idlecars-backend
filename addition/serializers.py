@@ -16,10 +16,10 @@ class AdditionSerializer(ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'ssn',
             'driver_license_image',
             'fhv_license_image',
             'address_proof_image',
-            'defensive_cert_image',
         )
         read_only_fields = (
             'id',

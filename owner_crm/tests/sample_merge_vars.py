@@ -39,6 +39,23 @@ merge_vars = {
                 If you have any other cars you would like to list, please go to the submission form here:\n'''
         }
     },
+    'one_button_three_images': {
+        'jeremy@idlecars.com': {
+            'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
+            'FNAME': 'Robert',
+            'HEADLINE': 'We have a better sandwich!',
+            'TEXT0': 'this is the intro text. Please note that the intro text looks really good.',
+            'IMAGE_1_URL': img_1_url,
+            'TEXT1': 'Caption for <a href="{}">image #1.</a>'.format(img_1_url),
+            'IMAGE_2_URL': img_2_url,
+            'TEXT2': 'Caption for <a href="{}">image #2.</a>'.format(img_2_url),
+            'IMAGE_3_URL': img_3_url,
+            'TEXT3': 'Caption for <a href="{}">image #3.</a>'.format(img_3_url),
+            'TEXT5': 'this is the text at the end of the email Maybe a wind-up for the call-to-action.',
+            'CTA_LABEL': 'Press the button',
+            'CTA_URL': 'http://idlecars.com',
+        },
+    },
     'one_button_four_images': {
         'jeremy@idlecars.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',

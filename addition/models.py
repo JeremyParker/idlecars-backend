@@ -21,6 +21,7 @@ class Addition(models.Model):
     email = models.EmailField(_('email address'), blank=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    ssn = models.CharField(max_length=9, blank=True)
 
     # Did the owner authorize All Taxi to run an MVR for this driver?
     mvr_authorized = models.DateTimeField(null=True, blank=True)
@@ -33,11 +34,6 @@ class Addition(models.Model):
         max_length=300,
         blank=True,
         verbose_name="Hack License",
-    )
-    defensive_cert_image = model_helpers.StrippedCharField(
-        max_length=300,
-        blank=True,
-        verbose_name="Social Security Card",
     )
     address_proof_image = model_helpers.StrippedCharField(
         max_length=300,
@@ -65,9 +61,10 @@ class Addition(models.Model):
             self.email and
             self.first_name and
             self.last_name and
+            self.ssn and
             self.driver_license_image and
             self.fhv_license_image and
-            (self.defensive_cert_image or self.mvr_authorized)
+            (self.address_proof_image or self.mvr_authorized)
         )
 
     # TODO - hook this up to send an email

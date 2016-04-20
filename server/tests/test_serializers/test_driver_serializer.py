@@ -12,10 +12,10 @@ class TestDriverSerializer(TestCase):
 
     def test_all_docs_uploaded_true(self):
         driver = factories.Driver.create(
+            ssn='123456789',
             driver_license_image='taco.jpg',
             fhv_license_image='taco.jpg',
             address_proof_image='taco.jpg',
-            defensive_cert_image='taco.jpg',
         )
 
         self.assertTrue(serializers.DriverSerializer(driver).data['all_docs_uploaded'])

@@ -10,6 +10,8 @@ from idlecars import model_helpers, fields
 
 class Driver(models.Model):
     auth_user = models.OneToOneField(auth.models.User, null=True) #TODO: null=False
+
+    ssn = models.CharField(max_length=9, blank=True)
     documentation_approved = models.BooleanField(
         default=False,
         verbose_name='docs approved',
@@ -32,12 +34,6 @@ class Driver(models.Model):
         blank=True,
         verbose_name="Motor Vehicle Record (MVR)",
     )
-    defensive_cert_image = model_helpers.StrippedCharField(
-        max_length=300,
-        blank=True,
-        verbose_name="Social Security Card",
-    )
-
     base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
     base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 
@@ -77,9 +73,8 @@ class Driver(models.Model):
     def all_docs_uploaded(self):
         return bool(
             self.driver_license_image and
-            self.fhv_license_image and
-            # self.address_proof_image and
-            self.defensive_cert_image
+            self.fhv_license_image
+            # self.address_proof_image ??
         )
 
     def clean(self, *args, **kwargs):
