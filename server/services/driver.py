@@ -107,6 +107,11 @@ def get_missing_docs(driver):
     return missing
 
 
+def update_doc(driver, doc_name, file_url):
+    setattr(driver, doc_name, file_url)
+    return driver.save()
+
+
 def get_default_payment_method(driver):
     return driver.paymentmethod_set.exclude(gateway_token='').order_by('pk').last()
 
