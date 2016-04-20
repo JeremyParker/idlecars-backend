@@ -53,6 +53,9 @@ class OwnerViewSet(
         serializer.instance = owner
 
     def update(self, request, *args, **kwargs):
+        if 'upload_driver_doc' in request.data:
+            doc = request.data['upload_driver_doc']
+            owner_service.upload_driver_doc(owner=self.get_object(), doc=doc)
         try:
             return super(OwnerViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
