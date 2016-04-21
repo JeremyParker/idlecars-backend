@@ -3,12 +3,17 @@ from __future__ import unicode_literals
 
 from django.core.mail import EmailMessage
 from django.conf import settings
+from djrill.exceptions import MandrillAPIError
 
 from idlecars.job_queue import job_queue
 
 
 def _send_now(msg):
-    return msg.send()
+    try:
+        return msg.send()
+    except MandrillAPIError as e:
+        print e.log_message
+        print e.resonse.content
 
 
 def setup_email(template_name, subject, merge_vars):

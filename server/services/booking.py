@@ -103,6 +103,7 @@ def someone_else_booked(booking):
 
 
 def request_insurance(booking):
+    ''' When a booking is complete, we send emails to owner to approve'''
     booking.requested_time = timezone.now()
     booking.save()
 
