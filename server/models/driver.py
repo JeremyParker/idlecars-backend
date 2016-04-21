@@ -74,8 +74,8 @@ class Driver(models.Model):
     def all_docs_uploaded(self):
         return bool(
             self.driver_license_image and
-            self.fhv_license_image
-            # self.address_proof_image ??
+            self.fhv_license_image and
+            self.address_proof_image or self.no_mvr
         )
 
     def clean(self, *args, **kwargs):
