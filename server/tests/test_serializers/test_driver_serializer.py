@@ -20,13 +20,13 @@ class TestDriverSerializer(TestCase):
 
         self.assertTrue(serializers.DriverSerializer(driver).data['all_docs_uploaded'])
 
-    def test_all_docs_uploaded_true(self):
+    def test_docs_uploaded_or_skipped(self):
         driver = factories.Driver.create(
             ssn='123456789',
             driver_license_image='taco.jpg',
             fhv_license_image='taco.jpg',
             address_proof_image='',
-            # TODO - add 'skipped' field
+            no_mvr=True,
         )
 
         self.assertTrue(serializers.DriverSerializer(driver).data['all_docs_uploaded'])

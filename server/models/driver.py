@@ -34,6 +34,7 @@ class Driver(models.Model):
         blank=True,
         verbose_name="Motor Vehicle Record (MVR)",
     )
+    no_mvr = models.BooleanField(default=False, verbose_name='Driver doesn\'t have an MVR')
     base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
     base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 
@@ -73,8 +74,8 @@ class Driver(models.Model):
     def all_docs_uploaded(self):
         return bool(
             self.driver_license_image and
-            self.fhv_license_image
-            # self.address_proof_image ??
+            self.fhv_license_image and
+            self.address_proof_image or self.no_mvr
         )
 
     def clean(self, *args, **kwargs):
