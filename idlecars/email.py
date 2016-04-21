@@ -13,7 +13,7 @@ def _send_now(msg):
         return msg.send()
     except MandrillAPIError as e:
         print e.log_message
-        print e.resonse.content
+        print e.response.content
 
 
 def setup_email(template_name, subject, merge_vars):
