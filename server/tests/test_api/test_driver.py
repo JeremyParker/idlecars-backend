@@ -150,6 +150,13 @@ class DriverUpdateTest(AuthenticatedDriverTest):
         self.driver.refresh_from_db()
         self.assertEqual(self.driver.ssn, '123456789')
 
+    def test_update_no_mvr(self):
+        data = {'no_mvr': True,}
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.driver.refresh_from_db()
+        self.assertTrue(self.driver.no_mvr)
+
     # def test_redeem_bad_referral_code(self):
     #     response = self.client.patch(self.url, {'invitor_code': 'BADCODE'})
     #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

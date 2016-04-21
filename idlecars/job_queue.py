@@ -16,7 +16,9 @@ class FakeQueue(object):
         pass
 
     def enqueue(self, func, *args, **kwargs):
-        print args[0].__dict__
+        # This is hacky, but it's OK. It's just for development.
+        if args:
+            print args[0].__dict__
         return func(*args, **kwargs)
 
 job_queue = vars()[settings.QUEUE_IMPLEMENTATION](connection=conn)

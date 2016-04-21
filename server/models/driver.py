@@ -34,6 +34,7 @@ class Driver(models.Model):
         blank=True,
         verbose_name="Motor Vehicle Record (MVR)",
     )
+    no_mvr = models.BooleanField(default=False, verbose_name='Driver doesn\'t have an MVR')
     base_letter = model_helpers.StrippedCharField(max_length=300, blank=True)
     base_letter_rejected = models.BooleanField(default=False, verbose_name='base letter rejected')
 

@@ -37,6 +37,7 @@ class DriverSerializer(ModelSerializer):
             'driver_license_image',
             'fhv_license_image',
             'address_proof_image',
+            'no_mvr',
             'all_docs_uploaded',
 
             # stuff from auth_user TOOD - remove User fields
@@ -86,6 +87,7 @@ class DriverSerializer(ModelSerializer):
         #     except ServiceError as e:
         #         raise ValidationError(e.message)
 
+        instance.no_mvr = validated_data.get('no_mvr', instance.no_mvr)
         instance.ssn = validated_data.get('ssn', instance.ssn)
         instance.driver_license_image = validated_data.get('driver_license_image', instance.driver_license_image)
         instance.fhv_license_image = validated_data.get('fhv_license_image', instance.fhv_license_image)

@@ -44,17 +44,18 @@ class DriverAdmin(ReverseModelAdmin):
         'ssn',
     ]
     fieldsets = (
-        ('Documentation', {
+        ('Driver Information', {
             'fields': (
+                ('ssn'),
                 ('driver_license_image', 'dmv_link'),
                 ('fhv_license_image', 'fhv_link'),
                 ('address_proof_image', 'poa_link'),
+                ('no_mvr',),
+                ('date_joined',),
             )
         }),
-        ('None', {
+        (None, {
             'fields': (
-                ('ssn'),
-                ('date_joined',),
                 ('notes'),
             ),
         }),

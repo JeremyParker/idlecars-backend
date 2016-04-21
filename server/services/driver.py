@@ -32,16 +32,25 @@ def documents_changed(original, modified):
     for doc in doc_fields_and_names.keys():
         if getattr(original, doc) != getattr(modified, doc):
             return True
+
+    if original.no_mvr != modified.no_mvr:
+        return True
+
     return False
 
 
 def pre_save(modified_driver, orig):
-    if documents_changed(orig, modified_driver) and modified_driver.all_docs_uploaded():
-        assign_credit_code(modified_driver)
-        server.services.booking.on_all_docs_uploaded(modified_driver)
+    if documents_changed(orig, modified_driver):
+        # if someone (driver, owner or admin) adds an MVR, clear the flag
+        if not orig.address_proof_image and modified_driver.address_proof_image:
+            modified_driver.no_mvr = False
 
-        # this is just informative. No action is required by ops.
-        notification.send('ops_notifications.DocumentsUploaded', modified_driver)
+        if modified_driver.all_docs_uploaded():
+            assign_credit_code(modified_driver)
+            server.services.booking.on_all_docs_uploaded(modified_driver)
+
+            # this is just informative. No action is required by ops.
+            notification.send('ops_notifications.DocumentsUploaded', modified_driver)
     return modified_driver
 
 
