@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'djrill',
     'django_extensions',
     'addition',
+    'removal',
 )
 
 MIDDLEWARE_CLASSES = (
