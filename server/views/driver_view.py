@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ValidationError
 
 from server import models
 from server.services import payment_method as payment_method_service
@@ -50,7 +50,7 @@ class DriverViewSet(
         try:
             return super(DriverViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': e.detail.values()[0]}, status.HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsDriver])
     def payment_method(self, request, pk=None):

@@ -45,4 +45,4 @@ class UserViewSet(
         try:
             return super(UserViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': e.detail.values()[0]}, status.HTTP_400_BAD_REQUEST)

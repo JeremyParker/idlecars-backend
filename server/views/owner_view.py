@@ -64,7 +64,7 @@ class OwnerViewSet(
         try:
             return super(OwnerViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': e.detail.values()[0]}, status.HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'])
     def bank_link(self, request, pk=None):

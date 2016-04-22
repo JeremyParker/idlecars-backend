@@ -7,7 +7,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import detail_route
-from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ValidationError
 
 from server.models import Car, Owner
 from server.services import car as car_service
@@ -73,7 +73,9 @@ class CarViewSet(
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': e.detail.values()[0]}, status.HTTP_400_BAD_REQUEST)
+        except ServiceError as e:
+            return Response({'_app_notifications': [e.message]}, status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
         '''

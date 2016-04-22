@@ -12,6 +12,7 @@ from idlecars import app_routes_driver, fields
 from server.models import Car, Owner
 from server.fields import CarColorField
 from server.services import car_helpers, booking as booking_service, car as car_service
+from server.services import ServiceError
 
 
 class CarCreateSerializer(ModelSerializer):
@@ -80,7 +81,7 @@ class CarCreateSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         if 'owner' in validated_data:
             if car_service.has_booking_in_progress(instance):
-                raise ValidationError('A driver is associated with this shift. Remove the driver, then delete.')
+                raise ServiceError('A driver is associated with this shift. Remove the driver, then delete.')
         return super(CarCreateSerializer, self).update(instance, validated_data)
 
     def get_name(self, obj):
