@@ -317,7 +317,7 @@ class BookingCanceled(notification.OwnerNotification):
 
         text = 'We\'re sorry. {} has decided not to rent your {}. We apologise for any inconvenience. We\'ve \
 already re-listed your car on the site so we can find you another driver as soon as possible.'.format(
-            kwargs['driver_first_name'],
+            kwargs['driver_first_name'] or 'The driver',
             kwargs['car_name'],
         )
         # TODO(JP) track gender of driver and customize this email text
@@ -356,21 +356,21 @@ We\'ve already re-listed your car on the site so we can find you another driver 
         }
 
 
-class InsuranceTooSlow(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': kwargs['user_first_name'],
-            'HEADLINE': 'Your {} rental has been canceled'.format(kwargs['car_name']),
-            'TEXT': '''
-                We are sorry to inform you, but we cancelled the {} rental for {}.
-                We require drivers get on the insurance and into cars within 24 to 48 hours,
-                so we hope that we will be able to do this next time.
-                <br />
-                If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
-            '''.format(kwargs['car_name'], kwargs['driver_full_name']),
-            'template_name': 'no_button_no_image',
-            'subject': 'Your {} rental has been canceled'.format(kwargs['car_name']),
-        }
+# class InsuranceTooSlow(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         return {
+#             'FNAME': kwargs['user_first_name'],
+#             'HEADLINE': 'Your {} rental has been canceled'.format(kwargs['car_name']),
+#             'TEXT': '''
+#                 We are sorry to inform you, but we cancelled the {} rental for {}.
+#                 We require drivers get on the insurance and into cars within 24 to 48 hours,
+#                 so we hope that we will be able to do this next time.
+#                 <br />
+#                 If you are unsatisfied with your broker - please contact us to be added to our preferred broker list.
+#             '''.format(kwargs['car_name'], kwargs['driver_full_name']),
+#             'template_name': 'no_button_no_image',
+#             'subject': 'Your {} rental has been canceled'.format(kwargs['car_name']),
+#         }
 
 
 class PasswordReset(notification.OwnerNotification):

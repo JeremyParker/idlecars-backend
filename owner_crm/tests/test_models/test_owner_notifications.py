@@ -94,10 +94,6 @@ class OwnerNotificationTest(TestCase):
             #     'email_result': self.requested_booking.driver.full_name(),
             #     'sms_result': self.requested_booking.car.display_name(),
             # },
-            'PendingNotification': {
-                'argument': 'pending_booking',
-                'email_result': 'interested',
-            },
             'BookingCanceled': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
@@ -108,10 +104,10 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
-            'InsuranceTooSlow': {
-                'argument': 'requested_booking',
-                'email_result': 'canceled',
-            },
+            # 'InsuranceTooSlow': {
+            #     'argument': 'requested_booking',
+            #     'email_result': 'canceled',
+            # },
             'BankAccountApproved': {
                 'argument': 'bank_account_owner',
                 'email_result': 'approved',

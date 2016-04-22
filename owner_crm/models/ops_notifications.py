@@ -14,12 +14,12 @@ from owner_crm.models import notification
 class DocumentsUploaded(notification.OpsNotification):
     def get_context(self, **kwargs):
         return {
-            'FNAME': 'dudes',
+            'FNAME': 'operations team',
             'HEADLINE': 'Driver Docs uploaded!',
             'TEXT': 'Someone with the number {} uploaded all thier docs. No action is required'.format(
                 kwargs['driver_phone_number']
             ),
-            'CTA_LABEL': 'Check \'em out',
+            'CTA_LABEL': 'View the Driver record',
             'CTA_URL': kwargs['driver_admin_link'],
             'template_name': 'one_button_no_image',
             'subject': 'Uploaded documents from {}'.format(kwargs['driver_phone_number']),
@@ -75,3 +75,21 @@ class InsuranceApproved(notification.OpsNotification):
             'template_name': 'one_button_three_images',
         }
         return context
+
+class DriverRemoved(notification.DriverNotification):
+    def get_context(self, **kwargs):
+        text = '''{} has removed {} from their medallion {}.'''.format(
+            kwargs['owner_name'],
+            kwargs['driver_full_name'] or 'Their driver',
+            kwargs['car_plate'],
+        )
+
+        return {
+            'FNAME': 'operations team',
+            'HEADLINE': 'A driver has been removed',
+            'TEXT': text,
+            'template_name': 'one_button_no_image',
+            'subject': 'a driver is being removed from  {}.'.format(kwargs['car_plate']),
+            'CTA_LABEL': 'More details',
+            'CTA_URL': kwargs['booking_admin_link'],
+        }

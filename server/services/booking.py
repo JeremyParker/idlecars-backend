@@ -168,7 +168,8 @@ def on_incomplete(booking, original_booking_state):
         if Booking.REQUESTED == original_booking_state:
             notification.send('owner_notifications.BookingCanceled', booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
-        notification.send('owner_notifications.InsuranceTooSlow', booking)
+        pass
+        # notification.send('owner_notifications.InsuranceTooSlow', booking)
         # notification.send('driver_notifications.InsuranceFailed', booking)
         # elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
         # notification.send('driver_notifications.BookingTimedOut', booking)
@@ -211,8 +212,8 @@ def approve(booking):
     if not is_requested(booking):
         raise ServiceError(INSURANCE_APPROVAL_ERROR)
     booking.approval_time = timezone.now()
-    new_booking = booking.save()
-    on_insurance_approved(new_booking)
+    booking.save()
+    on_insurance_approved(booking)
 
 
 def reject(booking):
@@ -289,9 +290,8 @@ def return_confirm(booking):
     booking.save()
 
 
-def on_driver_removed(payment):
-    pass
-    # notification.send('driver_notifications.DriverRemoved', payment)
+def on_driver_removed(booking):
+    notification.send('ops_notifications.DriverRemoved', booking)
 
 
 def start_time_display(booking):
@@ -309,7 +309,7 @@ def first_valid_end_time(booking):
     Returns a typle (ealiest legal end time, if the min_rental was limiting the 1st value)
     '''
     notice = timezone.now() + datetime.timedelta(days=7)
-    min_rental = datetime.timedelta(days=booking.car.minimum_rental_days())
+    min_rental = datetime.timedelta(days=booking.car.minimum_rental_days() or 1)
     min_rental_end = booking.pickup_time or estimate_pickup_time(booking) + min_rental
     return max(notice, min_rental_end), min_rental_end > notice
 

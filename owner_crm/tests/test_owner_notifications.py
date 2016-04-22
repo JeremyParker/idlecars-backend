@@ -24,44 +24,6 @@ from owner_crm.tests import sample_merge_vars
 from owner_crm.tests.test_services import test_message
 
 
-# class TestOwnerPendingBookingNotifications(TestCase):
-#     @freeze_time("2014-10-10 9:55:00")
-#     def setUp(self):
-#         self.driver = server.factories.Driver.create()
-
-#     def test_only_required_bookings_send_emails(self):
-#         with freeze_time("2014-10-10 11:00:00"):
-#             good_booking = server.factories.Booking.create(driver=self.driver)
-#             server.factories.RequestedBooking.create(driver=self.driver)
-#             server.factories.ReturnedBooking.create(driver=self.driver)
-#             server.factories.RefundedBooking.create(driver=self.driver)
-#             server.factories.IncompleteBooking.create(driver=self.driver)
-
-#         owner_service.process_pending_booking_reminder()
-
-#         from django.core.mail import outbox
-#         self.assertEqual(len(outbox), 1)
-
-#         self.assertEqual(
-#             outbox[0].subject,
-#             'Someone is interested in your {}'.format(good_booking.car.display_name()),
-#         )
-
-#     def test_no_email_twice(self):
-#         with freeze_time("2014-10-10 11:00:00"):
-#             good_booking = server.factories.Booking.create(driver=self.driver)
-
-#         owner_service.process_pending_booking_reminder()
-#         owner_service.process_pending_booking_reminder()
-
-#     @freeze_time("2014-10-11 10:55:00")
-#     def test_no_email_early(self):
-#         with freeze_time("2014-10-10 11:00:00"):
-#             good_booking = server.factories.Booking.create(driver=self.driver)
-
-#         owner_service.process_pending_booking_reminder()
-
-
 class TestOwnerRenewalNotifications(TestCase):
     def _setup_car_with_update_time(self, update_time):
         car = server.factories.BookableCar.create(

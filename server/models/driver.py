@@ -75,7 +75,7 @@ class Driver(models.Model):
         return bool(
             self.driver_license_image and
             self.fhv_license_image and
-            self.address_proof_image or self.no_mvr
+            (self.address_proof_image or self.no_mvr)
         )
 
     def clean(self, *args, **kwargs):

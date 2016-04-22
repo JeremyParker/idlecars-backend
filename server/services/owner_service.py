@@ -70,17 +70,6 @@ def _send_reminder_email(remindable_bookings, reminder_name, throttle_key):
     throttle_service.mark_sent(throttled_bookings, throttle_key)
 
 
-def process_pending_booking_reminder():
-    reminder_threshold = timezone.now() - datetime.timedelta(hours=24)
-    remindable_bookings = booking_service.filter_pending(Booking.objects.all()).filter(
-        created_time__lte=reminder_threshold,
-    )
-    throttled_bookings = throttle_service.throttle(remindable_bookings, 'PendingNotification')
-    for booking in throttled_bookings:
-        notification.send('owner_notifications.PendingNotification', booking)
-    throttle_service.mark_sent(throttled_bookings, 'PendingNotification')
-
-
 # def process_insurance_reminder():
 #     # TODO: hour, minute and delay_hours should be from settings
 #     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)

@@ -169,6 +169,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
         return not obj.approval_time
 
     def get_first_valid_end_time(self, obj):
+        return None
         first_valid_end, _ = booking_service.first_valid_end_time(obj)
         return fields.format_date_array(first_valid_end)
 

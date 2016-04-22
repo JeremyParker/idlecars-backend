@@ -187,7 +187,7 @@ TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '19f726892e44c923f6c1c67f62d3
 
 MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', '17bIyAXLhDzqG-At8DB3Nw') # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
-DEFAULT_FROM_EMAIL = 'test@alltaxiny.com'
+DEFAULT_FROM_EMAIL = 'drivers@alltaxiny.com'
 OPS_EMAIL = 'test@alltaxiny.com'
 OPS_PHONE_NUMBER = '6469021306'
 
