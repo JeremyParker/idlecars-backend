@@ -10,7 +10,7 @@ from django.db.models import Q
 from server.models import Booking, Car, Owner
 
 
-next_available_date_threshold = timezone.now() + datetime.timedelta(days=30)
+next_available_date_threshold = timezone.now() + datetime.timedelta(days=120)
 staleness_threshold = timezone.now() - datetime.timedelta(days=settings.STALENESS_LIMIT)
 
 # TODO - this belongs in booking_service
