@@ -185,7 +185,7 @@ TWILIO_PHONE_NUMBER = '+16466933874'
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC0f99e71e116ef18f0e8b2e67dcc28e97')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '19f726892e44c923f6c1c67f62d360cc')
 
-MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', 'k-5TEa3ZFDCbpM2LUe93wQ') # if not in env, test_key
+MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', '17bIyAXLhDzqG-At8DB3Nw') # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
 DEFAULT_FROM_EMAIL = 'test@idlecars.com'
 OPS_EMAIL = 'test@idlecars.com'
