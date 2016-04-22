@@ -16,9 +16,9 @@ merge_vars = {
                                   u'HEADLINE': u'Payment received for your 2012 Schmitt Walker',
                                   u'TEXT': u'\n        You have received a payment through idlecars. <br />\n        Invoice Period: Oct 10 - Oct 12 <br />\n        Payment Amount: $214.29\n        For your 2012 Schmitt Walker with medallion FYSXY1J6 <br />\n        From Driver: Olar Weimann <br />\n        <br /><br /><br />\n    This is the last payment. The driver should contact you to arrange dropoff.<br />\n        This booking will end on: Oct 12 <br /><br />\n        As always, if you have any questions, please call us at 1-844-IDLECAR (1-844-435-3227).\n    '}},
     'one_button_one_image': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'FNAME': 'Bob',
-            'TEXT': "<p>Don't forget! To rent your 2014 Toyota Camry you still need to upload:</p>\n<ul><li>your Drivers License, and<li>your TLC License</ul>\n<p>You can also email photographs of your documents to support@idlecars.com. Once we have all your documents, you will be added to the car's insurance. Then you can start driving and start earning!</p>",
+            'TEXT': "<p>Don't forget! To rent your 2014 Toyota Camry you still need to upload:</p>\n<ul><li>your Drivers License, and<li>your TLC License</ul>\n<p>You can also email photographs of your documents to support@alltaxiny.com. Once we have all your documents, you will be added to the car's insurance. Then you can start driving and start earning!</p>",
             'CTA_LABEL': 'Renew Now',
             'CTA_URL': 'http://idlecars.com',
             'HEADLINE': 'Your 2015 Rolls Royce is about to expire',
@@ -26,7 +26,7 @@ merge_vars = {
         },
     },
     'one_button_no_image': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'CTA_LABEL': 'List more cars',
             'CTA_URL': 'http://goo.gl/forms/4s26I6GUQY',
             'FNAME': 'Lindell',
@@ -40,7 +40,7 @@ merge_vars = {
         }
     },
     'one_button_three_images': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -57,7 +57,7 @@ merge_vars = {
         },
     },
     'one_button_four_images': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -76,7 +76,7 @@ merge_vars = {
         },
     },
     'no_button_four_images': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -93,7 +93,7 @@ merge_vars = {
         },
     },
     'no_button_five_images': {
-        'jeremy@idlecars.com': {
+        'jeremy@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',

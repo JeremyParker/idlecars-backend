@@ -12,7 +12,7 @@ from idlecars import fields
 from idlecars.factories import AuthUser
 from server import factories
 
-test_email = "idlecar@idlecars.com"
+test_email = "idlecar@alltaxiny.com"
 
 class UserApiTest(APITestCase):
     def setUp(self):

@@ -15,7 +15,7 @@ from . import payment as payment_service
 from server.services import ServiceError
 
 
-CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call Idlecars at ' + settings.IDLECARS_PHONE_NUMBER
+CANCEL_ERROR = 'Sorry, your rental can\'t be canceled at this time. Please call All Taxi Management at ' + settings.ALLTAXI_PHONE_NUMBER
 INSURANCE_APPROVAL_ERROR = 'Sorry, your rental can\'t be approved at this time.'
 INSURANCE_REJECT_ERROR = 'Sorry, your rental can\'t be rejected at this time.'
 PICKUP_ERROR = 'Sorry, your rental can\'t be picked up at this time.'
@@ -119,8 +119,8 @@ def request_insurance(booking):
 
 
 def on_insurance_approved(booking):
-    # TODO:alltaxi - send an email to All Taxi with documents and instructions
-    notification.send('driver_notifications.InsuranceApproved', booking)
+    notification.send('ops_notifications.InsuranceApproved', booking)
+    pass
 
 
 def create_booking(car, driver):
@@ -169,9 +169,9 @@ def on_incomplete(booking, original_booking_state):
             notification.send('owner_notifications.BookingCanceled', booking)
     elif reason == Booking.REASON_OWNER_TOO_SLOW:
         notification.send('owner_notifications.InsuranceTooSlow', booking)
-        notification.send('driver_notifications.InsuranceFailed', booking)
-    elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
-        notification.send('driver_notifications.BookingTimedOut', booking)
+        # notification.send('driver_notifications.InsuranceFailed', booking)
+        # elif reason in [Booking.REASON_DRIVER_TOO_SLOW_DOCS, Booking.REASON_DRIVER_TOO_SLOW_CC]:
+        # notification.send('driver_notifications.BookingTimedOut', booking)
     elif reason in [Booking.REASON_ANOTHER_BOOKED_DOCS, Booking.REASON_ANOTHER_BOOKED_CC]:
         notification.send('driver_notifications.SomeoneElseBooked', booking)
     elif reason in [
@@ -290,7 +290,8 @@ def return_confirm(booking):
 
 
 def on_driver_removed(payment):
-    notification.send('driver_notifications.DriverRemoved', payment)
+    pass
+    # notification.send('driver_notifications.DriverRemoved', payment)
 
 
 def start_time_display(booking):

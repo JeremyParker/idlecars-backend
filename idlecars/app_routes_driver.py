@@ -47,6 +47,3 @@ def terms_of_service():
 def faq():
     parts = (settings.DRIVER_APP_URL, '#', 'faq')
     return '/'.join(parts)
-
-def base_letter_sample_url():
-    return 'https://s3.amazonaws.com/driverdocs.idlecars.com/Base+Letters/base_letter_fake.gif'

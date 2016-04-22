@@ -30,8 +30,8 @@ SSLIFY_DISABLE = True
 CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
 SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
 
-DEFAULT_FROM_EMAIL = 'bookings@idlecars.com'
-OPS_EMAIL = 'support@idlecars.zendesk.com'
+DEFAULT_FROM_EMAIL = 'drivers@alltaxiny.com'
+OPS_EMAIL =  'jeremy@idlecars.com'
 
 PAYMENT_GATEWAY_NAME = 'braintree'
 BRAINTREE_BASE_URL = 'www.braintreegateway.com'

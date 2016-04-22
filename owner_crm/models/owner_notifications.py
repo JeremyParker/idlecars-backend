@@ -44,31 +44,28 @@ class RenewalEmail(notification.OwnerNotification):
             'CAR_IMAGE_URL': kwargs['car_image_url'],
             'template_name': 'one_button_one_image',
             'subject': 'Your {} listing is about to expire.'.format(kwargs['car_name']),
-            'sms_body': 'The listing for your {} with medallion {} is about to expire. \
-Is it still available? Please tap here to extend or remove your \
-listing: {}'.format(kwargs['car_name'], kwargs['car_plate'], kwargs['car_owner_details_url'])
         }
         return context
 
 
-class PendingNotification(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        text = '''Someone is interested in your {} with plates {}. They are still in the process
-        of submitting their documents, but we will send you everything as soon as possible. <br /><br />
-        If this shift is no longer available, please click below to de-list the shift from our
-        marketplace.'''.format(
-            kwargs['car_name'],
-            kwargs['car_plate'],
-        )
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Someone is interested in your {}'.format(kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Delist this shift',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Someone is interested in your {}'.format(kwargs['car_name']),
-        }
+# class PendingNotification(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         text = '''Someone is interested in your {} with plates {}. They are still in the process
+#         of submitting their documents, but we will send you everything as soon as possible. <br /><br />
+#         If this shift is no longer available, please click below to de-list the shift from our
+#         marketplace.'''.format(
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#         )
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Someone is interested in your {}'.format(kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Delist this shift',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Someone is interested in your {}'.format(kwargs['car_name']),
+#         }
 
 
 class SignupConfirmation(notification.OwnerNotification):
@@ -101,9 +98,8 @@ class NewBookingEmail(notification.OwnerNotification):
         # TODO(JP) track gender of driver and customize this email text
         text = '''
             {} wants to rent your car and has submitted their documentation. If you would like them
-            to be added to your insurance policy please see instructions.
-            All of their documents are included in this email. If you require any additional
-            information for insurance, please reach out to the driver at {}.'''.format(
+            to be added to your car please tap the link below and approve them in the app.
+            If you require any additional information, please reach out to the driver at {}.'''.format(
                 kwargs['driver_full_name'] or 'A driver',
                 fields.format_phone_number(kwargs['driver_phone_number']),
             )
@@ -134,184 +130,181 @@ class NewBookingEmail(notification.OwnerNotification):
             'CTA_URL': kwargs['car_owner_details_url'],
             'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
             'template_name': 'one_button_three_images',
-            'sms_body': headline + ' An email has been sent to {} with more information.'.format(
-                kwargs['user_email']
-            )
         }
         return context
 
 
-class FirstMorningInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
-know: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know if:
-        <ul><li> They were accepted on the car’s insurance </li>
-            <li> They were rejected by the insurance company </li>
-            <li> The car is no longer available </li></ul>'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-        )
+# class FirstMorningInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
+# know: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know if:
+#         <ul><li> They were accepted on the car’s insurance </li>
+#             <li> They were rejected by the insurance company </li>
+#             <li> The car is no longer available </li></ul>'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#         )
 
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'sms_body': sms_body,
-        }
-
-
-class SecondMorningInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
-know: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know if:
-        <ul><li> They were accepted on the car’s insurance </li>
-            <li> They were rejected by the insurance company </li>
-            <li> The car is no longer available </li></ul>'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-        )
-
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'sms_body': sms_body,
-        }
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'sms_body': sms_body,
+#         }
 
 
-class ThirdMorningInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click below to \
-let us know where they are in the process: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know where they
-        are in the process, otherwise the booking will be canceled within 24 hours.'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-        )
+# class SecondMorningInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
+# know: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know if:
+#         <ul><li> They were accepted on the car’s insurance </li>
+#             <li> They were rejected by the insurance company </li>
+#             <li> The car is no longer available </li></ul>'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#         )
 
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': '{}’s booking will be canceled soon'.format(kwargs['driver_full_name']),
-            'sms_body': sms_body,
-        }
-
-
-class FirstAfternoonInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
-know: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know if:
-        <ul><li> They were accepted on the car’s insurance </li>
-            <li> They were rejected by the insurance company </li>
-            <li> The car is no longer available </li></ul>'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-        )
-
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'sms_body': sms_body,
-        }
-
-class SecondAfternoonInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
-know: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know if:
-        <ul><li> They were accepted on the car’s insurance </li>
-            <li> They were rejected by the insurance company </li>
-            <li> The car is no longer available </li></ul>'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-        )
-
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'sms_body': sms_body,
-        }
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'sms_body': sms_body,
+#         }
 
 
-class ThirdAfternoonInsuranceReminder(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click here to let \
-us know where they are in the process: {}'.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-            kwargs['car_plate'],
-            kwargs['car_owner_details_url']
-        )
-        text = '''Has {} been accepted on the {}? Click the button below to let us know where they
-        are in the process, otherwise the booking will be canceled within 24 hours.'''.format(
-            kwargs['driver_full_name'],
-            kwargs['car_name'],
-        )
+# class ThirdMorningInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click below to \
+# let us know where they are in the process: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know where they
+#         are in the process, otherwise the booking will be canceled within 24 hours.'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#         )
 
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Accept/Reject Diver',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': '{}’s booking will be canceled soon'.format(kwargs['driver_full_name']),
-            'sms_body': sms_body,
-        }
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': '{}’s booking will be canceled soon'.format(kwargs['driver_full_name']),
+#             'sms_body': sms_body,
+#         }
+
+
+# class FirstAfternoonInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
+# know: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know if:
+#         <ul><li> They were accepted on the car’s insurance </li>
+#             <li> They were rejected by the insurance company </li>
+#             <li> The car is no longer available </li></ul>'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#         )
+
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'sms_body': sms_body,
+#         }
+
+# class SecondAfternoonInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = 'Has {} been accepted on the {} with plates {}? Click here to let us \
+# know: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know if:
+#         <ul><li> They were accepted on the car’s insurance </li>
+#             <li> They were rejected by the insurance company </li>
+#             <li> The car is no longer available </li></ul>'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#         )
+
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'sms_body': sms_body,
+#         }
+
+
+# class ThirdAfternoonInsuranceReminder(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         sms_body = '{}’s booking of the {} with medallion {} will be cancelled soon. Click here to let \
+# us know where they are in the process: {}'.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#             kwargs['car_plate'],
+#             kwargs['car_owner_details_url']
+#         )
+#         text = '''Has {} been accepted on the {}? Click the button below to let us know where they
+#         are in the process, otherwise the booking will be canceled within 24 hours.'''.format(
+#             kwargs['driver_full_name'],
+#             kwargs['car_name'],
+#         )
+
+#         return {
+#             'FNAME': kwargs['user_first_name'] or None,
+#             'HEADLINE': 'Has {} been accepted on the {}?'.format(kwargs['driver_full_name'], kwargs['car_name']),
+#             'TEXT': text,
+#             'CTA_LABEL': 'Accept/Reject Diver',
+#             'CTA_URL': kwargs['car_owner_details_url'],
+#             'template_name': 'one_button_no_image',
+#             'subject': '{}’s booking will be canceled soon'.format(kwargs['driver_full_name']),
+#             'sms_body': sms_body,
+#         }
 
 
 class BookingCanceled(notification.OwnerNotification):
@@ -322,8 +315,7 @@ class BookingCanceled(notification.OwnerNotification):
             kwargs['car_plate'],
         )
 
-        text = 'We\'re sorry. {} has decided not to rent your {}. Could you ask your insurance \
-broker not to add them to the insurance policy? We apologise for any inconvenience. We\'ve \
+        text = 'We\'re sorry. {} has decided not to rent your {}. We apologise for any inconvenience. We\'ve \
 already re-listed your car on the site so we can find you another driver as soon as possible.'.format(
             kwargs['driver_first_name'],
             kwargs['car_name'],
@@ -336,8 +328,7 @@ already re-listed your car on the site so we can find you another driver as soon
             'CTA_LABEL': 'See your listing',
             'CTA_URL': kwargs['car_driver_details_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
-            'sms_body': text,
+            'subject': 'The request for your {} has canceled.'.format(kwargs['car_name']),
         }
 
 
@@ -361,8 +352,7 @@ We\'ve already re-listed your car on the site so we can find you another driver 
             'CTA_LABEL': 'See your listing',
             'CTA_URL': kwargs['car_driver_details_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Your {} rental has canceled.'.format(kwargs['car_name']),
-            'sms_body': text,
+            'subject': 'The request for your {} has canceled.'.format(kwargs['car_name']),
         }
 
 
@@ -383,29 +373,6 @@ class InsuranceTooSlow(notification.OwnerNotification):
         }
 
 
-class ConfirmReturned(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        sms_body = '{} says your car has been returned. Please click {} to confirm and refund \
-any deposit to the driver'.format(kwargs['car_name'], kwargs['car_owner_details_url'])
-        text = '''{} says your car has been returned. Please click below to confirm that the car \
-        has been returned in good condition, and refund the driver\'s deposit. If your car has not been \
-        returned, or if there is a problem, please contact the driver at {}'''.format(
-            kwargs['driver_full_name'],
-            kwargs['driver_phone_number'],
-        )
-
-        return {
-            'FNAME': kwargs['user_first_name'] or None,
-            'HEADLINE': 'Has your {} been returned?'.format(kwargs['car_name']),
-            'TEXT': text,
-            'CTA_LABEL': 'Confirm and refund any deposit',
-            'CTA_URL': kwargs['car_owner_details_url'],
-            'template_name': 'one_button_no_image',
-            'subject': 'Has your {} been returned?'.format(kwargs['car_name']),
-            'sms_body': sms_body,
-        }
-
-
 class PasswordReset(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \
@@ -417,16 +384,15 @@ ignore this message. Otherwise, you can reset your password using this link: '
             'CTA_LABEL': 'Reset password',
             'CTA_URL': kwargs['owner_password_reset_url'],
             'template_name': 'one_button_no_image',
-            'subject': 'Reset your idlecars password.',
-            'sms_body': text + kwargs['owner_password_reset_url'],
+            'subject': 'Reset your All Taxi password.',
         }
 
 
 class PasswordResetConfirmation(notification.OwnerNotification):
     def get_context(self, **kwargs):
-        subject = 'Your idlecars password has been set.'
+        subject = 'Your All Taxi password has been set.'
         text = 'If you didn\'t set your password, or if you think something funny is going \
-on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
+on, please call us any time at ' + settings.ALLTAXI_PHONE_NUMBER + '.'
         return {
             'FNAME': kwargs['password_reset_user_first_name'] or None,
             'HEADLINE': 'Your account password has been set',
@@ -435,33 +401,32 @@ on, please call us any time at ' + settings.IDLECARS_PHONE_NUMBER + '.'
             'CTA_URL': kwargs['car_listing_url'],
             'template_name': 'one_button_no_image',
             'subject': subject,
-            'sms_body': subject + ' ' + text,
         }
 
 
-class BankAccountApproved(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        links = _get_car_listing_links(kwargs['owner'])
-        if links:
-            text = '''
-                    Congrats! Your bank information has been approved and your cars have been listed!
-                    You can view your live cars from the links below!
-                    <ul>{}</ul>
-                    If you have any other cars you would like to list, please go to the submission form here:
-                '''.format(links)
-        else:
-            text = '''
-                    Congrats! Your bank information has been approved! Now when you rent cars through idlecars, you will
-                    receive payment directly from the driver into your bank account.<br>
-                    If you have any cars you would like to list, please go to the submission form here:
-                '''
+# class BankAccountApproved(notification.OwnerNotification):
+#     def get_context(self, **kwargs):
+#         links = _get_car_listing_links(kwargs['owner'])
+#         if links:
+#             text = '''
+#                     Congrats! Your bank information has been approved and your cars have been listed!
+#                     You can view your live cars from the links below!
+#                     <ul>{}</ul>
+#                     If you have any other cars you would like to list, please go to the submission form here:
+#                 '''.format(links)
+#         else:
+#             text = '''
+#                     Congrats! Your bank information has been approved! Now when you rent cars through idlecars, you will
+#                     receive payment directly from the driver into your bank account.<br>
+#                     If you have any cars you would like to list, please go to the submission form here:
+#                 '''
 
-        return {
-            'FNAME': kwargs['user_first_name'],
-            'HEADLINE': 'Your bank account has been approved',
-            'TEXT': text,
-            'CTA_LABEL': 'List more cars',
-            'CTA_URL': app_routes_owner.owner_app_url(),
-            'template_name': 'one_button_no_image',
-            'subject': 'Your bank account has been approved.',
-        }
+#         return {
+#             'FNAME': kwargs['user_first_name'],
+#             'HEADLINE': 'Your bank account has been approved',
+#             'TEXT': text,
+#             'CTA_LABEL': 'List more cars',
+#             'CTA_URL': app_routes_owner.owner_app_url(),
+#             'template_name': 'one_button_no_image',
+#             'subject': 'Your bank account has been approved.',
+#         }

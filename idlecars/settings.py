@@ -187,8 +187,8 @@ TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '19f726892e44c923f6c1c67f62d3
 
 MANDRILL_API_KEY = os.getenv('MANDRILL_APIKEY', '17bIyAXLhDzqG-At8DB3Nw') # if not in env, test_key
 EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
-DEFAULT_FROM_EMAIL = 'test@idlecars.com'
-OPS_EMAIL = 'test@idlecars.com'
+DEFAULT_FROM_EMAIL = 'test@alltaxiny.com'
+OPS_EMAIL = 'test@alltaxiny.com'
 OPS_PHONE_NUMBER = '6469021306'
 
 TLC_DATA_IMPLEMENTATION = 'TestClient' #'Socrata'
@@ -215,22 +215,9 @@ CORS_ALLOW_HEADERS = (
 HEAP_APP_ID = '655181858'
 
 PAYMENT_GATEWAY_NAME = 'fake'
-BRAINTREE_BASE_URL = 'sandbox.braintreegateway.com' # doesn't work for fake gateway
 
-MASTER_MERCHANT_ACCOUNT_ID = os.getenv('MASTER_MERCHANT_ACCOUNT_ID', 'idlecarsllc')
-BRAINTREE = {
-    'environment': os.getenv('BRAINTREE_ENVIRONMENT', 'Sandbox'),
-    'merchant_id': os.getenv('BRAINTREE_MERCHANT_ID', 'fckq6988gccrfnty'),
-    'public_key': os.getenv('BRAINTREE_PUBLIC_KEY', 'hxbd5tx9836svxy7'),
-    'private_key': os.getenv('BRAINTREE_PRIVATE_KEY', '005ff099d74dfc1a098f77f176c175a8'),
-}
-IDLECARS_CUSTOMER_ID = os.getenv('IDLECARS_CUSTOMER_ID', '32418355') # for Braintree
-IDLECARS_PAYMENT_TOKEN = os.getenv('IDLECARS_PAYMENT_TOKEN', 'gwtbsw') # for Braintree
-
-# TODO - move these to a config service
-TAKE_RATE = '0.079'
 STALENESS_LIMIT = 14
 SIGNUP_CREDIT = 50
 INVITOR_CREDIT = 50
 
-IDLECARS_PHONE_NUMBER = '(347) 670-3064'
+ALLTAXI_PHONE_NUMBER = '(718) 361-0055'

@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 
 class TokenAuthTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='2121234567', password='password', email="idlecar@idlecars.com")
+        self.user = User.objects.create_user(username='2121234567', password='password', email="idlecar@alltaxiny.com")
         self.url = reverse('server:token-auth')
 
     def test_user_with_valid_username_and_password_gets_auth_token(self):

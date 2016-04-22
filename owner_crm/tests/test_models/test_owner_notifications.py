@@ -64,36 +64,36 @@ class OwnerNotificationTest(TestCase):
                 'email_result': self.requested_booking.car.display_name(),
                 'sms_result': self.requested_booking.car.owner.auth_users.first().email,
             },
-            'FirstMorningInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.car.display_name(),
-                'sms_result': self.requested_booking.driver.full_name(),
-            },
-            'SecondMorningInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.car.display_name(),
-                'sms_result': self.requested_booking.driver.full_name(),
-            },
-            'ThirdMorningInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.driver.full_name(),
-                'sms_result': self.requested_booking.car.display_name(),
-            },
-            'FirstAfternoonInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.car.display_name(),
-                'sms_result': self.requested_booking.driver.full_name(),
-            },
-            'SecondAfternoonInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.car.display_name(),
-                'sms_result': self.requested_booking.driver.full_name(),
-            },
-            'ThirdAfternoonInsuranceReminder': {
-                'argument': 'requested_booking',
-                'email_result': self.requested_booking.driver.full_name(),
-                'sms_result': self.requested_booking.car.display_name(),
-            },
+            # 'FirstMorningInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.car.display_name(),
+            #     'sms_result': self.requested_booking.driver.full_name(),
+            # },
+            # 'SecondMorningInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.car.display_name(),
+            #     'sms_result': self.requested_booking.driver.full_name(),
+            # },
+            # 'ThirdMorningInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.driver.full_name(),
+            #     'sms_result': self.requested_booking.car.display_name(),
+            # },
+            # 'FirstAfternoonInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.car.display_name(),
+            #     'sms_result': self.requested_booking.driver.full_name(),
+            # },
+            # 'SecondAfternoonInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.car.display_name(),
+            #     'sms_result': self.requested_booking.driver.full_name(),
+            # },
+            # 'ThirdAfternoonInsuranceReminder': {
+            #     'argument': 'requested_booking',
+            #     'email_result': self.requested_booking.driver.full_name(),
+            #     'sms_result': self.requested_booking.car.display_name(),
+            # },
             'PendingNotification': {
                 'argument': 'pending_booking',
                 'email_result': 'interested',
@@ -108,11 +108,6 @@ class OwnerNotificationTest(TestCase):
                 'email_result': 'canceled',
                 'sms_body': self.requested_booking.driver.first_name(),
             },
-            'ConfirmReturned': {
-                'argument': 'returned_booking',
-                'email_result': 'returned',
-                'sms_body': 'returned',
-            },
             'InsuranceTooSlow': {
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
@@ -123,7 +118,7 @@ class OwnerNotificationTest(TestCase):
             },
             'PasswordReset': {
                 'argument': 'password_reset',
-                'email_result': 'Reset your idlecars password',
+                'email_result': 'Reset your All Taxi password',
                 'sms_result': self.password_reset.token,
             },
             'PasswordResetConfirmation': {
@@ -147,18 +142,6 @@ class OwnerNotificationTest(TestCase):
                 campaign_name = 'owner_notifications.' + name
                 campaign = crm_factories.Campaign.create(name=campaign_name)
                 argument = eval('self.' + spec['argument'])
-
-                # check the sms if this notification is supposed to support sms
-                if 'sms_result' in spec.keys():
-                    campaign.preferred_medium = Campaign.SMS_MEDIUM
-                    campaign.save()
-
-                    # print 'sms: ' + campaign_name
-                    notification.send(campaign_name, argument)
-
-                    self.assertEqual(len(sms_service.test_get_outbox()), 1)
-                    self.assertTrue(spec['sms_result'] in sms_service.test_get_outbox()[0]['body'])
-                    sms_service.test_reset()
 
                 # check the email if this notification is supposed to support email
                 if 'email_result' in spec.keys():

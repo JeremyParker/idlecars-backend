@@ -12,7 +12,7 @@ class EmailTest(TestCase):
     '''
     def test_send(self):
         merge_vars = {
-            'jeremy@idlecars.com': {
+            'jeremy@alltaxiny.com': {
                 'FNAME': 'Robert',
                 'TEXT': 'have lunch with me',
                 'CTA_LABEL': 'Press a button',
@@ -38,8 +38,8 @@ class EmailTest(TestCase):
 
     def test_multiple_recipients(self):
         merge_vars = {
-            'jeff@idlecars.com': {'FNAME': "McFly"},
-            'jeremy@idlecars.com': {'FNAME': "Jeremy"},
+            'jeff@alltaxiny.com': {'FNAME': "McFly"},
+            'jeremy@alltaxiny.com': {'FNAME': "Jeremy"},
         }
 
         result = email.send_async(

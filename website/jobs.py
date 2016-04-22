@@ -12,12 +12,12 @@ from idlecars.job_queue import job_queue
 
 def queue_owner_welcome_email(email_address):
     text = '''
-    Find more drivers for your idle cars. <br>
+    Find more drivers for your cars. <br>
     Fill out this form to add your car to our listings. When a qualified driver requests your car, we will contact you directly. <br>
-    Questions? Email us at support@idlecars.com, or call ''' + IDLECARS_PHONE_NUMBER
+    Questions? Email us at support@alltaxiny.com, or call ''' + ALLTAXI_PHONE_NUMBER
     merge_vars = {
         email_address: {
-            'HEADLINE': 'Welcome To Idlecars!',
+            'HEADLINE': 'Welcome to All Taxi!',
             'TEXT': text,
             'CTA_LABEL': 'List a car',
             'CTA_URL': 'http://goo.gl/forms/4s26I6GUQY',
@@ -25,6 +25,6 @@ def queue_owner_welcome_email(email_address):
     }
     email.send_async(
         template_name='one_button_no_image',
-        subject='Welcome to idlecars',
+        subject='Welcome to All Taxi',
         merge_vars=merge_vars,
     )

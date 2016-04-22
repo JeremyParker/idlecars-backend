@@ -81,46 +81,46 @@ def process_pending_booking_reminder():
     throttle_service.mark_sent(throttled_bookings, 'PendingNotification')
 
 
-def process_insurance_reminder():
-    # TODO: hour, minute and delay_hours should be from settings
-    morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
-    afternoon_target = timezone.localtime(timezone.now()).replace(hour=13, minute=0)
-    delay_hours = 12
+# def process_insurance_reminder():
+#     # TODO: hour, minute and delay_hours should be from settings
+#     morning_target = timezone.localtime(timezone.now()).replace(hour=10, minute=0)
+#     afternoon_target = timezone.localtime(timezone.now()).replace(hour=13, minute=0)
+#     delay_hours = 12
 
-    if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
+#     if _within_minutes_of_local_time(POKE_FREQUENCY/2, morning_target):
 
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
-            reminder_name='FirstMorningInsuranceReminder',
-            throttle_key='first_morning_insurance_reminder',
-        )
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
-            reminder_name='SecondMorningInsuranceReminder',
-            throttle_key='second_morning_insurance_reminder',
-        )
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
-            reminder_name='ThirdMorningInsuranceReminder',
-            throttle_key='third_morning_insurance_reminder',
-        )
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
+#             reminder_name='FirstMorningInsuranceReminder',
+#             throttle_key='first_morning_insurance_reminder',
+#         )
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
+#             reminder_name='SecondMorningInsuranceReminder',
+#             throttle_key='second_morning_insurance_reminder',
+#         )
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
+#             reminder_name='ThirdMorningInsuranceReminder',
+#             throttle_key='third_morning_insurance_reminder',
+#         )
 
-    elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
-            reminder_name='FirstAfternoonInsuranceReminder',
-            throttle_key='first_afternoon_insurance_reminder',
-        )
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
-            reminder_name='SecondAfternoonInsuranceReminder',
-            throttle_key='second_afternoon_insurance_reminder',
-        )
-        _send_reminder_email(
-            remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
-            reminder_name='ThirdAfternoonInsuranceReminder',
-            throttle_key='third_afternoon_insurance_reminder',
-        )
+#     elif _within_minutes_of_local_time(POKE_FREQUENCY/2, afternoon_target):
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours),
+#             reminder_name='FirstAfternoonInsuranceReminder',
+#             throttle_key='first_afternoon_insurance_reminder',
+#         )
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 24),
+#             reminder_name='SecondAfternoonInsuranceReminder',
+#             throttle_key='second_afternoon_insurance_reminder',
+#         )
+#         _send_reminder_email(
+#             remindable_bookings=_get_remindable_bookings(delay_hours=delay_hours + 48),
+#             reminder_name='ThirdAfternoonInsuranceReminder',
+#             throttle_key='third_afternoon_insurance_reminder',
+#         )
 
 
 def create(auth_user):
@@ -140,14 +140,15 @@ def add_merchant_id_to_owner(merchant_account_id, owner):
 
 
 def update_account_state(merchant_account_id, state, errors=None):
-    owner = Owner.objects.get(merchant_id=merchant_account_id)
-    owner.merchant_account_state = state
-    owner.save()
+    pass
+    # owner = Owner.objects.get(merchant_id=merchant_account_id)
+    # owner.merchant_account_state = state
+    # owner.save()
 
-    if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
-        notification.send('owner_notifications.BankAccountApproved', owner)
-    else:
-        notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
+    # if owner.merchant_account_state is Owner.BANK_ACCOUNT_APPROVED:
+    #     notification.send('owner_notifications.BankAccountApproved', owner)
+    # else:
+    #     notification.send('ops_notifications.OwnerAccountDeclined', owner, errors)
 
 
 def _strip_dict(dictionary, valid_schema):

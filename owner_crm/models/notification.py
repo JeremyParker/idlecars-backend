@@ -23,7 +23,7 @@ def _get_booking_params(booking):
         'booking_return_time': booking.return_time,
         'booking_refund_time': booking.refund_time,
         'booking_incomplete_time': booking.incomplete_time,
-        'booking_admin_link': 'https://www.idlecars.com{}'.format(
+        'booking_admin_link': 'https://alltaxi.heroku.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
         ),
     }
@@ -120,7 +120,6 @@ def _get_urls_params(pseudo_argument):
         'faq_url': app_routes_driver.faq(),
         'owner_app_url': app_routes_owner.owner_app_url(),
         'owner_account_url': app_routes_owner.owner_account_url(),
-        'base_letter_sample_url': app_routes_driver.base_letter_sample_url(),
     }
 
 def _get_credit_params(credit_code):

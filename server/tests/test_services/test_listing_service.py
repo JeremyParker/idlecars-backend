@@ -47,7 +47,7 @@ class ListingTest(TestCase):
 
     def test_car_avialable_a_month_away(self):
         ''' car is not listed when it isn't available for another month '''
-        self.car.next_available_date = timezone.now() + datetime.timedelta(days=31)
+        self.car.next_available_date = timezone.now() + datetime.timedelta(days=900)
         self.car.save()
         self.assertEqual(len(_get_listing_queryset()), 0)
 

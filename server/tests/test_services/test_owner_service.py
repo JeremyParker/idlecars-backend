@@ -28,20 +28,20 @@ class OwnerServiceTest(TestCase):
         )
 
 
-class OwnerAccountTest(TestCase):
-    def setUp(self):
-        self.owner = factories.Owner.create()
+# class OwnerAccountTest(TestCase):
+#     def setUp(self):
+#         self.owner = factories.Owner.create()
 
-    def test_owner_account_declined(self):
-        owner_service.update_account_state(
-            self.owner.merchant_id,
-            Owner.BANK_ACCOUNT_DECLINED,
-            ['test fake errors'],
-        )
+#     def test_owner_account_declined(self):
+#         owner_service.update_account_state(
+#             self.owner.merchant_id,
+#             Owner.BANK_ACCOUNT_DECLINED,
+#             ['test fake errors'],
+#         )
 
-        from django.core.mail import outbox
-        self.assertEqual(len(outbox), 1)
-        self.assertEqual(
-            outbox[0].subject,
-            '{}\'s bank account was declined'.format(self.owner.name())
-        )
+#         from django.core.mail import outbox
+#         self.assertEqual(len(outbox), 1)
+#         self.assertEqual(
+#             outbox[0].subject,
+#             '{}\'s bank account was declined'.format(self.owner.name())
+#         )

@@ -83,7 +83,7 @@ def redeem_code(driver, code_string):
         raise ServiceError('Sorry, referral codes are for new drivers only.')
     try:
         credit_service.redeem_code(code_string, driver.auth_user.customer)
-        notification.send('driver_notifications.SignupCredit', driver)
+        # notification.send('driver_notifications.SignupCredit', driver)
     except credit_service.CreditError as e:
         raise ServiceError(e.message)
 
@@ -97,7 +97,7 @@ def on_newly_converted(driver):
     if success:
         try:
             invitor_driver = server.models.Driver.objects.get(auth_user__customer=invitor_customer)
-            notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
+            # notification.send('driver_notifications.InvitorReceivedCredit', invitor_driver)
         except Exception:
             pass # we allow invitors who aren't drivers.
 
@@ -165,7 +165,7 @@ def _inactive_coupon_reminder(delay_days):
             continue
 
         credit = assign_inactive_credit(driver)
-        notification.send('driver_notifications.InactiveCredit', driver, credit)
+        # notification.send('driver_notifications.InactiveCredit', driver, credit)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveCredit')
 
 
@@ -183,7 +183,7 @@ def _inactive_referral_reminder(delay_days):
             skip_drivers.append(driver.pk)
             continue
 
-        notification.send('driver_notifications.InactiveReferral', driver)
+        # notification.send('driver_notifications.InactiveReferral', driver)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'InactiveReferral')
 
 def _credit_reminder(delay_days):
@@ -204,7 +204,7 @@ def _credit_reminder(delay_days):
             skip_drivers.append(driver.pk)
             continue
 
-        notification.send('driver_notifications.UseYourCredit', driver)
+        # notification.send('driver_notifications.UseYourCredit', driver)
     throttle_service.mark_sent(throttled_drivers.exclude(pk__in=skip_drivers), 'UseYourCredit')
 
 
@@ -253,15 +253,15 @@ def _insurance_notification(delay_hours, reminder_name):
     throttle_service.mark_sent(throttled_bookings, reminder_name)
 
 
-def process_signup_notifications():
-    _signup_reminder(
-        delay_days=7,
-        reminder_name='SignupFirstReminder',
-    )
-    _signup_reminder(
-        delay_days=30,
-        reminder_name='SignupSecondReminder',
-    )
+# def process_signup_notifications():
+#     _signup_reminder(
+#         delay_days=7,
+#         reminder_name='SignupFirstReminder',
+#     )
+#     _signup_reminder(
+#         delay_days=30,
+#         reminder_name='SignupSecondReminder',
+#     )
 
 
 def process_credit_notifications():

@@ -38,153 +38,110 @@ class DriverNotificationTest(TestCase):
         self.notification_spec = {
             'SignupConfirmation': {
                 'argument': 'driver',
-                'sms_result': 'rideshare',
-                'email_result': 'Welcome to Idlecars',
+                'email_result': 'Welcome to All Taxi',
             },
             'SignupFirstReminder': {
                 'argument': 'driver',
-                'sms_result': 'rideshare',
-                'email_result': 'How Idlecars works',
+                'email_result': 'How All Taxi works',
             },
             'SignupSecondReminder': {
                 'argument': 'driver',
-                'sms_result': 'interested',
                 'email_result': 'Uber',
             },
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
-                'sms_result': settings.DRIVER_APP_URL + '/#/listing',
                 'email_result': self.approved_driver.full_name(),
             },
             'FirstDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'FirstDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Submit your documents',
             },
             'SecondDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'SecondDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Are you ready',
             },
             'ThirdDocumentsReminderBooking': {
                 'argument': 'pending_booking',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'submit your driver documents',
             },
             'ThirdDocumentsReminderDriver': {
                 'argument': 'driver',
-                'sms_result': settings.DRIVER_APP_URL + '/#/bookings',
                 'email_result': 'Are you ready',
             },
             'BookingTimedOut': {
                 'argument': 'pending_booking',
-                'sms_result': settings.DRIVER_APP_URL + '/#/listings',
                 'email_result': self.pending_booking.car.display_name(),
             },
             'AwaitingInsuranceEmail': {
                 'argument': 'requested_booking',
-                'sms_result': 'submitted',
                 'email_result': 'submitted',
             },
             'FirstInsuranceNotification': {
                 'argument': 'requested_booking',
-                'sms_result': 'insurance',
                 'email_result': 'insurance',
             },
             'SecondInsuranceNotification': {
                 'argument': 'requested_booking',
-                'sms_result': 'insurance',
                 'email_result': 'insurance',
             },
             'InsuranceApproved': {
                 'argument': 'requested_booking',
-                'sms_result': 'approved',
                 'email_result': self.requested_booking.car.display_name(),
             },
             'CheckoutReceipt': {
                 'argument': 'requested_booking',
-                'sms_result': 'If you have questions please contact {} at {}'.format(
-                        self.requested_booking.car.owner.name(),
-                        fields.format_phone_number(self.requested_booking.car.owner.phone_number()),
-                    ),
                 'email_result': 'Your {} was successfully reserved'.format(
                         self.requested_booking.car.display_name(),
                     ),
             },
             'BookingCanceled': {
                 'argument': 'pending_booking',
-                'sms_result': 'canceled',
                 'email_result': 'canceled',
-            },
-            'ExtendReminder': {
-                'argument': 'returned_booking',
-                'sms_result': 'extend',
-                'email_result': 'ends',
-            },
-            'FirstLateNotice': {
-                'argument': 'returned_booking',
-                'sms_result': '12 hours ago',
-                'email_result': 'ended',
-            },
-            'SecondLateNotice': {
-                'argument': 'returned_booking',
-                'sms_result': '24 hours ago',
-                'email_result': 'return',
             },
             'DriverRemoved': {
                 'argument': 'refunded_booking',
-                'sms_result': self.refunded_booking.car.display_name(),
                 'email_result': self.refunded_booking.car.display_name(),
             },
             'PasswordReset': {
                 'argument': 'password_reset',
-                'sms_result': 'password',
-                'email_result': 'your idlecars password',
+                'email_result': 'Reset your All Taxi password',
             },
             'InvitorReceivedCredit': {
                 'argument': 'approved_driver',
-                'sms_result': 'referral code',
                 'email_result': 'credit',
             },
             'UseYourCredit': {
                 'argument': 'approved_driver',
-                'sms_result': 'next rental',
                 'email_result': 'next rental',
             },
             'SignupCredit': {
                 'argument': 'driver',
-                'sms_result': 'referral code',
                 'email_result': 'Idlecars rental',
             },
             'ReferFriends': {
                 'argument': 'approved_driver',
-                'sms_result': 'refer your friends',
                 'email_result': 'refer',
             },
             'InactiveCredit': {
                 'argument': 'approved_driver',
                 'additional_args': '50.00',
-                'sms_result': 'cash',
                 'email_result': 'cash',
             },
             'InactiveReferral': {
                 'argument': 'approved_driver',
-                'sms_result': 'code',
                 'email_result': 'Share',
             },
             'InsuranceRejected': {
                 'argument': 'requested_booking',
-                'email_result': 'insurance',
+                'email_result': 'You couldn\'t be added to the car you wanted',
             },
             'InsuranceFailed': {
                 'argument': 'requested_booking',
@@ -200,7 +157,7 @@ class DriverNotificationTest(TestCase):
             },
             'PasswordResetConfirmation': {
                 'argument': 'password_reset',
-                'email_result': 'password',
+                'email_result': 'Your All Taxi password has been set.',
             },
         }
 

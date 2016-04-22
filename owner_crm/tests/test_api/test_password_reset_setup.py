@@ -31,7 +31,7 @@ class PasswordResetSetupTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].subject, 'Reset your idlecars password.')
+        self.assertEqual(outbox[0].subject, 'Reset your All Taxi password.')
 
     def test_setup_success_owner(self):
         # look ma! No password reset tokens!
@@ -47,7 +47,7 @@ class PasswordResetSetupTest(APITestCase):
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 1)
-        self.assertEqual(outbox[0].subject, 'Reset your idlecars password.')
+        self.assertEqual(outbox[0].subject, 'Reset your All Taxi password.')
 
         # check that we used the correct owner-app url
         reset = models.PasswordReset.objects.first()

@@ -130,7 +130,7 @@ class OwnerUpdateTest(APITestCase):
         # TODO: we need to test this once we setup the owner signup email
         # from django.core.mail import outbox
         # self.assertEqual(len(outbox), 1)
-        # self.assertEqual(outbox[0].subject, 'Welcome to Idlecars')
+        # self.assertEqual(outbox[0].subject, 'Welcome to All Taxi')
 
     def test_update_company_name(self):
         company_name = 'Miguel\'s Cars'

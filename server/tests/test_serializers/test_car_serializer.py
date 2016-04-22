@@ -124,7 +124,7 @@ class TextCarState(TestCase):
         self.assertEqual(serializer_data['state_buttons'][1]['function_key'], 'RemoveListing')
 
     def test_available_way_future(self):
-        future = timezone.now() + datetime.timedelta(days=90)
+        future = timezone.now() + datetime.timedelta(days=900)
         car = factories.BookableCar.create(next_available_date=future)
         serializer_data = serializers.CarSerializer(car).data
         self.assertEqual(

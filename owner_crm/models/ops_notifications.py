@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from idlecars import email
+from idlecars import email, fields
 
 from server import models
 
@@ -26,54 +26,52 @@ class DocumentsUploaded(notification.OpsNotification):
         }
 
 
-class PaymentJobFailed(notification.OpsNotification):
-    def __init__(self, campaign_name, argument, *args):
-        super(PaymentJobFailed, self).__init__(campaign_name, argument)
-        self.message = args[0]
-
+class InsuranceApproved(notification.OpsNotification):
     def get_context(self, **kwargs):
-        return {
-            'FNAME': 'people',
-            'HEADLINE': 'The payment job threw a {}'.format(self.message),
-            'TEXT': 'the auto-payment job ran into a problem while processing payment for a booking.',
-            'CTA_LABEL': 'Booking details',
+        headline = '{} has been approved on the {} with medallion {}.'.format(
+            kwargs['driver_full_name'] or 'A driver',
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        text = '''
+            {} has approved the request for {} to be added to their medallion: {}.
+            All the required documentation is encosed below. If there is no MVR attached
+            then the owner has accepted the charge for us to run an MVR on his behalf'''.format(
+                kwargs['owner_name'],
+                kwargs['driver_full_name'] or 'A driver',
+                kwargs['car_plate'],
+            )
+
+        context = {
+            'PREVIEW': headline,
+            'FNAME': 'operations team',
+            'HEADLINE': headline,
+            'TEXT0': text,
+            'IMAGE_1_URL': kwargs['driver_license_image'],
+            'TEXT1': 'DMV License <a href="{}">(click here to download)</a>'.format(
+                kwargs['driver_license_image']
+            ),
+            'IMAGE_2_URL': kwargs['fhv_license_image'],
+            'TEXT2': 'Hack License <a href="{}">(click here to download)</a>'.format(
+                kwargs['fhv_license_image']
+            ),
+            'IMAGE_3_URL': kwargs['address_proof_image'],
+            'TEXT3': 'MVR <a href="{}">(click here to download)</a>'.format(
+                kwargs['address_proof_image']
+            ),
+            'TEXT5': 'The driver\'s social security number is {}.<br>Questions? Need more documentation? Please call {} at {}.'.format(
+                    kwargs['driver_ssn'],
+                    kwargs['driver_first_name'] or 'the driver',
+                    fields.format_phone_number(kwargs['driver_phone_number']),
+                ),
+            'CTA_LABEL': 'More details',
             'CTA_URL': kwargs['booking_admin_link'],
-            'template_name': 'one_button_no_image',
-            'subject': 'The payment job failed.',
+            'subject': '{} has approved the request for {} to be added to their medallion: {}'.format(
+                kwargs['owner_name'],
+                kwargs['driver_full_name'] or 'A driver',
+                kwargs['car_plate'],
+            ),
+            'template_name': 'one_button_three_images',
         }
-
-
-class OwnerAccountDeclined(notification.OpsNotification):
-    def __init__(self, campaign_name, argument, *args):
-        super(OwnerAccountDeclined, self).__init__(campaign_name, argument)
-        self.errors = args[0]
-
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': 'Dearest Admin',
-            'HEADLINE': 'An owner\'s bank account was declined',
-            'TEXT': '''
-                {}'s bank account details were declined by the Braintree gateway.<br>
-                Braintree returned the following error(s):<br>
-                <ul>{}</ul>
-            '''.format(kwargs['owner_name'], ''.join(['<li>{}'.format(e) for e in self.errors])),
-            'template_name': 'no_button_no_image',
-            'subject': '{}\'s bank account was declined'.format(kwargs['owner_name']),
-        }
-
-
-class NewUserMessage(notification.OpsNotification):
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': 'Ops team',
-            'HEADLINE': 'A new message from user {}'.format(kwargs['message_first_name']),
-            'TEXT': '''
-                User first name is: {}
-                <br />
-                User email is: {}
-                <br />
-                Message is: <br /> {}
-            '''.format(kwargs['message_first_name'], kwargs['message_email'], kwargs['message_body']),
-            'template_name': 'no_button_no_image',
-            'subject': 'A new message from user {}'.format(kwargs['message_first_name']),
-        }
+        return context
