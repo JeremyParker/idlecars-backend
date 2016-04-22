@@ -67,10 +67,10 @@ class ListingTest(APITestCase):
                     ]
                 ),
                 ('deposit', '${}'.format(car.deposit)),
-                ('cost_str', ['14', '29']), # this number base on car.weekly_rent, which is $100 in the test
-                ('cost_time', 'a shift'),
-                ('cost_bucket', ['cheap']),
-                ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['cheap'], 'work_with': []}),
+                ('cost_str', ['100', '']), # this number base on car.weekly_rent, which is $100 in the test
+                ('cost_time', 'a day'),
+                ('cost_bucket', ['pricey']),
+                ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['pricey'], 'work_with': []}),
                 ('booked_features', '{}, {}'.format(
                         car.owner.city,
                         car.owner.state_code,
@@ -89,7 +89,7 @@ class ListingTest(APITestCase):
         if car.display_mileage():
             expected['details'] = [['Mileage', '{},000'.format(car.last_known_mileage / 1000)],] + expected['details']
         if car.hybrid:
-            expected['details'] = [['Hybrid ☑', ''],] + expected['details']
+            expected['details'] = [['Hybrid', ''],] + expected['details']
         return dict(expected)
 
     def test_get_cars(self):

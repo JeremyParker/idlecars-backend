@@ -406,16 +406,6 @@ any deposit to the driver'.format(kwargs['car_name'], kwargs['car_owner_details_
         }
 
 
-class AccountCreated(notification.OwnerNotification):
-    def get_context(self, **kwargs):
-        return {
-            'FNAME': kwargs['password_reset_user_first_name'] or None,
-            'CTA_URL': kwargs['owner_password_reset_url'],
-            'template_name': 'owner_account_invite',
-            'subject': 'Complete your account today - sign up with your bank account and start getting paid',
-        }
-
-
 class PasswordReset(notification.OwnerNotification):
     def get_context(self, **kwargs):
         text = 'We\'ve received a request to reset your password. If you didn\'t make the request, just \

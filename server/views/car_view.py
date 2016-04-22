@@ -69,7 +69,7 @@ class CarViewSet(
             try:
                 car_service.return_confirm(car=self.get_object())
             except ServiceError as e:
-                return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
+                return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
         try:
             return super(CarViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:

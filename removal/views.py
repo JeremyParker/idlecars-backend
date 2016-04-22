@@ -38,7 +38,7 @@ class RemovalViewSet(
         try:
             return super(RemovalViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         owner = server_models.Owner.objects.get(auth_users=self.request.user)

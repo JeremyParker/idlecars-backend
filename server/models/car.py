@@ -173,10 +173,6 @@ class Car(models.Model):
         else:
             return 'Available immediately'
 
-    # TODO: remove this once the client shows cents in the listing price.
-    def normalized_cost(self):
-        return int((self.weekly_rent + 6) / 7)
-
     def quantized_cost(self):
         return (self.weekly_rent / Decimal(7.00)).quantize(Decimal('.01'), rounding=ROUND_UP)
 

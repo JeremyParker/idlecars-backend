@@ -5,9 +5,9 @@ from server import models
 from server.models import CarCompatibility
 
 def get_cost_bucket(car):
-    if car.normalized_cost() < 60:
+    if car.weekly_rent < 60:
         return ['cheap']
-    elif car.normalized_cost() < 80:
+    elif car.weekly_rent < 80:
         return ['medium']
     else:
         return ['pricey']

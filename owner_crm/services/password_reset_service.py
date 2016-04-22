@@ -21,9 +21,3 @@ def create(phone_number):
     except auth.models.User.DoesNotExist:
         pass
     return None
-
-
-def invite_owner(auth_user):
-    password_reset = create(auth_user.username)
-    if password_reset:
-        notification.send('owner_notifications.AccountCreated', password_reset)

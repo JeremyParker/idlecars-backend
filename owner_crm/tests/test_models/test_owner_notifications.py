@@ -117,10 +117,6 @@ class OwnerNotificationTest(TestCase):
                 'argument': 'requested_booking',
                 'email_result': 'canceled',
             },
-            'AccountCreated': {
-                'argument': 'password_reset',
-                'email_result': 'account',
-            },
             'BankAccountApproved': {
                 'argument': 'bank_account_owner',
                 'email_result': 'approved',

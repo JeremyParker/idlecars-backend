@@ -111,12 +111,6 @@ merge_vars = {
             'TEXT6': 'this is the text at the end of the email Maybe a wind-up for the call-to-action.',
         },
     },
-    'owner_account_invite':  {
-        'jeremy@idlecars.com': {
-            'FNAME': 'Robert',
-            'CTA_URL': 'http://idlecars.com',
-        },
-    },
 }
 
 

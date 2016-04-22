@@ -50,7 +50,7 @@ class DriverViewSet(
         try:
             return super(DriverViewSet, self).update(request, *args, **kwargs)
         except ValidationError as e:
-            return Response({'_app_notifications': e.detail}, status.HTTP_400_BAD_REQUEST)
+            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
 
     @detail_route(methods=['post'], permission_classes=[OwnsDriver])
     def payment_method(self, request, pk=None):

@@ -107,21 +107,21 @@ class ListingSerializer(ModelSerializer):
         if obj.display_mileage():
             details = [['Mileage', obj.display_mileage()],] + details
         if obj.hybrid:
-            details = [['Hybrid ☑', ''],] + details
+            details = [['Hybrid', ''],] + details
         return details
 
     def get_deposit(self, obj):
         return '${}'.format(obj.deposit)
 
     def get_cost_str(self, obj):
-        return str(obj.quantized_cost()).split('.')
+        return [str(obj.weekly_rent), '']
 
     def get_cost_bucket(self, obj):
         # TODO: remove method when front end no longer needs it
         return car_search.get_cost_bucket(obj)
 
     def get_cost_time(self, obj):
-        return 'a shift'
+        return 'a day'
 
     def get_image_url(self, obj):
         return car_service.get_image_url(obj)

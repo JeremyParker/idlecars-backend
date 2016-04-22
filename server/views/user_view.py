@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import Http404
 from django.contrib import auth
 
+from rest_framework.serializers import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
@@ -39,3 +40,9 @@ class UserViewSet(
             except User.DoesNotExist:
                 raise Http404
         return super(UserViewSet, self).get_object()
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super(UserViewSet, self).update(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'_app_notifications': [e.detail]}, status.HTTP_400_BAD_REQUEST)
