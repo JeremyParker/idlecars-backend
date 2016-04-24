@@ -12,11 +12,15 @@ img_4_url = 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6e
 img_5_url = 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-110c2125-1d5d-453c-9fdc-910e2418eb16-image.jpg'
 
 merge_vars = {
-    'no_button_no_image': {u'reynolds.tremaine@gmail.com': {u'FNAME': u'Davian',
-                                  u'HEADLINE': u'Payment received for your 2012 Schmitt Walker',
-                                  u'TEXT': u'\n        You have received a payment through idlecars. <br />\n        Invoice Period: Oct 10 - Oct 12 <br />\n        Payment Amount: $214.29\n        For your 2012 Schmitt Walker with medallion FYSXY1J6 <br />\n        From Driver: Olar Weimann <br />\n        <br /><br /><br />\n    This is the last payment. The driver should contact you to arrange dropoff.<br />\n        This booking will end on: Oct 12 <br /><br />\n        As always, if you have any questions, please call us at 1-844-IDLECAR (1-844-435-3227).\n    '}},
+    'no_button_no_image': {
+        'testdrivers@alltaxiny.com': {
+            'HEADLINE': 'Your request to add a driver has been sent successfully.',
+            'TEXT': '\n                            All Taxi has received your request to add filled filled.\n                            You will be notified when your driver has been added.\n                            ',
+            'FNAME': "Kya Bailey's Cars"
+        }
+    },
     'one_button_one_image': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'FNAME': 'Bob',
             'TEXT': "<p>Don't forget! To rent your 2014 Toyota Camry you still need to upload:</p>\n<ul><li>your Drivers License, and<li>your TLC License</ul>\n<p>You can also email photographs of your documents to support@alltaxiny.com. Once we have all your documents, you will be added to the car's insurance. Then you can start driving and start earning!</p>",
             'CTA_LABEL': 'Renew Now',
@@ -26,7 +30,7 @@ merge_vars = {
         },
     },
     'one_button_no_image': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'CTA_LABEL': 'List more cars',
             'CTA_URL': 'http://goo.gl/forms/4s26I6GUQY',
             'FNAME': 'Lindell',
@@ -40,7 +44,7 @@ merge_vars = {
         }
     },
     'one_button_three_images': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -57,22 +61,20 @@ merge_vars = {
         },
     },
     'one_button_two_images': {
-        'jeremy@alltaxiny.com': {
-            'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
-            'FNAME': 'Robert',
-            'HEADLINE': 'We have a better sandwich!',
-            'TEXT0': 'this is the intro text. Please note that the intro text looks really good.',
-            'IMAGE_1_URL': img_1_url,
-            'TEXT1': 'Caption for <a href="{}">image #1.</a>'.format(img_1_url),
-            'IMAGE_2_URL': img_2_url,
-            'TEXT2': 'Caption for <a href="{}">image #2.</a>'.format(img_2_url),
-            'TEXT5': 'this is the text at the end of the email Maybe a wind-up for the call-to-action.',
-            'CTA_LABEL': 'Press the button',
-            'CTA_URL': 'http://idlecars.com',
+        'testdrivers@alltaxiny.com': {
+            'IMAGE_2_URL': 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-87c827e4-21c2-42f3-9696-b218e98396d7-14614511023701356170408.jpg',
+            'TEXT2': 'Hack License <a href="https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-87c827e4-21c2-42f3-9696-b218e98396d7-14614511023701356170408.jpg">click here to download</a>',
+            'TEXT0': "\n                    <ul>\n                    <li>Driver Name: Roger Meters</li>\n                    <li>Medallion: REAL_MEDALLION</li>\n                    <li>Driver's phone number: 1234567890<\\li>\n                    <li>Driver's email address: filled@filled.com<\\li>\n                    <li>Driver's Social Security Number: 033923808<\\li>\n                    <li>Driver's MVR: Authorized us to run MVR<\\li>\n                    </ul>\n                    ",
+            'TEXT1': 'Drivers License <a href="https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-2deb185a-d2af-4c82-b731-a4ca8388eba5-1461451048767-535588372.jpg">click here to download</a>',
+            'FNAME': 'operations team', 'TEXT5': 'Check the admin tool for more details or to edit this request', 'PREVIEW': "Kya Bailey's Cars wants to add a driver.",
+            'IMAGE_1_URL': 'https://s3.amazonaws.com/files.parsetfss.com/a0ed4ee2-63f3-4e88-a6ed-2be9921e9ed7/tfss-2deb185a-d2af-4c82-b731-a4ca8388eba5-1461451048767-535588372.jpg',
+            'HEADLINE': "Kya Bailey's Cars wants to add a driver.",
+            'CTA_URL': '/admin/addition/addition/1/',
+            'CTA_LABEL': 'Driver Addition'
         },
     },
     'one_button_four_images': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -91,7 +93,7 @@ merge_vars = {
         },
     },
     'no_button_four_images': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
@@ -108,7 +110,7 @@ merge_vars = {
         },
     },
     'no_button_five_images': {
-        'jeremy@alltaxiny.com': {
+        'testdrivers@alltaxiny.com': {
             'PREVIEW': 'Small text that shows you a peek of the content from your email list view.',
             'FNAME': 'Robert',
             'HEADLINE': 'We have a better sandwich!',
