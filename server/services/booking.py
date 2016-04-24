@@ -112,7 +112,10 @@ def request_insurance(booking):
     for conflicting_booking in conflicting_pending_bookings:
         conflicting_booking = someone_else_booked(conflicting_booking)
 
-    notification.send('owner_notifications.NewBookingEmail', booking)
+    if booking.driver.address_proof_image:
+        notification.send('owner_notifications.NewBookingEmail', booking)
+    else:
+        notification.send('owner_notifications.NewBookingEmailNoMVR', booking)
     notification.send('driver_notifications.AwaitingInsuranceEmail', booking)
 
     return booking

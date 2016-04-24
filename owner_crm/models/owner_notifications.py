@@ -95,7 +95,6 @@ class NewBookingEmail(notification.OwnerNotification):
             kwargs['car_plate'],
         )
 
-        # TODO(JP) track gender of driver and customize this email text
         text = '''
             {} wants to rent your car and has submitted their documentation. If you would like them
             to be added to your car please tap the link below and approve them in the app.
@@ -133,6 +132,47 @@ class NewBookingEmail(notification.OwnerNotification):
         }
         return context
 
+
+class NewBookingEmailNoMVR(notification.OwnerNotification):
+    def get_context(self, **kwargs):
+        headline = '{} wants to rent your {} with medallion {}.'.format(
+            kwargs['driver_full_name'] or 'A driver',
+            kwargs['car_name'],
+            kwargs['car_plate'],
+        )
+
+        text = '''
+            {} wants to rent your car and has submitted their documentation. If you would like them
+            to be added to your car please tap the link below and approve them in the app.
+            If you require any additional information, please reach out to the driver at {}.'''.format(
+                kwargs['driver_full_name'] or 'A driver',
+                fields.format_phone_number(kwargs['driver_phone_number']),
+            )
+
+        context = {
+            'PREVIEW': headline,
+            'FNAME': kwargs['user_first_name'],
+            'HEADLINE': headline,
+            'TEXT0': text,
+            'IMAGE_1_URL': kwargs['driver_license_image'],
+            'TEXT1': 'DMV License <a href="{}">(click here to download)</a>'.format(
+                kwargs['driver_license_image']
+            ),
+            'IMAGE_2_URL': kwargs['fhv_license_image'],
+            'TEXT2': 'FHV/Hack License <a href="{}">(click here to download)</a>'.format(
+                kwargs['fhv_license_image']
+            ),
+            'TEXT5': 'The driver\'s social security number is {}.<br> The driver has not provided an MVR.<br>Questions? Need more documentation? Please call {} at {}.'.format(
+                    kwargs['driver_ssn'],
+                    kwargs['driver_first_name'] or 'the driver',
+                    fields.format_phone_number(kwargs['driver_phone_number']),
+                ),
+            'CTA_LABEL': 'Accept/Reject Diver',
+            'CTA_URL': kwargs['car_owner_details_url'],
+            'subject': 'A driver has booked your {}.'.format(kwargs['car_name']),
+            'template_name': 'one_button_two_images',
+        }
+        return context
 
 # class FirstMorningInsuranceReminder(notification.OwnerNotification):
 #     def get_context(self, **kwargs):

@@ -79,14 +79,14 @@ class Addition(models.Model):
             # send an email to the owner who made the request
             email.send_async(
                 template_name='no_button_no_image',
-                subject='Your request to add {} {} has been sent successfully'.format(
+                subject='Your request to add {} {} has been sent successfully.'.format(
                     self.first_name,
                     self.last_name,
                 ),
                 merge_vars={
                     self.owner.auth_users.first().email: {
                         'FNAME': self.owner.name(),
-                        'HEADLINE': 'Your request to add a driver has been sent successfully.',
+                        'HEADLINE': 'Your request to add a driver has been sent.',
                         'TEXT': '''
                             All Taxi has received your request to add {} {}.
                             You will be notified when your driver has been added.
@@ -101,7 +101,8 @@ class Addition(models.Model):
             #send an email to ops
             email.send_async(
                 template_name='one_button_two_images',
-                subject='Your request to add {} {} has been sent successfully'.format(
+                subject='{} wants to add {} {}'.format(
+                    self.owner.name(),
                     self.first_name,
                     self.last_name,
                 ),
@@ -114,7 +115,7 @@ class Addition(models.Model):
             if self.address_proof_image:
                 mvr_text = '<a href="{}">(click here to download)</a>'.format(self.address_proof_image)
             else:
-                mvr_text = 'Authorized us to run MVR'
+                mvr_text = 'we are Authorized to run the MVR'
 
             return {
                 settings.OPS_EMAIL: {
@@ -125,10 +126,10 @@ class Addition(models.Model):
                     <ul>
                     <li>Driver Name: {} {}</li>
                     <li>Medallion: {}</li>
-                    <li>Driver's phone number: {}<\li>
-                    <li>Driver's email address: {}<\li>
-                    <li>Driver's Social Security Number: {}<\li>
-                    <li>Driver's MVR: {}<\li>
+                    <li>Driver's phone number: {}</li>
+                    <li>Driver's email address: {}</li>
+                    <li>Driver's Social Security Number: {}</li>
+                    <li>Driver's MVR: {}</li>
                     </ul>
                     '''.format(
                         self.first_name,

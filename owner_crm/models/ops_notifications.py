@@ -36,7 +36,7 @@ class InsuranceApproved(notification.OpsNotification):
 
         text = '''
             {} has approved the request for {} to be added to their medallion: {}.
-            All the required documentation is encosed below. If there is no MVR attached
+            All the required documentation is encosed below. If there is no MVR image attached
             then the owner has accepted the charge for us to run an MVR on his behalf'''.format(
                 kwargs['owner_name'],
                 kwargs['driver_full_name'] or 'A driver',
