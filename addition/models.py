@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 
-from idlecars import email, app_routes_owner
+from idlecars import email
 from idlecars import model_helpers, fields
 from server import models as server_models
 
