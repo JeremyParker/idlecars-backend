@@ -29,8 +29,6 @@ html(lang="en", ng-app="app")
             img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
         .links
           .content
-            a(href="/#tutorial") #[p.bold How It Works]
-            a(href='/about') #[p.bold About Us]
             a(href="#{ owner_app_url }") #[p.bold I Own A Car]
             a(href="#{ login_url }") #[p.bold Driver Log In]
 
@@ -38,8 +36,6 @@ html(lang="en", ng-app="app")
           .burger-button(ng-class='{active: showMenu}')
 
         .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-          a(href="/#tutorial") #[p How It Works]
-          a(href='/about') #[p About Us]
           a(href="#{ owner_app_url }") #[p I Own A Car]
           a(href="#{ login_url }") #[p Driver Log In]
 
@@ -53,10 +49,6 @@ html(lang="en", ng-app="app")
             .text.desktop
               p.bold
                 a(href="/") Home
-                span |
-                a(href="/about") About Us
-                span |
-                a(href="/#tutorial") How It Works
                 span.desktop-line |
                 a.desktop-line(href="#{ owner_app_url }") I Own A Car
                 span.desktop-line |
@@ -74,8 +66,6 @@ html(lang="en", ng-app="app")
 
             .text.mobile
               p.bold #[a(href="/") Home]
-              p.bold #[a(href="/about") About Us]
-              p.bold #[a(href="/#tutorial") How It Works]
               p.bold #[a(href="#{ owner_app_url }") I Own A Car]
               p.bold #[a(href="#{ login_url }") Driver Log In]
 
