@@ -31,7 +31,7 @@ CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
 SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
 
 DEFAULT_FROM_EMAIL = 'drivers@alltaxiny.com'
-OPS_EMAIL =  'jeremy@idlecars.com'
+OPS_EMAIL =  'alltaxisoftware@gmail.com'
 
 PAYMENT_GATEWAY_NAME = 'braintree'
 BRAINTREE_BASE_URL = 'www.braintreegateway.com'
