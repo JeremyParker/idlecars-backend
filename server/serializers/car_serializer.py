@@ -168,7 +168,7 @@ class CarCreateSerializer(ModelSerializer):
                     'state_string': 'Requested. Check your email for documentation.',
                     'buttons': [
                         {
-                            'label': 'Add this driver MVR',
+                            'label': 'Add this driver',
                             'function_key': 'ApproveAndUploadMVR',
                         },
                         # if we want the 'authorize MVR' button to appear on the same page, uncomment this
