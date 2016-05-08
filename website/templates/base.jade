@@ -27,17 +27,17 @@ html(lang="en", ng-app="app")
         .logo
           a(href="/")
             img(src="#{ settings.STATIC_URL }img/idlecars_logo_white.png")
-        .links
-          .content
-            a(href="#{ owner_app_url }") #[p.bold I Own A Car]
-            a(href="#{ login_url }") #[p.bold Driver Log In]
+        //- .links
+        //-   .content
+        //-     a(href="#{ owner_app_url }") #[p.bold I Own A Car]
+        //-     a(href="#{ login_url }") #[p.bold Driver Log In]
 
-        .menu-button(ng-click='showMenu = !showMenu')
-          .burger-button(ng-class='{active: showMenu}')
+        //- .menu-button(ng-click='showMenu = !showMenu')
+        //-   .burger-button(ng-class='{active: showMenu}')
 
-        .menu-container(ng-show='showMenu', ng-click='showMenu=false')
-          a(href="#{ owner_app_url }") #[p I Own A Car]
-          a(href="#{ login_url }") #[p Driver Log In]
+        //- .menu-container(ng-show='showMenu', ng-click='showMenu=false')
+        //-   a(href="#{ owner_app_url }") #[p I Own A Car]
+        //-   a(href="#{ login_url }") #[p Driver Log In]
 
     - block content
     - endblock
@@ -49,25 +49,15 @@ html(lang="en", ng-app="app")
             .text.desktop
               p.bold
                 a(href="/") Home
-                span.desktop-line |
-                a.desktop-line(href="#{ owner_app_url }") I Own A Car
-                span.desktop-line |
-                a.desktop-line(href="#{ login_url }") Driver Log In
-
-              p.bold.mobile-line
-                a(href="#{ owner_app_url }") I Own A Car
-                span |
-                a(href="#{ login_url }") Driver Log In
-
-              p
-                a(href="#{ faq }") Help
-                span |
-                a(href="#{ terms_of_service }") Terms & Privacy
+                //- span.desktop-line |
+                //- a.desktop-line(href="#{ owner_app_url }") I Own A Car
+                //- span.desktop-line |
+                //- a.desktop-line(href="#{ login_url }") Driver Log In
 
             .text.mobile
               p.bold #[a(href="/") Home]
-              p.bold #[a(href="#{ owner_app_url }") I Own A Car]
-              p.bold #[a(href="#{ login_url }") Driver Log In]
+              //- p.bold #[a(href="#{ owner_app_url }") I Own A Car]
+              //- p.bold #[a(href="#{ login_url }") Driver Log In]
 
             .social
               p.bold Follow us on
@@ -82,11 +72,6 @@ html(lang="en", ng-app="app")
                 .app
                   a(href="https://www.linkedin.com/company/10117035" target="_blank")
                     img(src="#{ settings.STATIC_URL }img/linkedin.svg")
-
-              .mobile
-                p #[a(href="#{ faq }") Help]
-                p #[a(href="#{ terms_of_service }") Terms & Privacy]
-
 
           .copyright
             p.bold Copyright © {% now 'Y' %} idlecars. #[br.mobile] All Rights Reserved
