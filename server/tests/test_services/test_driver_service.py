@@ -52,7 +52,7 @@ class DriverServiceTest(TestCase):
         # we should have sent a "welcome" email to the driver
         self.assertEqual(
             outbox[0].subject,
-            'Welcome to All Taxi, {}!'.format(self.driver.full_name())
+            'Welcome to All Taxi',
         )
 
         # ...and an informative email to ops

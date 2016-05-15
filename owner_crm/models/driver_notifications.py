@@ -148,13 +148,13 @@ See our selection of cars here: {}'.format(
 
 class DocsApprovedNoBooking(notification.DriverNotification):
     def get_context(self, **kwargs):
-        subject = 'Welcome to All Taxi, {driver_full_name}!'.format(**kwargs)
+        subject = 'Welcome to All Taxi'
         headline = 'Your documents have been received.'
         text = 'You are now ready to rent any car with one tap!'
         cta_url = kwargs['car_listing_url']
 
         return {
-            'FNAME': 'driver_full_name'.format(**kwargs),
+            'FNAME': '{driver_full_name}'.format(**kwargs),
             'HEADLINE': headline,
             'TEXT': text,
             'CTA_LABEL': 'Find a car now',

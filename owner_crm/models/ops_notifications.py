@@ -29,7 +29,7 @@ class DocumentsUploaded(notification.OpsNotification):
 class InsuranceApproved(notification.OpsNotification):
     def get_context(self, **kwargs):
         headline = '{} has been approved on the {} with medallion {}.'.format(
-            kwargs['driver_full_name'] or 'A driver',
+            kwargs['driver_full_name'] or 'a driver',
             kwargs['car_name'],
             kwargs['car_plate'],
         )
@@ -39,7 +39,7 @@ class InsuranceApproved(notification.OpsNotification):
             All the required documentation is encosed below. If there is no MVR image attached
             then the owner has accepted the charge for us to run an MVR on his behalf'''.format(
                 kwargs['owner_name'],
-                kwargs['driver_full_name'] or 'A driver',
+                kwargs['driver_full_name'] or 'a driver',
                 kwargs['car_plate'],
             )
 
@@ -69,7 +69,7 @@ class InsuranceApproved(notification.OpsNotification):
             'CTA_URL': kwargs['booking_admin_link'],
             'subject': '{} has approved the request for {} to be added to their medallion: {}'.format(
                 kwargs['owner_name'],
-                kwargs['driver_full_name'] or 'A driver',
+                kwargs['driver_full_name'] or 'a driver',
                 kwargs['car_plate'],
             ),
             'template_name': 'one_button_three_images',

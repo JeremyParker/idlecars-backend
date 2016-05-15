@@ -50,7 +50,7 @@ class DriverNotificationTest(TestCase):
             },
             'DocsApprovedNoBooking': {
                 'argument': 'approved_driver',
-                'email_result': self.approved_driver.full_name(),
+                'email_result': 'Welcome to All Taxi',
             },
             'FirstDocumentsReminderBooking': {
                 'argument': 'pending_booking',
