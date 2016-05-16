@@ -25,7 +25,7 @@ def _get_payment_params(payment):
         'payment_service_fee': payment.service_fee,
         'payment_status': payment.status,
         'payment_notes': payment.notes,
-        'payment_admin_link': 'https://www.idlecars.com{}'.format(
+        'payment_admin_link': 'http://www.idlecars.com{}'.format(
             reverse('admin:server_payment_change', args=(payment.pk,))
         ),
     }
@@ -61,7 +61,7 @@ def _get_booking_params(booking):
         'booking_return_time': booking.return_time,
         'booking_refund_time': booking.refund_time,
         'booking_incomplete_time': booking.incomplete_time,
-        'booking_admin_link': 'https://www.idlecars.com{}'.format(
+        'booking_admin_link': 'http://www.idlecars.com{}'.format(
             reverse('admin:server_booking_change', args=(booking.pk,))
         ),
         'booking_next_payment_amount': next_payment_amount,
@@ -115,7 +115,7 @@ def _get_driver_params(driver):
         'address_proof_image': driver.address_proof_image,
         'defensive_cert_image': driver.defensive_cert_image,
         'base_letter': driver.base_letter,
-        'driver_admin_link': 'https://www.idlecars.com{}'.format(
+        'driver_admin_link': 'http://www.idlecars.com{}'.format(
             reverse('admin:server_driver_change', args=(driver.pk,))
         ),
         'missing_docs_list': ', '.join(driver_service.get_missing_docs(driver)),

@@ -27,8 +27,10 @@ QUEUE_IMPLEMENTATION = 'RealQueue'
 SMS_IMPLEMENTATION = 'TwilioRestClient'
 TLC_DATA_IMPLEMENTATION = 'Socrata'
 
-CSRF_COOKIE_SECURE = True  # if True, only sends the CSRF token over HTTPS
-SESSION_COOKIE_SECURE = True  # if True, only sends session cookie over HTTPS
+# We're not using SSL at the moment. No payments happening.
+SSLIFY_DISABLE = True
+CSRF_COOKIE_SECURE = False  # if True, only sends the CSRF token over HTTPS
+SESSION_COOKIE_SECURE = False  # if True, only sends session cookie over HTTPS
 
 DEFAULT_FROM_EMAIL = 'bookings@idlecars.com'
 OPS_EMAIL = 'support@idlecars.zendesk.com'

@@ -112,7 +112,7 @@ STATICFILES_DIRS = (
 APPEND_SLASH=False
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # mark pages with a 'nosniff' header to stop browsers trying to determine the MIME type themselves
 SECURE_CONTENT_TYPE_NOSNIFF = True
