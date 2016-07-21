@@ -73,7 +73,6 @@ class AdditionNotificationTest(TestCase):
 
     def _fill_most_fields(self, addition):
         addition.phone_number = '1234567890'
-        addition.email = 'filled@filled.com'
         addition.first_name  = 'filled'
         addition.last_name  = 'filled'
         addition.ssn  = 'filled'

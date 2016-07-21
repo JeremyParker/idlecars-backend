@@ -123,21 +123,34 @@ class Addition(models.Model):
                     'HEADLINE': '{} wants to add a driver.'.format(self.owner.name()),
                     'TEXT0': '''
                     <ul>
-                    <li>Driver Name: {} {}</li>
-                    <li>Medallion: {}</li>
-                    <li>Driver's phone number: {}</li>
-                    <li>Driver's email address: {}</li>
-                    <li>Driver's Social Security Number: {}</li>
-                    <li>Driver's MVR: {}</li>
+                        <li>Owner Info:</li>
+                        <li>Name: {owner_name}</li>
+                        <li>Email: {owner_email}</li>
+                        <li>Phone: {owner_phone}</li>
+                        <li>Medallion: {plate}</li>
+                        <li>Last 4 of SSN: {owner_ssn}</li>
+                    </ul>
+
+                    <ul>
+                        <li>Driver Name: {driver_first} {driver_last}</li>
+                        <li>Driver's phone number: {driver_phone}</li>
+                        <li>Driver's email address: {driver_email}</li>
+                        <li>Driver's Social Security Number: {driver_ssn}</li>
+                        <li>Driver's MVR: {mvr_text}</li>
                     </ul>
                     '''.format(
-                        self.first_name,
-                        self.last_name,
-                        self.plate,
-                        self.phone_number,
-                        self.email,
-                        self.ssn,
-                        mvr_text
+                        owner_name=self.owner.name(),
+                        owner_email=self.owner.auth_users.first().email,
+                        owner_phone=self.owner.auth_users.first().username,
+                        plate=self.plate,
+                        owner_ssn=self.owner.social,
+
+                        driver_first=self.first_name,
+                        driver_last=self.last_name,
+                        driver_phone=self.phone_number,
+                        driver_email=self.email,
+                        driver_ssn=self.ssn,
+                        mvr_text=mvr_text
                     ),
                     'IMAGE_1_URL': self.driver_license_image,
                     'TEXT1': 'Drivers License <a href="{}">click here to download</a>'.format(self.driver_license_image),
