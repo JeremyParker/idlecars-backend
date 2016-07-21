@@ -61,7 +61,6 @@ class Addition(models.Model):
     def complete(self):
         return bool(
             self.phone_number and
-            self.email and
             self.first_name and
             self.last_name and
             self.ssn and
