@@ -92,8 +92,8 @@ class Removal(models.Model):
                 'FNAME': 'operations team',
                 'HEADLINE': '{} wants to remove a driver.'.format(self.owner.name()),
                 'TEXT': '''
+                Owner Info:
                 <ul>
-                    <li>Owner Info:</li>
                     <li>Name: {owner_name}</li>
                     <li>Email: {owner_email}</li>
                     <li>Phone: {owner_phone}</li>
@@ -101,7 +101,8 @@ class Removal(models.Model):
                     <li>Last 4 of SSN: {owner_ssn}</li>
                 </ul>
                 <ul>
-                    <li>Driver Name: {driver_first} {driver_last}</li>
+                Driver Info:
+                    <li>Name: {driver_first} {driver_last}</li>
                     <li>Hack License Number: {driver_license}</li>
                 </ul>
                 Check the admin tool for more details or to edit this request.
@@ -116,7 +117,7 @@ class Removal(models.Model):
                     driver_last=self.last_name,
                     driver_license=self.hack_license_number,
                 ),
-                'CTA_LABEL': 'Driver Removal',
+                'CTA_LABEL': 'Edit Driver Removal Request',
                 'CTA_URL': 'http://alltaxi.herokuapp.com{}'.format(
                    reverse('admin:removal_removal_change', args=(self.pk,)),
                ),

@@ -122,8 +122,8 @@ class Addition(models.Model):
                     'FNAME': 'operations team',
                     'HEADLINE': '{} wants to add a driver.'.format(self.owner.name()),
                     'TEXT0': '''
+                    Owner Info:
                     <ul>
-                        <li>Owner Info:</li>
                         <li>Name: {owner_name}</li>
                         <li>Email: {owner_email}</li>
                         <li>Phone: {owner_phone}</li>
@@ -131,12 +131,13 @@ class Addition(models.Model):
                         <li>Last 4 of SSN: {owner_ssn}</li>
                     </ul>
 
+                    Driver Info:
                     <ul>
-                        <li>Driver Name: {driver_first} {driver_last}</li>
-                        <li>Driver's phone number: {driver_phone}</li>
-                        <li>Driver's email address: {driver_email}</li>
-                        <li>Driver's Social Security Number: {driver_ssn}</li>
-                        <li>Driver's MVR: {mvr_text}</li>
+                        <li>Name: {driver_first} {driver_last}</li>
+                        <li>phone number: {driver_phone}</li>
+                        <li>email address: {driver_email}</li>
+                        <li>Social Security Number: {driver_ssn}</li>
+                        <li>MVR: {mvr_text}</li>
                     </ul>
                     '''.format(
                         owner_name=self.owner.name(),
@@ -157,7 +158,7 @@ class Addition(models.Model):
                     'IMAGE_2_URL': self.fhv_license_image,
                     'TEXT2': 'Hack License <a href="{}">click here to download</a>'.format(self.fhv_license_image),
                     'TEXT5': 'Check the admin tool for more details or to edit this request',
-                    'CTA_LABEL': 'Driver Addition',
+                    'CTA_LABEL': 'Edit Driver Add Request',
                     'CTA_URL': 'http://alltaxi.herokuapp.com{}'.format(
                         reverse('admin:addition_addition_change', args=(self.pk,))
                     ),
