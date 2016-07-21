@@ -70,7 +70,7 @@ class Addition(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        if self.pk is  None:
+        if self.pk is None:
             return super(Addition, self).save(*args, **kwargs)
 
         if self.complete() and not Addition.objects.get(pk=self.pk).complete():
@@ -158,6 +158,8 @@ class Addition(models.Model):
                     'TEXT2': 'Hack License <a href="{}">click here to download</a>'.format(self.fhv_license_image),
                     'TEXT5': 'Check the admin tool for more details or to edit this request',
                     'CTA_LABEL': 'Driver Addition',
-                    'CTA_URL': reverse('admin:addition_addition_change', args=(self.pk,)),
+                    'CTA_URL': 'http://alltaxi.herokuapp.com{}'.format(
+                        reverse('admin:addition_addition_change', args=(self.pk,))
+                    ),
                 }
             }

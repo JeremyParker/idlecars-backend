@@ -83,36 +83,42 @@ class Removal(models.Model):
         super(Removal, self).save(*args, **kwargs)
 
     def merge_vars_ops(self):
-            return {
-                settings.OPS_EMAIL: {
-                    'FNAME': 'operations team',
-                    'HEADLINE': '{} wants to remove a driver.'.format(self.owner.name()),
-                    'TEXT': '''
-                    <ul>
-                        <li>Owner Info:</li>
-                        <li>Name: {owner_name}</li>
-                        <li>Email: {owner_email}</li>
-                        <li>Phone: {owner_phone}</li>
-                        <li>Medallion: {plate}</li>
-                        <li>Last 4 of SSN: {owner_ssn}</li>
-                    </ul>
-                    <ul>
-                        <li>Driver Name: {driver_first} {driver_last}</li>
-                        <li>Hack License Number: {driver_license}</li>
-                    </ul>
-                    Check the admin tool for more details or to edit this request.
-                    '''.format(
-                        owner_name=self.owner.name(),
-                        owner_email=self.owner.auth_users.first().email,
-                        owner_phone=self.owner.auth_users.first().username,
-                        plate=self.plate,
-                        owner_ssn=self.owner.social,
+        medallion = 'no medallion registered'
+        if self.owner.cars.count():
+            medallion = self.owner.cars.last().plate
 
-                        driver_first=self.first_name,
-                        driver_last=self.last_name,
-                        driver_license=self.hack_license_number,
-                    ),
-                    'CTA_LABEL': 'Driver Removal',
-                    'CTA_URL': reverse('admin:removal_removal_change', args=(self.pk,)),
-                }
+        return {
+            settings.OPS_EMAIL: {
+                'FNAME': 'operations team',
+                'HEADLINE': '{} wants to remove a driver.'.format(self.owner.name()),
+                'TEXT': '''
+                <ul>
+                    <li>Owner Info:</li>
+                    <li>Name: {owner_name}</li>
+                    <li>Email: {owner_email}</li>
+                    <li>Phone: {owner_phone}</li>
+                    <li>Medallion: {medallion}</li>
+                    <li>Last 4 of SSN: {owner_ssn}</li>
+                </ul>
+                <ul>
+                    <li>Driver Name: {driver_first} {driver_last}</li>
+                    <li>Hack License Number: {driver_license}</li>
+                </ul>
+                Check the admin tool for more details or to edit this request.
+                '''.format(
+                    owner_name=self.owner.name(),
+                    owner_email=self.owner.auth_users.first().email,
+                    owner_phone=self.owner.auth_users.first().username,
+                    medallion=medallion,
+                    owner_ssn=self.owner.social,
+
+                    driver_first=self.first_name,
+                    driver_last=self.last_name,
+                    driver_license=self.hack_license_number,
+                ),
+                'CTA_LABEL': 'Driver Removal',
+                'CTA_URL': 'http://alltaxi.herokuapp.com{}'.format(
+                   reverse('admin:removal_removal_change', args=(self.pk,)),
+               ),
             }
+        }

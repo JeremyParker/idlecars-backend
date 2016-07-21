@@ -68,27 +68,40 @@ class RemovalUpdateTest(APITestCase):
 class RemovalNotificationTest(TestCase):
     def setUp(self):
         self.owner = server_factories.Owner.create()
-        self.addition = models.Removal.objects.create(
+        self.removal = models.Removal.objects.create(
             owner=self.owner,
         )
 
-    def _fill_most_fields(self, addition):
-        addition.first_name  = 'filled'
-        addition.last_name  = 'filled'
-        return addition
+    def _fill_most_fields(self, removal):
+        removal.first_name  = 'filled'
+        removal.last_name  = 'filled'
+        return removal
 
     def test_incomplete_sends_no_email(self):
-        self.addition = self._fill_most_fields(self.addition)
-        self.addition.save()
+        self.removal = self._fill_most_fields(self.removal)
+        self.removal.save()
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 0)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
 
     def test_completion_sends_email(self):
-        self.addition = self._fill_most_fields(self.addition)
-        self.addition.hack_license_number = 'filled'
-        self.addition.save()
+        self.removal = self._fill_most_fields(self.removal)
+        self.removal.hack_license_number = 'filled'
+        self.removal.save()
 
         from django.core.mail import outbox
         self.assertEqual(len(outbox), 2)
         self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+
+    def test_completion_sends_email_with_medallion(self):
+        car = server_factories.car.BookableCar.create(
+            owner=self.owner,
+        )
+        self.removal = self._fill_most_fields(self.removal)
+        self.removal.hack_license_number = 'filled'
+        self.removal.save()
+
+        from django.core.mail import outbox
+        self.assertEqual(len(outbox), 2)
+        self.assertTrue(sample_merge_vars.check_template_keys(outbox))
+        self.assertTrue(car.plate in outbox[1].merge_vars['test@alltaxiny.com']['TEXT'])
