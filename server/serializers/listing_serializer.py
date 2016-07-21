@@ -121,7 +121,7 @@ class ListingSerializer(ModelSerializer):
         return car_search.get_cost_bucket(obj)
 
     def get_cost_time(self, obj):
-        return 'a day'
+        return '' # could be something like "a day"
 
     def get_image_url(self, obj):
         return car_service.get_image_url(obj)

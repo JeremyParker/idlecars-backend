@@ -68,7 +68,7 @@ class ListingTest(APITestCase):
                 ),
                 ('deposit', '${}'.format(car.deposit)),
                 ('cost_str', ['100', '']), # this number base on car.weekly_rent, which is $100 in the test
-                ('cost_time', 'a day'),
+                ('cost_time', ''),
                 ('cost_bucket', ['pricey']),
                 ('searchable', {'body_type': ['Sedan'], 'lux_level': ['Standard'], 'cost_bucket': ['pricey'], 'work_with': []}),
                 ('booked_features', '{}, {}'.format(
