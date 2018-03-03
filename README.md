@@ -1,5 +1,5 @@
 # idlecars
-The repo for the idlecars backend
+The repo for the idlecars backend. For a demo of all functionality see https://www.youtube.com/watch?v=dQi7ZiM23jg
 
 'server' is the main api for the owner and driver apps
 
